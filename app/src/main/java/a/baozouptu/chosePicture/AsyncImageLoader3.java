@@ -1,0 +1,111 @@
+package a.baozouptu.chosePicture;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import android.graphics.Bitmap;
+import android.os.Handler;
+import android.support.v4.util.LruCache;
+import android.util.Log;
+import android.widget.ImageView;
+
+/**
+ * 缓存，异步，多线程
+ * 为了加快速度，在内存中开启缓存（主要应用于重复图片较多时，或者同一个图片要多次被访问， 比如在ListView时来回滚动） 软引用不可用 public
+ * Map<String, SoftReference<Bitmap>> imageCache = new HashMap<String,
+ * SoftReference<Bitmap>>();
+ */
+public class AsyncImageLoader3 {
+
+	/**
+	 * 使用LRU算法，用key-value形式查找对象；
+	 */
+	public LruCache<String, Bitmap> imageCache;
+	/**
+	 * 线程池，固定五个线程来执行任务，规定最大线程数量的线程池
+	 */
+	private ExecutorService executorService = Executors.newFixedThreadPool(5);
+	private final Handler handler = new Handler();
+
+	/**
+	 * 构造函数，获取LRUCache，并设定其容量为应用最大容量的1/8；
+	 *
+	 * @param imageUrl
+	 *            图像url地址
+	 * @param callbackg
+	 *            回调接口
+	 * @return 返回内存中缓存的图像，第一次加载返回null
+	 */
+	public AsyncImageLoader3() {
+		int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+		imageCache = new LruCache<String, Bitmap>(maxMemory / 8);
+	}
+
+	/**
+	 * 使用线程池和handler将需要的图片加载到对应的View上面,如果图片存在LRUcache，则直接返回图片的Bitmap对象，
+	 * 如果不存在，直接异步获取Bitmap，并进行加载
+	 *
+	 * @param imageUrl
+	 * @param image   要加载图片的那个ImageView
+	 * @param callback 自己实现一个接口用于回调
+	 * @return
+	 */
+	public Bitmap loadBitmap(final String imageUrl, final ImageView image,
+							 final ImageCallback callback) {
+		// 如果缓存过就从缓存中取出数据
+		if (imageCache.get(imageUrl) != null) {
+			return imageCache.get(imageUrl);
+		}
+		// 缓存中没有图像，则从SDcard取出数据，并将取出的数据缓存到内存中
+		executorService.submit(new Runnable() {// 线程池执行取出图片的进程
+			public void run() {
+				try {
+					final Bitmap bitmap = loadImageFromSD(imageUrl);// 获取图片URL对应的图片Bitmap
+					imageCache.put(imageUrl, bitmap);
+					handler.post(// handler的轻量级方法，利用handler的post方法，在attached的即handler依附的线程中执行下面的代码
+							new Runnable() {
+								public void run() {
+									callback.imageLoaded(bitmap, image,
+											imageUrl);
+								}
+							});
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		});
+		return null;
+	}
+
+	/**
+	 * 从所给路径，返回对应大小的图片Bitmap对象
+	 *
+	 * @param path
+	 *            String 路径
+	 * @return Bitmap对象
+	 */
+	protected Bitmap loadImageFromSD(String path) {
+		try {
+			// 测试时，模拟网络延时，实际时这行代码不能有
+			// SystemClock.sleep(2000);
+			Bitmap bm = new BitmapTool().charge(path);
+			return bm;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	// 对外界开放的回调接口
+	public interface ImageCallback {
+		/**
+		 * 将Bitmap的对象放入到image里面，这个接口已经导入，可以使用
+		 *
+		 * @param imageDrawable
+		 *            将要放入的Bitmap对象，
+		 * @param image
+		 *            显示Bitmap的View
+		 */
+		public void imageLoaded(Bitmap imageDrawable, ImageView image,
+								String imageUrl);
+	}
+}

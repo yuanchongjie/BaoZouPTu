@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@android:color/background_dark" >
+
+    <GridView
+        android:id="@+id/gv_photolist"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="11"
+        android:gravity="center"
+        android:horizontalSpacing="3dp"
+        android:numColumns="3"
+        android:verticalSpacing="3dp" >
+    </GridView>
+    
+ <LinearLayout
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom"
+        android:gravity="bottom"
+        >
+    <Button 
+        android:text="相册"
+        android:id="@+id/show_picture_file"
+        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_gravity="bottom"
+         />
+	<Button
+	    android:text="手绘图"
+	     android:id="@+id/draw_piture"
+	     android:layout_height="match_parent"
+	     android:layout_width="0dp"
+	     android:layout_weight="1"
+	      android:layout_gravity="bottom"
+         />
+	<Button
+	    android:text="相机"
+	      android:id="@+id/get_camera"
+	    android:layout_height="match_parent"
+	     android:layout_width="0dp"
+	     android:layout_weight="1"
+	      android:layout_gravity="bottom"
+	     />
+	
+    </LinearLayout>
+   
+</LinearLayout>

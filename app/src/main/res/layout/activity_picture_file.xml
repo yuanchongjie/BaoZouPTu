@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/background_light" >
+<TextView android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:text="选择相册"
+    android:textSize="10pt"
+    android:textColor="#ffff6600"
+    android:gravity="center_vertical"
+    android:drawableLeft="@mipmap/icon1"
+    android:background="#8f70ccff"
+   />
+    <ListView
+        android:id="@+id/picture_file_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
+        android:divider="#afCDC9A5"
+        android:dividerHeight="10dp"
+        >
+    </ListView>
+
+</LinearLayout>
