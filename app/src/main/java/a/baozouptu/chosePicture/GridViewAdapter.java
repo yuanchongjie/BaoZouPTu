@@ -1,14 +1,16 @@
 package a.baozouptu.chosePicture;
 
 import java.util.List;
+import java.util.Map;
 
-import a.baozouptu.myCodeTools.P;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 
 import a.baozouptu.R;
@@ -33,8 +35,10 @@ public class GridViewAdapter extends BaseAdapter {
 	 * 加载图片的类
 	 */
 	private AsyncImageLoader3 imageLoader;
-
-	/**
+/**
+ *
+ */
+	GridView mGridView;/**
 	 *
 	 * @param context
 	 * @param imgUrls   要显示在GridView上的所有 图片的路径
@@ -80,51 +84,41 @@ public class GridViewAdapter extends BaseAdapter {
 	 */
 	@Override
 	public View getView(int position, View holder, ViewGroup parent) {
+		if(mGridView==null) mGridView=(GridView)parent;
+
 		final ViewHolder setter;
 		String path = imgUrls.get(position);
 		if (holder == null) {// 如果gridView的子项目为空，那么建立这个子项目
 			setter = new ViewHolder();
-			if (Date.screenWidth < 660) {
-				holder = layoutInflater.inflate(
-						R.layout.photolist_item_400to660, null);
-
-				setter.ivImage = (ImageView) holder
-						.findViewById(R.id.iv_photoicon_photolist_item1);
-			} else if (Date.screenWidth <= 840) {
-				holder = layoutInflater.inflate(
-						R.layout.photolist_item_660to840, null);
-
-				setter.ivImage = (ImageView) holder
-						.findViewById(R.id.iv_photoicon_photolist_item2);
-			} else if (Date.screenWidth <= 1020) {
-				holder = layoutInflater.inflate(
-						R.layout.photolist_item_840to1020, null);
-
-				setter.ivImage = (ImageView) holder
-						.findViewById(R.id.iv_photoicon_photolist_item3);
-			} else {
-				holder = layoutInflater.inflate(
-						R.layout.photolist_item_1020to1200, null);
-
-				setter.ivImage = (ImageView) holder
-						.findViewById(R.id.iv_photoicon_photolist_item4);
-			}
-			holder.setTag(setter);// setTeg是往view组件中添加一个任意的数据，以后可以随时取出
+			holder = layoutInflater.inflate(
+						R.layout.photolist_item, null);
+			setter.ivImage = (ImageView) holder
+						.findViewById(R.id.iv_photolist_image);
+			setter.ivImage.setTag(position);
+			holder.setTag(setter);
+			// setTeg是往view组件中添加一个任意的数据，以后可以随时取出
 		} else {// 先前已将这个convertView的tag设置为ViewHolder，现在直接取出即可
-			setter = (ViewHolder) holder.getTag();
+			setter=(ViewHolder)holder.getTag();
+			setter.ivImage.setTag(position);
 		}
 		// 这个地方主义，imageLoader启动了一个新线程获取图片到cacheImage里面，新线程运行，本线程也会运行，
 		// 因为新线程耗时，所以本线程已经执行到后面了，先加载了一张预设的图片，然后这个新线程会使用handler类更新UI线程， 妙啊！
-		Bitmap cachedImage = imageLoader.loadBitmap(path, setter.ivImage,
+		Bitmap cachedImage = imageLoader.loadBitmap(path, setter.ivImage,position,
 				new ImageCallback() {
 					public void imageLoaded(Bitmap imageBitmap,
-											ImageView image, String imageUrl) {
-						setter.ivImage.setImageBitmap(imageBitmap);
+											ImageView image, int position,String imageUrl) {
+						Log.e("old position"+position,"new position"+(int)image.getTag());
+						if(setter.ivImage!=null&&position==(int)image.getTag()) {
+							setter.ivImage.setImageBitmap(imageBitmap);
+						}
+						//Log.e("position: " + pi, "bitmapId:" + imageBitmap.getGenerationId()
+						//+"\n"+"imageView"+setter.ivImage.hashCode());
 					}
 				});
-		if (cachedImage != null) {
+		if (cachedImage != null&&setter.ivImage!=null) {
+			Log.e("position: "+position,"bitmapId:"+cachedImage.getGenerationId()+"\nimageView" + setter.ivImage.hashCode());
 			setter.ivImage.setImageBitmap(cachedImage);
-		} else {
+		} else if(setter.ivImage!=null) {
 			setter.ivImage.setImageResource(R.mipmap.icon1);
 		}
 		return holder;// 返回最终ListView的子项目View
@@ -134,7 +128,6 @@ public class GridViewAdapter extends BaseAdapter {
 		/**
 		 * 图片
 		 */
-		public ImageView ivImage;
-
+		public volatile ImageView ivImage;
 	}
 }

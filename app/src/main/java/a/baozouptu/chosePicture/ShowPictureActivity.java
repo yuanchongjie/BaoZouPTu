@@ -130,6 +130,11 @@ public class ShowPictureActivity extends Activity {
 		});
 		thread.run();
 	}
+	int f(int t){
+		if(t<10000*10000)
+			return f(t+1);
+		return 100000000;
+	}
 	/**
 	 * Called when the activity is first created.
 	 * 过程描述：启动一个线程获取所有图片的路径，再启动一个子线程设置好GridView，而且要求这个子线程必须在ui线程之前启动
@@ -140,6 +145,8 @@ public class ShowPictureActivity extends Activity {
 		setContentView(R.layout.activity_show_picture);
 		InnerSDpath = Environment.getExternalStorageDirectory().getPath();
 
+		int t=0;
+		t=f(t);
 		DisplayMetrics metric = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metric);
 		Date.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
@@ -192,9 +199,9 @@ public class ShowPictureActivity extends Activity {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view,
 										int position, long id) {
-					Intent intent=new Intent(ShowPictureActivity.this,PTuActivity.class);
-					intent.putExtra("path", lstFilePath.get(position));
-					startActivity(intent);
+					//Intent intent=new Intent(ShowPictureActivity.this,PTuActivity.class);
+					//intent.putExtra("path", lstFilePath.get(position));
+					//startActivity(intent);
 				}
 			});
 			GridViewAdapter iadapter = new GridViewAdapter(

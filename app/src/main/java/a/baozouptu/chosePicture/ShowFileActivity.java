@@ -19,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import a.baozouptu.R;
 import a.baozouptu.chosePicture.AsyncImageLoader3.ImageCallback;
 
 public class ShowFileActivity extends Activity {
@@ -138,7 +137,7 @@ public class ShowFileActivity extends Activity {
 			if (Date.screenWidth < 660) {
 				P.le("加载了Item", 660);
 				convertView = layoutInflater.inflate(
-						R.layout.picture_file_400to660, null);
+						R.layout.picture_file, null);
 				viewHolder.ivImage = (ImageView) convertView
 						.findViewById(R.id.represent_picture1);
 				viewHolder.ivText = (TextView) convertView
@@ -146,7 +145,7 @@ public class ShowFileActivity extends Activity {
 			} else if (Date.screenWidth <= 840) {
 				P.le("加载了Item", 720);
 				convertView = layoutInflater.inflate(
-						R.layout.picture_file_660to840, null);
+						R.layout.picture_file, null);
 				viewHolder.ivImage = (ImageView) convertView
 						.findViewById(R.id.represent_picture2);
 				viewHolder.ivText = (TextView) convertView
@@ -162,7 +161,7 @@ public class ShowFileActivity extends Activity {
 			} else {
 				P.le("加载了Item", 1080);
 				convertView = layoutInflater.inflate(
-						R.layout.picture_file_1020to1200, null);
+						R.layout.picture_file, null);
 				viewHolder.ivImage = (ImageView) convertView
 						.findViewById(R.id.represent_picture4);
 				viewHolder.ivText = (TextView) convertView
@@ -192,10 +191,10 @@ public class ShowFileActivity extends Activity {
 			// 妙啊！
 			P.le("bitmap的路径: ",representPicturePath.get(position));
 			Bitmap cacheBitmap = asyLoader3.loadBitmap(
-					representPicturePath.get(position), viewHolder.ivImage,
+					representPicturePath.get(position), viewHolder.ivImage,position,
 					new ImageCallback() {
 						public void imageLoaded(Bitmap imageDrawable,
-								ImageView image, String imageUrl) {
+								ImageView image,int poition, String imageUrl) {
 							image.setImageBitmap(imageDrawable);
 						}
 					});

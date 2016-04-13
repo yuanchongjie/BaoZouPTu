@@ -4,6 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.util.LruCache;
 import android.util.Log;
@@ -21,21 +22,14 @@ public class AsyncImageLoader3 {
 	 * 使用LRU算法，用key-value形式查找对象；
 	 */
 	public LruCache<String, Bitmap> imageCache;
+	private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
 	/**
 	 * 线程池，固定五个线程来执行任务，规定最大线程数量的线程池
 	 */
-	private ExecutorService executorService = Executors.newFixedThreadPool(5);
+	private ExecutorService executorService = Executors.newFixedThreadPool((int)Math.round(CPU_COUNT*1.5));
 	private final Handler handler = new Handler();
 
-	/**
-	 * 构造函数，获取LRUCache，并设定其容量为应用最大容量的1/8；
-	 *
-	 * @param imageUrl
-	 *            图像url地址
-	 * @param callbackg
-	 *            回调接口
-	 * @return 返回内存中缓存的图像，第一次加载返回null
-	 */
+
 	public AsyncImageLoader3() {
 		int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
 		imageCache = new LruCache<String, Bitmap>(maxMemory / 8);
@@ -45,12 +39,13 @@ public class AsyncImageLoader3 {
 	 * 使用线程池和handler将需要的图片加载到对应的View上面,如果图片存在LRUcache，则直接返回图片的Bitmap对象，
 	 * 如果不存在，直接异步获取Bitmap，并进行加载
 	 *
-	 * @param imageUrl
+	 * @param imageUrl  图像url地址
 	 * @param image   要加载图片的那个ImageView
 	 * @param callback 自己实现一个接口用于回调
-	 * @return
+	 * @return 返回内存中缓存的图像，第一次加载返回null
+	 *
 	 */
-	public Bitmap loadBitmap(final String imageUrl, final ImageView image,
+	public Bitmap loadBitmap(final String imageUrl, final ImageView image,final int position,
 							 final ImageCallback callback) {
 		// 如果缓存过就从缓存中取出数据
 		if (imageCache.get(imageUrl) != null) {
@@ -65,7 +60,7 @@ public class AsyncImageLoader3 {
 					handler.post(// handler的轻量级方法，利用handler的post方法，在attached的即handler依附的线程中执行下面的代码
 							new Runnable() {
 								public void run() {
-									callback.imageLoaded(bitmap, image,
+									callback.imageLoaded(bitmap, image, position,
 											imageUrl);
 								}
 							});
@@ -105,7 +100,7 @@ public class AsyncImageLoader3 {
 		 * @param image
 		 *            显示Bitmap的View
 		 */
-		public void imageLoaded(Bitmap imageDrawable, ImageView image,
+		void imageLoaded(Bitmap imageDrawable, ImageView image,int position,
 								String imageUrl);
 	}
 }
