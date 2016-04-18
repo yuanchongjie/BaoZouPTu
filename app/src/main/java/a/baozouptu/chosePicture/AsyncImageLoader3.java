@@ -4,11 +4,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.util.LruCache;
-import android.util.Log;
 import android.widget.ImageView;
+
+import a.baozouptu.tools.BitmapTool;
 
 /**
  * 缓存，异步，多线程

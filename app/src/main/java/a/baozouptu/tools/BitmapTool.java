@@ -1,9 +1,9 @@
-package a.baozouptu.chosePicture;
+package a.baozouptu.tools;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.util.Log;
+
+import a.baozouptu.tools.Date;
 
 /**
  * 用于获取图片的bitmap，并且将其缩放到和合适的大小
@@ -32,7 +32,7 @@ public class BitmapTool {
 			optsa.inSampleSize = 1;
 		}
 		else  {
-			optsa.inSampleSize =(int)(Math.sqrt((height*width)/Date.thumbnailSize));
+			optsa.inSampleSize =(int)(Math.sqrt((height*width)/ Date.thumbnailSize));
 		}
 		bm = BitmapFactory.decodeFile(path, optsa);
 		return bm;

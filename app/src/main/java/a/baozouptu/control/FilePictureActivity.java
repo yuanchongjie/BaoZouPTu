@@ -1,26 +1,19 @@
-package a.baozouptu.chosePicture;
+package a.baozouptu.control;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import a.baozouptu.R;
-import a.baozouptu.ptu.PTuActivity;
+import a.baozouptu.tools.FileTool;
+import a.baozouptu.chosePicture.GridViewAdapter;
 
 import a.baozouptu.myCodeTools.P;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.GridView;
 
 public class FilePictureActivity extends Activity {

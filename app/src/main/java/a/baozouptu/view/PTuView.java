@@ -1,4 +1,4 @@
-package a.baozouptu.ptu;
+package a.baozouptu.view;
 
 import a.baozouptu.myCodeTools.P;
 import android.content.Context;
@@ -10,6 +10,8 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Bitmap.Config;
+import android.graphics.drawable.ClipDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;

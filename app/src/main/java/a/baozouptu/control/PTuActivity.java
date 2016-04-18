@@ -1,13 +1,13 @@
-package a.baozouptu.ptu;
+package a.baozouptu.control;
 
 import a.baozouptu.myCodeTools.P;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import a.baozouptu.R;
+import a.baozouptu.view.PTuView;
+
 public class PTuActivity extends Activity{
 	@Override
 	public void onCreate(Bundle savedInstanceState)

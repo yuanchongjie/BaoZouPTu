@@ -1,4 +1,4 @@
-package a.baozouptu.chosePicture;
+package a.baozouptu.tools;
 /**
  * 保存应用所需的一些常用通用的数据项
  * @author acm_lgc
