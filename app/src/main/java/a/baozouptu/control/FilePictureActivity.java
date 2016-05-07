@@ -5,9 +5,9 @@ import java.util.List;
 
 import a.baozouptu.R;
 import a.baozouptu.tools.FileTool;
-import a.baozouptu.chosePicture.GridViewAdapter;
+import a.baozouptu.dataAndLogic.GridViewAdapter;
 
-import a.baozouptu.myCodeTools.P;
+import a.baozouptu.tools.P;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;

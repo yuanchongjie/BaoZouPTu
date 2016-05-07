@@ -1,4 +1,4 @@
-package a.baozouptu.myCodeTools;
+package a.baozouptu.tools;
 
 import android.content.Context;
 import android.util.Log;
@@ -13,6 +13,10 @@ public class P {
 	public static void le(Object s)
 	{
 		Log.e(s.toString(),"------");
+	}
+	public static void le(Class s1,Object s2)
+	{
+		Log.e(s1.getSimpleName(),s2.toString());
 	}
 	public static void le(Object s1,Object s2)
 	{

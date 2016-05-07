@@ -1,7 +1,6 @@
-package a.baozouptu.chosePicture;
+package a.baozouptu.dataAndLogic;
 
 import java.util.List;
-import java.util.Map;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -14,7 +13,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import a.baozouptu.R;
-import a.baozouptu.chosePicture.AsyncImageLoader3.ImageCallback;
+import a.baozouptu.dataAndLogic.AsyncImageLoader3.ImageCallback;
 
 /**
  * 自定义GridView，用于显示所有图片，采用相应的处理，防止内存溢出和显示错乱
@@ -91,7 +90,7 @@ public class GridViewAdapter extends BaseAdapter {
 		if (holder == null) {// 如果gridView的子项目为空，那么建立这个子项目
 			setter = new ViewHolder();
 			holder = layoutInflater.inflate(
-						R.layout.photolist_item, null);
+						R.layout.item_photolist, null);
 			setter.ivImage = (ImageView) holder
 						.findViewById(R.id.iv_photolist_image);
 			setter.ivImage.setTag(position);
@@ -107,16 +106,12 @@ public class GridViewAdapter extends BaseAdapter {
 				new ImageCallback() {
 					public void imageLoaded(Bitmap imageBitmap,
 											ImageView image, int position,String imageUrl) {
-						Log.e("old position"+position,"new position"+(int)image.getTag());
 						if(setter.ivImage!=null&&position==(int)image.getTag()) {
 							setter.ivImage.setImageBitmap(imageBitmap);
 						}
-						//Log.e("position: " + pi, "bitmapId:" + imageBitmap.getGenerationId()
-						//+"\n"+"imageView"+setter.ivImage.hashCode());
 					}
 				});
 		if (cachedImage != null&&setter.ivImage!=null) {
-			Log.e("position: "+position,"bitmapId:"+cachedImage.getGenerationId()+"\nimageView" + setter.ivImage.hashCode());
 			setter.ivImage.setImageBitmap(cachedImage);
 		} else if(setter.ivImage!=null) {
 			setter.ivImage.setImageResource(R.mipmap.icon1);

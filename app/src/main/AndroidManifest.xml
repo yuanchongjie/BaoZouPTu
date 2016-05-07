@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Wallpaper.NoTitleBar">
         <activity
-            android:name="a.baozouptu.chosePicture.ShowPictureActivity"
+            android:name=".control.ShowRecentPictureActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,9 +31,6 @@
             android:label="@string/app_name"></activity>
         <activity
             android:name=".control.PTuActivity"
-            android:label="@string/app_name"></activity>
-        <activity
-            android:name=".control.AddText"
             android:label="@string/app_name"></activity>
     </application>
 

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import a.baozouptu.R;
-import a.baozouptu.chosePicture.AsyncImageLoader3;
+import a.baozouptu.dataAndLogic.AsyncImageLoader3;
 import a.baozouptu.tools.Date;
-import a.baozouptu.myCodeTools.P;
+import a.baozouptu.tools.P;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -21,7 +21,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import a.baozouptu.chosePicture.AsyncImageLoader3.ImageCallback;
+import a.baozouptu.dataAndLogic.AsyncImageLoader3.ImageCallback;
 
 public class ShowFileActivity extends Activity {
 
@@ -139,7 +139,7 @@ public class ShowFileActivity extends Activity {
 			if (Date.screenWidth < 660) {
 				P.le("加载了Item", 660);
 				convertView = layoutInflater.inflate(
-						R.layout.picture_file, null);
+						R.layout.list_item_picture_file, null);
 				viewHolder.ivImage = (ImageView) convertView
 						.findViewById(R.id.represent_picture1);
 				viewHolder.ivText = (TextView) convertView
@@ -147,7 +147,7 @@ public class ShowFileActivity extends Activity {
 			} else if (Date.screenWidth <= 840) {
 				P.le("加载了Item", 720);
 				convertView = layoutInflater.inflate(
-						R.layout.picture_file, null);
+						R.layout.list_item_picture_file, null);
 				viewHolder.ivImage = (ImageView) convertView
 						.findViewById(R.id.represent_picture2);
 				viewHolder.ivText = (TextView) convertView
@@ -163,7 +163,7 @@ public class ShowFileActivity extends Activity {
 			} else {
 				P.le("加载了Item", 1080);
 				convertView = layoutInflater.inflate(
-						R.layout.picture_file, null);
+						R.layout.list_item_picture_file, null);
 				viewHolder.ivImage = (ImageView) convertView
 						.findViewById(R.id.represent_picture4);
 				viewHolder.ivText = (TextView) convertView

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:widget="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <a.baozouptu.view.HorizontalListView
+        android:paddingLeft="2dp"
+        android:id="@+id/HorizontalListView_add_text_function"
+        android:background="#55ffffff"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="#878787"
+        widget:dividerWidth="2dp" />
+</LinearLayout>

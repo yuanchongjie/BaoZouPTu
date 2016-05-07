@@ -9,6 +9,9 @@
     <dimen name="file_item_2">150px</dimen>
     <dimen name="file_item_3">190px</dimen>
     <dimen name="file_item_4">212px</dimen>
+    <dimen name="pading_main_function">10dp</dimen>
+    <dimen name="function_width">100dp</dimen>
+    <dimen name="text_size_main_function">10pt</dimen>
 
 
 </resources>
