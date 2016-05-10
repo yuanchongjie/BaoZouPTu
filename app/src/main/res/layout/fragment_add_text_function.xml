@@ -14,7 +14,8 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/pading_function_item_image">
 
             <LinearLayout
                 android:id="@+id/add_text_toumingdu"
@@ -26,9 +27,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:src="@mipmap/toumingdu" />
+                    android:src="@mipmap/toumingdu"
+                    android:paddingLeft="@dimen/pading_function_item_image"
+                    android:paddingRight="@dimen/pading_function_item_image"
+                    android:paddingTop="@dimen/pading_function_item_image"
+                    android:paddingBottom="@dimen/pading_function_item_image"
+                    />
 
                 <TextView
+
                     android:layout_width="@dimen/function_width"
                     android:layout_height="0dp"
                     android:layout_weight="1"
@@ -47,7 +54,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:src="@mipmap/bold" />
+                    android:src="@mipmap/bold"
+                    android:paddingLeft="@dimen/pading_function_item_image"
+                    android:paddingRight="@dimen/pading_function_item_image"
+                    android:paddingTop="@dimen/pading_function_item_image"
+                    android:paddingBottom="@dimen/pading_function_item_image"
+                />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
@@ -68,7 +80,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:src="@mipmap/color" />
+                    android:src="@mipmap/color" android:paddingLeft="@dimen/pading_function_item_image"
+                    android:paddingRight="@dimen/pading_function_item_image"
+                    android:paddingTop="@dimen/pading_function_item_image"
+                    android:paddingBottom="@dimen/pading_function_item_image"
+                    />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
@@ -76,27 +92,6 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="颜色"
-                    android:textSize="@dimen/text_size_main_function" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/add_text_special"
-                android:layout_width="@dimen/function_width"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="2"
-                    android:src="@mipmap/special" />
-
-                <TextView
-                    android:layout_width="@dimen/function_width"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="特效"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
 
@@ -110,7 +105,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:src="@mipmap/typeface" />
+                    android:src="@mipmap/typeface"
+                    android:paddingLeft="@dimen/pading_function_item_image"
+                    android:paddingRight="@dimen/pading_function_item_image"
+                    android:paddingTop="@dimen/pading_function_item_image"
+                    android:paddingBottom="@dimen/pading_function_item_image"
+                    />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
@@ -118,6 +118,31 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="字体"
+                    android:textSize="@dimen/text_size_main_function" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/add_text_special"
+                android:layout_width="@dimen/function_width"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:src="@mipmap/special"
+                    android:paddingLeft="@dimen/pading_function_item_image"
+                    android:paddingRight="@dimen/pading_function_item_image"
+                    android:paddingTop="@dimen/pading_function_item_image"
+                    android:paddingBottom="@dimen/pading_function_item_image"
+                    />
+
+                <TextView
+                    android:layout_width="@dimen/function_width"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="特效"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
 
@@ -131,7 +156,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:src="@mipmap/bubble" />
+                    android:src="@mipmap/bubble"
+                    android:paddingLeft="@dimen/pading_function_item_image"
+                    android:paddingRight="@dimen/pading_function_item_image"
+                    android:paddingTop="@dimen/pading_function_item_image"
+                    android:paddingBottom="@dimen/pading_function_item_image"
+                    />
 
                 <TextView
                     android:layout_width="@dimen/function_width"

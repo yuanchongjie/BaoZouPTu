@@ -4,12 +4,12 @@
     android:layout_height="@dimen/file_item_4"
     android:orientation="horizontal" >
     <ImageView 
-        android:id="@+id/represent_picture4"
+        android:id="@+id/represent_picture"
         android:layout_height="@dimen/file_item_4"
         android:layout_width="@dimen/file_item_4"
         android:scaleType="centerCrop"
         />
-    <TextView android:id="@+id/info_of_file4"
+    <TextView android:id="@+id/info_of_file"
         android:layout_width="match_parent"
         android:layout_height="@dimen/file_item_4"
         android:textSize="10pt"

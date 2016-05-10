@@ -44,7 +44,7 @@ public class FilePictureActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_picture_in_file);
+		setContentView(R.layout.layout_drawer_file_list);
 		pictureFilePath =getIntent().getStringExtra("path");
 		P.le(1.3,pictureFilePath);
 		Thread thread = new Thread(null, new Runnable() {

@@ -19,112 +19,125 @@ import android.view.View;
 import android.widget.Toast;
 
 public class PtuView extends View {
-
-    final float maxRatio = 5;
+    /**
+     * 每次刷新0.0002倍
+     */
+    public static final float SCALE_FREQUENCE=0.0002f;
+    private static final float MIN_RATIO = 0.3f;
+    private static final float MAX_RATIO = 8;
     /**
      * 表示当前处理状态：缩放，移动等等
      */
-    static int CURRENT_STATUS = 0;
+    private static int CURRENT_STATUS = 0;
     /**
      * 初始化状态
      */
-    static final int STATUS_INIT = 0;
+    private static final int STATUS_INIT = 0;
     /**
      * 移动状态
      */
-    static final int STATUS_MOVE = 1;
+    private static final int STATUS_MOVE = 1;
     /**
      * 缩放状态
      */
-    static final int STATUS_ZOOM_SMALL = 2;
-
-    private static final int STATUS_ZOOM_BIG = 3;
-
-    static final int STATUS_DRAW_PATH = 4;
+    private static final int STATUS_ZOOM_BIG = 2;
+    private static final int STATUS_ZOOM_SMALL = 3;
+    private static final int STATUS_DRAW_PATH = 4;
     /**
      * 最近的x的位置
      */
-    float lastX = -1;
+    private float lastX = -1;
     /**
      * 最近的y的位置
      */
-    float lastY = -1;
+    private float lastY = -1;
     /**
      * x的移动距离
      */
-    float totalTranX;
+    private float totalTranX;
     /**
      * y的移动距离
      */
-    float totalTranY = 0;
+    private float totalTranY = 0;
     /**
      * 当前用于缩放两个手指的距离
      */
 
-    double currentDis;
+    private double currentDis;
     /**
      * 最近一次用于缩放两手指间的距离
      */
-    double lastDis;
+    private float lastDis;
 
     /**
-     * 中的缩放比例
+     * 中的缩放比例，其它的是辅助，放大时直接需要就是一个totalRatio
      */
-    float totalRatio = 1f;
+    private float totalRatio = 1f;
     /**
      * 当前的缩放比例
      */
-    float currentRatio = 1f;
+    private float currentRatio = 1f;
     /**
      * context
      */
-    Context context;
+    private Context context;
     /**
      * 原图片
      */
-    Bitmap sourceBitmap;
+    private Bitmap sourceBitmap;
     /**
      * 用于处理图片的矩阵
      */
-    Matrix matrix = new Matrix();
+    private Matrix matrix = new Matrix();
     /**
      * 整个View的宽
      */
-    int totalWidth;
+    private int totalWidth;
     /**
      * 整个View的高
      */
-    int totalHeight;
+    private int totalHeight;
     /**
      * 原图片的宽度
      */
-    int srcPicWidth;
+    private int srcPicWidth;
     /**
      * 原图片的高度
      */
-    int srcPicHeight;
+    private int srcPicHeight;
     /**
      * 当前图片的宽
      */
-    int curPicWidth;
+    private int curPicWidth;
     /**
      * 当前图片的高
      */
-    int curPicHeight;
+    private int curPicHeight;
     /**
      * 右上角x坐标，以view的右上角为原点，（0,0）
      */
-    int rtX;
+    private int coX;
     /**
      * 右上角y坐标，以view的右上角为原点，（0,0）
      */
-    int rtY;
+    private int coY;
 
-    Rect srcRect;
-    Rect dstRect;
+    Rect srcRect = new Rect(0, 0, 1, 1);
+    ;
+    Rect dstRect = new Rect(1, 2, 3, 4);
+    ;
 
     Paint picPaint = new Paint();
     Bitmap bitmapToDraw;
+    Canvas drawCanvas;
+    /**
+     * 显示在屏幕上绘制的宽度
+     */
+    private int drawWidth;
+    /**
+     * 显示在屏幕上绘制的高度
+     */
+    private int drawHeight;
 
     public PtuView(Context context, AttributeSet set) {
         super(context, set);
@@ -133,8 +146,6 @@ public class PtuView extends View {
         picPaint.setColor(Color.RED);
         picPaint.setStrokeWidth(25);
         picPaint.setTextSize(25);
-        srcRect = new Rect(0, 0, 1, 1);
-        dstRect = new Rect(1, 2, 3, 4);
     }
 
     @Override
@@ -163,7 +174,9 @@ public class PtuView extends View {
     class Point {
         public float x, y;
 
-        Point() {
+        public void set(float x, float y) {
+            this.x=x;
+            this.y=y;
         }
     }
 
@@ -176,7 +189,6 @@ public class PtuView extends View {
      * 从调用的ACtivity中传过来的bitmap
      */
     Path path = new Path();
-
 
     /**
      * 根据路径解析出图片
@@ -201,48 +213,122 @@ public class PtuView extends View {
             case MotionEvent.ACTION_DOWN:
                 startPoint.x = event.getX();
                 startPoint.y = event.getY();
+
                 if (DoubleClick.isDoubleClick()) {
-                    if (totalRatio < maxRatio) {//进行放大
-                        currentRatio = maxRatio / totalRatio;
-                        totalRatio = maxRatio;
+                    if (startPoint.x < dstRect.left || startPoint.x > dstRect.right || startPoint.y < dstRect.top
+                            || startPoint.y > dstRect.bottom)
+                        return true;
+                    if (1.0 < totalRatio && totalRatio < MAX_RATIO) {//进行放大
+                        currentRatio = MAX_RATIO / totalRatio;
+                        totalRatio = MAX_RATIO;
                         CURRENT_STATUS = STATUS_ZOOM_BIG;
-                        invalidate();
                     } else {
-                        currentRatio = 1;
-                        CURRENT_STATUS = STATUS_ZOOM_SMALL;
-                        invalidate();
+                        currentRatio = 1 / MAX_RATIO;
+                        totalRatio = Math.min(totalWidth * 1.0f / (srcPicWidth * 1.0f),
+                                totalHeight * 1.0f / (srcPicHeight * 1.0f));
+                        CURRENT_STATUS = STATUS_INIT;
                     }
+                    invalidate();
                 }
-                //myPath.startPath(path, event.getX(), event.getY());
                 break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                lastDis = getScaleDisAndCenter(event);
             case MotionEvent.ACTION_MOVE:
-                endPoint.x = event.getX();
-                endPoint.y = event.getY();
-                //myPath.addPoint(path,event.getX(), event.getY());
-                CURRENT_STATUS = STATUS_DRAW_PATH;
-                invalidate();
+                if (event.getPointerCount() == 2) {
+                    float endD = getScaleDisAndCenter(event);
+                    currentRatio = endD / lastDis;
+                    if (currentRatio > 1-SCALE_FREQUENCE && currentRatio < 1+SCALE_FREQUENCE) return true;//缩放倍数太小
+
+                    if (totalRatio * currentRatio > MAX_RATIO ||
+                            totalRatio * currentRatio * srcPicWidth < totalWidth / 2
+                                    && totalRatio * currentRatio * srcPicHeight < totalHeight / 2)
+                        return true;//总倍数太大
+                    totalRatio *= currentRatio;
+                    if (currentRatio >= 1)
+                        CURRENT_STATUS = STATUS_ZOOM_BIG;
+                    else
+                        CURRENT_STATUS = STATUS_ZOOM_SMALL;
+                    lastDis = endD;
+                } else if(event.getPointerCount()==1){
+                    endPoint.x = event.getX();
+                    endPoint.y = event.getY();
+                    if(startPoint.x==-1)
+                        startPoint.set(endPoint.x,endPoint.y);
+                        P.le(endPoint.x, endPoint.y);
+                    CURRENT_STATUS = STATUS_MOVE;
+                }else return true;
+                invalidate();//myPath.addPoint(path,event.getX(), event.getY(
                 break;
+            case MotionEvent.ACTION_POINTER_UP:
+                if(event.getPointerCount()<=2) {
+                    startPoint.x = -1;
+                    startPoint.y = -1;
+                }
             default:
                 break;
         }
         return true;
     }
 
-    private void scale(Canvas canvas,boolean fangda) {
-        getParameter(true);
-        getRect();
-        canvas.drawBitmap(Bitmap.createScaledBitmap(sourceBitmap, curPicWidth, curPicHeight, true),
-                srcRect, dstRect, picPaint);//将原图填充到底图上
+    /**
+     * 获取缩放的点之间的位置
+     * <p>设置缩放的中心
+     *
+     * @param event
+     * @return 返回两个触摸点（点0和点1）间的距离
+     */
+    private float getScaleDisAndCenter(MotionEvent event) {
+        float x1 = event.getX(0), y1 = event.getY(0);
+        float x2 = event.getX(1), y2 = event.getY(1);
+        //如果某一边超出边界，则使用手指的中心，否则使用图片的中心
+        if (coX > 0) startPoint.x = totalWidth / 2;
+        else startPoint.x = (x1 + x2) / 2;
+        if (coY > 0) startPoint.y = totalHeight / 2;
+        else startPoint.y = (y1 + y2) / 2;
+
+        return (float) Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
     }
 
-    private void getParameter(boolean fangda) {
-        curPicWidth = (int) (curPicWidth * currentRatio);
-        curPicHeight = (int) (curPicHeight * currentRatio);
-        if (fangda) {
-            rtX = rtX - (int) (Math.abs(rtX - startPoint.x) * (currentRatio - 1));
-            rtY = rtY - (int) (Math.abs(rtY - startPoint.y) * (currentRatio - 1));
+    private void scalePic() {
+        bitmapToDraw.eraseColor(Color.alpha(00));
+        getParameter();
+        getRect();
+        drawCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);//将原图填充到底图上
+    }
+
+    /**
+     * 获取当前的宽高，
+     * <p>要绘制出的宽高，
+     * <p>缩放后图片右上角顶点的位置
+     */
+    private void getParameter() {
+        curPicWidth = (int) (srcPicWidth * totalRatio);
+        curPicHeight = (int) (srcPicHeight * totalRatio);
+        drawWidth = curPicWidth > totalWidth ? totalWidth : curPicWidth;
+        drawHeight = curPicHeight > totalHeight ? totalHeight : curPicHeight;
+        switch (CURRENT_STATUS) {//放大的计算
+            case STATUS_ZOOM_BIG:
+                coX = coX - (int) ((startPoint.x - coX) * (currentRatio - 1));
+                coY = coY - (int) ((startPoint.y - coY) * (currentRatio - 1));
+                if (coX > 0) coX = (totalWidth - curPicWidth) / 2;//校正偏差
+                if (coY > 0) coY = (totalHeight - curPicHeight) / 2;//校正偏差
+                break;
+            case STATUS_ZOOM_SMALL://缩小的计算
+                int dx = (int) (startPoint.x - coX), dy = (int) (startPoint.y - coY);
+                dx = (int) (dx * currentRatio);
+                dy = (int) (dy * currentRatio);
+                coX = (int) (startPoint.x - dx);
+                coY = (int) (startPoint.y - dy);
+                if (coX > 0) coX = (totalWidth - curPicWidth) / 2;//校正偏差
+                if (coY > 0) coY = (totalHeight - curPicHeight) / 2;//校正偏差
+                break;
+            case STATUS_INIT:
+                coX = (totalWidth - curPicWidth) / 2;
+                coY = (totalHeight - curPicHeight) / 2;
+                break;
         }
     }
+
 
     /**
      * 绘制，这里根据不同的当前状态来绘制图片CURRENT_STATUS
@@ -252,69 +338,70 @@ public class PtuView extends View {
         super.onDraw(canvas);
         switch (CURRENT_STATUS) {
             case STATUS_INIT:
-                init(canvas);
+                initAndFirstDraw();
                 break;
             case STATUS_DRAW_PATH:
-                canvas.drawLine(startPoint.x, startPoint.y,
+                drawCanvas.drawLine(startPoint.x, startPoint.y,
                         endPoint.x, endPoint.y, picPaint);
                 startPoint.x = endPoint.x;
                 startPoint.y = endPoint.y;
                 break;
             case STATUS_ZOOM_BIG:
-                scale(canvas,true);
+                scalePic();//别合并，不同
                 break;
             case STATUS_ZOOM_SMALL:
-                toInit(canvas);
+                scalePic();
                 break;
+            case STATUS_MOVE:
+                movePic();
             default:
                 break;
         }
-        matrix.reset();
         canvas.drawBitmap(bitmapToDraw, matrix, null);//将底图绘制到View上面到
-        P.le("PTuView.onDraw", "到达");
     }
 
-    public void toInit(Canvas canvas) {
-        srcPicWidth = sourceBitmap.getWidth();
-        srcPicHeight = sourceBitmap.getHeight();
+    private void movePic() {
+        bitmapToDraw.eraseColor(Color.alpha(00));
+        int t = coX;
+        coX += endPoint.x - startPoint.x;
+        if (coX >= 0 || Math.abs(coX) + totalWidth > curPicWidth)//如果x超出界限，就不移动了
+            coX = t;
 
-        totalRatio = Math.min(totalWidth * 1.0f / (srcPicWidth * 1.0f),
-                totalHeight * 1.0f / (srcPicHeight * 1.0f));
-
-        curPicWidth = (int) (srcPicWidth * totalRatio);
-        curPicHeight = (int) (srcPicHeight * totalRatio);
-        rtX = (totalWidth - curPicWidth) / 2;
-        rtY = (totalHeight - curPicHeight) / 2;
+        t = coY;
+        coY += endPoint.y - startPoint.y;
+        if (coY >= 0 || Math.abs(coY) + totalHeight > curPicHeight)//如果x超出界限，就不移动了
+            coY = t;
+        startPoint.x = endPoint.x;
+        startPoint.y = endPoint.y;
         getRect();
-        canvas.drawBitmap(Bitmap.createScaledBitmap(sourceBitmap, curPicWidth, curPicHeight, true),
-                srcRect, dstRect, picPaint);//将原图填充到底图上
+        drawCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);
     }
 
-    public void init(Canvas canvas) {
+    /**
+     * 获取原始bitmap的宽和高
+     * <p>创建并设置好用于保存的Bitmap
+     * <p>获取当前何种的Ratio
+     */
+    public void initAndFirstDraw() {
         srcPicWidth = sourceBitmap.getWidth();
         srcPicHeight = sourceBitmap.getHeight();
-
-        totalRatio = Math.min(totalWidth * 1.0f / (srcPicWidth * 1.0f),
-                totalHeight * 1.0f / (srcPicHeight * 1.0f));
-
-        curPicWidth = (int) (srcPicWidth * totalRatio);
-        curPicHeight = (int) (srcPicHeight * totalRatio);
-        rtX = (totalWidth - curPicWidth) / 2;
-        rtY = (totalHeight - curPicHeight) / 2;
         bitmapToDraw = Bitmap.createBitmap(totalWidth, totalHeight,
                 Config.ARGB_8888);//创建一个空图做底图
-        canvas.setBitmap(bitmapToDraw);//设置drawCanvas为底图
+        drawCanvas = new Canvas(bitmapToDraw);//设置drawCanvas为底图
+        currentRatio = totalRatio = Math.min(totalWidth * 1.0f / (srcPicWidth * 1.0f),
+                totalHeight * 1.0f / (srcPicHeight * 1.0f));
+
+        getParameter();
         getRect();
-        canvas.drawBitmap(Bitmap.createScaledBitmap(sourceBitmap, curPicWidth, curPicHeight, true),
-                srcRect, dstRect, picPaint);//将原图填充到底图上
+        drawCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);//将原图填充到底图上
     }
 
     private void getRect() {
-        int drawX = rtX < 0 ? 0 : rtX, drawY = rtY < 0 ? 0 : rtY;
-        int picX = rtX > 0 ? 0 : -rtX, picY = rtY > 0 ? 0 : -rtY;
-        int drawWidth = curPicWidth > totalWidth ? totalWidth : curPicWidth;
-        int drawHeight = curPicHeight > totalHeight ? totalHeight : curPicHeight;
-        srcRect.set(picX, picY, picX + drawWidth, picY + drawHeight);
+        int drawX = coX < 0 ? 0 : coX, drawY = coY < 0 ? 0 : coY;
+        int picX = coX > 0 ? 0 : -coX, picY = coY > 0 ? 0 : -coY;
+        int x = (int) (picX / totalRatio), y = (int) (picY / totalRatio);
+        int x1 = (int) ((picX + drawWidth) / totalRatio), y1 = (int) ((picY + drawHeight) / totalRatio);
+        srcRect.set(x, y, x1, y1);
         dstRect.set(drawX, drawY, drawX + drawWidth, drawY + drawHeight);
     }
 }

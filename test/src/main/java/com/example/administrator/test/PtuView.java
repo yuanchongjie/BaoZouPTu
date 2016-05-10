@@ -6,12 +6,9 @@ import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.MaskFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -196,7 +193,7 @@ public class PtuView extends View {
 		super.onDraw(canvas);
 		switch (CURRENT_STATUS) {
 			case STATUS_INIT:
-				init(canvas);
+				init();
 				break;
 			case STATUS_DRAW_PATH:
 				drawCanvas.drawLine(startPoint.x, startPoint.y,
@@ -211,7 +208,7 @@ public class PtuView extends View {
 		canvas.drawBitmap(bitmapToDraw, matrix, null);//将底图绘制到View上面到
 		P.le("PTuActivity.onDraw","到达");
 	}
-	public void init(Canvas canvas)
+	public void init()
 	{
 		bitmapToDraw = Bitmap.createBitmap(sourceWidth, sourceHeight,
 				Config.ARGB_8888);//创建一个空图做底图

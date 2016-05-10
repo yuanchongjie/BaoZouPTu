@@ -28,7 +28,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
         P.le("PTuActivity.onCreat()", "到达");
         if (intent == null) P.le("PTuActivity.onCreat()", "intent出现空指针");
         String path = intent.getStringExtra("path");
-        P.le(path);
+
         PtuView pTuView = (PtuView) findViewById(R.id.ptu_view);
         pTuView.initBitmap(path);
         setFragment();
