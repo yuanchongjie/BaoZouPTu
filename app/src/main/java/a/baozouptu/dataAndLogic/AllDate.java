@@ -1,10 +1,10 @@
-package a.baozouptu.tools;
+package a.baozouptu.dataAndLogic;
 /**
  * 保存应用所需的一些常用通用的数据项
  * @author acm_lgc
  * @version android 6.0,  sdk 23,jdk 1.8,2015.10
  */
-public class Date {
+public class AllDate {
 	/** 屏幕的宽度*/
 	public static int screenWidth;
 	/** 常用的图片的格式 */

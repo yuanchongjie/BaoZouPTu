@@ -1,20 +1,22 @@
 package a.baozouptu.dataAndLogic;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import a.baozouptu.R;
+import a.baozouptu.control.ShowPictureActivity;
 import a.baozouptu.dataAndLogic.AsyncImageLoader3.ImageCallback;
+import a.baozouptu.tools.P;
 
 /**
  * 自定义GridView，用于显示所有图片，采用相应的处理，防止内存溢出和显示错乱
@@ -22,6 +24,7 @@ import a.baozouptu.dataAndLogic.AsyncImageLoader3.ImageCallback;
  * @author acm_lgc
  */
 public class GridViewAdapter extends BaseAdapter {
+    Context mContext;
     /**
      * 布局形成器
      */
@@ -44,13 +47,14 @@ public class GridViewAdapter extends BaseAdapter {
      * @param imgUrls 要显示在GridView上的所有 图片的路径
      */
     public GridViewAdapter(Context context, List<String> imgUrls) {
+        mContext = context;
         layoutInflater = LayoutInflater.from(context);
         this.imgUrls = imgUrls;
         imageLoader = AsyncImageLoader3.getInstatnce();
     }
 
-    public void setList(List<String> list){
-        imgUrls=list;
+    public void setList(List<String> list) {
+        imgUrls = list;
     }
 
     @Override
@@ -66,6 +70,41 @@ public class GridViewAdapter extends BaseAdapter {
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    ImageCallback imageCallback = new ImageCallback() {
+        @Override
+        public void imageLoaded(Bitmap imageDrawable, ImageView image, int position, String imageUrl) {
+            if (image != null && position == (int) image.getTag()) {
+                image.setImageBitmap(imageDrawable);
+            }
+        }
+    };
+
+    LinearLayout creatItemLayout(ViewGroup parent) {
+        // 创建LinearLayout对象
+        LinearLayout mLinearLayout = new LinearLayout(mContext);
+
+// 建立布局样式宽和高，对应xml布局中：
+// android:layout_width="fill_parent"
+// android:layout_height="fill_parent"
+        mLinearLayout.setLayoutParams(new GridView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, AllDate.screenWidth / 3 - 4));
+
+// 设置方向，对应xml布局中：
+// android:orientation="vertical"
+        mLinearLayout.setOrientation(LinearLayout.VERTICAL);
+        mLinearLayout.setGravity(Gravity.CENTER);
+        return mLinearLayout;
+    }
+
+    ImageView creatItemImage(LinearLayout linearLayout) {
+        ImageView imageView = new ImageView(mContext);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        LinearLayout.LayoutParams mLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, AllDate.screenWidth / 3 - 4);
+        linearLayout.addView(imageView, mLayoutParams);
+        return imageView;
     }
 
     /**
@@ -90,10 +129,8 @@ public class GridViewAdapter extends BaseAdapter {
         String path = imgUrls.get(position);
         if (holder == null) {// 如果gridView的子项目为空，那么建立这个子项目
             setter = new ViewHolder();
-            holder = layoutInflater.inflate(
-                    R.layout.item_photolist, null);
-            setter.ivImage = (ImageView) holder
-                    .findViewById(R.id.iv_photolist_image);
+            holder = creatItemLayout(parent);
+            setter.ivImage = creatItemImage((LinearLayout) holder);
             setter.ivImage.setTag(position);
             holder.setTag(setter);
             // setTeg是往view组件中添加一个任意的数据，以后可以随时取出
@@ -103,15 +140,11 @@ public class GridViewAdapter extends BaseAdapter {
         }
         // 这个地方主义，imageLoader启动了一个新线程获取图片到cacheImage里面，新线程运行，本线程也会运行，
         // 因为新线程耗时，所以本线程已经执行到后面了，先加载了一张预设的图片，然后这个新线程会使用handler类更新UI线程， 妙啊！
-        Bitmap cachedImage = imageLoader.loadBitmap(path, setter.ivImage, position,
-                new ImageCallback() {
-                    public void imageLoaded(Bitmap imageBitmap,
-                                            ImageView image, int position, String imageUrl) {
-                        if (setter.ivImage != null && position == (int) image.getTag()) {
-                            setter.ivImage.setImageBitmap(imageBitmap);
-                        }
-                    }
-                });
+        Bitmap cachedImage = null;
+        cachedImage = imageLoader.getBitmap(path);
+        if (cachedImage == null && position <= 25) {
+            imageLoader.loadBitmap(path, setter.ivImage, position, imageCallback);
+        }
         if (cachedImage != null && setter.ivImage != null) {
             setter.ivImage.setImageBitmap(cachedImage);
         } else if (setter.ivImage != null) {

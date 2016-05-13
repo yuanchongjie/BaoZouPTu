@@ -404,4 +404,11 @@ public class PtuView extends View {
         srcRect.set(x, y, x1, y1);
         dstRect.set(drawX, drawY, drawX + drawWidth, drawY + drawHeight);
     }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        bitmapToDraw.recycle();
+        sourceBitmap.recycle();
+        super.onDetachedFromWindow();
+    }
 }

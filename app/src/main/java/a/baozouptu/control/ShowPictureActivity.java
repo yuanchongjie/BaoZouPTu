@@ -1,13 +1,12 @@
 package a.baozouptu.control;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import a.baozouptu.dataAndLogic.AsyncImageLoader3;
-import a.baozouptu.tools.Date;
+import a.baozouptu.dataAndLogic.AllDate;
 import a.baozouptu.tools.FileTool;
 import a.baozouptu.dataAndLogic.GridViewAdapter;
 import a.baozouptu.tools.P;
@@ -24,11 +23,10 @@ import android.provider.MediaStore;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.DisplayMetrics;
-import android.view.DragEvent;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -65,11 +63,11 @@ public class ShowPictureActivity extends Activity {
     /**
      * map存下所有相册的名字和张数
      */
-    Map<String, Integer> picFileNumberMap = new HashMap<String, Integer>();
+    Map<String, Integer> picFileNumberMap = new TreeMap<String, Integer>();
     /**
      * 每个文件夹下的代表图片的路径
      */
-    Map<String, String> representPicturePathMap = new HashMap<String, String>();
+    Map<String, String> representPicturePathMap = new TreeMap<String, String>();
     /**
      * 要显示的最近改动过图片的张数
      */
@@ -82,6 +80,7 @@ public class ShowPictureActivity extends Activity {
     private Button showPictureFileBn;
     private DrawerLayout fileListDrawer;
     private GridViewAdapter showPicAdpter;
+    private GridView gridview;
 
     /**
      * 获取所有图片的文件信息，最近的图片，
@@ -91,7 +90,7 @@ public class ShowPictureActivity extends Activity {
         /**
          * 内部SD卡路径
          */
-        String InnerSDpath=Environment.getExternalStorageDirectory().getPath();
+        String InnerSDpath = Environment.getExternalStorageDirectory().getPath();
         recentPicPathList.clear();
         /** QQ表情 */
         String QQPictureFace = InnerSDpath + "/tencent/QQ_Favorite/";
@@ -106,8 +105,8 @@ public class ShowPictureActivity extends Activity {
         /**排序处理得到的图片的map*/
         final Map<Integer, String> sortPictureMap = new TreeMap<Integer, String>();
 
-        getRecentBitmapPath(sortPictureMap,recentPicPathList, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        getRecentBitmapPath(sortPictureMap,recentPicPathList, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+        getRecentBitmapPath(sortPictureMap, recentPicPathList, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        getRecentBitmapPath(sortPictureMap, recentPicPathList, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
 
         FileTool fileTool = new FileTool();
         fileTool.ListFiles(QQPictureFace, recentPicPathList);
@@ -161,7 +160,7 @@ public class ShowPictureActivity extends Activity {
                     cursor.close();
                 }
                 // 将符合条件的前几张图片取出
-                for (String value: sortPictureMap.values()) {
+                for (String value : sortPictureMap.values()) {
                     lstpaths.add(value);
                     if (lstpaths.size() > RECENT_BITMAP_NUMBER)
                         break;
@@ -172,7 +171,7 @@ public class ShowPictureActivity extends Activity {
     }
 
     /**
-     *  初始化设置文件list和图片list里面的内容
+     * 初始化设置文件list和图片list里面的内容
      */
     private Runnable returnRes = new Runnable() {
         public void run() {
@@ -185,7 +184,6 @@ public class ShowPictureActivity extends Activity {
      * 为显示图片的gridView加载数据
      */
     private void disposeShowPicture() {
-        GridView gridview = (GridView) findViewById(R.id.gv_photolist);
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -198,6 +196,42 @@ public class ShowPictureActivity extends Activity {
         });
         showPicAdpter = new GridViewAdapter(
                 ShowPictureActivity.this, currentPicFilePathList);
+        gridview.setOnScrollListener(new AbsListView.OnScrollListener() {
+            AsyncImageLoader3 imageLoader = AsyncImageLoader3.getInstatnce();
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                switch (scrollState) {
+                    case AbsListView.OnScrollListener.SCROLL_STATE_IDLE:
+                        showAdjacentPic();
+                        break;
+                    case AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+                        imageLoader.cancelLoad();//取消解析，提交的任务还没有执行的就不执行了
+                        break;
+                }
+            }
+
+            AsyncImageLoader3.ImageCallback imageCallback = new AsyncImageLoader3.ImageCallback() {
+                public void imageLoaded(Bitmap imageBitmap, ImageView image, int position, String imageUrl) {
+                    if (image != null && position == (int) image.getTag()) {
+                        image.setImageBitmap(imageBitmap);
+                    }
+                }
+            };
+
+            private void showAdjacentPic() {
+                int first = gridview.getFirstVisiblePosition();
+                int last = gridview.getLastVisiblePosition();
+                for (int position = first; position <= last; position++) {
+                    String path = currentPicFilePathList.get(position);
+                    final ImageView ivImage = (ImageView) gridview.findViewWithTag(position);
+                    imageLoader.loadBitmap(path, ivImage, position, imageCallback);
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            }
+        });
         gridview.setAdapter(showPicAdpter);
         m_ProgressDialog.dismiss();// 表示此处开始就解除这个进度条Dialog，应该是在相对起始线程的另一个中使用
     }
@@ -208,8 +242,7 @@ public class ShowPictureActivity extends Activity {
     void getScreenWidth() {
         DisplayMetrics metric = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metric);
-        Date.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
-        P.le("ShowPictureActivity,returnres", "屏幕宽度" + Date.screenWidth);
+        AllDate.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
     }
 
     /**
@@ -223,7 +256,7 @@ public class ShowPictureActivity extends Activity {
         getScreenWidth();
         initView();
 
-       new Thread(null, new Runnable() {
+        new Thread(null, new Runnable() {
             public void run() {
                 getValues();
             }
@@ -234,11 +267,11 @@ public class ShowPictureActivity extends Activity {
 
         // 跳转显示文件夹的button
         setClick();
-
     }
 
     private void initView() {
         fileListDrawer = (DrawerLayout) findViewById(R.id.drawer_layout_show_picture);
+        gridview = (GridView) findViewById(R.id.gv_photolist);
     }
 
     void setClick() {
@@ -250,12 +283,6 @@ public class ShowPictureActivity extends Activity {
                 fileListDrawer.openDrawer(GravityCompat.END);
             }
         });
-        fileListDrawer.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                //showPicAdpter.notifyDataSetChanged();
-            }
-        });
     }
 
     /**
@@ -264,8 +291,11 @@ public class ShowPictureActivity extends Activity {
     private void disposeDrawer() {
 
         List<String> picFileInfoList = new ArrayList<>();
-        List<String> representPicPathList = new ArrayList<>();
+        final List<String> representPicPathList = new ArrayList<>();
+        picFileInfoList.add("最近图片 (" + recentPicPathList.size() + ")");
+        representPicPathList.add(recentPicPathList.get(0));
         final List<String> picFilePathList = new ArrayList<>();
+        picFilePathList.add("000");
         for (Map.Entry<String, Integer> entry : picFileNumberMap.entrySet()) {
             String path = entry.getKey();
             picFilePathList.add(path);
@@ -274,22 +304,30 @@ public class ShowPictureActivity extends Activity {
             picFileInfoList.add(name + " (" + String.valueOf(entry.getValue()) + ")");
         }
         ListView PictureFileListView = (ListView) findViewById(R.id.drawer_picture_file_list);
+
         PictureFileListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                getCurrentPicPathList(picFilePathList.get(position));
+                if (position == 0) {
+                    currentPicFilePathList = recentPicPathList;
+                    showPicAdpter.setList(recentPicPathList);
+                } else
+                    getCurrentPicPathList(picFilePathList.get(position));
                 fileListDrawer.closeDrawer(GravityCompat.END);
-                showPicAdpter.notifyDataSetChanged();
+                gridview.setAdapter(showPicAdpter);
             }
 
+            /**
+             * 获取将要显示的图片的列表，并且将当前要显示的列表{@code currentPicFilePathList}和adpter内的数据指向获取的列表
+             * @param pictureFilePath
+             */
             private void getCurrentPicPathList(String pictureFilePath) {
                 picPathInFile.clear();
                 FileTool fileTool = new FileTool();
                 fileTool.ListFiles(pictureFilePath, picPathInFile);
                 currentPicFilePathList = picPathInFile;
                 showPicAdpter.setList(picPathInFile);
-                showPicAdpter.notifyDataSetChanged();
             }
         });
         PictureFileListView.setAdapter(new MyListAdapter(picFileInfoList, representPicPathList));
@@ -375,4 +413,5 @@ public class ShowPictureActivity extends Activity {
             return convertView;
         }
     }
+
 }

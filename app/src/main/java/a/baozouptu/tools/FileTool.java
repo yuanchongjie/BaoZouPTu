@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import a.baozouptu.dataAndLogic.AllDate;
+
 /**
  * 主要用于获取图片文件夹下的所有图片的路径，图片大小支取5k-6000k的见方法注解
  *
@@ -40,7 +42,7 @@ public class FileTool {
 			String htx = fName.substring(fName.lastIndexOf(".") + 1,
 					fName.length()).toLowerCase(); // 得到扩展名,用求字串的方法
 
-			for (String s : Date.normalPictureFormat) {
+			for (String s : AllDate.normalPictureFormat) {
 				if (htx.equals(s)) {
 					if (fileSizeValidity(f.getPath())) {
 						lstPaths.add(f.getPath());
@@ -79,7 +81,7 @@ public class FileTool {
 					e.printStackTrace();
 				}
 			}
-			if (cur >= Date.PIC_FILE_SIZE_MIN && cur <= Date.PIC_FILE_SIZE_MAX)
+			if (cur >= AllDate.PIC_FILE_SIZE_MIN && cur <= AllDate.PIC_FILE_SIZE_MAX)
 				return true;
 		}
 

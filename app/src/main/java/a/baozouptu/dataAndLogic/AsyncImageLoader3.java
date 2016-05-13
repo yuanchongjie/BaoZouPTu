@@ -1,7 +1,13 @@
 package a.baozouptu.dataAndLogic;
 
+import java.nio.channels.ClosedByInterruptException;
+import java.util.PriorityQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import android.graphics.Bitmap;
 import android.os.Handler;
@@ -9,6 +15,7 @@ import android.support.v4.util.LruCache;
 import android.widget.ImageView;
 
 import a.baozouptu.tools.BitmapTool;
+import a.baozouptu.tools.P;
 
 /**
  * 缓存，异步，多线程
@@ -17,16 +24,19 @@ import a.baozouptu.tools.BitmapTool;
  * SoftReference<Bitmap>>();
  */
 public class AsyncImageLoader3 {
-
     /**
      * 使用LRU算法，用key-value形式查找对象；
      */
     public static LruCache<String, Bitmap> imageCache;
     private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+    LinkedBlockingQueue<Runnable> lque = new LinkedBlockingQueue<Runnable>();
     /**
      * 线程池，固定五个线程来执行任务，规定最大线程数量的线程池
      */
-    private ExecutorService executorService = Executors.newFixedThreadPool((int) Math.round(CPU_COUNT * 1.5));
+    private ExecutorService executorService = new ThreadPoolExecutor(5, 5,
+            0L, TimeUnit.MILLISECONDS,
+            lque);
+
     private final Handler handler = new Handler();
     private static AsyncImageLoader3 asyncImageLoader3;
 
@@ -38,7 +48,26 @@ public class AsyncImageLoader3 {
 
     private AsyncImageLoader3() {
         int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-        imageCache = new LruCache<String, Bitmap>(maxMemory / 8);
+        P.le("最大可用内存", maxMemory);
+        imageCache = new LruCache<String, Bitmap>(maxMemory / 8) {
+            @Override
+            protected int sizeOf(String key, Bitmap value) {
+                return value.getRowBytes() * value.getHeight() / 1024;
+            }
+        };
+    }
+
+    /**
+     * 如果缓存过就从缓存中取出数据
+     *
+     * @param imageUrl
+     * @return
+     */
+    public Bitmap getBitmap(String imageUrl) {
+        if (imageCache.get(imageUrl) != null) {
+            return imageCache.get(imageUrl);
+        }
+        return null;
     }
 
     /**
@@ -52,11 +81,10 @@ public class AsyncImageLoader3 {
      */
     public Bitmap loadBitmap(final String imageUrl, final ImageView image, final int position,
                              final ImageCallback callback) {
-        // 如果缓存过就从缓存中取出数据
+        // 缓存中没有图像，则从SDcard取出数据，并将取出的数据缓存到内存中
         if (imageCache.get(imageUrl) != null) {
             return imageCache.get(imageUrl);
         }
-        // 缓存中没有图像，则从SDcard取出数据，并将取出的数据缓存到内存中
         executorService.submit(new Runnable() {// 线程池执行取出图片的进程
             public void run() {
                 try {
@@ -77,13 +105,17 @@ public class AsyncImageLoader3 {
         return null;
     }
 
+    public void cancelLoad() {
+        while (!lque.isEmpty())lque.clear();
+    }
+
     /**
      * 从所给路径，返回对应大小的图片Bitmap对象
      *
      * @param path String 路径
      * @return Bitmap对象
      */
-    protected Bitmap loadImageFromSD(String path) {
+    private Bitmap loadImageFromSD(String path) {
         try {
             // 测试时，模拟网络延时，实际时这行代码不能有
             // SystemClock.sleep(2000);
