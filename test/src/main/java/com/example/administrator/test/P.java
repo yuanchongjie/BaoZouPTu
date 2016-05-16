@@ -11,6 +11,10 @@ import android.widget.Toast;
  *
  */
 public class P {
+	/**
+	 * 添加了数据到master
+	 * @param s
+     */
 	public static void le(Object s)
 	{
 		Log.e(s.toString(),"------");
