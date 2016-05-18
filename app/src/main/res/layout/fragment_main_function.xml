@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:background="#ffffff"
     android:orientation="horizontal">
+
     <HorizontalScrollView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -14,8 +15,32 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:paddingBottom="@dimen/pading_function_item_image">
+            android:paddingBottom="@dimen/pading_function_item_image"
+            android:paddingTop="2dp">
+            <LinearLayout
+                android:id="@+id/main_function_cut"
+                android:layout_width="@dimen/function_width"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:paddingBottom="@dimen/pading_function_item_image"
+                    android:paddingLeft="@dimen/pading_function_item_image"
+                    android:paddingRight="@dimen/pading_function_item_image"
+                    android:paddingTop="@dimen/pading_function_item_image"
+                    android:src="@mipmap/edit" />
+
+                <TextView
+                    android:layout_width="@dimen/function_width"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="裁剪旋转"
+                    android:textSize="@dimen/text_size_main_function" />
+            </LinearLayout>
             <LinearLayout
                 android:id="@+id/main_function_text"
                 android:layout_width="@dimen/function_width"
@@ -26,12 +51,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:src="@mipmap/function_text"
+                    android:paddingBottom="@dimen/pading_function_item_image"
                     android:paddingLeft="@dimen/pading_function_item_image"
                     android:paddingRight="@dimen/pading_function_item_image"
                     android:paddingTop="@dimen/pading_function_item_image"
-                    android:paddingBottom="@dimen/pading_function_item_image"
-                    />
+                    android:src="@mipmap/function_text" />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
@@ -39,10 +63,8 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="文字"
-                    android:textSize="@dimen/text_size_main_function"
-                    />
+                    android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
-
             <LinearLayout
                 android:id="@+id/main_function_tietu"
                 android:layout_width="@dimen/function_width"
@@ -53,12 +75,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:src="@mipmap/tietu"
+                    android:paddingBottom="@dimen/pading_function_item_image"
                     android:paddingLeft="@dimen/pading_function_item_image"
                     android:paddingRight="@dimen/pading_function_item_image"
                     android:paddingTop="@dimen/pading_function_item_image"
-                    android:paddingBottom="@dimen/pading_function_item_image"
-                    />
+                    android:src="@mipmap/tietu" />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
@@ -79,12 +100,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:src="@mipmap/pencil"
+                    android:paddingBottom="@dimen/pading_function_item_image"
                     android:paddingLeft="@dimen/pading_function_item_image"
                     android:paddingRight="@dimen/pading_function_item_image"
                     android:paddingTop="@dimen/pading_function_item_image"
-                    android:paddingBottom="@dimen/pading_function_item_image"
-                    />
+                    android:src="@mipmap/pencil" />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
@@ -94,7 +114,6 @@
                     android:text="绘图"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
-
             <LinearLayout
                 android:id="@+id/main_function_koutu"
                 android:layout_width="@dimen/function_width"
@@ -105,12 +124,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:src="@mipmap/function_text"
+                    android:paddingBottom="@dimen/pading_function_item_image"
                     android:paddingLeft="@dimen/pading_function_item_image"
                     android:paddingRight="@dimen/pading_function_item_image"
                     android:paddingTop="@dimen/pading_function_item_image"
-                    android:paddingBottom="@dimen/pading_function_item_image"
-                    />
+                    android:src="@mipmap/koutu" />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
@@ -120,31 +138,6 @@
                     android:text="抠图"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
-            <LinearLayout
-                android:id="@+id/main_function_cut"
-                android:layout_width="@dimen/function_width"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="2"
-                    android:src="@mipmap/function_text"
-                    android:paddingLeft="@dimen/pading_function_item_image"
-                    android:paddingRight="@dimen/pading_function_item_image"
-                    android:paddingTop="@dimen/pading_function_item_image"
-                    android:paddingBottom="@dimen/pading_function_item_image" />
-
-                <TextView
-                    android:layout_width="@dimen/function_width"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="裁剪旋转"
-                    android:textSize="@dimen/text_size_main_function" />
-            </LinearLayout>
-
         </LinearLayout>
     </HorizontalScrollView>
 </LinearLayout>

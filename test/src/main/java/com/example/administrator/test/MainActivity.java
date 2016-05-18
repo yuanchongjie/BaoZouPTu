@@ -17,6 +17,7 @@ public class MainActivity extends Activity  {
     private ContentFragment mWeixin;
     void createDialog(){
         Dialog dialog=new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         /*
          * 获取圣诞框的窗口对象及参数对象以修改对话框的布局设置,
          * 可以直接调用getWindow(),表示获得这个Activity的Window

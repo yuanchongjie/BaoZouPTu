@@ -1,12 +1,18 @@
 package a.baozouptu.control;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.webkit.WebView;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
 
 import a.baozouptu.R;
 import a.baozouptu.tools.P;
@@ -16,10 +22,15 @@ import a.baozouptu.tools.P;
  */
 public class AddTextFragment extends Fragment {
     Context mcontext;
-
+    LinearLayout toumingdu;
+    LinearLayout style;
+    LinearLayout color;
+    LinearLayout typeface;
+    LinearLayout special;
+    LinearLayout bouble;
     @Override
     public void onAttach(Context context) {
-        mcontext = context;
+
         P.le(this, "onAttach" + this.getClass().getSimpleName());
         super.onAttach(context);
     }
@@ -27,9 +38,41 @@ public class AddTextFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         P.le(this.getClass(), "onCreateView");
+        mcontext = getActivity();
         View view = inflater.inflate(R.layout.fragment_add_text_function, container, false);
+        initView(view);
+        setClick();
         return view;
     }
+    private void initView(View view) {
+        toumingdu=(LinearLayout)view.findViewById(R.id.add_text_toumingdu);
+        style=(LinearLayout)view.findViewById(R.id.add_text_style);
+        color=(LinearLayout) view.findViewById(R.id.add_text_color);
+        typeface=(LinearLayout)view.findViewById(R.id.add_text_typeface);
+        special=(LinearLayout)view.findViewById(R.id.add_text_special);
+        bouble=(LinearLayout)view.findViewById(R.id.add_text_bubble);
+    }
+    private void setClick() {
+        toumingdu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Dialog tmdDialog=new Dialog(mcontext);
+                tmdDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                tmdDialog.setContentView(R.layout.dialog_layout_toumindu);
+                Window dialogWindow = tmdDialog.getWindow();
+                dialogWindow.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
+                dialogWindow.setBackgroundDrawableResource(R.mipmap.bold);
+
+                WindowManager.LayoutParams lp = dialogWindow.getAttributes();
+                lp.flags= 0;
+                lp.y=v.getHeight()+5;
+                dialogWindow.setAttributes(lp);
+                tmdDialog.show();
+            }
+        });
+    }
+
+
 
     @Override
     public void onDestroy() {

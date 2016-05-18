@@ -15,6 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal"
+            android:paddingTop="2dp"
             android:paddingBottom="@dimen/pading_function_item_image">
 
             <LinearLayout
@@ -45,7 +46,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/add_text_bold"
+                android:id="@+id/add_text_style"
                 android:layout_width="@dimen/function_width"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
