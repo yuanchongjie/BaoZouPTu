@@ -39,6 +39,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="裁剪旋转"
+                    android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
             <LinearLayout
@@ -63,6 +64,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="文字"
+                    android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
             <LinearLayout
@@ -87,6 +89,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="贴图"
+                    android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
 
@@ -112,6 +115,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="绘图"
+                    android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
             <LinearLayout
@@ -136,6 +140,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="抠图"
+                    android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
         </LinearLayout>

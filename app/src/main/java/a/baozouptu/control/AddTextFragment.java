@@ -2,6 +2,7 @@ package a.baozouptu.control;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.Gravity;
@@ -10,12 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
 import a.baozouptu.R;
-import a.baozouptu.tools.P;
+import a.baozouptu.tools.Util;
 
 /**
  * Created by Administrator on 2016/5/1.
@@ -31,13 +31,13 @@ public class AddTextFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
 
-        P.le(this, "onAttach" + this.getClass().getSimpleName());
+        Util.P.le(this, "onAttach" + this.getClass().getSimpleName());
         super.onAttach(context);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        P.le(this.getClass(), "onCreateView");
+        Util.P.le(this.getClass(), "onCreateView");
         mcontext = getActivity();
         View view = inflater.inflate(R.layout.fragment_add_text_function, container, false);
         initView(view);
@@ -59,14 +59,16 @@ public class AddTextFragment extends Fragment {
                 Dialog tmdDialog=new Dialog(mcontext);
                 tmdDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 tmdDialog.setContentView(R.layout.dialog_layout_toumindu);
+
                 Window dialogWindow = tmdDialog.getWindow();
                 dialogWindow.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
-                dialogWindow.setBackgroundDrawableResource(R.mipmap.bold);
+                dialogWindow.setBackgroundDrawableResource(R.drawable.dialog_background);
 
                 WindowManager.LayoutParams lp = dialogWindow.getAttributes();
                 lp.flags= 0;
-                lp.y=v.getHeight()+5;
+                lp.y=v.getHeight()+Util.dp2Px(mcontext,20);
                 dialogWindow.setAttributes(lp);
+                SeekBar tmdSeekbar=(SeekBar)tmdDialog.findViewById(R.id.seekbar_toumingdu);
                 tmdDialog.show();
             }
         });
@@ -76,7 +78,7 @@ public class AddTextFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        P.le(this.getClass(), "onDeastory");
+        Util.P.le(this.getClass(), "onDeastory");
         super.onDestroy();
     }
 }

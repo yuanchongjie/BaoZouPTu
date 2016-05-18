@@ -7,7 +7,7 @@
     <dimen name="picture_item_height">200dp</dimen>
     <dimen name="pading_main_function">10dp</dimen>
     <dimen name="function_width">72dp</dimen>
-    <dimen name="text_size_main_function">8pt</dimen>
+    <dimen name="text_size_main_function">8.3pt</dimen>
     <dimen name="pading_function_item_image">3dp</dimen>
     <dimen name="show_picture_item_height">83dp</dimen>
 

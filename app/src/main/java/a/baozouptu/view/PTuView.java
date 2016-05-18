@@ -1,7 +1,6 @@
 package a.baozouptu.view;
 
-import a.baozouptu.tools.DoubleClick;
-import a.baozouptu.tools.P;
+import a.baozouptu.tools.Util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -201,7 +200,7 @@ public class PtuView extends View {
         sourceBitmap = BitmapFactory.decodeFile(path2);
         if (sourceBitmap == null) {
             Toast.makeText(context, "图片不存在", Toast.LENGTH_SHORT).show();
-            P.le("PTuView.initBitmap", "sourceBitmap出现空指针");
+            Util.P.le("PTuView.initBitmap", "sourceBitmap出现空指针");
             return;
         }
         invalidate();
@@ -214,7 +213,7 @@ public class PtuView extends View {
                 startPoint.x = event.getX();
                 startPoint.y = event.getY();
 
-                if (DoubleClick.isDoubleClick()) {
+                if (Util.DoubleClick.isDoubleClick()) {
                     if (startPoint.x < dstRect.left || startPoint.x > dstRect.right || startPoint.y < dstRect.top
                             || startPoint.y > dstRect.bottom)
                         return true;
@@ -254,7 +253,7 @@ public class PtuView extends View {
                     endPoint.y = event.getY();
                     if(startPoint.x==-1)
                         startPoint.set(endPoint.x,endPoint.y);
-                        P.le(endPoint.x, endPoint.y);
+                        Util.P.le(endPoint.x, endPoint.y);
                     CURRENT_STATUS = STATUS_MOVE;
                 }else return true;
                 invalidate();//myPath.addPoint(path,event.getX(), event.getY(

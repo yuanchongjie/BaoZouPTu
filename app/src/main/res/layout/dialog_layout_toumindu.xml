@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="400dp"
-    android:layout_height="20dp"
-    android:orientation="vertical">
-
-    <SeekBar
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</LinearLayout>
+<SeekBar xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/seekbar_toumingdu"
+    android:thumb="@drawable/seekbar_thumb_bigoval"
+    android:progressDrawable="@drawable/seekbar_progress"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp"
+    android:thumbOffset="15dp"
+    android:maxHeight="5dp"
+    android:layout_width="280dp"
+    android:layout_height="wrap_content"
+   >
+</SeekBar>

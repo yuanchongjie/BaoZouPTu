@@ -1,11 +1,7 @@
 package a.baozouptu.dataAndLogic;
 
-import java.nio.channels.ClosedByInterruptException;
-import java.util.PriorityQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +11,7 @@ import android.support.v4.util.LruCache;
 import android.widget.ImageView;
 
 import a.baozouptu.tools.BitmapTool;
-import a.baozouptu.tools.P;
+import a.baozouptu.tools.Util;
 
 /**
  * 缓存，异步，多线程
@@ -48,7 +44,7 @@ public class AsyncImageLoader3 {
 
     private AsyncImageLoader3() {
         int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-        P.le("最大可用内存", maxMemory);
+        Util.P.le("最大可用内存", maxMemory);
         imageCache = new LruCache<String, Bitmap>(maxMemory / 8) {
             @Override
             protected int sizeOf(String key, Bitmap value) {

@@ -9,7 +9,6 @@ import a.baozouptu.dataAndLogic.AsyncImageLoader3;
 import a.baozouptu.dataAndLogic.AllDate;
 import a.baozouptu.tools.FileTool;
 import a.baozouptu.dataAndLogic.GridViewAdapter;
-import a.baozouptu.tools.P;
 
 import android.app.Activity;
 import android.app.ProgressDialog;

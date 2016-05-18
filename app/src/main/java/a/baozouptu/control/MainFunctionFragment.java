@@ -6,18 +6,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import a.baozouptu.R;
-import a.baozouptu.tools.P;
-import a.baozouptu.view.HorizontalListView;
 
 /**
  * Created by Administrator on 2016/4/29.

@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import a.baozouptu.R;
-import a.baozouptu.tools.P;
+import a.baozouptu.tools.Util;
 import a.baozouptu.view.PtuView;
 
 public class PTuActivity extends Activity implements MainFunctionFragment.Listen {
@@ -25,8 +25,8 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ptu);
         Intent intent = getIntent();
-        P.le("PTuActivity.onCreat()", "到达");
-        if (intent == null) P.le("PTuActivity.onCreat()", "intent出现空指针");
+        Util.P.le("PTuActivity.onCreat()", "到达");
+        if (intent == null) Util.P.le("PTuActivity.onCreat()", "intent出现空指针");
         String path = intent.getStringExtra("path");
 
         PtuView pTuView = (PtuView) findViewById(R.id.ptu_view);
