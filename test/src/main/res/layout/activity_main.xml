@@ -4,16 +4,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
+    <com.example.administrator.test.ColorBar
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="50"
-        android:background="#000000" />
+        android:layout_height="100dp"
+        />
 
     <Button
         android:id="@+id/button"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="7"
+        android:layout_height="22dp"
         android:text="显示dialog" />
 </LinearLayout>

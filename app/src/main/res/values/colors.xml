@@ -3,7 +3,7 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="text_color1">#111111</color>
+    <color name="text_color1">#ff5722</color>
     <drawable name="dialog_background">#80ffffff</drawable>
     <drawable name="hou">#dcdcdc</drawable>
     <drawable name="qian">#039be5</drawable>

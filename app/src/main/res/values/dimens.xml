@@ -7,8 +7,15 @@
     <dimen name="picture_item_height">200dp</dimen>
     <dimen name="pading_main_function">10dp</dimen>
     <dimen name="function_width">72dp</dimen>
-    <dimen name="text_size_main_function">8.3pt</dimen>
+    <dimen name="text_size_main_function">7pt</dimen>
     <dimen name="pading_function_item_image">3dp</dimen>
     <dimen name="show_picture_item_height">83dp</dimen>
+
+    <dimen name="color_wheel_radius">124dp</dimen>
+    <dimen name="color_wheel_thickness">15dp</dimen>
+    <dimen name="color_center_halo_radius">60dp</dimen>
+    <dimen name="color_center_radius">54dp</dimen>
+    <dimen name="color_pointer_halo_radius">23dp</dimen>
+    <dimen name="color_pointer_radius">16dp</dimen>
 
 </resources>
