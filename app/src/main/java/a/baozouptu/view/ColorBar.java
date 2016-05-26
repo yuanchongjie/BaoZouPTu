@@ -15,6 +15,11 @@ import android.view.View;
 import a.baozouptu.dataAndLogic.AllDate;
 import a.baozouptu.tools.Util;
 
+/**
+ * 简单的条形颜色选择器，可以使用xml设置宽和高
+ * 圆形滑块
+ * 其中的高为滑块的高，颜色条的高为滑块高的1/2
+ */
 public class ColorBar extends View {
     /**
      * Colors to construct the color wheel using {@link android.graphics.SweepGradient}.
@@ -30,7 +35,7 @@ public class ColorBar extends View {
     /**
      * 长条的高度
      */
-    private int barWidth = AllDate.screenWidth - 50;
+    private int barWidth;
 
     /**
      * 滑块的半径
@@ -58,8 +63,8 @@ public class ColorBar extends View {
 
     private int currentColor;
 
-    public void setBarHeight(int h) {
-        barHeight = h;
+    public void setHeight(int h) {
+        thumbRadius = barHeight = h / 2;
     }
 
     public interface ColorChangeListener {
@@ -75,13 +80,32 @@ public class ColorBar extends View {
         invalidate();
     }
 
-    void setOnColorChangerListener(ColorChangeListener colorChangerListener) {
+    /**
+     * 获取组件的长和宽
+     * @param w
+     * @param h
+     * @param oldw
+     * @param oldh
+     */
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        thumbRadius = h / 2;
+        barHeight = thumbRadius;
+        barWidth = w - thumbRadius * 2;
+        barStartY = thumbRadius - barHeight / 2;
+        super.onSizeChanged(w, h, oldw, oldh);
+    }
+
+    public void setOnColorChangerListener(ColorChangeListener colorChangerListener) {
         this.colorChangeListener = colorChangerListener;
     }
 
+    /**
+     * 绘制底部颜色条
+     *
+     * @param canvas
+     */
     private void drawBar(Canvas canvas) {
-        barStartX = thumbRadius;
-        barStartY = thumbRadius - barHeight / 2;
         Paint barPaint = new Paint();
         barPaint.setShader(
                 new LinearGradient(barStartX, barStartY + barHeight / 2,
@@ -93,19 +117,28 @@ public class ColorBar extends View {
                 barPaint);
     }
 
+    /**
+     * 处理点击和滑动事件
+     * @param event
+     * @return
+     */
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
+        switch (event.getAction()) {//点击时
             case MotionEvent.ACTION_DOWN:
                 currentThumbOffset = (int) event.getX();
-                if(currentThumbOffset<=thumbRadius)currentThumbOffset=thumbRadius;
-                if(currentThumbOffset>=barWidth+thumbRadius)currentThumbOffset=barWidth+thumbRadius;
+                if (currentThumbOffset <= thumbRadius) currentThumbOffset = thumbRadius;
+                if (currentThumbOffset >= barWidth + thumbRadius)
+                    currentThumbOffset = barWidth + thumbRadius;
                 STATUS = STATUS_SEEK;
                 break;
+            //滑动时
             case MotionEvent.ACTION_MOVE:
                 currentThumbOffset = (int) event.getX();
-                if(currentThumbOffset<=thumbRadius)currentThumbOffset=thumbRadius;
-                if(currentThumbOffset>=barWidth+thumbRadius)currentThumbOffset=barWidth+thumbRadius;
+                if (currentThumbOffset <= thumbRadius) currentThumbOffset = thumbRadius;
+                if (currentThumbOffset >= barWidth + thumbRadius)
+                    currentThumbOffset = barWidth + thumbRadius;
                 break;
 
         }
@@ -126,7 +159,7 @@ public class ColorBar extends View {
                 drawBar(canvas);
                 currentColor = getCurrentColor();
                 drawThumb(canvas);
-                if(colorChangeListener!=null)
+                if (colorChangeListener != null)
                     colorChangeListener.colorChange(currentColor);
         }
         super.onDraw(canvas);
@@ -136,12 +169,16 @@ public class ColorBar extends View {
         return s + (t - s) * step / unit;
     }
 
+    /**
+     *  获取当前所在区间，再根据颜色变换算法获取颜色值
+     */
+
     private int getCurrentColor() {
         int unit = barWidth / (COLORS.length - 1);
         int position = currentThumbOffset - thumbRadius;
         int i = position / unit;
         int step = position % unit;
-        if(i>=COLORS.length-1)return COLORS[COLORS.length-1];
+        if (i >= COLORS.length - 1) return COLORS[COLORS.length - 1];
         int c0 = COLORS[i];
         int c1 = COLORS[i + 1];
 
@@ -157,6 +194,9 @@ public class ColorBar extends View {
         thumbPaint.setColor(currentColor);
         canvas.drawOval(getThumbRect(), thumbPaint);
     }
+    /**
+     *  获取滑块所在的矩形区域
+     */
 
     private RectF getThumbRect() {
         return new RectF(currentThumbOffset - thumbRadius, barStartY + barHeight / 2 - thumbRadius,

@@ -1,29 +1,26 @@
-package a.baozouptu.view;
+package com.example.administrator.test;
 
-import a.baozouptu.tools.Util;
-
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Bitmap.Config;
 import android.graphics.Rect;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+
 public class PtuView extends View {
     /**
      * 每次刷新0.0002倍
      */
-    public static final float SCALE_FREQUENCE=0.0002f;
+    public static final float SCALE_FREQUENCE = 0.0002f;
     private static final float MIN_RATIO = 0.3f;
     private static final float MAX_RATIO = 8;
     /**
@@ -176,8 +173,8 @@ public class PtuView extends View {
         public float x, y;
 
         public void set(float x, float y) {
-            this.x=x;
-            this.y=y;
+            this.x = x;
+            this.y = y;
         }
     }
 
@@ -238,7 +235,8 @@ public class PtuView extends View {
                 if (event.getPointerCount() == 2) {
                     float endD = getScaleDisAndCenter(event);
                     currentRatio = endD / lastDis;
-                    if (currentRatio > 1-SCALE_FREQUENCE && currentRatio < 1+SCALE_FREQUENCE) return true;//缩放倍数太小
+                    if (currentRatio > 1 - SCALE_FREQUENCE && currentRatio < 1 + SCALE_FREQUENCE)
+                        return true;//缩放倍数太小
 
                     if (totalRatio * currentRatio > MAX_RATIO ||
                             totalRatio * currentRatio * srcPicWidth < totalWidth / 2
@@ -250,18 +248,18 @@ public class PtuView extends View {
                     else
                         CURRENT_STATUS = STATUS_ZOOM_SMALL;
                     lastDis = endD;
-                } else if(event.getPointerCount()==1){
+                } else if (event.getPointerCount() == 1) {
                     endPoint.x = event.getX();
                     endPoint.y = event.getY();
-                    if(startPoint.x==-1)
-                        startPoint.set(endPoint.x,endPoint.y);
-                        Util.P.le(endPoint.x, endPoint.y);
+                    if (startPoint.x == -1)
+                        startPoint.set(endPoint.x, endPoint.y);
+                    Util.P.le(endPoint.x, endPoint.y);
                     CURRENT_STATUS = STATUS_MOVE;
-                }else return true;
+                } else return true;
                 invalidate();//myPath.addPoint(path,event.getX(), event.getY(
                 break;
             case MotionEvent.ACTION_POINTER_UP:
-                if(event.getPointerCount()<=2) {
+                if (event.getPointerCount() <= 2) {
                     startPoint.x = -1;
                     startPoint.y = -1;
                 }
@@ -334,7 +332,6 @@ public class PtuView extends View {
     /**
      * 绘制，这里根据不同的当前状态来绘制图片CURRENT_STATUS
      */
-    @TargetApi(Build.VERSION_CODES.M)
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -360,6 +357,7 @@ public class PtuView extends View {
                 break;
         }
         canvas.drawBitmap(bitmapToDraw, matrix, null);//将底图绘制到View上面到
+
     }
 
     private void movePic() {
@@ -396,8 +394,9 @@ public class PtuView extends View {
         getParameter();
         getRect();
         drawCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);//将原图填充到底图上
-        drawCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);//将原图填充到底图上
-
+        Paint paint=new Paint();
+        paint.setTextSize(10);
+        drawCanvas.drawText("哈红的嗲嗲鱼鱼吧红A啊有Naaaaaaaaaaaa123456789", 0, totalHeight/2,paint);
     }
 
     private void getRect() {

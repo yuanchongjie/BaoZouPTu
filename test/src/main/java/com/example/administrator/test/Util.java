@@ -1,4 +1,4 @@
-package a.baozouptu.tools;
+package com.example.administrator.test;
 
 import android.app.Application;
 import android.content.Context;
@@ -87,7 +87,7 @@ public class Util {
          *
          * @param s
          */
-        public static void make(Object s) {
+        void make(Object s) {
             if (MyApplication.getAppContext() != null)
                 make(MyApplication.getAppContext(), s);
             else

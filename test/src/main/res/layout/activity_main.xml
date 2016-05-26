@@ -3,15 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
-    <com.example.administrator.test.ColorBar
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        />
-
     <Button
-        android:id="@+id/button"
-        android:layout_width="match_parent"
-        android:layout_height="22dp"
-        android:text="显示dialog" />
+        android:id="@+id/ptu_view"
+        android:text="xxxxxxxxxxxxxxxx"
+        android:layout_width="100dp"
+        android:layout_height="100dp" />
 </LinearLayout>
