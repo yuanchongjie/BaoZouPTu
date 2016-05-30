@@ -106,7 +106,7 @@ public class Util {
         public static long lastTime=-1;
         public static boolean isDoubleClick(){
             long curTime=System.currentTimeMillis();
-            if(curTime-lastTime<200) {
+            if(curTime-lastTime<300) {
                 lastTime=curTime;
                 return true;
             }

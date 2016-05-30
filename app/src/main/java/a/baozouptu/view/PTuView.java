@@ -17,13 +17,14 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 public class PtuView extends View {
     /**
      * 每次刷新0.0002倍
      */
-    public static final float SCALE_FREQUENCE=0.0002f;
+    public static final float SCALE_FREQUENCE = 0.0002f;
     private static final float MIN_RATIO = 0.3f;
     private static final float MAX_RATIO = 8;
     /**
@@ -176,8 +177,8 @@ public class PtuView extends View {
         public float x, y;
 
         public void set(float x, float y) {
-            this.x=x;
-            this.y=y;
+            this.x = x;
+            this.y = y;
         }
     }
 
@@ -218,7 +219,7 @@ public class PtuView extends View {
                 if (Util.DoubleClick.isDoubleClick()) {
                     if (startPoint.x < dstRect.left || startPoint.x > dstRect.right || startPoint.y < dstRect.top
                             || startPoint.y > dstRect.bottom)
-                        return true;
+                        return false;
                     if (1.0 < totalRatio && totalRatio < MAX_RATIO) {//进行放大
                         currentRatio = MAX_RATIO / totalRatio;
                         totalRatio = MAX_RATIO;
@@ -238,37 +239,38 @@ public class PtuView extends View {
                 if (event.getPointerCount() == 2) {
                     float endD = getScaleDisAndCenter(event);
                     currentRatio = endD / lastDis;
-                    if (currentRatio > 1-SCALE_FREQUENCE && currentRatio < 1+SCALE_FREQUENCE) return true;//缩放倍数太小
+                    if (currentRatio > 1 - SCALE_FREQUENCE && currentRatio < 1 + SCALE_FREQUENCE)
+                        return false;//缩放倍数太小
 
                     if (totalRatio * currentRatio > MAX_RATIO ||
                             totalRatio * currentRatio * srcPicWidth < totalWidth / 2
                                     && totalRatio * currentRatio * srcPicHeight < totalHeight / 2)
-                        return true;//总倍数太大
+                        return false;//总倍数太大
                     totalRatio *= currentRatio;
                     if (currentRatio >= 1)
                         CURRENT_STATUS = STATUS_ZOOM_BIG;
                     else
                         CURRENT_STATUS = STATUS_ZOOM_SMALL;
                     lastDis = endD;
-                } else if(event.getPointerCount()==1){
+                } else if (event.getPointerCount() == 1) {
                     endPoint.x = event.getX();
                     endPoint.y = event.getY();
-                    if(startPoint.x==-1)
-                        startPoint.set(endPoint.x,endPoint.y);
-                        Util.P.le(endPoint.x, endPoint.y);
+                    if (startPoint.x == -1)
+                        startPoint.set(endPoint.x, endPoint.y);
+                    Util.P.le(endPoint.x, endPoint.y);
                     CURRENT_STATUS = STATUS_MOVE;
-                }else return true;
+                } else return false;
                 invalidate();//myPath.addPoint(path,event.getX(), event.getY(
                 break;
             case MotionEvent.ACTION_POINTER_UP:
-                if(event.getPointerCount()<=2) {
+                if (event.getPointerCount() <= 2) {
                     startPoint.x = -1;
                     startPoint.y = -1;
                 }
             default:
                 break;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -407,6 +409,12 @@ public class PtuView extends View {
         int x1 = (int) ((picX + drawWidth) / totalRatio), y1 = (int) ((picY + drawHeight) / totalRatio);
         srcRect.set(x, y, x1, y1);
         dstRect.set(drawX, drawY, drawX + drawWidth, drawY + drawHeight);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        getParent().requestDisallowInterceptTouchEvent(true);
+        return super.dispatchTouchEvent(event);
     }
 
     @Override

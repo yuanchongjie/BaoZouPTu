@@ -158,7 +158,7 @@ public class ShowPictureActivity extends Activity {
                     }
                     cursor.close();
                 }
-                // 将符合条件的前几张图片取出
+                // 将符合条件的前图片取出
                 for (String value : sortPictureMap.values()) {
                     lstpaths.add(value);
                     if (lstpaths.size() > RECENT_BITMAP_NUMBER)

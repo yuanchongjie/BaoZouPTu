@@ -209,6 +209,7 @@ public class PtuView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
+                Util.P.le(getClass(),"ACTION_DOWN");
                 startPoint.x = event.getX();
                 startPoint.y = event.getY();
 
@@ -382,7 +383,7 @@ public class PtuView extends View {
      * <p>创建并设置好用于保存的Bitmap
      * <p>获取当前何种的Ratio
      */
-    public void initAndFirstDraw() {
+    private void initAndFirstDraw() {
         srcPicWidth = sourceBitmap.getWidth();
         srcPicHeight = sourceBitmap.getHeight();
         bitmapToDraw = Bitmap.createBitmap(totalWidth, totalHeight,

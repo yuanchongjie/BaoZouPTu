@@ -12,8 +12,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import a.baozouptu.R;
 import a.baozouptu.tools.Util;
@@ -32,8 +34,9 @@ public class AddTextFragment extends Fragment {
     LinearLayout typeface;
     LinearLayout special;
     LinearLayout bouble;
-    private int lastColor=0xff000000;
-    private FunctionDialogBuilder  textDialogBuilder;
+    private int lastColor = 0xff000000;
+    private FunctionDialogBuilder textDialogBuilder;
+
     @Override
     public void onAttach(Context context) {
 
@@ -70,7 +73,7 @@ public class AddTextFragment extends Fragment {
                 tmdDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 tmdDialog.setContentView(R.layout.dialog_layout_toumindu);
 
-                setDialogLayout(tmdDialog,v.getHeight());
+                setDialogLayout(tmdDialog, v.getHeight());
                 SeekBar tmdSeekbar = (SeekBar) tmdDialog.findViewById(R.id.seekbar_toumingdu);
                 tmdDialog.show();
             }
@@ -79,12 +82,12 @@ public class AddTextFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Dialog colorDialog = new Dialog(mContext);
-                final int[] colors=new int[]{0xff000000,0xffff0000,0xff00ff00,0xff0000ff,0xffffff00,
-                0xffffffff,0xff555555,0xff880088,0xff008800,0xff880000,0xff000088,0xff008888};
+                final int[] colors = new int[]{0xff000000, 0xffff0000, 0xff00ff00, 0xff0000ff, 0xffffff00,
+                        0xffffffff, 0xff555555, 0xff880088, 0xff008800, 0xff880000, 0xff000088, 0xff008888};
                 colorDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 colorDialog.setContentView(R.layout.dialog_layout_color);
-                final ColorBar colorBar= (ColorBar) colorDialog.findViewById(R.id.color_picker);
-                final ColorLump colorLump= (ColorLump) colorDialog.findViewById(R.id.chosed_color);
+                final ColorBar colorBar = (ColorBar) colorDialog.findViewById(R.id.color_picker);
+                final ColorLump colorLump = (ColorLump) colorDialog.findViewById(R.id.chosed_color);
                 colorLump.setColor(lastColor);
                 colorBar.setOnColorChangerListener(new ColorBar.ColorChangeListener() {
                     @Override
@@ -92,7 +95,7 @@ public class AddTextFragment extends Fragment {
                         colorLump.setColor(color);
                     }
                 });
-                final HorizontalListView colorList= (HorizontalListView) colorDialog.findViewById(R.id.color_list);
+                final HorizontalListView colorList = (HorizontalListView) colorDialog.findViewById(R.id.color_list);
 
                 colorList.setAdapter(new BaseAdapter() {
                     @Override
@@ -112,21 +115,21 @@ public class AddTextFragment extends Fragment {
 
                     @Override
                     public View getView(int position, View convertView, ViewGroup parent) {
-                        LinearLayout linearLayout=new LinearLayout(mContext);
+                        LinearLayout linearLayout = new LinearLayout(mContext);
                         linearLayout.setLayoutParams(
                                 new HorizontalListView.LayoutParams(
-                                        ViewGroup.LayoutParams.WRAP_CONTENT,Util.dp2Px(30)));
+                                        ViewGroup.LayoutParams.WRAP_CONTENT, Util.dp2Px(30)));
 
                         linearLayout.setOrientation(LinearLayout.VERTICAL);
                         linearLayout.setGravity(Gravity.CENTER);
 
                         LinearLayout.LayoutParams mLayoutParams = new LinearLayout.LayoutParams(
-                                Util.dp2Px(30f) ,Util.dp2Px(30));
+                                Util.dp2Px(30f), Util.dp2Px(30));
 
-                        ColorLump colorLump=new ColorLump(mContext);
+                        ColorLump colorLump = new ColorLump(mContext);
 
                         colorLump.setColor(colors[position]);
-                        linearLayout.addView(colorLump,mLayoutParams);
+                        linearLayout.addView(colorLump, mLayoutParams);
                         return colorLump;
                     }
                 });
@@ -136,7 +139,7 @@ public class AddTextFragment extends Fragment {
                         colorLump.setColor(colors[position]);
                     }
                 });
-                setDialogLayout(colorDialog,v.getHeight());
+                setDialogLayout(colorDialog, v.getHeight());
                 colorDialog.show();
             }
         });
@@ -156,18 +159,16 @@ public class AddTextFragment extends Fragment {
     }
 
     /**
-     *
      * @param dialog
      * @param height 相对高度
      */
-    void setDialogLayout(Dialog dialog,int height) {
+    void setDialogLayout(Dialog dialog, int height) {
         Window dialogWindow = dialog.getWindow();
         dialogWindow.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
         //dialogWindow.setBackgroundDrawableResource(R.drawable.dialog_background);
-
         WindowManager.LayoutParams lp = dialogWindow.getAttributes();
         lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-        lp.y = height+ Util.dp2Px(mContext, 20);
+        lp.y = height + Util.dp2Px(mContext, 20);
         dialogWindow.setAttributes(lp);
     }
 

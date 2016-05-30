@@ -3,51 +3,65 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
     <android.support.v7.widget.Toolbar
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        >
+        android:layout_height="50dp">
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="button"/>
+            android:text="button" />
+
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="70dp"
-            android:src="@mipmap/edit"/>
+            android:src="@mipmap/edit" />
+
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="70dp"
-            android:src="@mipmap/bold"/>
+            android:src="@mipmap/bold" />
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="去发送"/>
+            android:text="去发送" />
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="分享"/>
+            android:text="分享" />
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="选项"/>
+            android:text="选项" />
     </android.support.v7.widget.Toolbar>
-    <a.baozouptu.view.PtuView
-        android:id="@+id/ptu_view"
+
+    <a.baozouptu.view.PtuFrameLayout
+        android:id="@+id/ptu_frame_layout"
         android:layout_width="match_parent"
-        android:paddingBottom="0dp"
         android:layout_height="0dp"
-        android:layout_weight="85"
-        android:background="#ffffff"/>
+        android:layout_weight="85">
+        <a.baozouptu.view.PtuView
+            android:id="@+id/ptu_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffffff"
+            android:paddingBottom="0dp" />
+    </a.baozouptu.view.PtuFrameLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:background="#000000"/>
+        android:background="#000000" />
+
     <FrameLayout
         android:id="@+id/fragment_function"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="10"/>
+        android:layout_weight="10" />
 </LinearLayout>
