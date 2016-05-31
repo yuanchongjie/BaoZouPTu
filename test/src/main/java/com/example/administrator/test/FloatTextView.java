@@ -122,6 +122,10 @@ public class FloatTextView extends TextView {
         super(context, attrs);
         mContext = context;
     }
+    public FloatTextView(Context context) {
+        super(context);
+        mContext = context;
+    }
 
     @Override
     public void setHeight(int pixels) {

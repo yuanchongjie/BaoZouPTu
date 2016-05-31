@@ -41,18 +41,12 @@
             android:text="选项" />
     </android.support.v7.widget.Toolbar>
 
-    <a.baozouptu.view.PtuFrameLayout
-        android:id="@+id/ptu_frame_layout"
+    <a.baozouptu.view.PtuView
+        android:id="@+id/ptu_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="85">
-        <a.baozouptu.view.PtuView
-            android:id="@+id/ptu_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#ffffff"
-            android:paddingBottom="0dp" />
-    </a.baozouptu.view.PtuFrameLayout>
+    </a.baozouptu.view.PtuView>
 
     <TextView
         android:layout_width="match_parent"

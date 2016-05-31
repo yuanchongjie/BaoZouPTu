@@ -5,15 +5,8 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import a.baozouptu.R;
-import a.baozouptu.tools.Util;
-import a.baozouptu.view.FloatTextView;
-import a.baozouptu.view.PtuFrameLayout;
 import a.baozouptu.view.PtuView;
 
 public class PTuActivity extends Activity implements MainFunctionFragment.Listen {
@@ -26,30 +19,26 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
     private MainFunctionFragment fragMain;
     private AddTextFragment fragText;
     private PtuView pTuView;
-    private PtuFrameLayout ptuFrame;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ptu);
-        Intent intent = getIntent();
-        Util.P.le("PTuActivity.onCreat()", "到达");
-        if (intent == null) Util.P.le("PTuActivity.onCreat()", "intent出现空指针");
-        String path = intent.getStringExtra("path");
+
         initView();
         setViewContent();
-        pTuView.initBitmap(path);
         setFragment();
     }
 
     private void initView() {
-        pTuView = (PtuView) findViewById(R.id.ptu_view);
-        ptuFrame = (PtuFrameLayout) findViewById(R.id.ptu_frame_layout);
+        pTuView = (PtuView)findViewById(R.id.ptu_view);
     }
 
     private void setViewContent() {
-        ptuFrame.initAdd();
+        Intent intent = getIntent();
+        String path = intent.getStringExtra("path");
+        pTuView.initBitmap(path);
     }
 
     //

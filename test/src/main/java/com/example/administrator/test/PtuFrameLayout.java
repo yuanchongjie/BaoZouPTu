@@ -1,10 +1,9 @@
-package a.baozouptu.view;
+package com.example.administrator.test;
 
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.FrameLayout;
 
 /**
@@ -20,6 +19,11 @@ public class PtuFrameLayout extends FrameLayout {
     private Rect rect;
     Context mContext;
     private float lastX, lastY;
+    /**
+     * framelayout事件是否分发到PtuView上面
+     */
+    private boolean dispath = true;
+    private boolean FTCanMove;
 
     public PtuFrameLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -33,16 +37,19 @@ public class PtuFrameLayout extends FrameLayout {
         super.onSizeChanged(w, h, oldw, oldh);
     }
 
-    public void initAdd() {
+
+    public void initAdd(int width, int height) {
+        totalWidth = width;
+        toTalHeight = height;
         startX = (totalWidth - FTWidth) / 2;
         startY = (toTalHeight - FTHeight) / 2;
 
         floatTextView = new FloatTextView(mContext);
         floatTextView.setWidth(FTWidth);
         floatTextView.setHeight(FTHeight);
-        floatParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        rect=new Rect(startX, startY, startX + FTWidth, startY + FTHeight);
-        floatParams.setMargins(rect.left,rect.top,rect.bottom,rect.top);
+        floatParams = new FrameLayout.LayoutParams(FTWidth, FTHeight);
+        rect = new Rect(startX, startY, startX + FTWidth, startY + FTHeight);
+        floatParams.setMargins(rect.left, rect.top, rect.right, rect.bottom);
         addView(floatTextView, floatParams);
     }
 
@@ -52,34 +59,37 @@ public class PtuFrameLayout extends FrameLayout {
             case MotionEvent.ACTION_DOWN:
                 lastX = event.getX();
                 lastY = event.getY();
+                if (rect.contains((int) lastX, (int) lastY)) {
+                    dispath = false;
+                }
                 break;
             case MotionEvent.ACTION_MOVE:
                 float x = event.getX();
                 float y = event.getY();
                 //如果点击事件发生在浮动view内部，则移动有效，移动它
-                if(rect.contains((int)lastX,(int)lastY)) {
-                    startX += x - lastX;
-                    startY += y - lastY;
-                    floatParams.setMargins(startX, startY, startX + FTWidth, startY + FTHeight);
-                    lastX = x;
-                    lastY = y;
-                    rect.set(startX, startY, startX + FTWidth, startY + FTHeight);
-                    moveFloatView();
-                }
+
+                startX += x - lastX;
+                startY += y - lastY;
+                floatParams.setMargins(startX, startY, startX + FTWidth, startY + FTHeight);
+                lastX = x;
+                lastY = y;
+                rect.set(startX, startY, startX + FTWidth, startY + FTHeight);
+                moveFloatView();
                 break;
             case MotionEvent.ACTION_UP:
-                startX = 0;
-                startY = 0;
-                lastX = 0;
-                lastY = 0;
+                dispath = true;
                 break;
         }
-        return true;
+        return true;    }
+
+
+    private void moveFloatView() {
+        if (!dispath||FTCanMove) {
+            removeView(floatTextView);
+            addView(floatTextView, floatParams);
+        }
     }
-    private void moveFloatView(){
-        removeView(floatTextView);
-        addView(floatTextView, floatParams);
-    }
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         super.onInterceptTouchEvent(ev);
@@ -88,7 +98,12 @@ public class PtuFrameLayout extends FrameLayout {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        getChildAt(0).dispatchTouchEvent(ev);
+        if (dispath)
+            getChildAt(0).dispatchTouchEvent(ev);
         return super.dispatchTouchEvent(ev);
+    }
+
+    public void setFTCanMove(boolean FTCanMove) {
+        this.FTCanMove = FTCanMove;
     }
 }
