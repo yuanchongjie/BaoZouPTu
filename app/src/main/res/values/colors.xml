@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="text_color1">#ff5722</color>
-    <color name="float_child_item">#ff5722</color>
-    <color name="toolbar_backgroud">#880277bd</color>
-    <color name="float_rim_color">#32211</color>
-    <drawable name="dialog_background">#80ffffff</drawable>
-    <drawable name="hou">#dcdcdc</drawable>
-    <drawable name="qian">#039be5</drawable>
+    <color name="colorPrimary">#ff9604</color>
+    <color name="colorPrimaryDark">#ff9604</color>
+    <!--colorAccent 颜色 和floatbutton-->
+    <color name="colorAccent">#ff9604</color>
+    <color name="white">#ffffff</color>
+
+    <color name="my_blue">#4a90e2</color>
 </resources>
