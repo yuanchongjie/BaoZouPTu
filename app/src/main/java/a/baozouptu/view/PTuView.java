@@ -18,7 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-public class PtuView extends View {
+public class PTuView extends View {
     /**
      * 每次刷新0.0002倍
      */
@@ -139,7 +139,7 @@ public class PtuView extends View {
      */
     private int drawHeight;
 
-    public PtuView(Context context, AttributeSet set) {
+    public PTuView(Context context, AttributeSet set) {
         super(context, set);
         this.context = context;
         CURRENT_STATUS = STATUS_INIT;

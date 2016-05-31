@@ -8,7 +8,7 @@ import android.os.Bundle;
 
 import a.baozouptu.R;
 import a.baozouptu.tools.P;
-import a.baozouptu.view.PtuView;
+import a.baozouptu.view.PTuView;
 
 public class PTuActivity extends Activity implements MainFunctionFragment.Listen {
     /**
@@ -29,7 +29,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
         if (intent == null) P.le("PTuActivity.onCreat()", "intent出现空指针");
         String path = intent.getStringExtra("path");
 
-        PtuView pTuView = (PtuView) findViewById(R.id.ptu_view);
+        PTuView pTuView = (PTuView) findViewById(R.id.ptu_view);
         pTuView.initBitmap(path);
         setFragment();
     }

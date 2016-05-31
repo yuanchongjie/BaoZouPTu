@@ -10,5 +10,6 @@
     <dimen name="text_size_main_function">10pt</dimen>
     <dimen name="pading_function_item_image">4dp</dimen>
     <dimen name="show_picture_item_height">83dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 
 </resources>
