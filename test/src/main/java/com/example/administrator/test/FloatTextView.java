@@ -6,8 +6,6 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.TouchDelegate;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 /**
@@ -184,7 +182,14 @@ public class FloatTextView extends TextView {
     }
 
     @Override
+    public void draw(Canvas canvas) {
+        canvas.setBitmap();
+        super.draw(canvas);
+    }
+
+    @Override
     protected void onDraw(Canvas canvas) {
+        canvas.getWidth();
         canvas.drawColor(Color.RED);
         super.onDraw(canvas);
     }

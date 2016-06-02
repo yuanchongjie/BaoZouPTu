@@ -254,7 +254,10 @@ public class ShowPictureActivity extends Activity {
         setContentView(R.layout.activity_show_picture);
         getScreenWidth();
         initView();
-
+        Intent intent = new Intent(ShowPictureActivity.this, PTuActivity.class);
+        intent.putExtra("path", "/storage/sdcard1/哈哈.jpg");
+        startActivity(intent);
+/*
         new Thread(null, new Runnable() {
             public void run() {
                 getValues();
@@ -265,7 +268,7 @@ public class ShowPictureActivity extends Activity {
                 "数据读取中...", true);
 
         // 跳转显示文件夹的button
-        setClick();
+        setClick();*/
     }
 
     private void initView() {

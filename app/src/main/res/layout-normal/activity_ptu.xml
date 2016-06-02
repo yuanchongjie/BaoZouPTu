@@ -6,12 +6,14 @@
 
     <android.support.v7.widget.Toolbar
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="50dp"
+        android:background="@color/toolbar_backgroud">
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="button" />
+            android:text="button"
+            android:background="@color/text_color1"/>
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -28,6 +30,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@color/text_color1"
             android:text="去发送" />
 
         <Button
@@ -41,18 +44,12 @@
             android:text="选项" />
     </android.support.v7.widget.Toolbar>
 
-    <a.baozouptu.view.PtuView
-        android:id="@+id/ptu_view"
+    <a.baozouptu.view.PtuFrameLayout
+        android:id="@+id/ptu_frame"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="85">
-    </a.baozouptu.view.PtuView>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:background="#000000" />
-
+    </a.baozouptu.view.PtuFrameLayout>
     <FrameLayout
         android:id="@+id/fragment_function"
         android:layout_width="match_parent"

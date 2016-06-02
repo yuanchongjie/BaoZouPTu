@@ -23,8 +23,5 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FloatTextView ft=(FloatTextView)findViewById(R.id.float_text_view);
-        PtuView ptuView=(PtuView) findViewById(R.id.ptu_view);
-        ptuView.initBitmap("/storage/sdcard1/哈哈.jpg");
-        ptuView.setTouchDelegate(new TouchDelegate(new Rect(160,400,560,800),ft));
     }
 }

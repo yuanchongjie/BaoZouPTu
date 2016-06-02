@@ -5,8 +5,11 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import a.baozouptu.R;
+import a.baozouptu.view.PtuFrameLayout;
 import a.baozouptu.view.PtuView;
 
 public class PTuActivity extends Activity implements MainFunctionFragment.Listen {
@@ -19,6 +22,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
     private MainFunctionFragment fragMain;
     private AddTextFragment fragText;
     private PtuView pTuView;
+    private PtuFrameLayout ptuFrame;
 
 
     @Override
@@ -29,10 +33,27 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
         initView();
         setViewContent();
         setFragment();
+
+        ptuFrame = (PtuFrameLayout) findViewById(R.id.ptu_frame);
+        ptuFrame.getViewTreeObserver().addOnPreDrawListener(
+                new ViewTreeObserver.OnPreDrawListener() {
+                    @Override
+                    public boolean onPreDraw() {
+                        ptuFrame.getViewTreeObserver().removeOnPreDrawListener(this);
+                        int height = ptuFrame.getMeasuredHeight();
+                        int width = ptuFrame.getMeasuredWidth();
+                        ptuFrame.addView(pTuView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.MATCH_PARENT));
+                        ptuFrame.initAddFloat(width, height);
+                        pTuView.setTouchable(false);
+                        return true;
+                    }
+
+                });
     }
 
     private void initView() {
-        pTuView = (PtuView)findViewById(R.id.ptu_view);
+        pTuView = new PtuView(this);
     }
 
     private void setViewContent() {

@@ -1,5 +1,6 @@
 package a.baozouptu.view;
 
+import a.baozouptu.control.PTuActivity;
 import a.baozouptu.tools.Util;
 
 import android.annotation.TargetApi;
@@ -17,6 +18,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 public class PtuView extends View {
@@ -45,7 +47,6 @@ public class PtuView extends View {
     private static final int STATUS_ZOOM_SMALL = 3;
     private static final int STATUS_DRAW_PATH = 4;
 
-    private static final int STATUS_MOVE_FLOAT = 5;
     /**
      * 最近的x的位置
      */
@@ -124,9 +125,11 @@ public class PtuView extends View {
      * 右上角y坐标，以view的右上角为原点，（0,0）
      */
     private int coY;
-    FloatTextView floatView;
 
     Rect srcRect = new Rect(0, 0, 1, 1);
+    /**
+     * 图片在canvas上面的位置
+     */
     Rect dstRect = new Rect(1, 2, 3, 4);
 
     Paint picPaint = new Paint();
@@ -144,10 +147,16 @@ public class PtuView extends View {
      */
     private int drawHeight;
 
+    /**
+     * 是否可以touch
+     */
+    boolean touchable = true;
+
     public PtuView(Context context) {
         super(context);
-        this.mContext =context;
+        this.mContext = context;
     }
+
     public PtuView(Context context, AttributeSet set) {
         super(context, set);
         this.mContext = context;
@@ -162,6 +171,10 @@ public class PtuView extends View {
         totalWidth = w;
         totalHeight = h;
         super.onSizeChanged(w, h, oldw, oldh);
+    }
+
+    public void setTouchable(boolean touchable) {
+        this.touchable = touchable;
     }
     /*
     public void saveNewBitmap(String path) {
@@ -218,6 +231,7 @@ public class PtuView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!touchable) return false;
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 startPoint.x = event.getX();
@@ -239,11 +253,7 @@ public class PtuView extends View {
                     }
                     invalidate();
                 }
-                if(floatView.realRect.contain(startPoint.x,startPoint.y))
-                {//滑动发生在浮动View里面
-                    floatView.lastX=startPoint.x;
-                    floatView.lastY=startPoint.y;
-                }
+
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 lastDis = getScaleDisAndCenter(event);
@@ -265,16 +275,12 @@ public class PtuView extends View {
                         CURRENT_STATUS = STATUS_ZOOM_SMALL;
                     lastDis = endD;
                 } else if (event.getPointerCount() == 1) {
+
                     endPoint.x = event.getX();
                     endPoint.y = event.getY();
-                    if(floatView.realRect.contain(endPoint.x,endPoint.y))
-                    {//滑动发生在浮动View里面
-                        onTouchFloatView(event);
-                    }else {
-                        if (startPoint.x == -1)
-                            startPoint.set(endPoint.x, endPoint.y);
-                        CURRENT_STATUS = STATUS_MOVE;
-                    }
+                    if (startPoint.x == -1)
+                        startPoint.set(endPoint.x, endPoint.y);
+                    CURRENT_STATUS = STATUS_MOVE;
                 } else return true;
                 invalidate();//myPath.addPoint(path,event.getX(), event.getY(
                 break;
@@ -287,18 +293,6 @@ public class PtuView extends View {
                 break;
         }
         return true;
-    }
-
-    private void onTouchFloatView(MotionEvent event) {
-        float dx=event.getX()-floatView.lastX;
-        float dy=event.getY()-floatView.lastY;
-        floatView.startX+=dx;
-        floatView.startY+=dy;
-        floatView.realRect.translate(dx,dy);
-        floatView.realRect.translateFormRect(floatView.totalRect,dx,dy);
-        floatView.lastX=endPoint.x;
-        floatView.lastY=endPoint.y;
-        CURRENT_STATUS=STATUS_MOVE_FLOAT;
     }
 
     /**
@@ -325,8 +319,6 @@ public class PtuView extends View {
         getParameter();
         getRect();
         secondCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);//将原图填充到底图上
-        secondCanvas.drawBitmap(floatView.bitmapToView, floatView.getStartX(), floatView.getStartY()
-                ,picPaint);
     }
 
     /**
@@ -389,18 +381,14 @@ public class PtuView extends View {
             case STATUS_MOVE:
                 movePic();
                 break;
-            case STATUS_MOVE_FLOAT:
-                moveFloatView();
             default:
                 break;
         }
         canvas.drawBitmap(bitmapToview, matrix, null);//将底图绘制到View上面到
     }
-    private void moveFloatView(){
-        bitmapToview.eraseColor(Color.alpha(00));
-        secondCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);
-        secondCanvas.drawBitmap(floatView.bitmapToView, floatView.getStartX(), floatView.getStartY()
-                ,picPaint);
+
+    public Rect getBound() {
+        return dstRect;
     }
 
     private void movePic() {
@@ -418,8 +406,6 @@ public class PtuView extends View {
         startPoint.y = endPoint.y;
         getRect();
         secondCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);
-        secondCanvas.drawBitmap(floatView.bitmapToView, floatView.getStartX(), floatView.getStartY()
-                ,picPaint);
     }
 
     /**
@@ -439,10 +425,6 @@ public class PtuView extends View {
         getParameter();
         getRect();
         secondCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);//将原图填充到底图上
-
-        floatView = new FloatTextView(mContext,totalWidth,totalHeight);
-        secondCanvas.drawBitmap(floatView.bitmapToView, floatView.getStartX(), floatView.getStartY()
-                ,picPaint);
     }
 
     private void getRect() {
@@ -456,8 +438,8 @@ public class PtuView extends View {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        getParent().requestDisallowInterceptTouchEvent(true);
-        return super.dispatchTouchEvent(event);
+        Util.P.le(super.dispatchTouchEvent(event));
+        return touchable;
     }
 
     @Override

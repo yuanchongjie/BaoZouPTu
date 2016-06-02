@@ -1,6 +1,7 @@
 package a.baozouptu.tools;
 
 import android.graphics.Rect;
+import android.graphics.RectF;
 
 /**
  * 非水平的矩形,可以为斜的的那种矩形，注意构造时必须按顺时针或逆时针放入四个点
@@ -76,7 +77,7 @@ public class UnlevelRect {
      * @param dx
      * @param dy
      */
-    public void translateFormRect(Rect rect,float dx, float dy){
+    public void translateFormRect(RectF rect, float dx, float dy){
         rect.left+=dx;
         rect.top+=dy;
         rect.right+=dx;
