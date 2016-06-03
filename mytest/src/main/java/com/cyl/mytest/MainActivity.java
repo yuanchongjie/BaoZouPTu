@@ -1,3 +1,5 @@
+/*
+
 package com.cyl.mytest;
 
 import android.graphics.Color;
@@ -78,3 +80,4 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 }
+*/

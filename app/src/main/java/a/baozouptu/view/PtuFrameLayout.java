@@ -109,7 +109,7 @@ public class PtuFrameLayout extends FrameLayout {
             case MotionEvent.ACTION_UP:
 
                 if (GeoUtil.getDis(downX, downY, event.getX(), event.getY()) < minMoveDis
-                        && floatView.getBoundRect().contains(event.getX(), event.getY())
+                        && !floatView.getBound().contains(event.getX(), event.getY())
                         && System.currentTimeMillis() - downTime < 500)
                     floatView.hideBackGround();  //点击，隐藏整个背景
                 else
