@@ -16,15 +16,19 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
@@ -40,7 +44,7 @@ import a.baozouptu.R;
  * 显示所选的最近的或某个文件夹下面的所有图片
  * 并且有选择文件夹，相机，空白图画图的功能
  */
-public class ShowPictureActivity extends Activity {
+public class ShowPictureActivity extends AppCompatActivity {
     /**
      * 进度条
      */
@@ -197,6 +201,7 @@ public class ShowPictureActivity extends Activity {
                 ShowPictureActivity.this, currentPicFilePathList);
         gridview.setOnScrollListener(new AbsListView.OnScrollListener() {
             AsyncImageLoader3 imageLoader = AsyncImageLoader3.getInstatnce();
+
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 switch (scrollState) {
@@ -272,6 +277,12 @@ public class ShowPictureActivity extends Activity {
     }
 
     private void initView() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
         fileListDrawer = (DrawerLayout) findViewById(R.id.drawer_layout_show_picture);
         gridview = (GridView) findViewById(R.id.gv_photolist);
     }
