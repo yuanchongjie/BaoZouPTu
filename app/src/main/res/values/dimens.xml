@@ -10,6 +10,7 @@
     <dimen name="text_size_main_function">7pt</dimen>
     <dimen name="pading_function_item_image">3dp</dimen>
     <dimen name="show_picture_item_height">83dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 
     <dimen name="color_wheel_radius">124dp</dimen>
     <dimen name="color_wheel_thickness">15dp</dimen>
