@@ -9,7 +9,6 @@ import a.baozouptu.dataAndLogic.AsyncImageLoader3;
 import a.baozouptu.dataAndLogic.AllDate;
 import a.baozouptu.tools.FileTool;
 import a.baozouptu.dataAndLogic.GridViewAdapter;
-import a.baozouptu.tools.P;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -159,7 +158,7 @@ public class ShowPictureActivity extends Activity {
                     }
                     cursor.close();
                 }
-                // 将符合条件的前几张图片取出
+                // 将符合条件的前图片取出
                 for (String value : sortPictureMap.values()) {
                     lstpaths.add(value);
                     if (lstpaths.size() > RECENT_BITMAP_NUMBER)
@@ -252,10 +251,14 @@ public class ShowPictureActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_picture);
+
+        Intent intent = new Intent(ShowPictureActivity.this, PTuActivity.class);
+        intent.putExtra("path", "/storage/sdcard1/哈哈.jpg");
+        startActivity(intent);
+
+        /*setContentView(R.layout.activity_show_picture);
         getScreenWidth();
         initView();
-
         new Thread(null, new Runnable() {
             public void run() {
                 getValues();
@@ -266,7 +269,7 @@ public class ShowPictureActivity extends Activity {
                 "数据读取中...", true);
 
         // 跳转显示文件夹的button
-        setClick();
+        setClick();*/
     }
 
     private void initView() {

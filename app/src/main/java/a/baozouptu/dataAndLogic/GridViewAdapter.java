@@ -14,9 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import a.baozouptu.R;
-import a.baozouptu.control.ShowPictureActivity;
 import a.baozouptu.dataAndLogic.AsyncImageLoader3.ImageCallback;
-import a.baozouptu.tools.P;
 
 /**
  * 自定义GridView，用于显示所有图片，采用相应的处理，防止内存溢出和显示错乱

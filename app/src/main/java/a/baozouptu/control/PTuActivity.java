@@ -5,10 +5,12 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import a.baozouptu.R;
-import a.baozouptu.tools.P;
-import a.baozouptu.view.PTuView;
+import a.baozouptu.view.PtuFrameLayout;
+import a.baozouptu.view.PtuView;
 
 public class PTuActivity extends Activity implements MainFunctionFragment.Listen {
     /**
@@ -19,20 +21,47 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
     FragmentManager fm;
     private MainFunctionFragment fragMain;
     private AddTextFragment fragText;
+    private PtuView pTuView;
+    private PtuFrameLayout ptuFrame;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ptu);
-        Intent intent = getIntent();
-        P.le("PTuActivity.onCreat()", "到达");
-        if (intent == null) P.le("PTuActivity.onCreat()", "intent出现空指针");
-        String path = intent.getStringExtra("path");
 
-        PTuView pTuView = (PTuView) findViewById(R.id.ptu_view);
-        pTuView.initBitmap(path);
+        initView();
+        setViewContent();
         setFragment();
+
+        ptuFrame = (PtuFrameLayout) findViewById(R.id.ptu_frame);
+        ptuFrame.getViewTreeObserver().addOnPreDrawListener(
+                new ViewTreeObserver.OnPreDrawListener() {
+                    @Override
+                    public boolean onPreDraw() {
+                        ptuFrame.getViewTreeObserver().removeOnPreDrawListener(this);
+                        int height = ptuFrame.getMeasuredHeight();
+                        int width = ptuFrame.getMeasuredWidth();
+                        ptuFrame.addView(pTuView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.MATCH_PARENT));
+                        ptuFrame.initAddFloat(width, height);
+                        pTuView.setTouchable(false);
+                        return true;
+                    }
+
+                });
     }
+
+    private void initView() {
+        pTuView = new PtuView(this);
+    }
+
+    private void setViewContent() {
+        Intent intent = getIntent();
+        String path = intent.getStringExtra("path");
+        pTuView.initBitmap(path);
+    }
+
     //
     //观察Fragment的生命周期，
     // （1）是否Activity创建，不管有没有添加，都会执行

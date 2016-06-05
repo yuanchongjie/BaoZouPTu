@@ -1,8 +1,9 @@
 package a.baozouptu.view;
 
-import a.baozouptu.tools.DoubleClick;
-import a.baozouptu.tools.P;
+import a.baozouptu.control.PTuActivity;
+import a.baozouptu.tools.Util;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,16 +14,18 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Bitmap.Config;
 import android.graphics.Rect;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
-public class PTuView extends View {
+public class PtuView extends View {
     /**
      * 每次刷新0.0002倍
      */
-    public static final float SCALE_FREQUENCE=0.0002f;
+    public static final float SCALE_FREQUENCE = 0.0002f;
     private static final float MIN_RATIO = 0.3f;
     private static final float MAX_RATIO = 8;
     /**
@@ -43,6 +46,7 @@ public class PTuView extends View {
     private static final int STATUS_ZOOM_BIG = 2;
     private static final int STATUS_ZOOM_SMALL = 3;
     private static final int STATUS_DRAW_PATH = 4;
+
     /**
      * 最近的x的位置
      */
@@ -78,9 +82,9 @@ public class PTuView extends View {
      */
     private float currentRatio = 1f;
     /**
-     * context
+     * mContext
      */
-    private Context context;
+    private Context mContext;
     /**
      * 原图片
      */
@@ -123,13 +127,17 @@ public class PTuView extends View {
     private int coY;
 
     Rect srcRect = new Rect(0, 0, 1, 1);
-    ;
+    /**
+     * 图片在canvas上面的位置
+     */
     Rect dstRect = new Rect(1, 2, 3, 4);
-    ;
 
     Paint picPaint = new Paint();
-    Bitmap bitmapToDraw;
-    Canvas drawCanvas;
+    Bitmap bitmapToview;
+    /**
+     * 将内容绘制到底图上，view再讲地图绘制到自己的canvas上面
+     */
+    Canvas secondCanvas;
     /**
      * 显示在屏幕上绘制的宽度
      */
@@ -139,9 +147,19 @@ public class PTuView extends View {
      */
     private int drawHeight;
 
-    public PTuView(Context context, AttributeSet set) {
+    /**
+     * 是否可以touch
+     */
+    boolean touchable = true;
+
+    public PtuView(Context context) {
+        super(context);
+        this.mContext = context;
+    }
+
+    public PtuView(Context context, AttributeSet set) {
         super(context, set);
-        this.context = context;
+        this.mContext = context;
         CURRENT_STATUS = STATUS_INIT;
         picPaint.setColor(Color.RED);
         picPaint.setStrokeWidth(25);
@@ -154,6 +172,10 @@ public class PTuView extends View {
         totalHeight = h;
         super.onSizeChanged(w, h, oldw, oldh);
     }
+
+    public void setTouchable(boolean touchable) {
+        this.touchable = touchable;
+    }
     /*
     public void saveNewBitmap(String path) {
 		File file = new File(path);
@@ -161,7 +183,7 @@ public class PTuView extends View {
 			try { 
 				FileOutputStream fileOutputStream = new FileOutputStream(
 						file.getPath());
-				bitmapToDraw.compress(Bitmap.CompressFormat.JPEG, 100,
+				bitmapToview.compress(Bitmap.CompressFormat.JPEG, 100,
 						fileOutputStream);
 				fileOutputStream.close();
 				Log.e("saveBmp is succseed", "yes!");
@@ -175,8 +197,8 @@ public class PTuView extends View {
         public float x, y;
 
         public void set(float x, float y) {
-            this.x=x;
-            this.y=y;
+            this.x = x;
+            this.y = y;
         }
     }
 
@@ -200,8 +222,8 @@ public class PTuView extends View {
         options.inPreferQualityOverSpeed = true;
         sourceBitmap = BitmapFactory.decodeFile(path2);
         if (sourceBitmap == null) {
-            Toast.makeText(context, "图片不存在", Toast.LENGTH_SHORT).show();
-            P.le("PTuView.initBitmap", "sourceBitmap出现空指针");
+            Toast.makeText(mContext, "图片不存在", Toast.LENGTH_SHORT).show();
+            Util.P.le("PTuView.initBitmap", "sourceBitmap出现空指针");
             return;
         }
         invalidate();
@@ -209,12 +231,13 @@ public class PTuView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!touchable) return false;
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 startPoint.x = event.getX();
                 startPoint.y = event.getY();
 
-                if (DoubleClick.isDoubleClick()) {
+                if (Util.DoubleClick.isDoubleClick()) {
                     if (startPoint.x < dstRect.left || startPoint.x > dstRect.right || startPoint.y < dstRect.top
                             || startPoint.y > dstRect.bottom)
                         return true;
@@ -230,6 +253,7 @@ public class PTuView extends View {
                     }
                     invalidate();
                 }
+
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 lastDis = getScaleDisAndCenter(event);
@@ -237,7 +261,8 @@ public class PTuView extends View {
                 if (event.getPointerCount() == 2) {
                     float endD = getScaleDisAndCenter(event);
                     currentRatio = endD / lastDis;
-                    if (currentRatio > 1-SCALE_FREQUENCE && currentRatio < 1+SCALE_FREQUENCE) return true;//缩放倍数太小
+                    if (currentRatio > 1 - SCALE_FREQUENCE && currentRatio < 1 + SCALE_FREQUENCE)
+                        return true;//缩放倍数太小
 
                     if (totalRatio * currentRatio > MAX_RATIO ||
                             totalRatio * currentRatio * srcPicWidth < totalWidth / 2
@@ -249,18 +274,18 @@ public class PTuView extends View {
                     else
                         CURRENT_STATUS = STATUS_ZOOM_SMALL;
                     lastDis = endD;
-                } else if(event.getPointerCount()==1){
+                } else if (event.getPointerCount() == 1) {
+
                     endPoint.x = event.getX();
                     endPoint.y = event.getY();
-                    if(startPoint.x==-1)
-                        startPoint.set(endPoint.x,endPoint.y);
-                        P.le(endPoint.x, endPoint.y);
+                    if (startPoint.x == -1)
+                        startPoint.set(endPoint.x, endPoint.y);
                     CURRENT_STATUS = STATUS_MOVE;
-                }else return true;
+                } else return true;
                 invalidate();//myPath.addPoint(path,event.getX(), event.getY(
                 break;
             case MotionEvent.ACTION_POINTER_UP:
-                if(event.getPointerCount()<=2) {
+                if (event.getPointerCount() <= 2) {
                     startPoint.x = -1;
                     startPoint.y = -1;
                 }
@@ -290,10 +315,10 @@ public class PTuView extends View {
     }
 
     private void scalePic() {
-        bitmapToDraw.eraseColor(Color.alpha(00));
+        bitmapToview.eraseColor(Color.alpha(00));
         getParameter();
         getRect();
-        drawCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);//将原图填充到底图上
+        secondCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);//将原图填充到底图上
     }
 
     /**
@@ -333,6 +358,7 @@ public class PTuView extends View {
     /**
      * 绘制，这里根据不同的当前状态来绘制图片CURRENT_STATUS
      */
+    @TargetApi(Build.VERSION_CODES.M)
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -341,7 +367,7 @@ public class PTuView extends View {
                 initAndFirstDraw();
                 break;
             case STATUS_DRAW_PATH:
-                drawCanvas.drawLine(startPoint.x, startPoint.y,
+                secondCanvas.drawLine(startPoint.x, startPoint.y,
                         endPoint.x, endPoint.y, picPaint);
                 startPoint.x = endPoint.x;
                 startPoint.y = endPoint.y;
@@ -354,14 +380,19 @@ public class PTuView extends View {
                 break;
             case STATUS_MOVE:
                 movePic();
+                break;
             default:
                 break;
         }
-        canvas.drawBitmap(bitmapToDraw, matrix, null);//将底图绘制到View上面到
+        canvas.drawBitmap(bitmapToview, matrix, null);//将底图绘制到View上面到
+    }
+
+    public Rect getBound() {
+        return dstRect;
     }
 
     private void movePic() {
-        bitmapToDraw.eraseColor(Color.alpha(00));
+        bitmapToview.eraseColor(Color.alpha(00));
         int t = coX;
         coX += endPoint.x - startPoint.x;
         if (coX >= 0 || Math.abs(coX) + totalWidth > curPicWidth)//如果x超出界限，就不移动了
@@ -369,12 +400,12 @@ public class PTuView extends View {
 
         t = coY;
         coY += endPoint.y - startPoint.y;
-        if (coY >= 0 || Math.abs(coY) + totalHeight > curPicHeight)//如果x超出界限，就不移动了
+        if (coY >= 0 || Math.abs(coY) + totalHeight > curPicHeight)//如果y超出界限，就不移动了
             coY = t;
         startPoint.x = endPoint.x;
         startPoint.y = endPoint.y;
         getRect();
-        drawCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);
+        secondCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);
     }
 
     /**
@@ -385,15 +416,15 @@ public class PTuView extends View {
     public void initAndFirstDraw() {
         srcPicWidth = sourceBitmap.getWidth();
         srcPicHeight = sourceBitmap.getHeight();
-        bitmapToDraw = Bitmap.createBitmap(totalWidth, totalHeight,
+        bitmapToview = Bitmap.createBitmap(totalWidth, totalHeight,
                 Config.ARGB_8888);//创建一个空图做底图
-        drawCanvas = new Canvas(bitmapToDraw);//设置drawCanvas为底图
+        secondCanvas = new Canvas(bitmapToview);//设置drawCanvas为底图
         currentRatio = totalRatio = Math.min(totalWidth * 1.0f / (srcPicWidth * 1.0f),
                 totalHeight * 1.0f / (srcPicHeight * 1.0f));
 
         getParameter();
         getRect();
-        drawCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);//将原图填充到底图上
+        secondCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);//将原图填充到底图上
     }
 
     private void getRect() {
@@ -406,8 +437,14 @@ public class PTuView extends View {
     }
 
     @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        Util.P.le(super.dispatchTouchEvent(event));
+        return touchable;
+    }
+
+    @Override
     protected void onDetachedFromWindow() {
-        bitmapToDraw.recycle();
+        bitmapToview.recycle();
         sourceBitmap.recycle();
         super.onDetachedFromWindow();
     }

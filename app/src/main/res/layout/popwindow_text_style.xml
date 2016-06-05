@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:slideswitch="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/bold_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:gravity="center"
+            android:text="  粗体"
+            android:textSize="10pt"
+            android:textColor="@color/text_color1"
+            />
+
+        <a.baozouptu.view.MySwitchButton
+            android:id="@+id/switch_button_bold"
+            android:layout_gravity="right"
+            android:layout_width="55dp"
+            android:layout_height="35dp"
+            slideswitch:isOpen="false"
+            slideswitch:shape="circle"
+            slideswitch:themeColor="#f200aa96" />
+    </LinearLayout>
+</LinearLayout>

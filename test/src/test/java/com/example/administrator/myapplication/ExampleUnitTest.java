@@ -1,4 +1,4 @@
-package com.cyl.test;
+package com.example.administrator.myapplication;
 
 import org.junit.Test;
 

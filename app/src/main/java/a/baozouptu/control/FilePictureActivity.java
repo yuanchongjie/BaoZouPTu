@@ -7,7 +7,8 @@ import a.baozouptu.R;
 import a.baozouptu.tools.FileTool;
 import a.baozouptu.dataAndLogic.GridViewAdapter;
 
-import a.baozouptu.tools.P;
+import a.baozouptu.tools.Util;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -32,7 +33,7 @@ public class FilePictureActivity extends Activity {
 		lstFilePath.clear();
 		FileTool fileTool = new FileTool();
 		fileTool.ListFiles(pictureFilePath, lstFilePath);
-		P.le("FilePictureActivity.java 显示图片的总数",lstFilePath.size());
+		Util.P.le("FilePictureActivity.java 显示图片的总数",lstFilePath.size());
 		// 获取最近修改过的图片
 		runOnUiThread(returnRes);// 表示强制这个线程在UI线程之前启动，
 	}
@@ -46,7 +47,7 @@ public class FilePictureActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.layout_drawer_file_list);
 		pictureFilePath =getIntent().getStringExtra("path");
-		P.le(1.3,pictureFilePath);
+		Util.P.le(1.3,pictureFilePath);
 		Thread thread = new Thread(null, new Runnable() {
 			public void run() {
 				getValues();
