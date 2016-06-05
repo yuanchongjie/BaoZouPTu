@@ -112,7 +112,7 @@ public class AddTextFragment extends Fragment {
      */
     public class FunctionPopWindowBuilder {
         Context mContext;
-        boolean isBold=false,isItalic=false;
+        boolean isBold=false,isItalic=false,hasShadow=false;
         public FunctionPopWindowBuilder(Context context) {
             mContext = context;
         }
@@ -178,6 +178,7 @@ public class AddTextFragment extends Fragment {
             View contentView = getStylePopView();
             //粗体
             MySwitchButton switchBold=(MySwitchButton)contentView.findViewById(R.id.switch_button_bold);
+            switchBold.setState(isBold);
             switchBold.setOnSlideListener(new MySwitchButton.SlideListener() {
                 @Override
                 public void open() {
@@ -199,6 +200,7 @@ public class AddTextFragment extends Fragment {
             });
             //斜体
             MySwitchButton switchItalic=(MySwitchButton)contentView.findViewById(R.id.switch_button_text_italic);
+            switchItalic.setState(isItalic);
             switchItalic.setOnSlideListener(new MySwitchButton.SlideListener() {
                 @Override
                 public void open() {
@@ -219,15 +221,18 @@ public class AddTextFragment extends Fragment {
                 }
             });
             MySwitchButton switchShadow=(MySwitchButton)contentView.findViewById(R.id.switch_button_text_shadow);
+            switchShadow.setState(hasShadow);
             switchShadow.setOnSlideListener(new MySwitchButton.SlideListener() {
                 @Override
                 public void open() {
                     floatTextView.setShadowLayer(5,5,5, Color.GRAY);
+                    hasShadow=true;
                 }
 
                 @Override
                 public void close() {
                     floatTextView.setShadowLayer(0,0,0, Color.GRAY);
+                    hasShadow=false;
                 }
             });
             setLayout(v, contentView);
