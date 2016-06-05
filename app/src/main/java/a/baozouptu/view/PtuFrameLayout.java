@@ -32,7 +32,7 @@ public class PtuFrameLayout extends FrameLayout {
     /**
      * 判断手指是否抬起过，因为down事件会不断触发，无法判断up与down的关系
      */
-    private boolean hasUp=true;
+    private boolean hasUp = true;
 
 
     public PtuFrameLayout(Context context, AttributeSet attrs) {
@@ -61,8 +61,8 @@ public class PtuFrameLayout extends FrameLayout {
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                if(hasUp){
-                    hasUp=false;
+                if (hasUp) {
+                    hasUp = false;
                     floatView.setDownState();
                 }
                 floatView.changeShowState(FloatView.STATUS_RIM);
@@ -90,8 +90,8 @@ public class PtuFrameLayout extends FrameLayout {
                     //以缩放中心的为相对坐标，用于一边缩放一边移动
                     float ncenterX = (event.getX(0) + event.getX(1)) / 2,
                             ncenterY = (event.getY(0) + event.getY(1)) / 2;
-
-                    if (GeoUtil.getDis(scaleCenterX, scaleCenterY, ncenterX, ncenterY) > Util.dp2Px(5))
+                    //缩放时移动距离大于2dp时移动
+                    if (GeoUtil.getDis(scaleCenterX, scaleCenterY, ncenterX, ncenterY) > Util.dp2Px(2))
                         floatView.drag(ncenterX, ncenterY);
                     scaleCenterX = ncenterX;
                     scaleCenterY = ncenterY;
@@ -119,14 +119,14 @@ public class PtuFrameLayout extends FrameLayout {
                 }
             case MotionEvent.ACTION_UP:
                 //点击事件
-                if (hasUp==false&&GeoUtil.getDis(downX, downY, event.getX(), event.getY()) < minMoveDis
+                if (hasUp == false && GeoUtil.getDis(downX, downY, event.getX(), event.getY()) < minMoveDis
                         && System.currentTimeMillis() - downTime < 500) {
-                    if (floatView.showLayoutOrRefreshByClick(event.getX(),event.getY()))//返回true表示需要重绘
+                    if (floatView.showLayoutOrRefreshByClick(event.getX(), event.getY()))//返回true表示需要重绘
                         redrawFloat();
                 } else {//不是点击事件，将之前状态显示出来
                     floatView.changeShowState(floatView.getDownState());
                 }
-                hasUp=true;
+                hasUp = true;
                 break;
         }
         return true;
@@ -136,7 +136,7 @@ public class PtuFrameLayout extends FrameLayout {
     public boolean dispatchTouchEvent(MotionEvent ev) {
         super.dispatchTouchEvent(ev);
         //拥有浮动视图时，处理点击事件，否则tpuview全权处理了
-        if(getChildCount()>1)  onTouchEvent(ev);
+        if (getChildCount() > 1) onTouchEvent(ev);
         return true;
     }
 

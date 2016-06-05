@@ -377,7 +377,7 @@ public class FloatTextView extends EditText implements FloatView {
             return true;
         }//点击发生在这个floatView之外
         else if (x < 0 || y < 0 || x > mWidth || y > mHeight) {
-            if(SHOW_SATUS==STATUS_INPUT){
+            if(SHOW_SATUS==STATUS_INPUT){//取消输入法
                 InputMethodManager imm = ( InputMethodManager ) mContext.getSystemService( Context.INPUT_METHOD_SERVICE );
                 if ( imm.isActive( ) ) {
                     imm.hideSoftInputFromWindow( this.getApplicationWindowToken( ) , 0 );
