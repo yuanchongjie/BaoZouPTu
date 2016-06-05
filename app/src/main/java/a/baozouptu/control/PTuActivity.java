@@ -4,11 +4,16 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.LinearLayout;
 
 import a.baozouptu.R;
+import a.baozouptu.view.FloatTextView;
 import a.baozouptu.view.PtuFrameLayout;
 import a.baozouptu.view.PtuView;
 
@@ -21,8 +26,9 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
     FragmentManager fm;
     private MainFunctionFragment fragMain;
     private AddTextFragment fragText;
-    private PtuView pTuView;
+    private PtuView ptuView;
     private PtuFrameLayout ptuFrame;
+
 
 
     @Override
@@ -33,35 +39,23 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
         initView();
         setViewContent();
         setFragment();
-
-        ptuFrame = (PtuFrameLayout) findViewById(R.id.ptu_frame);
-        ptuFrame.getViewTreeObserver().addOnPreDrawListener(
-                new ViewTreeObserver.OnPreDrawListener() {
-                    @Override
-                    public boolean onPreDraw() {
-                        ptuFrame.getViewTreeObserver().removeOnPreDrawListener(this);
-                        int height = ptuFrame.getMeasuredHeight();
-                        int width = ptuFrame.getMeasuredWidth();
-                        ptuFrame.addView(pTuView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.MATCH_PARENT));
-                        ptuFrame.initAddFloat(width, height);
-                        pTuView.setTouchable(false);
-                        return true;
-                    }
-
-                });
+        setOnClick();
     }
 
     private void initView() {
-        pTuView = new PtuView(this);
+        ptuFrame = (PtuFrameLayout) findViewById(R.id.ptu_frame);
+        ptuView= (PtuView) findViewById(R.id.ptu_view);
     }
 
     private void setViewContent() {
         Intent intent = getIntent();
         String path = intent.getStringExtra("path");
-        pTuView.initBitmap(path);
-    }
+        ptuView.initBitmap(path);
 
+    }
+    private void setOnClick(){
+
+    }
     //
     //观察Fragment的生命周期，
     // （1）是否Activity创建，不管有没有添加，都会执行
@@ -70,7 +64,6 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
 
     private void setFragment() {
         fragMain = new MainFunctionFragment();
-        fragText = new AddTextFragment();
         fm = getFragmentManager();
         ft = fm.beginTransaction();
         ft.replace(R.id.fragment_function, fragMain);
@@ -81,11 +74,24 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
     public void changeFragment(String function) {
         switch (function) {
             case "text":
-                fragText = new AddTextFragment();
+                if(fragText==null) {
+                    fragText = new AddTextFragment();
+                }
                 fm.beginTransaction().add(R.id.fragment_function, fragText)
                         .addToBackStack("main")
                         .commit();
+                Rect rect=ptuView.getBound();
+                ptuView.setTouchable(false);
+                FloatTextView floatTextView = ptuFrame.initAddFloat(rect.right-rect.left,rect.bottom-rect.top);
+                fragText.setFloatView(floatTextView);
                 break;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        ptuFrame.removeViewAt(1);
+        ptuView.setTouchable(true);
+        super.onBackPressed();
     }
 }

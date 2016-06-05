@@ -31,6 +31,9 @@
     <color name="blueGrey">#607d8b</color>
 
 
+    <color name="button_color_switch">#5677fc</color>
+
+
     <drawable name="dialog_background">#80ffffff</drawable>
     <drawable name="hou">#dcdcdc</drawable>
     <drawable name="qian">#039be5</drawable>
