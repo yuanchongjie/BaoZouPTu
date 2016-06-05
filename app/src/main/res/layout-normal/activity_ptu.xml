@@ -12,8 +12,8 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="button"
-            android:background="@color/text_color1"/>
+            android:background="@color/text_color1"
+            android:text="button" />
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -27,16 +27,23 @@
             android:minWidth="70dp"
             android:src="@mipmap/bold" />
 
-        <Button
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/text_color1"
-            android:text="去发送" />
+            android:background="#00000000"
+            android:paddingLeft="@dimen/pading_function_item_image"
+            android:paddingRight="@dimen/pading_function_item_image"
+            android:src="@drawable/ic_menu_send" />
 
-        <Button
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="分享" />
+            android:background="#00000000"
+            android:paddingLeft="@dimen/pading_function_item_image"
+            android:paddingRight="@dimen/pading_function_item_image"
+            android:src="@drawable/ic_menu_share"
+
+            />
 
         <Button
             android:layout_width="wrap_content"
@@ -49,7 +56,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="85">
+        <a.baozouptu.view.PtuView
+            android:id="@+id/ptu_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </a.baozouptu.view.PtuFrameLayout>
+
     <FrameLayout
         android:id="@+id/fragment_function"
         android:layout_width="match_parent"

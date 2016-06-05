@@ -68,7 +68,7 @@
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="粗体"
+                    android:text="风格"
                     android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
