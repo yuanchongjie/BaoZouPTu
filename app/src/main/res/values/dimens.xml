@@ -12,11 +12,5 @@
     <dimen name="show_picture_item_height">83dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
-    <dimen name="color_wheel_radius">124dp</dimen>
-    <dimen name="color_wheel_thickness">15dp</dimen>
-    <dimen name="color_center_halo_radius">60dp</dimen>
-    <dimen name="color_center_radius">54dp</dimen>
-    <dimen name="color_pointer_halo_radius">23dp</dimen>
-    <dimen name="color_pointer_radius">16dp</dimen>
-
+    <dimen name="color_lump_width">35dp</dimen>
 </resources>

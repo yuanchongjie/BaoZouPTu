@@ -25,13 +25,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         Intent intent = new Intent(this,ShowPictureActivity.class);
         startActivity(intent);
-        /*
-        setContentView(R.layout.activity_main);
+
+       /* setContentView(R.layout.activity_main);
 
         initToolbar();
 
-        initview();*/
-
+        initview();
+*/
     }
 
     private void initview() {

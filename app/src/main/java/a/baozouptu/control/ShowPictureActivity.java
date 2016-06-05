@@ -256,7 +256,7 @@ public class ShowPictureActivity extends Activity {
         intent.putExtra("path", "/storage/sdcard1/哈哈.jpg");
         startActivity(intent);
 
-       /* setContentView(R.layout.activity_show_picture);
+        /*setContentView(R.layout.activity_show_picture);
         getScreenWidth();
         initView();
         new Thread(null, new Runnable() {

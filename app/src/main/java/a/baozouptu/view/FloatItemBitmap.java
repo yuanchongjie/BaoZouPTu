@@ -21,7 +21,6 @@ public class FloatItemBitmap {
         paint.setAntiAlias(true);
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
     public Bitmap getEditBitmap(Context context, int width, int color) {
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -41,12 +40,13 @@ public class FloatItemBitmap {
     public Bitmap getToBottomCenterBitmap(Context context, int width, int color) {
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
+        paint.setDither(true);
         paint.setColor(color);
-        paint.setStrokeWidth(5);
+        paint.setStrokeWidth(3.5f);
         canvas.drawLine(0, width / 4, width, width / 4, paint);
-        canvas.drawLine(0, width / 2, width, width / 2, paint);
-        canvas.drawLine(0, width / 2, width / 2, width, paint);
-        canvas.drawLine(width, width / 2, width / 2, width, paint);
+        canvas.drawLine(0, width / 2-3, width, width / 2-3, paint);
+        canvas.drawLine(0, width / 2-3, width / 2+1.5f, width-15, paint);
+        canvas.drawLine(width, width / 2-3, width / 2-1.5f, width-15, paint);
         return bitmap;
     }
 

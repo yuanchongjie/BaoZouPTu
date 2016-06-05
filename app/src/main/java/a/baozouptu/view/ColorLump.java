@@ -7,10 +7,12 @@ import android.util.AttributeSet;
 import android.view.View;
 
 /**
+ * 它的宽高用xml设置
  * Created by Administrator on 2016/5/24.
  */
 public class ColorLump extends View {
     private int mcolor;
+
 
     public ColorLump(Context context) {
         super(context);

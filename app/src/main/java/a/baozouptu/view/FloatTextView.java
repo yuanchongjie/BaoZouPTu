@@ -7,14 +7,16 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.hardware.input.InputManager;
 import android.os.Build;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.FrameLayout;
+
+import java.util.ArrayList;
 
 import a.baozouptu.R;
 import a.baozouptu.tools.Util;
@@ -22,7 +24,7 @@ import a.baozouptu.tools.Util;
 /**
  * Created by Administrator on 2016/5/29.
  */
-public class FloatTextView extends EditText {
+public class FloatTextView extends EditText implements FloatView {
     /**
      * 总的宽和高
      */
@@ -43,8 +45,12 @@ public class FloatTextView extends EditText {
     private static final int STATUS_TRANSLATE = 1;
     private static final int STATUS_SCALE = 2;
     private static final int STATUS_ROTATE = 3;
+    private static String ITEM_NAME;
+    private static final String ITEM_EDTI = "edit";
+    private static final String ITEM_BOTTOM_CENTER = "bcenter";
+
     private Context mContext;
-    public int mPadding = Util.dp2Px(12);
+    public int mPadding = Util.dp2Px(24);
     /**
      * 用与缩放的最近的位置
      */
@@ -52,30 +58,43 @@ public class FloatTextView extends EditText {
     public float currentRatio;
     private Rect pvBoundRect;
     private float mTextSize = 30;
-    private String mText = "请输入文字";
+    private String mText = "点击输入文字";
     private Paint mPaint = new Paint();
-    private Bitmap editItemBitmap;
     public float mWidth, mHeight;
     private static int SHOW_SATUS;
-    /**
-     * 透明
-     */
-    private static final int STATUS_TOUMING = 1;
-    /**
-     * 只显示边框
-     */
-    private static final int STATUS_RIM = 2;
-    /**
-     * 显示子项目
-     */
-    private static final int STATUS_ITEM = 3;
-    /**
-     * 显示输入法，输入状态
-     */
-    private static final int STATUS_INPUT = 4;
     private int rimColor;
     private int itemColor;
-    private Bitmap toBottomSenterBitmap;
+    private int downShowState;
+
+    public void setDownState() {
+        downShowState = SHOW_SATUS;
+    }
+
+    public int getDownState() {
+        return downShowState;
+    }
+
+    /**
+     * 表示item信息的类
+     */
+    private class Item {
+        float x;
+        float y;
+        String name;
+        Bitmap bitmap;
+
+        Item(float x, float y, String name) {
+            this.x = x;
+            this.y = y;
+            this.name = name;
+        }
+    }
+
+    ArrayList<Item> items = new ArrayList<>(8);
+    /**
+     * 边框的上下左右位置,注意这个位置相对与文本的边界发生了偏移
+     */
+    private float rimLeft, rimTop, rimRight, rimBottom;
 
     /**
      * 传入布局容器的宽高，确定view的位置
@@ -92,6 +111,10 @@ public class FloatTextView extends EditText {
 
     public Bitmap getEditItemBitmap() {
         return bitmapToView;
+    }
+
+    public int getShowState() {
+        return SHOW_SATUS;
     }
 
     public float getRelativeY() {
@@ -138,7 +161,7 @@ public class FloatTextView extends EditText {
         setText(mText);
         setTextSize(mTextSize);
         setTextColor(Color.BLACK);
-        setPadding(mPadding * 2, mPadding, mPadding * 2, mPadding);
+        setPadding(mPadding, mPadding, mPadding, mPadding);
         setBackground(null);
 
         //获取view的宽和高
@@ -148,12 +171,6 @@ public class FloatTextView extends EditText {
         startY = totalHeight - mHeight;
 
         SHOW_SATUS = STATUS_INPUT;
-        setOnClickListener(new TextView.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showItem();
-            }
-        });
 
         initItems();
     }
@@ -166,9 +183,19 @@ public class FloatTextView extends EditText {
             rimColor = mContext.getResources().getColor(R.color.float_rim_color);
             itemColor = mContext.getResources().getColor(R.color.float_item_color);
         }
+        items.add(null);//第0个
+        items.add(null);//第1个
         FloatItemBitmap floatItemBitmap = new FloatItemBitmap();
-        editItemBitmap = floatItemBitmap.getEditBitmap(mContext, mPadding, itemColor);
-        toBottomSenterBitmap = floatItemBitmap.getToBottomCenterBitmap(mContext, mPadding, itemColor);
+        Item item = new Item(-1, -1, ITEM_EDTI);
+        item.bitmap = floatItemBitmap.getEditBitmap(mContext, mPadding, itemColor);
+        items.add(item);//第2个
+        items.add(null);//第3个
+        items.add(null);//第4个
+        items.add(null);//第5个
+        item = new Item(-1, -1, ITEM_BOTTOM_CENTER);
+        item.bitmap = floatItemBitmap.getToBottomCenterBitmap(mContext, mPadding, itemColor);
+        items.add(item);//第6个
+        items.add(null);//第7个
     }
 
     /**
@@ -226,9 +253,9 @@ public class FloatTextView extends EditText {
         }
         //根据范围调整比例
         if (mTextSize <= 2) {
-            mTextSize = 4;
+            mTextSize = 3;
             if (currentRatio < 1)
-                currentRatio = 1.1f;
+                currentRatio = 1f;
         }
         if (mWidth > pvBoundRect.right - pvBoundRect.left + 150) {
             float tr = (pvBoundRect.right - pvBoundRect.left + 150) / mWidth;
@@ -269,59 +296,28 @@ public class FloatTextView extends EditText {
             startY = pvBoundRect.bottom - mPadding;
     }
 
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        super.onTouchEvent(event);
-        return true;
-    }
-
-
-    public void hideBackGround() {
-        if (SHOW_SATUS != STATUS_TOUMING) {
-            SHOW_SATUS = STATUS_TOUMING;
+    public void changeShowState(int state) {
+        if (SHOW_SATUS != state) {
+            SHOW_SATUS = state;
             invalidate();
-           /* InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-           if(imm.isActive()){
-               imm.hideSoftInputFromWindow(this.getWindowToken(), 0);
-           }*/
         }
-    }
-
-    public void showItem() {
-        if (SHOW_SATUS == STATUS_RIM) {
-            SHOW_SATUS = STATUS_ITEM;
-        } else if (SHOW_SATUS == STATUS_TOUMING) {
-            SHOW_SATUS = STATUS_ITEM;
-        } else {//背景不透明了，显示输入法
-            SHOW_SATUS = STATUS_INPUT;
-        }
-        invalidate();
-    }
-
-    /**
-     * 不显示floatview的边框，只显示其item
-     */
-    public void hideItem() {
-        SHOW_SATUS = STATUS_RIM;
-        invalidate();
     }
 
 
     /**
      * 将sp值转换为px值，保证文字大小不变
      *
-     * @param spValue
-     *            （DisplayMetrics类中属性scaledDensity）
+     * @param spValue （DisplayMetrics类中属性scaledDensity）
      * @return
      */
     public int sp2px(float spValue) {
         final float fontScale = mContext.getResources().getDisplayMetrics().scaledDensity;
         return (int) (spValue * fontScale + 0.5f);
     }
+
     @Override
     protected void onDraw(Canvas canvas) {
-        if (SHOW_SATUS >= STATUS_RIM) {
+        if (SHOW_SATUS >= STATUS_RIM) {//要显示的东西不止边框
             mPaint.setColor(rimColor);
             mPaint.setStrokeWidth(3);
 
@@ -330,40 +326,73 @@ public class FloatTextView extends EditText {
             /**
              * 文本默认不局中，计算中间位置
              */
-
-            float md = sp2px(fm.ascent - fm.top), nd = sp2px(fm.bottom - fm.descent), dd=md-nd;
+            float md = sp2px(fm.ascent - fm.top), nd = sp2px(fm.bottom - fm.descent), dd = md - nd;
+            rimLeft = mPadding - md;
+            rimTop = mPadding + dd;
+            rimRight = mWidth - mPadding + md;
+            rimBottom = mHeight - mPadding;
             //上边的线
-            canvas.drawLine(mPadding * 2 - md, mPadding,
-                    mWidth - mPadding * 2 + md, mPadding,
-                    mPaint);
+            canvas.drawLine(rimLeft, rimTop, rimRight, rimTop, mPaint);
             //左边的线
-            canvas.drawLine(mPadding * 2 - md, mPadding,
-                    mPadding * 2 - md, mHeight - mPadding + dd,
-                    mPaint);
+            canvas.drawLine(rimLeft, rimTop, rimLeft, rimBottom, mPaint);
             //下边的线
-            canvas.drawLine(mPadding * 2 - md, mHeight - mPadding + dd,
-                    mWidth - mPadding * 2 + md, mHeight - mPadding + dd,
-                    mPaint);
+            canvas.drawLine(rimLeft, rimBottom, rimRight, rimBottom, mPaint);
             //右边的线
-            canvas.drawLine(mWidth - mPadding * 2 + md, mPadding,
-                    mWidth - mPadding * 2 + md, mHeight - mPadding + dd,
-                    mPaint);
+            canvas.drawLine(rimRight, rimTop, rimRight, rimBottom, mPaint);
         }
         if (SHOW_SATUS >= STATUS_ITEM) {
             mPaint.setColor(itemColor);
-            canvas.drawBitmap(editItemBitmap, new Rect(0, 0, mPadding * 2, mPadding * 2),
-                    new RectF(mWidth - mPadding * 2, 0,
-                            mWidth, mPadding * 2),
-                    mPaint);
-            canvas.drawBitmap(toBottomSenterBitmap, new Rect(0, 0, mPadding * 2 - 5, mPadding * 2 - 5),
-                    new RectF(mWidth / 2 - mPadding, mHeight - mPadding + 5,
-                            mWidth / 2 + mPadding, mHeight),
-                    mPaint);
+            items.get(2).x = rimRight - mPadding / 2;
+            items.get(2).y = rimTop - mPadding / 2;
+            drawItems(canvas, items.get(2));
+            items.get(6).x = mWidth / 2 - mPadding / 2;
+            items.get(6).y = rimBottom;
+            drawItems(canvas, items.get(6));
         }
         super.onDraw(canvas);
     }
 
-    public RectF getBound() {
-        return new RectF(startX, startY, startX + mWidth, startY + mHeight);
+    private void drawItems(Canvas canvas, Item item) {
+        canvas.drawBitmap(item.bitmap, new Rect(0, 0, mPadding, mPadding),
+                new RectF(item.x, item.y,
+                        item.x + mPadding,
+                        item.y + mPadding),
+                mPaint);
+    }
+
+    /**
+     * 判断点击的发生的位置，根据相应条件判断是否重回自己，告诉父图是否需要重新layout；
+     *
+     * @param x
+     * @param y
+     * @return
+     */
+    public boolean showLayoutOrRefreshByClick(float x, float y) {
+        x -= startX;
+        y -= startY;//变换为本view的坐标
+        if (new RectF(items.get(6).x, items.get(2).y,
+                items.get(6).x + mPadding,
+                items.get(6).y + mPadding).contains(x, y)) {
+            onClickBottomCenter();
+            return true;
+        }//点击发生在这个floatView之外
+        else if (x < 0 || y < 0 || x > mWidth || y > mHeight) {
+            if(SHOW_SATUS==STATUS_INPUT){
+                InputMethodManager imm = ( InputMethodManager ) mContext.getSystemService( Context.INPUT_METHOD_SERVICE );
+                if ( imm.isActive( ) ) {
+                    imm.hideSoftInputFromWindow( this.getApplicationWindowToken( ) , 0 );
+                }
+            }
+            changeShowState(STATUS_TOUMING);
+        } else if (SHOW_SATUS < STATUS_INPUT) {
+            changeShowState(STATUS_INPUT);
+        }
+        return false;
+    }
+
+    private void onClickBottomCenter() {
+        startX = (totalWidth - mWidth) / 2;
+        startY = totalHeight - mHeight;
+        SHOW_SATUS=STATUS_INPUT;
     }
 }

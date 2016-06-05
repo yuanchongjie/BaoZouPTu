@@ -81,7 +81,8 @@ public class ColorBar extends View {
     }
 
     /**
-     * 获取组件的长和宽
+     * onsizechanged时获取组件的长和宽，后面ondraw时就利用它们进行绘图
+     *
      * @param w
      * @param h
      * @param oldw
@@ -92,6 +93,7 @@ public class ColorBar extends View {
         thumbRadius = h / 2;
         barHeight = thumbRadius;
         barWidth = w - thumbRadius * 2;
+        barStartX = thumbRadius;//不从0开始，左右边缘用于显示滑块
         barStartY = thumbRadius - barHeight / 2;
         super.onSizeChanged(w, h, oldw, oldh);
     }
@@ -119,6 +121,7 @@ public class ColorBar extends View {
 
     /**
      * 处理点击和滑动事件
+     *
      * @param event
      * @return
      */
@@ -142,6 +145,7 @@ public class ColorBar extends View {
                 break;
 
         }
+        //局部更新，好像没什么用
         invalidate(currentThumbOffset - thumbRadius, barStartY + barHeight / 2 - thumbRadius,
                 currentThumbOffset + thumbRadius, barStartY + barHeight / 2 + thumbRadius);
         return true;
@@ -155,7 +159,6 @@ public class ColorBar extends View {
                 drawThumb(canvas);
                 break;
             case STATUS_SEEK:
-                Util.P.le(canvas.getHeight(), canvas.getWidth());
                 drawBar(canvas);
                 currentColor = getCurrentColor();
                 drawThumb(canvas);
@@ -170,7 +173,7 @@ public class ColorBar extends View {
     }
 
     /**
-     *  获取当前所在区间，再根据颜色变换算法获取颜色值
+     * 获取当前所在区间，再根据颜色变换算法获取颜色值
      */
 
     private int getCurrentColor() {
@@ -194,10 +197,10 @@ public class ColorBar extends View {
         thumbPaint.setColor(currentColor);
         canvas.drawOval(getThumbRect(), thumbPaint);
     }
-    /**
-     *  获取滑块所在的矩形区域
-     */
 
+    /**
+     * 获取滑块所在的矩形区域
+     */
     private RectF getThumbRect() {
         return new RectF(currentThumbOffset - thumbRadius, barStartY + barHeight / 2 - thumbRadius,
                 currentThumbOffset + thumbRadius, barStartY + barHeight / 2 + thumbRadius);
