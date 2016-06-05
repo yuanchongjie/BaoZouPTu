@@ -69,10 +69,17 @@ public class ColorBar extends View {
 
     public interface ColorChangeListener {
         void colorChange(int color);
+    } public interface ColorChosedListener {
+        void colorChosed(int color);
     }
-
-    ColorChangeListener colorChangeListener;
-
+    ColorChangeListener colorChangeListener; 
+    ColorChosedListener colorChosedListener;
+    public void setOnColorChangerListener(ColorChangeListener colorChangerListener) {
+        this.colorChangeListener = colorChangerListener;
+    }
+    public void setOnColorChosedListener(ColorChosedListener colorChosedrListener) {
+        this.colorChosedListener = colorChosedrListener;
+    }
     public ColorBar(Context context, AttributeSet attrs) {
         super(context, attrs);
         currentColor = COLORS[0];
@@ -96,10 +103,6 @@ public class ColorBar extends View {
         barStartX = thumbRadius;//不从0开始，左右边缘用于显示滑块
         barStartY = thumbRadius - barHeight / 2;
         super.onSizeChanged(w, h, oldw, oldh);
-    }
-
-    public void setOnColorChangerListener(ColorChangeListener colorChangerListener) {
-        this.colorChangeListener = colorChangerListener;
     }
 
     /**
@@ -143,6 +146,10 @@ public class ColorBar extends View {
                 if (currentThumbOffset >= barWidth + thumbRadius)
                     currentThumbOffset = barWidth + thumbRadius;
                 break;
+            case MotionEvent.ACTION_UP:
+                if (colorChosedListener != null)
+                    currentColor = getCurrentColor();
+                    colorChosedListener.colorChosed(currentColor);
 
         }
         //局部更新，好像没什么用

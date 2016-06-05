@@ -125,7 +125,9 @@ public class PtuView extends View {
      * 右上角y坐标，以view的右上角为原点，（0,0）
      */
     private int coY;
-
+    /**
+     * 图片的局部，要现实出来的部分
+     */
     Rect srcRect = new Rect(0, 0, 1, 1);
     /**
      * 图片在canvas上面的位置
@@ -176,9 +178,13 @@ public class PtuView extends View {
     public void setTouchable(boolean touchable) {
         this.touchable = touchable;
     }
-    /*
+
+    /**
+     * 保存生成的图片
+     * @param path
+     */
     public void saveNewBitmap(String path) {
-		File file = new File(path);
+		/*File file = new File(path);
 		if (!file.exists())
 			try { 
 				FileOutputStream fileOutputStream = new FileOutputStream(
@@ -189,9 +195,9 @@ public class PtuView extends View {
 				Log.e("saveBmp is succseed", "yes!");
 			} catch (Exception e) {
 				e.printStackTrace();
-			}
+			}*/
 	}
-*/
+
 
     class Point {
         public float x, y;
@@ -221,11 +227,13 @@ public class PtuView extends View {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferQualityOverSpeed = true;
         sourceBitmap = BitmapFactory.decodeFile(path2);
+
         if (sourceBitmap == null) {
             Toast.makeText(mContext, "图片不存在", Toast.LENGTH_SHORT).show();
             Util.P.le("PTuView.initBitmap", "sourceBitmap出现空指针");
             return;
         }
+        CURRENT_STATUS=STATUS_INIT;
         invalidate();
     }
 
@@ -358,7 +366,6 @@ public class PtuView extends View {
     /**
      * 绘制，这里根据不同的当前状态来绘制图片CURRENT_STATUS
      */
-    @TargetApi(Build.VERSION_CODES.M)
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -387,6 +394,10 @@ public class PtuView extends View {
         canvas.drawBitmap(bitmapToview, matrix, null);//将底图绘制到View上面到
     }
 
+    /**
+     * 图片在PtuFrameLayout上的相对位置
+     * @return
+     */
     public Rect getBound() {
         return dstRect;
     }
@@ -414,6 +425,11 @@ public class PtuView extends View {
      * <p>获取当前何种的Ratio
      */
     public void initAndFirstDraw() {
+        if (sourceBitmap == null) {
+            Toast.makeText(mContext, "图片不存在", Toast.LENGTH_SHORT).show();
+            Util.P.le("PTuView.initBitmap", "sourceBitmap出现空指针");
+            return;
+        }
         srcPicWidth = sourceBitmap.getWidth();
         srcPicHeight = sourceBitmap.getHeight();
         bitmapToview = Bitmap.createBitmap(totalWidth, totalHeight,

@@ -17,14 +17,36 @@ import a.baozouptu.R;
  * Created by Administrator on 2016/4/29.
  */
 @TargetApi(Build.VERSION_CODES.M)
-public class MainFunctionFragment extends Fragment{
+public class MainFunctionFragment extends Fragment {
     Context mcontext;
+    /**
+     * 代表主功能的组件,剪切
+     */
+    private LinearLayout cutFunction;
+    /**
+     * 代表主功能的组件,文字
+     */
+    private LinearLayout textFunction;
+    /**
+     * 代表主功能的组件,贴图
+     */
+    private LinearLayout tietuFunction;
+    /**
+     * 代表主功能的组件,绘图
+     */
+    private LinearLayout huituFunction;
+    /**
+     * 代表主功能的组件,抠图
+     */
+    private LinearLayout koutuFunction;
 
     private View view;
     private Listen listen;
-    public interface Listen{
+
+    public interface Listen {
         void changeFragment(String function);
     }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -32,8 +54,8 @@ public class MainFunctionFragment extends Fragment{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mcontext=getActivity();
-        listen=(Listen)mcontext;
+        mcontext = getActivity();
+        listen = (Listen) mcontext;
         super.onCreate(savedInstanceState);
     }
 
@@ -41,13 +63,50 @@ public class MainFunctionFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_main_function, container, false);
-        LinearLayout textLin=(LinearLayout)view.findViewById(R.id.main_function_text);
-        textLin.setOnClickListener(new View.OnClickListener() {
+        initView(view);
+        setOnClick();
+        return view;
+    }
+
+    private void setOnClick() {
+        cutFunction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listen.changeFragment("cut");
+            }
+        });
+        textFunction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 listen.changeFragment("text");
             }
         });
-        return view;
+        tietuFunction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listen.changeFragment("tietu");
+            }
+        });
+        huituFunction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listen.changeFragment("huitu");
+            }
+        });
+        koutuFunction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listen.changeFragment("koutu");
+            }
+        });
+
+    }
+
+    private void initView(View view) {
+        cutFunction = (LinearLayout) view.findViewById(R.id.main_function_cut);
+        textFunction = (LinearLayout) view.findViewById(R.id.main_function_text);
+        tietuFunction = (LinearLayout) view.findViewById(R.id.main_function_tietu);
+        huituFunction = (LinearLayout) view.findViewById(R.id.main_function_huitu);
+        koutuFunction = (LinearLayout) view.findViewById(R.id.main_function_koutu);
     }
 }

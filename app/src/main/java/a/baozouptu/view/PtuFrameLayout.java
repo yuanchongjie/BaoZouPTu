@@ -40,7 +40,7 @@ public class PtuFrameLayout extends FrameLayout {
         mContext = context;
     }
 
-    public void initAddFloat(int totalWidth, int totalHeight) {
+    public FloatTextView initAddFloat(int totalWidth, int totalHeight) {
         this.totalWidth = totalWidth;
         this.totalHeight = totalHeight;
         //设置floatText的基本属性
@@ -54,6 +54,7 @@ public class PtuFrameLayout extends FrameLayout {
                 (int) (floatView.getStartX() + floatView.mWidth),
                 (int) (floatView.getStartY() + floatView.mHeight));
         addView(floatView, floatParams);
+        return floatView;
     }
 
     @Override
@@ -134,7 +135,8 @@ public class PtuFrameLayout extends FrameLayout {
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         super.dispatchTouchEvent(ev);
-        onTouchEvent(ev);
+        //拥有浮动视图时，处理点击事件，否则tpuview全权处理了
+        if(getChildCount()>1)  onTouchEvent(ev);
         return true;
     }
 

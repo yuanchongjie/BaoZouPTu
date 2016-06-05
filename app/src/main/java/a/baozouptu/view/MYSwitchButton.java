@@ -224,7 +224,7 @@ public class MySwitchButton extends View {
         }
     }
 
-    public void setSlideListener(SlideListener listener) {
+    public void setOnSlideListener(SlideListener listener) {
         this.listener = listener;
     }
 
