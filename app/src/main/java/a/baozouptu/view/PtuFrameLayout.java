@@ -1,6 +1,8 @@
 package a.baozouptu.view;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
@@ -13,6 +15,7 @@ import a.baozouptu.tools.Util;
  * Created by Administrator on 2016/5/30.
  */
 public class PtuFrameLayout extends FrameLayout {
+    private String DEBUG_TAG ="PtuFrameLayout";
     private static int CURRENT_STATUS = 0;
     private static final int STATUS_INIT = 0;
     private static final int STATUS_MOVE_FLOAT = 1;
@@ -41,6 +44,7 @@ public class PtuFrameLayout extends FrameLayout {
     }
 
     public FloatTextView initAddFloat(int totalWidth, int totalHeight) {
+        Util.P.le(DEBUG_TAG,"initAddFloat");
         this.totalWidth = totalWidth;
         this.totalHeight = totalHeight;
         //设置floatText的基本属性
@@ -50,30 +54,31 @@ public class PtuFrameLayout extends FrameLayout {
         FrameLayout.LayoutParams floatParams =
                 new FrameLayout.LayoutParams((int) floatView.mWidth, (int) floatView.mHeight);
 
-        floatParams.setMargins((int) floatView.getStartX(), (int) floatView.getStartY(),
-                (int) (floatView.getStartX() + floatView.mWidth),
-                (int) (floatView.getStartY() + floatView.mHeight));
+        floatParams.setMargins((int) floatView.getmLeft(), (int) floatView.getmTop(),
+                (int) (floatView.getmLeft() + floatView.mWidth),
+                (int) (floatView.getmTop() + floatView.mHeight));
         addView(floatView, floatParams);
         return floatView;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        Util.P.le(DEBUG_TAG,"onTouchEvent");
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 if (hasUp) {
                     hasUp = false;
                     floatView.setDownState();
                 }
-                floatView.changeShowState(FloatView.STATUS_RIM);
+                Util.P.le("经过了down",floatView.getDownState());
 
                 //获取点击下去时的数据，位置，时间，
                 downX = event.getX();
                 downY = event.getY();
                 downTime = System.currentTimeMillis();
 
-                floatView.relativeX = event.getX() - floatView.getStartX();
-                floatView.relativeY = event.getY() - floatView.getStartY();
+                floatView.relativeX = event.getX() - floatView.getmLeft();
+                floatView.relativeY = event.getY() - floatView.getmTop();
                 CURRENT_STATUS = STATUS_MOVE_FLOAT;
 
                 break;
@@ -83,9 +88,11 @@ public class PtuFrameLayout extends FrameLayout {
                         event.getX(1), event.getY(1));
                 scaleCenterX = (event.getX(0) + event.getX(1)) / 2;
                 scaleCenterY = (event.getY(0) + event.getY(1)) / 2;
-                floatView.relativeX = scaleCenterX - floatView.getStartX();
-                floatView.relativeY = scaleCenterY - floatView.getStartY();
+                floatView.relativeX = scaleCenterX - floatView.getmLeft();
+                floatView.relativeY = scaleCenterY - floatView.getmTop();
+
             case MotionEvent.ACTION_MOVE:
+                floatView.changeShowState(FloatView.STATUS_RIM);
                 if (event.getPointerCount() == 2) {
                     //以缩放中心的为相对坐标，用于一边缩放一边移动
                     float ncenterX = (event.getX(0) + event.getX(1)) / 2,
@@ -109,45 +116,67 @@ public class PtuFrameLayout extends FrameLayout {
                         CURRENT_STATUS == STATUS_MOVE_FLOAT) {//是在移动浮动view
                     floatView.drag(event.getX(), event.getY());
                     redrawFloat();
-                } else {
-
                 }
                 break;
-            case MotionEvent.ACTION_POINTER_UP:
-                if (event.getPointerCount() == 1) {
-                } else if (event.getPointerCount() == 2) {
-                }
             case MotionEvent.ACTION_UP:
+                Util.P.le("经过了up");
                 //点击事件
                 if (hasUp == false && GeoUtil.getDis(downX, downY, event.getX(), event.getY()) < minMoveDis
                         && System.currentTimeMillis() - downTime < 500) {
-                    if (floatView.showLayoutOrRefreshByClick(event.getX(), event.getY()))//返回true表示需要重绘
-                        redrawFloat();
+                    //点击发生在floatView之外
+                    if (!(new RectF(floatView.getmLeft(),floatView.getmTop(),
+                            floatView.getLeft()+floatView.mWidth,floatView.getmTop()+floatView.mHeight)
+                            .contains(event.getX(),event.getY())))
+                        floatView.changeShowState(floatView.STATUS_TOUMING);
+                    Util.P.le("经过了up2");
                 } else {//不是点击事件，将之前状态显示出来
                     floatView.changeShowState(floatView.getDownState());
+                    Util.P.le("经过了up3",floatView.getDownState());
                 }
+                Util.P.le("经过了up4");
                 hasUp = true;
                 break;
         }
+        return false;
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
         return true;
     }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        super.dispatchTouchEvent(ev);
-        //拥有浮动视图时，处理点击事件，否则tpuview全权处理了
-        if (getChildCount() > 1) onTouchEvent(ev);
+        Util.P.le(DEBUG_TAG,"dispatchTouchEvent");
+        Util.P.le("实际位置"+(ev.getX()-floatView.getmLeft()),(ev.getY()-floatView.getmTop()));
+        float sx=ev.getX(),sy=ev.getY();
+        boolean isConsume=false;
+        if(getChildCount()>1){
+            if ((new RectF(floatView.getmLeft(),floatView.getmTop(),
+                    floatView.getLeft()+floatView.mWidth,floatView.getmTop()+floatView.mHeight)
+                    .contains(ev.getX(),ev.getY()))) {
+                ev.setLocation(ev.getX()-floatView.getmLeft(),ev.getY()-floatView.getmTop());
+                isConsume=getChildAt(1).dispatchTouchEvent(ev);
+                if(isConsume)//消费了up事件，up置为true
+                    hasUp=true;
+            }
+        }
+        if(!isConsume){
+            ev.setLocation(sx,sy);
+            onTouchEvent(ev);
+        }
         return true;
     }
 
     public void redrawFloat() {
+        Util.P.le(DEBUG_TAG,"redrawFloat");
         removeView(floatView);
         FrameLayout.LayoutParams floatParams =
                 new FrameLayout.LayoutParams((int) floatView.mWidth,
                         (int) floatView.mHeight);
-        floatParams.setMargins((int) floatView.getStartX(), (int) floatView.getStartY(),
-                (int) (floatView.getStartX() + floatView.mWidth),
-                (int) (floatView.getStartY() + floatView.mHeight));
+        floatParams.setMargins((int) floatView.getmLeft(), (int) floatView.getmTop(),
+                (int) (floatView.getmLeft() + floatView.mWidth),
+                (int) (floatView.getmTop() + floatView.mHeight));
         addView(floatView, floatParams);
     }
 }

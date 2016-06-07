@@ -12,6 +12,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.TouchDelegate;
 import android.view.View;
+import android.view.ViewParent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -20,6 +21,57 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
+    void invalidateInternal(int l, int t, int r, int b, boolean invalidateCache,
+                            boolean fullInvalidate) {
+        if (mGhostView != null) {
+            mGhostView.invalidate(true);
+            return;
+        }
+
+        if (skipInvalidate()) {
+            return;
+        }
+
+        if ((mPrivateFlags & (PFLAG_DRAWN | PFLAG_HAS_BOUNDS)) == (PFLAG_DRAWN | PFLAG_HAS_BOUNDS)
+                || (invalidateCache && (mPrivateFlags & PFLAG_DRAWING_CACHE_VALID) == PFLAG_DRAWING_CACHE_VALID)
+                || (mPrivateFlags & PFLAG_INVALIDATED) != PFLAG_INVALIDATED
+                || (fullInvalidate && isOpaque() != mLastIsOpaque)) {
+            if (fullInvalidate) {
+                mLastIsOpaque = isOpaque();
+                mPrivateFlags &= ~PFLAG_DRAWN;
+            }
+
+            mPrivateFlags |= PFLAG_DIRTY;
+
+            if (invalidateCache) {
+                mPrivateFlags |= PFLAG_INVALIDATED;
+                mPrivateFlags &= ~PFLAG_DRAWING_CACHE_VALID;
+            }
+
+            // Propagate the damage rectangle to the parent view.
+            final AttachInfo ai = mAttachInfo;
+            final ViewParent p = mParent;
+            if (p != null && ai != null && l < r && t < b) {
+                final Rect damage = ai.mTmpInvalRect;
+                damage.set(l, t, r, b);
+                p.invalidateChild(this, damage);
+            }
+
+            // Damage the entire projection receiver, if necessary.
+            if (mBackground != null && mBackground.isProjected()) {
+                final View receiver = getProjectionReceiver();
+                if (receiver != null) {
+                    receiver.damageInParent();
+                }
+            }
+
+            // Damage the entire IsolatedZVolume receiving this view's shadow.
+            if (isHardwareAccelerated() && getZ() != 0) {
+                damageShadowReceiver();
+            }
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
