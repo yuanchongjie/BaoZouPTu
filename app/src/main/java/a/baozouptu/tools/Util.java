@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.Log;
+import android.view.ViewConfiguration;
 import android.widget.Toast;
 
 /**
@@ -107,7 +108,8 @@ public class Util {
         public static long lastTime=-1;
         public static boolean isDoubleClick(){
             long curTime=System.currentTimeMillis();
-            if(curTime-lastTime<300) {
+            //貌似系统定义的双击正是300毫秒 ViewConfiguration.getDoubleTapTimeout()
+            if(curTime-lastTime<ViewConfiguration.getDoubleTapTimeout()) {
                 lastTime=curTime;
                 return true;
             }

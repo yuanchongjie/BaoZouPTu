@@ -26,6 +26,7 @@ import a.baozouptu.view.HorizontalListView;
 import a.baozouptu.view.MySwitchButton;
 
 /**
+ * 添加文字功能的fragment
  * Created by Administrator on 2016/5/1.
  */
 public class AddTextFragment extends Fragment {
