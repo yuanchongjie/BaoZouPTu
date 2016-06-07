@@ -1,25 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:openDrawer="start">
+    android:orientation="vertical">
+   <EditText
+       android:layout_gravity="center"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:inputType="none"
+       android:text="wahahahahah....."
+       android:textSize="20pt"
+       />
+   <Button
+       android:id="@+id/show_popup_window"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:text="显示popupwindow"
+       android:textSize="20pt"
+       />
 
-    <include
-        layout="@layout/app_bar_main2"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <android.support.design.widget.NavigationView
-        android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_main2"
-        app:menu="@menu/activity_main_drawer" />
-
-</android.support.v4.widget.DrawerLayout>
+</LinearLayout>

@@ -30,7 +30,7 @@ public class FunctionDialogBuilder {
     void getTypefaceDialog(int baseViewHeight) {
         Dialog dialog = new Dialog(mContext);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_text_type);
+        dialog.setContentView(R.layout.popwindow_text_type);
         HorizontalListView horizontalListView = (HorizontalListView) dialog.findViewById(R.id.hList_text_type);
         final Typeface[] typefaces = new Typeface[]{Typeface.DEFAULT, Typeface.DEFAULT_BOLD,
                 Typeface.MONOSPACE, Typeface.SANS_SERIF};
@@ -80,7 +80,7 @@ public class FunctionDialogBuilder {
     void getTextStyleDialog(int baseViewHeight) {
         final Dialog dialog = new Dialog(mContext);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_text_style);
+        dialog.setContentView(R.layout.popwindow_text_style);
 
         setDialogLayout(dialog, baseViewHeight);
         dialog.show();

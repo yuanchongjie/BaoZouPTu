@@ -9,6 +9,7 @@ import a.baozouptu.tools.GeoUtil;
 import a.baozouptu.tools.Util;
 
 /**
+ * 重绘子视图是一个重要的功能，应该写得简洁有力
  * Created by Administrator on 2016/5/30.
  */
 public class PtuFrameLayout extends FrameLayout {
@@ -28,6 +29,10 @@ public class PtuFrameLayout extends FrameLayout {
     private long downTime;
     private float scaleCenterX;
     private float scaleCenterY;
+    /**
+     * 判断手指是否抬起过，因为down事件会不断触发，无法判断up与down的关系
+     */
+    private boolean hasUp=true;
 
 
     public PtuFrameLayout(Context context, AttributeSet attrs) {
@@ -55,7 +60,11 @@ public class PtuFrameLayout extends FrameLayout {
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                floatView.hideItem();
+                if(hasUp){
+                    hasUp=false;
+                    floatView.setDownState();
+                }
+                floatView.changeShowState(FloatView.STATUS_RIM);
 
                 //获取点击下去时的数据，位置，时间，
                 downX = event.getX();
@@ -83,7 +92,8 @@ public class PtuFrameLayout extends FrameLayout {
 
                     if (GeoUtil.getDis(scaleCenterX, scaleCenterY, ncenterX, ncenterY) > Util.dp2Px(5))
                         floatView.drag(ncenterX, ncenterY);
-                    scaleCenterX=ncenterX;scaleCenterY=ncenterY;
+                    scaleCenterX = ncenterX;
+                    scaleCenterY = ncenterY;
 
                     //增加的距离
                     float endFloatDis = GeoUtil.getDis(event.getX(0), event.getY(0),
@@ -107,13 +117,15 @@ public class PtuFrameLayout extends FrameLayout {
                 } else if (event.getPointerCount() == 2) {
                 }
             case MotionEvent.ACTION_UP:
-
-                if (GeoUtil.getDis(downX, downY, event.getX(), event.getY()) < minMoveDis
-                        && floatView.getBoundRect().contains(event.getX(), event.getY())
-                        && System.currentTimeMillis() - downTime < 500)
-                    floatView.hideBackGround();  //点击，隐藏整个背景
-                else
-                    floatView.showItem();   //拖动或放大是隐藏了整个背景，将其显示出来
+                //点击事件
+                if (hasUp==false&&GeoUtil.getDis(downX, downY, event.getX(), event.getY()) < minMoveDis
+                        && System.currentTimeMillis() - downTime < 500) {
+                    if (floatView.showLayoutOrRefreshByClick(event.getX(),event.getY()))//返回true表示需要重绘
+                        redrawFloat();
+                } else {//不是点击事件，将之前状态显示出来
+                    floatView.changeShowState(floatView.getDownState());
+                }
+                hasUp=true;
                 break;
         }
         return true;
