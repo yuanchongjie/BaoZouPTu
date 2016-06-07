@@ -47,14 +47,6 @@ public class FloatTextView extends EditText implements FloatView {
      * 移动的顶点最后的位置
      */
     public float relativeX, relativeY;
-    /**
-     * 当前的操作状态
-     */
-    private static int CURRENT_STATUS = 0;
-    private static final int STATUS_TRANSLATE = 1;
-    private static final int STATUS_SCALE = 2;
-    private static final int STATUS_ROTATE = 3;
-    private static String ITEM_NAME;
     private static final String ITEM_EDTI = "edit";
     private static final String ITEM_BOTTOM_CENTER = "bcenter";
 
@@ -129,10 +121,6 @@ public class FloatTextView extends EditText implements FloatView {
         init(totalWidth, totalHeight);
     }
 
-    public Bitmap getEditItemBitmap() {
-        return bitmapToView;
-    }
-
     public int getShowState() {
         return SHOW_SATUS;
     }
@@ -155,10 +143,6 @@ public class FloatTextView extends EditText implements FloatView {
         return mLeft;
     }
 
-    /**
-     * 含有view内容的bitmap
-     */
-    public Bitmap bitmapToView;
     RectF rect;
 
     public FloatTextView(Context context) {
@@ -375,6 +359,11 @@ public class FloatTextView extends EditText implements FloatView {
         return (int) (spValue * fontScale + 0.5f);
     }
 
+    public Bitmap getBitmap(){
+        Bitmap textBitmap=Bitmap.createBitmap((int)mWidth,(int)mHeight, Bitmap.Config.ARGB_8888);
+        super.draw(new Canvas(textBitmap));
+        return textBitmap;
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
