@@ -2,6 +2,7 @@ package a.baozouptu.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -22,7 +23,6 @@ public class PtuFrameLayout extends FrameLayout {
     private static final int STATUS_SCALE_FLOAT = 2;
 
     private FloatTextView floatView;
-    private int totalWidth, totalHeight;
     Context mContext;
     private float lastFloatDis;
     private boolean onFloat = false;
@@ -43,12 +43,10 @@ public class PtuFrameLayout extends FrameLayout {
         mContext = context;
     }
 
-    public FloatTextView initAddFloat(int totalWidth, int totalHeight) {
+    public FloatTextView initAddFloat(Rect ptuViewBound) {
         Util.P.le(DEBUG_TAG,"initAddFloat");
-        this.totalWidth = totalWidth;
-        this.totalHeight = totalHeight;
         //设置floatText的基本属性
-        floatView = new FloatTextView(mContext, totalWidth, totalHeight);
+        floatView = new FloatTextView(mContext, ptuViewBound);
 
         //设置布局
         FrameLayout.LayoutParams floatParams =
@@ -68,7 +66,7 @@ public class PtuFrameLayout extends FrameLayout {
             case MotionEvent.ACTION_DOWN:
                 if (hasUp) {
                     hasUp = false;
-                    floatView.setDownState();
+                        floatView.setDownState();
                 }
                 Util.P.le("经过了down",floatView.getDownState());
 
@@ -93,30 +91,30 @@ public class PtuFrameLayout extends FrameLayout {
 
             case MotionEvent.ACTION_MOVE:
                 floatView.changeShowState(FloatView.STATUS_RIM);
-                if (event.getPointerCount() == 2) {
-                    //以缩放中心的为相对坐标，用于一边缩放一边移动
-                    float ncenterX = (event.getX(0) + event.getX(1)) / 2,
-                            ncenterY = (event.getY(0) + event.getY(1)) / 2;
-                    //缩放时移动距离大于2dp时移动
-                    if (GeoUtil.getDis(scaleCenterX, scaleCenterY, ncenterX, ncenterY) > Util.dp2Px(2))
-                        floatView.drag(ncenterX, ncenterY);
-                    scaleCenterX = ncenterX;
-                    scaleCenterY = ncenterY;
-
-                    //增加的距离
-                    float endFloatDis = GeoUtil.getDis(event.getX(0), event.getY(0),
-                            event.getX(1), event.getY(1));
-                    float ratio = (floatView.mWidth + (endFloatDis - lastFloatDis)) / floatView.mWidth;
-                    if (ratio == 1.0) break;
-                    floatView.scale(ratio);
-                    redrawFloat();
-                    lastFloatDis = endFloatDis;
-
-                } else if (event.getPointerCount() == 1 &&
+                if (event.getPointerCount() == 1 &&
                         CURRENT_STATUS == STATUS_MOVE_FLOAT) {//是在移动浮动view
                     floatView.drag(event.getX(), event.getY());
                     redrawFloat();
-                }
+                } else if(event.getPointerCount()>=2){
+                //以缩放中心的为相对坐标，用于一边缩放一边移动
+                float ncenterX = (event.getX(0) + event.getX(1)) / 2,
+                        ncenterY = (event.getY(0) + event.getY(1)) / 2;
+                //缩放时移动距离大于2dp时移动
+                if (GeoUtil.getDis(scaleCenterX, scaleCenterY, ncenterX, ncenterY) > Util.dp2Px(2))
+                    floatView.drag(ncenterX, ncenterY);
+                scaleCenterX = ncenterX;
+                scaleCenterY = ncenterY;
+
+                //增加的距离
+                float endFloatDis = GeoUtil.getDis(event.getX(0), event.getY(0),
+                        event.getX(1), event.getY(1));
+                float ratio = (floatView.mWidth + (endFloatDis - lastFloatDis)) / floatView.mWidth;
+                if (ratio == 1.0) break;
+                floatView.scale(ratio);
+                redrawFloat();
+                lastFloatDis = endFloatDis;
+
+            }
                 break;
             case MotionEvent.ACTION_UP:
                 Util.P.le("经过了up");
@@ -147,11 +145,9 @@ public class PtuFrameLayout extends FrameLayout {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        Util.P.le(DEBUG_TAG,"dispatchTouchEvent");
-        Util.P.le("实际位置"+(ev.getX()-floatView.getmLeft()),(ev.getY()-floatView.getmTop()));
-        float sx=ev.getX(),sy=ev.getY();
-        boolean isConsume=false;
         if(getChildCount()>1){
+            boolean isConsume=false;
+            float sx=ev.getX(),sy=ev.getY();
             if ((new RectF(floatView.getmLeft(),floatView.getmTop(),
                     floatView.getLeft()+floatView.mWidth,floatView.getmTop()+floatView.mHeight)
                     .contains(ev.getX(),ev.getY()))) {
@@ -160,11 +156,14 @@ public class PtuFrameLayout extends FrameLayout {
                 if(isConsume)//消费了up事件，up置为true
                     hasUp=true;
             }
+            //没有消费才分发事件，不然就不分发
+            if(!isConsume){
+                ev.setLocation(sx,sy);
+                onTouchEvent(ev);
+            }
         }
-        if(!isConsume){
-            ev.setLocation(sx,sy);
-            onTouchEvent(ev);
-        }
+        //只有PtuView时只将事件分发给它，坐标不用变换，他们大小一样，PtuView占满了整个布局
+        else getChildAt(0).dispatchTouchEvent(ev);
         return true;
     }
 

@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Build;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ActionMode;
@@ -37,7 +38,6 @@ public class FloatTextView extends EditText implements FloatView {
     /**
      * 总的宽和高
      */
-    public float totalWidth, totalHeight;
 
     /**
      * 顶点的x，y坐标
@@ -52,10 +52,8 @@ public class FloatTextView extends EditText implements FloatView {
 
     private Context mContext;
     public int mPadding = Util.dp2Px(24);
-    /**
-     * 用与缩放的最近的位置
-     */
-    public float lastX, lastY;
+
+
     public float currentRatio;
     private Rect pvBoundRect;
     private float mTextSize = 30;
@@ -72,6 +70,10 @@ public class FloatTextView extends EditText implements FloatView {
     private float downX;
     private boolean hasUp = true;
     private int lastSelectionId;
+    /**
+     * 初始的位置，也是常用位置
+     */
+    private float initLeft, initTop;
 
     public void setDownState() {
         downShowState = SHOW_SATUS;
@@ -112,13 +114,11 @@ public class FloatTextView extends EditText implements FloatView {
      * 传入布局容器的宽高，确定view的位置
      *
      * @param mContext
-     * @param totalWidth
-     * @param totalHeight
      */
-    public FloatTextView(Context mContext, int totalWidth, int totalHeight) {
+    public FloatTextView(Context mContext, Rect pvBoundRect) {
         super(mContext);
         this.mContext = mContext;
-        init(totalWidth, totalHeight);
+        init(pvBoundRect);
     }
 
     public int getShowState() {
@@ -150,11 +150,11 @@ public class FloatTextView extends EditText implements FloatView {
         mContext = context;
     }
 
-    private void init(float totalWidth, float totalHeight) {
+    private void init(Rect pvBoundRect) {
         Util.P.le(DEBUG_TAG, "init");
-        this.totalWidth = totalWidth;
-        this.totalHeight = totalHeight;
 
+        //获取ptuView的范围
+        this.pvBoundRect = pvBoundRect;
         rect = new RectF(mLeft, mTop, mLeft + mWidth, mTop + mHeight);
 /**
  * 设置文字布局
@@ -173,8 +173,11 @@ public class FloatTextView extends EditText implements FloatView {
         //获取view的宽和高
         getRealSize();
 
-        mLeft = (totalWidth - mWidth) / 2;
-        mTop = totalHeight - mHeight;
+        //获取了实际的宽高之后才能获取初始位置
+        initLeft = (pvBoundRect.left + pvBoundRect.right) / 2 - mWidth / 2;
+        initTop = pvBoundRect.bottom - mHeight;
+        mLeft = initLeft;
+        mTop = initTop;
 
         initItems();
         addTextChangedListener(new TextWatcher() {
@@ -245,8 +248,8 @@ public class FloatTextView extends EditText implements FloatView {
     }
 
     /**
-     * 在view还没回执之前获取到他的宽高，并且将其值赋给
-     * mwidth，mHeight
+     * 当view的某个影响宽高的参数改变之后，在view还没绘制之前获取到他的宽高，
+     * <p>并且将其值赋给mwidth，mHeight，此方法只会改变mwidth，mHeight
      */
     private void getRealSize() {
         Util.P.le(DEBUG_TAG, "getRealSize");
@@ -272,21 +275,6 @@ public class FloatTextView extends EditText implements FloatView {
         adjustEdegeBound();
     }
 
-    /**
-     * 拖动floatview，利用相对点，相对点变化，
-     * view根据原来他与相对点的坐标差移动，避免了拖动
-     * 处理的误差
-     *
-     * @param nx 新的对应点的x坐标
-     * @param ny 新的对应点的y坐标
-     */
-    public void drag(float nx, float ny) {
-        Util.P.le(DEBUG_TAG, "drag");
-        mLeft = nx - relativeX;
-        mTop = ny - relativeY;
-        adjustEdegeBound();
-    }
-
     private void adjustSize(float ratio) {
         Util.P.le(DEBUG_TAG, "adjustSize");
         currentRatio = ratio;
@@ -295,12 +283,6 @@ public class FloatTextView extends EditText implements FloatView {
         tsize *= ratio;
         setTextSize(tsize);
         getRealSize();
-        //获取ptuView的范围
-        if (pvBoundRect == null) {
-            PtuFrameLayout ptuFrameLayout = (PtuFrameLayout) getParent();
-            //pvBoundRect = ((PtuView) (ptuFrameLayout.getChildAt(0))).getBound();
-            pvBoundRect = new Rect(20, 100, 700, 1100);
-        }
         //根据范围调整比例
         if (mTextSize <= 2) {
             mTextSize = 3;
@@ -326,6 +308,20 @@ public class FloatTextView extends EditText implements FloatView {
         getRealSize();
     }
 
+    /**
+     * 拖动floatview，利用相对点，相对点变化，
+     * view根据原来他与相对点的坐标差移动，避免了拖动
+     * 处理的误差
+     *
+     * @param nx 新的对应点的x坐标
+     * @param ny 新的对应点的y坐标
+     */
+    public void drag(float nx, float ny) {
+        Util.P.le(DEBUG_TAG, "drag");
+        mLeft = nx - relativeX;
+        mTop = ny - relativeY;
+        adjustEdegeBound();
+    }
 
     /**
      * 适配floatview的位置,不能超出图片的边界
@@ -333,11 +329,6 @@ public class FloatTextView extends EditText implements FloatView {
      */
     private void adjustEdegeBound() {
         Util.P.le(DEBUG_TAG, "adjustEdegeBound");
-        //获取ptuView的范围
-        if (pvBoundRect == null) {
-            PtuFrameLayout ptuFrameLayout = (PtuFrameLayout) getParent();
-            pvBoundRect = ((PtuView) (ptuFrameLayout.getChildAt(0))).getBound();
-        }
         if (mLeft + mWidth < pvBoundRect.left)
             mLeft = pvBoundRect.left - mWidth + mPadding;
         if (mTop + mHeight < pvBoundRect.top)
@@ -359,10 +350,74 @@ public class FloatTextView extends EditText implements FloatView {
         return (int) (spValue * fontScale + 0.5f);
     }
 
-    public Bitmap getBitmap(){
-        Bitmap textBitmap=Bitmap.createBitmap((int)mWidth,(int)mHeight, Bitmap.Config.ARGB_8888);
+    /**
+     * <p> 获取子功能生成点的bitmap，以及bitmap的大小，位置的相关参数
+     * <p> 传入initRatio：ptuView上的图片一开始缩放的比例，
+     * <p> finalRatio最终需要缩放的比例，
+     * <p>方法内部再用RealRatio=finalRation/initRation,算出实际的缩放比例,
+     * <p>然后得出子功能获得参数：
+     * <p>相对left：rleft=（FloatView的letf-ptuView的图片的left）*realRatio,rtop一样
+     * <p>FloatView的宽mwidth*=realRatio获取的实际的宽，高一样
+     * <p>最后采用相应方法获取相应大小的Bitmap对象，
+     * <p>将参数装入Boundle，返回bitmap对象
+     * <p/>
+     * <p>此方法会改变floatTextView的大小，textSize，显示状态，
+     * <p>但作为最会返回bitmap，floatTextView销毁了，就没有关系了
+     *
+     * @param bitmapPara 子功能获取的bitmap的参数,0为获取图片相对原图片的左边距，1为获取图片相对原图片的上边距，
+     *                   <p>2为获取图片的宽，3为获取图片的高度
+     */
+    public Bitmap getResultBitmap(float initRatio, float finalRatio, float[] bitmapPara) {
+        float realRatio = finalRatio / initRatio;
+        float rLeft = (mLeft - pvBoundRect.left) * realRatio, rTop = (mTop - pvBoundRect.top) * realRatio;
+        float fWidth = mWidth * realRatio, fHeight = mHeight * realRatio;//最终的宽高
+
+        float tSize = mTextSize, tWidth = mWidth, tHeight = mHeight;
+        //文本缩放时缩放程度小于实际宽高的缩放
+        //所以循环增加的方式，让宽高达到要求
+        while (mWidth < fWidth) {
+            mTextSize=(int)Math.ceil(mTextSize*1.1);
+            setTextSize(mTextSize);
+            getRealSize();
+        }
+
+        while (mWidth > fWidth) {
+            mTextSize=(int)Math.floor(mTextSize*0.9);
+            if(mTextSize<=1)break;
+            setTextSize(mTextSize);
+            getRealSize();
+        }
+        mHeight=tHeight*(mWidth/tWidth);
+
+        changeShowState(STATUS_TOUMING);
+        Bitmap textBitmap = Bitmap.createBitmap((int) mWidth, (int) mHeight, Bitmap.Config.ARGB_8888);
         super.draw(new Canvas(textBitmap));
-        return textBitmap;
+
+        /**
+         * 将文字框多余的部分裁剪出去
+         */
+        float cl,ct,cw,ch;
+        if(mLeft<pvBoundRect.left) {
+            bitmapPara[0] = 0;
+            cl=pvBoundRect.left-mLeft;
+        }else {
+            cl=0;
+            bitmapPara[0]=mLeft-pvBoundRect.left;
+        }
+        if(mTop<pvBoundRect.top) {
+            ct =  pvBoundRect.top-mTop;
+            bitmapPara[1] = 0;
+        }else{
+            ct=0;
+            bitmapPara[1]=mTop-pvBoundRect.top;
+        }
+        bitmapPara[2]=cw=Math.min(pvBoundRect.right,mLeft+mWidth)-
+                    Math.max(mLeft,pvBoundRect.left);
+
+        bitmapPara[3]=ch=Math.min(pvBoundRect.bottom,mTop+mHeight)-
+                Math.max(mTop,pvBoundRect.top);
+
+        return Bitmap.createBitmap(textBitmap,(int)cl,(int)ct,(int)Math.floor(cw),(int)Math.floor(ch));
     }
 
     @Override
@@ -486,8 +541,8 @@ public class FloatTextView extends EditText implements FloatView {
 
     private void onClickBottomCenter() {
         Util.P.le(DEBUG_TAG, "onClickBottomCenter");
-        mLeft = (totalWidth - mWidth) / 2;
-        mTop = totalHeight - mHeight;
+        mLeft = initLeft;
+        mTop = initTop;
         changeShowState(STATUS_ITEM);
         //请求重绘
         ((PtuFrameLayout) getParent()).redrawFloat();

@@ -1,6 +1,7 @@
 package a.baozouptu.control;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -30,7 +31,7 @@ import a.baozouptu.view.MySwitchButton;
  * Created by Administrator on 2016/5/1.
  */
 public class AddTextFragment extends Fragment {
-    Context mContext;
+    PTuActivity mAcitivty;
     LinearLayout toumingdu;
     LinearLayout style;
     LinearLayout color;
@@ -48,11 +49,17 @@ public class AddTextFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mContext = getActivity();//onAttach貌似不会执行，需要在这里获取context
+        mAcitivty = (PTuActivity) getActivity();//onAttach貌似不会执行，需要在这里获取context
         View view = inflater.inflate(R.layout.fragment_add_text_function, container, false);
         initView(view);
-        textPopupBuilder = new FunctionPopWindowBuilder(mContext);
+        textPopupBuilder = new FunctionPopWindowBuilder(mAcitivty);
         setClick();
+        mAcitivty.setResultInterface(new PTuActivity.ResultInterface() {
+            @Override
+            public Bitmap getResultBitmap(float initRatio,float finalRatio,float[] bitmapPara) {
+                return floatTextView.getResultBitmap(initRatio,finalRatio,bitmapPara);
+            }
+        });
         return view;
     }
 
@@ -113,7 +120,8 @@ public class AddTextFragment extends Fragment {
      */
     public class FunctionPopWindowBuilder {
         Context mContext;
-        boolean isBold=false,isItalic=false,hasShadow=false;
+        boolean isBold = false, isItalic = false, hasShadow = false;
+
         public FunctionPopWindowBuilder(Context context) {
             mContext = context;
         }
@@ -157,7 +165,7 @@ public class AddTextFragment extends Fragment {
                     textView.setGravity(Gravity.CENTER);
 
                     textView.setTypeface(typefaces[position]);
-                    HorizontalListView.LayoutParams layoutParams=new HorizontalListView.LayoutParams(
+                    HorizontalListView.LayoutParams layoutParams = new HorizontalListView.LayoutParams(
                             ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
                     textView.setLayoutParams(layoutParams);
                     textView.setGravity(Gravity.CENTER);
@@ -168,7 +176,7 @@ public class AddTextFragment extends Fragment {
             horizontalListView.setOnItemClickListener(new HorizontalListView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Util.P.le("字体",textStyleNames[position]+"被点击");
+                    Util.P.le("字体", textStyleNames[position] + "被点击");
                 }
             });
             return contentView;
@@ -178,62 +186,62 @@ public class AddTextFragment extends Fragment {
 
             View contentView = getStylePopView();
             //粗体
-            MySwitchButton switchBold=(MySwitchButton)contentView.findViewById(R.id.switch_button_bold);
+            MySwitchButton switchBold = (MySwitchButton) contentView.findViewById(R.id.switch_button_bold);
             switchBold.setState(isBold);
             switchBold.setOnSlideListener(new MySwitchButton.SlideListener() {
                 @Override
                 public void open() {
-                    if(isItalic)
-                        floatTextView.setTypeface(Typeface.MONOSPACE,Typeface.BOLD_ITALIC);
+                    if (isItalic)
+                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.BOLD_ITALIC);
                     else
-                        floatTextView.setTypeface(Typeface.MONOSPACE,Typeface.BOLD);
-                    isBold=true;
+                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
+                    isBold = true;
                 }
 
                 @Override
                 public void close() {
-                    if(isItalic)
-                        floatTextView.setTypeface(Typeface.MONOSPACE,Typeface.ITALIC);
+                    if (isItalic)
+                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.ITALIC);
                     else
-                        floatTextView.setTypeface(Typeface.MONOSPACE,Typeface.NORMAL);
-                    isBold=false;
+                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.NORMAL);
+                    isBold = false;
                 }
             });
             //斜体
-            MySwitchButton switchItalic=(MySwitchButton)contentView.findViewById(R.id.switch_button_text_italic);
+            MySwitchButton switchItalic = (MySwitchButton) contentView.findViewById(R.id.switch_button_text_italic);
             switchItalic.setState(isItalic);
             switchItalic.setOnSlideListener(new MySwitchButton.SlideListener() {
                 @Override
                 public void open() {
-                    if(isBold)
-                        floatTextView.setTypeface(Typeface.MONOSPACE,Typeface.BOLD_ITALIC);//斜体，中文有效
+                    if (isBold)
+                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.BOLD_ITALIC);//斜体，中文有效
                     else
-                        floatTextView.setTypeface(Typeface.MONOSPACE,Typeface.ITALIC);//斜体，中文有效
-                    isItalic=true;
+                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.ITALIC);//斜体，中文有效
+                    isItalic = true;
                 }
 
                 @Override
                 public void close() {
-                    if(isBold)
-                        floatTextView.setTypeface(Typeface.MONOSPACE,Typeface.BOLD);
+                    if (isBold)
+                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
                     else
-                        floatTextView.setTypeface(Typeface.MONOSPACE,Typeface.NORMAL);
-                    isItalic=false;
+                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.NORMAL);
+                    isItalic = false;
                 }
             });
-            MySwitchButton switchShadow=(MySwitchButton)contentView.findViewById(R.id.switch_button_text_shadow);
+            MySwitchButton switchShadow = (MySwitchButton) contentView.findViewById(R.id.switch_button_text_shadow);
             switchShadow.setState(hasShadow);
             switchShadow.setOnSlideListener(new MySwitchButton.SlideListener() {
                 @Override
                 public void open() {
-                    floatTextView.setShadowLayer(5,5,5, Color.GRAY);
-                    hasShadow=true;
+                    floatTextView.setShadowLayer(5, 5, 5, Color.GRAY);
+                    hasShadow = true;
                 }
 
                 @Override
                 public void close() {
-                    floatTextView.setShadowLayer(0,0,0, Color.GRAY);
-                    hasShadow=false;
+                    floatTextView.setShadowLayer(0, 0, 0, Color.GRAY);
+                    hasShadow = false;
                 }
             });
             setLayout(v, contentView);
@@ -251,12 +259,13 @@ public class AddTextFragment extends Fragment {
 
         /**
          * 获取功能子视图
+         *
          * @return
          */
         private View getColorPopView() {
             View contentView = LayoutInflater.from(mContext).inflate(R.layout.popwindow_chose_color, null);
             //颜色选择条
-            final ColorBar colorBar =  (ColorBar) contentView.findViewById(R.id.color_picker);
+            final ColorBar colorBar = (ColorBar) contentView.findViewById(R.id.color_picker);
             //颜色块
             final ColorLump colorLump = (ColorLump) contentView.findViewById(R.id.chosed_color);
             colorLump.setColor(lastColor);
@@ -323,28 +332,28 @@ public class AddTextFragment extends Fragment {
         }
 
 
-
         public void setToumingduPopWindow(View v) {
-            View contentView=createTouminduPopView();
-            setLayout(v,contentView);
+            View contentView = createTouminduPopView();
+            setLayout(v, contentView);
         }
 
         private View createTouminduPopView() {
-            View contentView = LayoutInflater.from(mContext).inflate(R.layout.popwindow_toumindu,null);
-            SeekBar seekBar= (SeekBar) contentView.findViewById(R.id.seekbar_toumingdu);
+            View contentView = LayoutInflater.from(mContext).inflate(R.layout.popwindow_toumindu, null);
+            SeekBar seekBar = (SeekBar) contentView.findViewById(R.id.seekbar_toumingdu);
             return contentView;
         }
 
         /**
          * 设置功能子视图的布局
          * 注意这里popupwindow的高度要加上view所在布局的padding
+         *
          * @param v
          * @param contentView
          */
         private void setLayout(View v, View contentView) {
             PopupWindow colorPop = new PopupWindow(contentView,
                     WindowManager.LayoutParams.MATCH_PARENT,
-                    v.getHeight()+Util.dp2Px(5), true);
+                    v.getHeight() + Util.dp2Px(5), true);
             colorPop.setTouchable(true);
             // 如果不设置PopupWindow的背景，无论是点击外部区域还是Back键都无法dismiss弹框
             // 我觉得这里是API的一个bug
@@ -358,7 +367,7 @@ public class AddTextFragment extends Fragment {
     @Override
     public void onDestroy() {
         //textPopBuilder的状态都取消了
-        textPopupBuilder=null;
+        textPopupBuilder = null;
         super.onDestroy();
     }
 }

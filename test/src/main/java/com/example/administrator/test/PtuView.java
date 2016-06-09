@@ -3,18 +3,17 @@ package com.example.administrator.test;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
-
 
 public class PtuView extends View {
     /**
@@ -41,6 +40,7 @@ public class PtuView extends View {
     private static final int STATUS_ZOOM_BIG = 2;
     private static final int STATUS_ZOOM_SMALL = 3;
     private static final int STATUS_DRAW_PATH = 4;
+
     /**
      * 最近的x的位置
      */
@@ -76,9 +76,9 @@ public class PtuView extends View {
      */
     private float currentRatio = 1f;
     /**
-     * context
+     * mContext
      */
-    private Context context;
+    private Context mContext;
     /**
      * 原图片
      */
@@ -88,29 +88,17 @@ public class PtuView extends View {
      */
     private Matrix matrix = new Matrix();
     /**
-     * 整个View的宽
+     * 整个View的宽,高
      */
-    private int totalWidth;
+    private int totalWidth, totalHeight;
     /**
-     * 整个View的高
+     * 原图片的宽度,高度
      */
-    private int totalHeight;
+    private int srcPicWidth, srcPicHeight;
     /**
-     * 原图片的宽度
+     * 当前图片的宽、高
      */
-    private int srcPicWidth;
-    /**
-     * 原图片的高度
-     */
-    private int srcPicHeight;
-    /**
-     * 当前图片的宽
-     */
-    private int curPicWidth;
-    /**
-     * 当前图片的高
-     */
-    private int curPicHeight;
+    private int curPicWidth, curPicHeight;
     /**
      * 右上角x坐标，以view的右上角为原点，（0,0）
      */
@@ -119,15 +107,26 @@ public class PtuView extends View {
      * 右上角y坐标，以view的右上角为原点，（0,0）
      */
     private int coY;
-
+    /**
+     * 图片的局部，要现实出来的部分
+     */
     Rect srcRect = new Rect(0, 0, 1, 1);
-    ;
+    /**
+     * 要绘制的总图在view的canvas上面的位置,
+     * <P>也即是在bitmapToView上的位置
+     * <p>也是在secondcanvas上的位置</p>
+     */
     Rect dstRect = new Rect(1, 2, 3, 4);
-    ;
 
     Paint picPaint = new Paint();
-    Bitmap bitmapToDraw;
-    Canvas drawCanvas;
+    /**
+     * 显示到view上的bitmap，长宽为ptuView的总长，背景透明，刷新时会将背景刷新
+     */
+    Bitmap bitmapToview;
+    /**
+     * 将内容绘制到底图上，view再讲地图绘制到自己的canvas上面
+     */
+    Canvas secondCanvas;
     /**
      * 显示在屏幕上绘制的宽度
      */
@@ -137,13 +136,24 @@ public class PtuView extends View {
      */
     private int drawHeight;
 
+    /**
+     * 是否可以touch
+     */
+    boolean touchable = true;
+    private float initRatio = 1f;
+    private Bitmap tempBitmap;
+    private BitmapDrawable tempDrawable;
+
+    public PtuView(Context context) {
+        super(context);
+        this.mContext = context;
+    }
+
     public PtuView(Context context, AttributeSet set) {
         super(context, set);
-        this.context = context;
+        this.mContext = context;
         CURRENT_STATUS = STATUS_INIT;
-        picPaint.setColor(Color.RED);
-        picPaint.setStrokeWidth(25);
-        picPaint.setTextSize(25);
+        picPaint.setDither(true);
     }
 
     @Override
@@ -152,22 +162,59 @@ public class PtuView extends View {
         totalHeight = h;
         super.onSizeChanged(w, h, oldw, oldh);
     }
-    /*
+
+    public void setTouchable(boolean touchable) {
+        this.touchable = touchable;
+    }
+
+    /**
+     * 保存生成的图片
+     *
+     * @param path
+     */
     public void saveNewBitmap(String path) {
-		File file = new File(path);
+        /*File file = new File(path);
 		if (!file.exists())
 			try { 
 				FileOutputStream fileOutputStream = new FileOutputStream(
 						file.getPath());
-				bitmapToDraw.compress(Bitmap.CompressFormat.JPEG, 100,
+				bitmapToview.compress(Bitmap.CompressFormat.JPEG, 100,
 						fileOutputStream);
 				fileOutputStream.close();
 				Log.e("saveBmp is succseed", "yes!");
 			} catch (Exception e) {
 				e.printStackTrace();
-			}
-	}
-*/
+			}*/
+    }
+
+    public float getInitRatio() {
+        return initRatio;
+    }
+
+    /**
+     * @param bitmap
+     * @param bp 子功能获取的bitmap的参数,0为获取图片相对原图片的左边距，1为获取图片相对原图片的上边距，
+     *                   <p>2为获取图片的宽，3为获取图片的高度
+     */
+    public void addBitmap(Bitmap bitmap, float[] bp) {
+        //initRatio一开始的缩放倍数，通过它计算然后将添加图片放到开始时大小的图上
+        float cLeft = dstRect.left + bp[0] * initRatio, cTop = dstRect.top + bp[1] * initRatio,
+                cWidth = dstRect.left +  bp[2] * initRatio, cHeight =  dstRect.top + bp[3] * initRatio;
+
+        Rect addRect=new Rect((int)cLeft,(int)cTop,(int)(cLeft+cWidth),(int)(cTop+cHeight));
+
+        BitmapDrawable addDrawable = new BitmapDrawable(mContext.getResources(),bitmap);
+        addDrawable.setDither(true);
+        addDrawable.setAntiAlias(true);
+        addDrawable.setFilterBitmap(true);
+        addDrawable.setBounds(addRect);
+        addDrawable.draw(secondCanvas);
+        invalidate();
+    }
+
+    public void getRealBitmap() {
+
+    }
 
     class Point {
         public float x, y;
@@ -193,23 +240,22 @@ public class PtuView extends View {
      *
      * @param path2
      */
-    public void initBitmap(String path2) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferQualityOverSpeed = true;
-        sourceBitmap = BitmapFactory.decodeFile(path2);
+    public void setBitmapByPath(String path2) {
+        sourceBitmap = new BitmapTool().getLosslessBitmap(path2);
         if (sourceBitmap == null) {
-            Toast.makeText(context, "图片不存在", Toast.LENGTH_SHORT).show();
-            Util.P.le("PTuView.initBitmap", "sourceBitmap出现空指针");
+            Toast.makeText(mContext, "图片不存在", Toast.LENGTH_SHORT).show();
+            Util.P.le("PTuView.setBitmapByPath", "sourceBitmap出现空指针");
             return;
         }
+        CURRENT_STATUS = STATUS_INIT;
         invalidate();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!touchable) return false;
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                Util.P.le(getClass(),"ACTION_DOWN");
                 startPoint.x = event.getX();
                 startPoint.y = event.getY();
 
@@ -229,6 +275,7 @@ public class PtuView extends View {
                     }
                     invalidate();
                 }
+
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 lastDis = getScaleDisAndCenter(event);
@@ -250,11 +297,11 @@ public class PtuView extends View {
                         CURRENT_STATUS = STATUS_ZOOM_SMALL;
                     lastDis = endD;
                 } else if (event.getPointerCount() == 1) {
+
                     endPoint.x = event.getX();
                     endPoint.y = event.getY();
                     if (startPoint.x == -1)
                         startPoint.set(endPoint.x, endPoint.y);
-                    Util.P.le(endPoint.x, endPoint.y);
                     CURRENT_STATUS = STATUS_MOVE;
                 } else return true;
                 invalidate();//myPath.addPoint(path,event.getX(), event.getY(
@@ -290,10 +337,10 @@ public class PtuView extends View {
     }
 
     private void scalePic() {
-        bitmapToDraw.eraseColor(Color.alpha(00));
+        bitmapToview.eraseColor(Color.alpha(00));
         getParameter();
         getRect();
-        drawCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);//将原图填充到底图上
+        drawToBitmapToView();
     }
 
     /**
@@ -341,7 +388,7 @@ public class PtuView extends View {
                 initAndFirstDraw();
                 break;
             case STATUS_DRAW_PATH:
-                drawCanvas.drawLine(startPoint.x, startPoint.y,
+                secondCanvas.drawLine(startPoint.x, startPoint.y,
                         endPoint.x, endPoint.y, picPaint);
                 startPoint.x = endPoint.x;
                 startPoint.y = endPoint.y;
@@ -354,15 +401,30 @@ public class PtuView extends View {
                 break;
             case STATUS_MOVE:
                 movePic();
+                break;
             default:
                 break;
         }
-        canvas.drawBitmap(bitmapToDraw, matrix, null);//将底图绘制到View上面到
+        BitmapDrawable bitmapDrawable = new BitmapDrawable(mContext.getResources(), bitmapToview);
+        bitmapDrawable.setBounds(0, 0, bitmapToview.getWidth(), bitmapToview.getHeight());
+        bitmapDrawable.setDither(true);
+        bitmapDrawable.setAntiAlias(true);
+        bitmapDrawable.setFilterBitmap(true);
+        bitmapDrawable.draw(canvas);//将底图绘制到View上面到
+        //canvas.drawBitmap(bitmapToview, matrix, null);
+    }
 
+    /**
+     * 图片在PtuFrameLayout上的相对位置
+     *
+     * @return
+     */
+    public Rect getBound() {
+        return dstRect;
     }
 
     private void movePic() {
-        bitmapToDraw.eraseColor(Color.alpha(00));
+        bitmapToview.eraseColor(Color.alpha(00));
         int t = coX;
         coX += endPoint.x - startPoint.x;
         if (coX >= 0 || Math.abs(coX) + totalWidth > curPicWidth)//如果x超出界限，就不移动了
@@ -370,12 +432,12 @@ public class PtuView extends View {
 
         t = coY;
         coY += endPoint.y - startPoint.y;
-        if (coY >= 0 || Math.abs(coY) + totalHeight > curPicHeight)//如果x超出界限，就不移动了
+        if (coY >= 0 || Math.abs(coY) + totalHeight > curPicHeight)//如果y超出界限，就不移动了
             coY = t;
         startPoint.x = endPoint.x;
         startPoint.y = endPoint.y;
         getRect();
-        drawCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);
+        drawToBitmapToView();
     }
 
     /**
@@ -383,21 +445,36 @@ public class PtuView extends View {
      * <p>创建并设置好用于保存的Bitmap
      * <p>获取当前何种的Ratio
      */
-    private void initAndFirstDraw() {
+    public void initAndFirstDraw() {
+        if (sourceBitmap == null) {
+            Toast.makeText(mContext, "图片不存在", Toast.LENGTH_SHORT).show();
+            Util.P.le("PTuView.setBitmapByPath", "sourceBitmap出现空指针");
+            return;
+        }
         srcPicWidth = sourceBitmap.getWidth();
         srcPicHeight = sourceBitmap.getHeight();
-        bitmapToDraw = Bitmap.createBitmap(totalWidth, totalHeight,
+        bitmapToview = Bitmap.createBitmap(totalWidth, totalHeight,
                 Config.ARGB_8888);//创建一个空图做底图
-        drawCanvas = new Canvas(bitmapToDraw);//设置drawCanvas为底图
+        secondCanvas = new Canvas(bitmapToview);//设置drawCanvas为底图
         currentRatio = totalRatio = Math.min(totalWidth * 1.0f / (srcPicWidth * 1.0f),
                 totalHeight * 1.0f / (srcPicHeight * 1.0f));
-
+        initRatio = totalRatio;
         getParameter();
         getRect();
-        drawCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);//将原图填充到底图上
-        Paint paint=new Paint();
-        paint.setTextSize(10);
-        drawCanvas.drawText("哈红的嗲嗲鱼鱼吧红A啊有Naaaaaaaaaaaa123456789", 0, totalHeight/2,paint);
+        drawToBitmapToView();
+        //secondCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);//将原图填充到底图上
+    }
+
+    private void drawToBitmapToView() {
+        tempBitmap = Bitmap.createBitmap(sourceBitmap, srcRect.left, srcRect.top,
+                srcRect.right - srcRect.left, srcRect.bottom - srcRect.top);
+        tempDrawable = new BitmapDrawable(mContext.getResources(),tempBitmap);
+        tempDrawable.setDither(true);
+        tempDrawable.setAntiAlias(true);
+        tempDrawable.setFilterBitmap(true);
+        tempDrawable.setBounds(dstRect);
+        tempDrawable.draw(secondCanvas);
+        tempBitmap.recycle();
     }
 
     private void getRect() {
@@ -410,8 +487,14 @@ public class PtuView extends View {
     }
 
     @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        Util.P.le(super.dispatchTouchEvent(event));
+        return touchable;
+    }
+
+    @Override
     protected void onDetachedFromWindow() {
-        bitmapToDraw.recycle();
+        bitmapToview.recycle();
         sourceBitmap.recycle();
         super.onDetachedFromWindow();
     }

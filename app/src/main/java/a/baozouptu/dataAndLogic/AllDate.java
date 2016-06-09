@@ -15,4 +15,5 @@ public class AllDate {
 	/** 图片内存最大值 6000K */
 	public final static int PIC_FILE_SIZE_MAX = 40000;
 
+
 }

@@ -189,7 +189,7 @@ public class ShowPictureActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 Intent intent = new Intent(ShowPictureActivity.this, PTuActivity.class);
-                intent.putExtra("path", currentPicFilePathList.get(position));
+                intent.putExtra("picPath", currentPicFilePathList.get(position));
                 startActivity(intent);
             }
         });
@@ -252,11 +252,11 @@ public class ShowPictureActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent intent = new Intent(ShowPictureActivity.this, PTuActivity.class);
-        intent.putExtra("path", "/storage/sdcard1/哈哈.jpg");
-        startActivity(intent);
+        /*Intent intent = new Intent(ShowPictureActivity.this, PTuActivity.class);
+        intent.putExtra("picPath", "/storage/sdcard1/哈哈.jpg");
+        startActivity(intent);*/
 
-        /*setContentView(R.layout.activity_show_picture);
+        setContentView(R.layout.activity_show_picture);
         getScreenWidth();
         initView();
         new Thread(null, new Runnable() {
@@ -269,7 +269,7 @@ public class ShowPictureActivity extends Activity {
                 "数据读取中...", true);
 
         // 跳转显示文件夹的button
-        setClick();*/
+        setClick();
     }
 
     private void initView() {

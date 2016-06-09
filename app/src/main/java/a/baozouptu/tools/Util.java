@@ -118,6 +118,10 @@ public class Util {
                 return false;
             }
         }
+
+        public static void cancel() {
+            lastTime=-1;
+        }
     }
 
     /**

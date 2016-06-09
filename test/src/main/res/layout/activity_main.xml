@@ -3,20 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-   <EditText
-       android:layout_gravity="center"
+
+   <com.example.administrator.test.PtuView
+       android:id="@+id/image"
        android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:inputType="none"
-       android:text="wahahahahah....."
-       android:textSize="20pt"
-       />
-   <Button
-       android:id="@+id/show_popup_window"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:text="显示popupwindow"
-       android:textSize="20pt"
+       android:layout_height="match_parent"
+       android:drawingCacheQuality="high"
+       android:scaleType="fitCenter"
        />
 
 </LinearLayout>
