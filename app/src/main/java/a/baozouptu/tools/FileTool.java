@@ -1,5 +1,7 @@
 package a.baozouptu.tools;
 
+import android.graphics.Path;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -86,5 +88,16 @@ public class FileTool {
 		}
 
 		return false;
+	}
+
+	/**
+	 * 根据原来的路径创建一个新的路径和名称
+	 * @param oldPath 以前的路径
+	 * @return
+     */
+	public static String getNewPicturePath(String oldPath) {
+		String prefix=oldPath.substring(0,oldPath.lastIndexOf("."));
+		String suffix= oldPath.substring(oldPath.lastIndexOf("."),oldPath.length());
+		return prefix+"baozou"+suffix;
 	}
 }

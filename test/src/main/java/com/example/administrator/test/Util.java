@@ -3,6 +3,7 @@ package com.example.administrator.test;
 import android.app.Application;
 import android.content.Context;
 import android.util.Log;
+import android.view.ViewConfiguration;
 import android.widget.Toast;
 
 /**
@@ -87,7 +88,7 @@ public class Util {
          *
          * @param s
          */
-        void make(Object s) {
+        public static void make(Object s) {
             if (MyApplication.getAppContext() != null)
                 make(MyApplication.getAppContext(), s);
             else
@@ -106,7 +107,8 @@ public class Util {
         public static long lastTime=-1;
         public static boolean isDoubleClick(){
             long curTime=System.currentTimeMillis();
-            if(curTime-lastTime<300) {
+            //貌似系统定义的双击正是300毫秒 ViewConfiguration.getDoubleTapTimeout()
+            if(curTime-lastTime<ViewConfiguration.getDoubleTapTimeout()) {
                 lastTime=curTime;
                 return true;
             }
@@ -116,4 +118,18 @@ public class Util {
             }
         }
     }
+
+    /**
+     * 获取两点间的位置
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @return
+     */
+    float getDis(float x1, float y1, float x2, float y2) {
+        float dx = x1 - x2, dy = y1 - y2;
+        return (float) Math.sqrt(dx * dx + dy * dy);
+    }
+
 }

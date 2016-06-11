@@ -25,6 +25,7 @@ public class Util {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (px / scale + 0.5f);
     }
+
     public static int px2Dp(float px) {
         final float scale = MyApplication.getAppContext().getResources().getDisplayMetrics().density;
         return (int) (px / scale + 0.5f);
@@ -83,45 +84,48 @@ public class Util {
     /**
      * 只是测试时方便写代码的，正式的还是正式的书写
      */
-    public static class T {
-        /**
-         * 默认长的,系统context不为空
-         *
-         * @param s
-         */
-        public static void make(Object s) {
-            if (MyApplication.getAppContext() != null)
-                make(MyApplication.getAppContext(), s);
-            else
-                P.le("全局的context不存在");
-        }
+    /**
+     * 默认长的,系统context不为空
+     *
+     * @param s
+     */
+    public static void T(Object s) {
+        if (MyApplication.getAppContext() != null)
+            T(MyApplication.getAppContext(), s);
+        else
+            P.le("全局的context不存在");
+    }
 
-        public static void make(Context context, Object s) {
-            Toast.makeText(context, s.toString(), Toast.LENGTH_LONG).show();
-        }
+    public static void T(Context context, Object s) {
+        Toast.makeText(context, s.toString(), Toast.LENGTH_LONG).show();
     }
 
     /**
      * Created by Administrator on 2016/5/8.
      */
     public static class DoubleClick {
-        public static long lastTime=-1;
-        public static boolean isDoubleClick(){
-            long curTime=System.currentTimeMillis();
+        public static long lastTime = -1;
+
+        public static boolean isDoubleClick() {
+            long curTime = System.currentTimeMillis();
             //貌似系统定义的双击正是300毫秒 ViewConfiguration.getDoubleTapTimeout()
-            if(curTime-lastTime<ViewConfiguration.getDoubleTapTimeout()) {
-                lastTime=curTime;
+            if (curTime - lastTime < ViewConfiguration.getDoubleTapTimeout()) {
+                lastTime = curTime;
                 return true;
-            }
-            else {
-                lastTime=curTime;
+            } else {
+                lastTime = curTime;
                 return false;
             }
+        }
+
+        public static void cancel() {
+            lastTime = -1;
         }
     }
 
     /**
      * 获取两点间的位置
+     *
      * @param x1
      * @param y1
      * @param x2
