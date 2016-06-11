@@ -54,12 +54,6 @@ public class AddTextFragment extends Fragment {
         initView(view);
         textPopupBuilder = new FunctionPopWindowBuilder(mAcitivty);
         setClick();
-        mAcitivty.setResultInterface(new PTuActivity.ResultInterface() {
-            @Override
-            public Bitmap getResultBitmap(float initRatio,float finalRatio,float[] bitmapPara) {
-                return floatTextView.getResultBitmap(initRatio,finalRatio,bitmapPara);
-            }
-        });
         return view;
     }
 

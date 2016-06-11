@@ -6,6 +6,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 
 import a.baozouptu.tools.GeoUtil;

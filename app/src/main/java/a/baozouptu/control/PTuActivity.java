@@ -1,17 +1,25 @@
 package a.baozouptu.control;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import a.baozouptu.R;
 import a.baozouptu.tools.BitmapTool;
 import a.baozouptu.tools.FileTool;
+import a.baozouptu.tools.Util;
 import a.baozouptu.view.FloatTextView;
 import a.baozouptu.view.PtuFrameLayout;
 import a.baozouptu.view.PtuView;
@@ -34,28 +42,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
      */
     private float[] childFunctionbitmapPara;
     private String picPath = null;
-
-    public static interface ResultInterface {
-        /**
-         * <p> 获取子功能生成点的bitmap，以及bitmap的大小，位置的相关参数
-         * <p> 传入initRatio：ptuView上的图片一开始缩放的比例，
-         * <p>  finalRatio最终需要缩放的比例，
-         * <p>方法内部再用RealRatio=finalRation/initRation,算出实际的缩放比例,
-         * <p>然后得出子功能获得参数：
-         * <p>相对left：rleft=（FloatView的letf-ptuView的图片的left）*realRatio,rtop一样
-         * <p>FloatView的宽mwidth*=realRatio获取的实际的宽，高一样
-         * <p>最后采用相应方法获取相应大小的Bitmap对象，
-         * <p>将参数装入bitmapPara，返回bitmap对象
-         *
-         * @param bitmapPara 子功能获取的bitmap的参数,0为获取图片相对原图片的左边距，1为获取图片相对原图片的上边距，
-         *                   <p>2为获取图片的宽，3为获取图片的高度
-         *                   <p> 注意, 每个子功能fragment被添加时，要将此接口赋值，保证调用的是对应的接口
-         */
-        Bitmap getResultBitmap(float initRatio, float finalRatio, float[] bitmapPara);
-    }
-
-    private ResultInterface resultInterface;
-
+    private FloatTextView floatTextView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,34 +64,73 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                    //上面有图，先把图添加到PtuView上面
+                        //上面有图，先把图添加到PtuView上面
                         if (ptuFrame.getChildCount() > 1) {
                             childFunctionbitmapPara = new float[4];
-                            Bitmap bitmap = resultInterface.getResultBitmap(ptuView.getInitRatio(),
+                            boolean canGet = floatTextView.prepareResultBitmap(ptuView.getInitRatio(),
                                     finalRatio, childFunctionbitmapPara);//先获取
+                            if (!canGet) {//有些情况下会返回空
+                                Util.T(PTuActivity.this, "获取到的图像为空");
+                                return;
+                            } else {
+                                //view加载完成时回调
+                                final Bitmap[] textBitmap = new Bitmap[1];
+                                floatTextView.getViewTreeObserver().addOnGlobalLayoutListener(
+                                        new ViewTreeObserver.OnGlobalLayoutListener() {
+                                            @Override
+                                            public void onGlobalLayout() {
+                                                textBitmap[0] = getViewBitmap(floatTextView);
+                                                Dialog dialog = new Dialog(PTuActivity.this);
+                                                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                                                dialog.setContentView(R.layout.test);
+                                                ImageView image = (ImageView) dialog.findViewById(R.id.test_image);
+                                                image.setImageBitmap(textBitmap[0]);
+                                                dialog.show();
+                                                // ptuFrame.removeViewAt(1);
+                                                //ptuView.addBitmap(textBitmap[0], finalRatio, childFunctionbitmapPara);
+                                                //Bitmap bitmap = ptuView.getFinalPicture(finalRatio);
+                                                //String newPath = FileTool.getNewPicturePath(picPath);
+                                                //String result = BitmapTool.saveBitmap(bitmap, newPath);
+                                                //if (("创建成功".equals(result))) {//创建成功，退出应用，activity
+                                                //     Util.P.le(result);
+                                                // PTuActivity.this.finish();
+                                                // } else
+                                                //     Util.T(PTuActivity.this, result);
+                                                // floatTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                            }
+                                        });
 
-                            ptuFrame.removeViewAt(1);
-                            ptuView.addBitmap(bitmap, childFunctionbitmapPara);
+                            }
                         }
-                        Bitmap bitmap = ptuView.getFinalPicture(finalRatio);
-                        String newPath = FileTool.getNewPicturePath(picPath);
-                        if(BitmapTool.saveBitmap(bitmap, newPath).equals("创建成功"))
-                        {//创建成功，退出应用，activity
-                            PTuActivity.this.finish();
-                        }
+
                     }
                 }
         );
-    }
-
-    void setResultInterface(ResultInterface result) {
-        resultInterface = result;
     }
 
     private void setViewContent() {
         Intent intent = getIntent();
         picPath = intent.getStringExtra("picPath");
         ptuView.setBitmapAndInit(picPath);
+    }
+
+    private Bitmap getViewBitmap(View view) {
+        view.setDrawingCacheEnabled(true);
+        Bitmap bitmap = null;
+        try {
+            if (null != view.getDrawingCache()) {
+                bitmap = Bitmap.createScaledBitmap(view.getDrawingCache(),
+                        floatTextView.getWidth(), floatTextView.getHeight(), true);
+            } else {
+                return null;
+            }
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+        } finally {
+            view.setDrawingCacheEnabled(false);
+            view.destroyDrawingCache();
+        }
+        return bitmap;
     }
 
     private void setOnClick() {
@@ -135,15 +161,35 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
                 fm.beginTransaction().add(R.id.fragment_function, fragText)
                         .addToBackStack("main")
                         .commit();
-                FloatTextView floatTextView = ptuFrame.initAddFloat(ptuView.getBound());
+                floatTextView = ptuFrame.initAddFloat(ptuView.getBound());
                 fragText.setFloatView(floatTextView);
+
+                floatTextView.setFocusable(true);
+                floatTextView.requestFocus();
+                onFocusChange(floatTextView.isFocused());
                 break;
         }
     }
 
+    private void onFocusChange(boolean hasFocus) {
+
+        final boolean isFocus = hasFocus;
+        (new Handler()).postDelayed(new Runnable() {
+            public void run() {
+                InputMethodManager imm = (InputMethodManager)
+                        floatTextView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (isFocus) {
+                    imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+                } else {
+                    imm.hideSoftInputFromWindow(floatTextView.getWindowToken(), 0);
+                }
+            }
+        }, 100);
+    }
+
     @Override
     public void onBackPressed() {
-        if(ptuFrame.getChildCount()>1)
+        if (ptuFrame.getChildCount() > 1)
             ptuFrame.removeViewAt(1);
         super.onBackPressed();
     }

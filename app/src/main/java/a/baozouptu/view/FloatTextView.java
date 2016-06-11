@@ -1,5 +1,6 @@
 package a.baozouptu.view;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -10,6 +11,7 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Selection;
 import android.text.TextWatcher;
 import android.view.ActionMode;
 import android.view.Gravity;
@@ -19,9 +21,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 
@@ -60,7 +65,7 @@ public class FloatTextView extends EditText implements FloatView {
     private String mHint = "点击输入文字";
     private Paint mPaint = new Paint();
     public float mWidth, mHeight;
-    private static int SHOW_SATUS = STATUS_ITEM;
+    private static int SHOW_SATUS = STATUS_INPUT;
     private int rimColor;
     private int itemColor;
     private int downShowState;
@@ -74,6 +79,7 @@ public class FloatTextView extends EditText implements FloatView {
      * 初始的位置，也是常用位置
      */
     private float initLeft, initTop;
+    private String mText = "";
 
     public void setDownState() {
         downShowState = SHOW_SATUS;
@@ -81,11 +87,6 @@ public class FloatTextView extends EditText implements FloatView {
 
     public int getDownState() {
         return downShowState;
-    }
-
-    public boolean isAtInner(float x, float y) {
-        return new RectF(rimLeft + mPadding / 2, rimTop, rimRight - mPadding / 2, rimBottom)
-                .contains(x, y);
     }
 
     /**
@@ -152,7 +153,6 @@ public class FloatTextView extends EditText implements FloatView {
 
     private void init(Rect pvBoundRect) {
         Util.P.le(DEBUG_TAG, "init");
-
         //获取ptuView的范围
         this.pvBoundRect = pvBoundRect;
         rect = new RectF(mLeft, mTop, mLeft + mWidth, mTop + mHeight);
@@ -160,16 +160,16 @@ public class FloatTextView extends EditText implements FloatView {
  * 设置文字布局
  */
         setGravity(Gravity.CENTER);
-        FrameLayout.LayoutParams layoutParms = new FrameLayout.LayoutParams(
+        final FrameLayout.LayoutParams layoutParms = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         setLayoutParams(layoutParms);
 
-        setText(mHint);
+        setHint(mHint);
         setTextSize(mTextSize);
         setTextColor(Color.BLACK);
         setPadding(mPadding, mPadding, mPadding, mPadding);
         setBackground(null);
-
+        setSelected(true);
         //获取view的宽和高
         getRealSize();
 
@@ -183,7 +183,7 @@ public class FloatTextView extends EditText implements FloatView {
         addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                lastSelectionId = start;
+                lastSelectionId = start + after;
             }
 
             @Override
@@ -192,10 +192,11 @@ public class FloatTextView extends EditText implements FloatView {
 
             @Override
             public void afterTextChanged(Editable s) {
-                Util.P.le(DEBUG_TAG, "执行了after TextChanged");
                 //原来的中心坐标
                 float cx = mLeft + mWidth / 2, cy = mTop + mHeight / 2;
                 Util.P.le(mWidth, mHeight);
+                mText = s.toString();
+                setHint("");
                 getRealSize();
                 //按原来的的中心坐标缩放
                 mWidth = getMeasuredWidth();
@@ -216,7 +217,6 @@ public class FloatTextView extends EditText implements FloatView {
         setOnLongClickListener(new OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Util.P.le("发生了长按");
                 return true;
             }
         });
@@ -364,65 +364,95 @@ public class FloatTextView extends EditText implements FloatView {
      * <p>此方法会改变floatTextView的大小，textSize，显示状态，
      * <p>但作为最会返回bitmap，floatTextView销毁了，就没有关系了
      *
-     * @param bitmapPara 子功能获取的bitmap的参数,0为获取图片相对原图片的左边距，1为获取图片相对原图片的上边距，
+     * @param bitmapPara 子功能获取的bitmap的参数,0为获取图片相对原始图片的左边距，1为获取图片相对原图片的上边距，
      *                   <p>2为获取图片的宽，3为获取图片的高度
+     *@return 是否能成功获取图片
      */
-    public Bitmap getResultBitmap(float initRatio, float finalRatio, float[] bitmapPara) {
+    public boolean prepareResultBitmap(float initRatio, float finalRatio, float[] bitmapPara) {
+        if (mText.equals("")) return false;
+        float pvWidth = pvBoundRect.right - pvBoundRect.left,
+                pvHeight = pvBoundRect.bottom - pvBoundRect.top;
         float realRatio = finalRatio / initRatio;
-        float rLeft = (mLeft - pvBoundRect.left) * realRatio, rTop = (mTop - pvBoundRect.top) * realRatio;
-        float fWidth = mWidth * realRatio, fHeight = mHeight * realRatio;//最终的宽高
+        float centerX = mLeft + mWidth / 2, centerY = mTop + mHeight / 2;
 
+        //计算出相对原始图片的位置
+        float rLeft, rTop;
+        if (mLeft < pvBoundRect.left) rLeft = 0;
+        else if (mLeft > pvBoundRect.right) rLeft = pvWidth;
+        else rLeft = mLeft - pvBoundRect.left;
+
+        if (mTop < pvBoundRect.top) rTop = 0;
+        else if (mTop > pvBoundRect.bottom) rTop = pvHeight;
+        else rTop = mTop - pvBoundRect.top;
+
+        /**
+         * 裁剪文字框,只留下在picture中的部分
+         */
+        float innerLeft, innerTop, innerRight, innerBottom;
+        if (mLeft < pvBoundRect.left) innerLeft = pvBoundRect.left - mLeft;
+        else innerLeft = 0;
+        if (mTop < pvBoundRect.top) innerTop = pvBoundRect.top - mTop;
+        else innerTop = 0;
+        bitmapPara[0] = rLeft / initRatio;
+
+        if (mLeft + mWidth > pvBoundRect.right)
+            innerRight = pvBoundRect.right - mLeft;
+        else
+            innerRight = mWidth;
+        if (mTop + mHeight > pvBoundRect.bottom)
+            innerBottom = pvBoundRect.bottom - mTop;
+        else innerBottom = mHeight;
+        bitmapPara[1] = rTop / initRatio;
+
+        //获取realratio比例下，浮动视图的图片
+        float fWidth = mWidth * realRatio, fHeight = mHeight * realRatio;//最终的宽高
         float tSize = mTextSize, tWidth = mWidth, tHeight = mHeight;
         //文本缩放时缩放程度小于实际宽高的缩放
         //所以循环增加的方式，让宽高达到要求
         while (mWidth < fWidth) {
-            mTextSize=(int)Math.ceil(mTextSize*1.1);
+            mTextSize += (((fWidth - mWidth) / 10) + 1); //每次增加十分之一的差值+1
             setTextSize(mTextSize);
             getRealSize();
         }
-
         while (mWidth > fWidth) {
-            mTextSize=(int)Math.floor(mTextSize*0.9);
-            if(mTextSize<=1)break;
+            mTextSize -= (((mWidth - fWidth) / 10) + 1);
+            if (mTextSize <= 1) {
+                mTextSize += (((mWidth - fWidth) / 10) + 1);
+                break;
+            }
             setTextSize(mTextSize);
             getRealSize();
         }
-        mHeight=tHeight*(mWidth/tWidth);
+        realRatio = (mWidth / tWidth);//注意realRatio发生了变化，使用新的RealRatio
+        mHeight = tHeight * realRatio;
 
-        changeShowState(STATUS_TOUMING);
-        Bitmap textBitmap = Bitmap.createBitmap((int) mWidth, (int) mHeight, Bitmap.Config.ARGB_8888);
-        super.draw(new Canvas(textBitmap));
+        mLeft = centerX - mWidth / 2;
+        mTop = centerY - mHeight / 2;
+        setTextSize(mTextSize);
+        setCursorVisible(false);
+        requestFocus();
+        SHOW_SATUS = STATUS_TOUMING;
+        ((PtuFrameLayout) getParent()).redrawFloat();
 
-        /**
-         * 将文字框多余的部分裁剪出去
-         */
-        float cl,ct,cw,ch;
-        if(mLeft<pvBoundRect.left) {
-            bitmapPara[0] = 0;
-            cl=pvBoundRect.left-mLeft;
-        }else {
-            cl=0;
-            bitmapPara[0]=mLeft-pvBoundRect.left;
-        }
-        if(mTop<pvBoundRect.top) {
-            ct =  pvBoundRect.top-mTop;
-            bitmapPara[1] = 0;
-        }else{
-            ct=0;
-            bitmapPara[1]=mTop-pvBoundRect.top;
-        }
-        bitmapPara[2]=cw=Math.min(pvBoundRect.right,mLeft+mWidth)-
-                    Math.max(mLeft,pvBoundRect.left);
+        innerLeft *= realRatio;
+        innerRight *= realRatio;
+        innerTop *= realRatio;
+        innerBottom *= realRatio;
+        //处理边界溢出，避免异常
+        innerRight = Math.min(innerRight, mWidth);
+        innerBottom = Math.min(innerBottom, mHeight);
 
-        bitmapPara[3]=ch=Math.min(pvBoundRect.bottom,mTop+mHeight)-
-                Math.max(mTop,pvBoundRect.top);
-
-        return Bitmap.createBitmap(textBitmap,(int)cl,(int)ct,(int)Math.floor(cw),(int)Math.floor(ch));
+        innerLeft = Math.max(0, innerLeft);
+        innerLeft = Math.min(Math.min(mWidth, innerLeft), innerRight);
+        innerTop = Math.max(0, innerTop);
+        innerTop = Math.min(Math.min(mHeight, innerTop), innerBottom);
+        bitmapPara[2] = innerRight - innerLeft;
+        bitmapPara[3] = innerBottom - innerTop;
+       return true;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        Util.P.le(DEBUG_TAG, "onDraw");
         if (SHOW_SATUS >= STATUS_RIM) {//要显示的东西不止边框
             mPaint.setColor(rimColor);
             mPaint.setStrokeWidth(3);
@@ -456,8 +486,8 @@ public class FloatTextView extends EditText implements FloatView {
             drawItem(canvas, items.get(6));
         }
         super.onDraw(canvas);
-        Util.P.le(DEBUG_TAG, "父组件绘制完成");
     }
+
 
     private void drawItem(Canvas canvas, Item item) {
         canvas.drawBitmap(item.bitmap, new Rect(0, 0, mPadding, mPadding),
@@ -475,8 +505,8 @@ public class FloatTextView extends EditText implements FloatView {
     public void changeShowState(int state) {
         if (SHOW_SATUS != state) {
             if (SHOW_SATUS == STATUS_INPUT && state != STATUS_INPUT) {//如果当前是输入状态，改变到非输入状态，这需要取消输入法
-                InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(this.getApplicationWindowToken(), 0);
+            //    InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+               // imm.hideSoftInputFromWindow(this.getApplicationWindowToken(), 0);
             }
             //不需要重绘的情况
             if (SHOW_SATUS == STATUS_ITEM && state == STATUS_INPUT

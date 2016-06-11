@@ -191,12 +191,19 @@ public class ShowPictureActivity extends Activity {
                 Intent intent = new Intent(ShowPictureActivity.this, PTuActivity.class);
                 intent.putExtra("picPath", currentPicFilePathList.get(position));
                 startActivity(intent);
+                Intent sintent = getIntent();
+                if (sintent != null) {
+                    String s = sintent.getExtras().getString("myFlag");
+                    if (s != null && s.equals("notify"))
+                        finish();
+                }
             }
         });
         showPicAdpter = new GridViewAdapter(
                 ShowPictureActivity.this, currentPicFilePathList);
         gridview.setOnScrollListener(new AbsListView.OnScrollListener() {
             AsyncImageLoader3 imageLoader = AsyncImageLoader3.getInstatnce();
+
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 switch (scrollState) {
@@ -255,6 +262,7 @@ public class ShowPictureActivity extends Activity {
         /*Intent intent = new Intent(ShowPictureActivity.this, PTuActivity.class);
         intent.putExtra("picPath", "/storage/sdcard1/哈哈.jpg");
         startActivity(intent);*/
+        Intent sintent = getIntent();
 
         setContentView(R.layout.activity_show_picture);
         getScreenWidth();
@@ -416,5 +424,4 @@ public class ShowPictureActivity extends Activity {
             return convertView;
         }
     }
-
 }

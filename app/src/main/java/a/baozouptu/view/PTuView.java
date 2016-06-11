@@ -144,12 +144,12 @@ public class PtuView extends View {
      * @param finalRatio 缩放的比例
      */
     public Bitmap getFinalPicture(float finalRatio) {
-        Bitmap bitmap = Bitmap.createScaledBitmap(sourceBitmap, (int) (sourceBitmap.getWidth() * finalRatio),
+        /*Bitmap bitmap = Bitmap.createScaledBitmap(sourceBitmap, (int) (sourceBitmap.getWidth() * finalRatio),
                 (int) (sourceBitmap.getHeight() * finalRatio), true);
         if (bitmap.equals(sourceBitmap))
             sourceBitmap.recycle();
-        bitmapToview.recycle();
-        return bitmap;
+        bitmapToview.recycle();*/
+        return sourceBitmap;
     }
 
     public float getInitRatio() {
@@ -411,34 +411,40 @@ public class PtuView extends View {
 
     /**
      * @param bitmap
-     * @param bp     子功能获取的bitmap的参数,0为获取图片相对原图片的左边距，1为获取图片相对原图片的上边距，
-     *               <p>2为获取图片的宽，3为获取图片的高度
+     * @param bp     子功能获取的bitmap的参数,0为获取图片相对原始图片的左边距，1为获取图片相对原始图片的上边距，
+     *               <p>2为获取图片的宽，3为获取图片的高度</p>
      */
-    public void addBitmap(Bitmap bitmap, float[] bp) {
-        //initRatio一开始的缩放倍数，通过它计算然后将添加图片放到开始时大小的图上
-        float cLeft = dstRect.left + bp[0] * initRatio, cTop = dstRect.top + bp[1] * initRatio,
-                cWidth = dstRect.left + bp[2] * initRatio, cHeight = dstRect.top + bp[3] * initRatio;
+    public Bitmap addBitmap(Bitmap bitmap, float finalRatio, float[] bp) {
+        //initRatio一开始的缩放倍数
+        //先将图放到原始图片上面
+        float cLeft = bp[0], cTop = bp[1],
+                cRight =cLeft + bp[2]/finalRatio, cBottom =cTop + bp[3]/finalRatio;
         if (cLeft < 0) cLeft = 0;
-        if (cLeft + cWidth > sourceBitmap.getWidth()) cWidth = sourceBitmap.getWidth() - cLeft;
+        if (cRight > sourceBitmap.getWidth()) cRight = sourceBitmap.getWidth();
         if (cTop < 0) cTop = 0;
-        if (cTop + cHeight > sourceBitmap.getHeight()) cHeight = sourceBitmap.getHeight() - cTop;
+        if (cBottom > sourceBitmap.getHeight()) cBottom = sourceBitmap.getHeight();
 
-        Rect addRect = new Rect((int) cLeft, (int) cTop, (int) (cLeft + cWidth), (int) (cTop + cHeight));
-        Canvas canvas = new Canvas(
-                Bitmap.createBitmap(sourceBitmap.getWidth(),
-                        sourceBitmap.getHeight(),Config.ARGB_8888));
+        Rect addRect = new Rect((int) cLeft, (int) cTop, (int)cRight, (int) cBottom);
+        Bitmap tempBit=Bitmap.createBitmap(sourceBitmap.getWidth(),
+                sourceBitmap.getHeight(),Config.ARGB_8888);
+        Canvas canvas = new Canvas(tempBit);
 
+        //将原图画上去
         BitmapDrawable sourceDrawable=new BitmapDrawable(mContext.getResources(),sourceBitmap);
         sourceDrawable.setBounds(0,0,sourceBitmap.getWidth(),sourceBitmap.getHeight());
         sourceDrawable.draw(canvas);
+        sourceBitmap.recycle();
 
-        BitmapDrawable addDrawable = new BitmapDrawable(mContext.getResources(), sourceBitmap);
+        //再将新图画上去
+        BitmapDrawable addDrawable = new BitmapDrawable(mContext.getResources(), bitmap);
         addDrawable.setDither(true);
         addDrawable.setAntiAlias(true);
         addDrawable.setFilterBitmap(true);
         addDrawable.setBounds(addRect);
         addDrawable.draw(canvas);
-        invalidate();
+        sourceBitmap=tempBit;
+        resetDraw();
+        return tempBit;
     }
 
     @Override

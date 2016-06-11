@@ -72,19 +72,21 @@ public class BitmapTool {
         Bitmap.CompressFormat bmc=null;
         if(suffix.equals(".jpg")||suffix.equals(".jpeg"))
             bmc= Bitmap.CompressFormat.JPEG;
-        if(suffix.equals(".png"))
+        else if(suffix.equals(".png"))
             bmc= Bitmap.CompressFormat.PNG;
-        if(suffix.equals(".webp"))
+        else if(suffix.equals(".webp"))
             bmc= Bitmap.CompressFormat.WEBP;
 
         FileOutputStream fo=null;
         try {
             File file=new File(path);
             if(file.exists())//如果文件已存在
-                return "文件已存在";
-            else file.createNewFile();
+            {
+                file.delete();
+            }else file.createNewFile();
             fo=new FileOutputStream(path);
             bitmap.compress(bmc,100,fo);
+            fo.flush();
         } catch (FileNotFoundException e) {
             Util.P.le("Bitmaptool.savePicture","存储文件失败");
             e.printStackTrace();
