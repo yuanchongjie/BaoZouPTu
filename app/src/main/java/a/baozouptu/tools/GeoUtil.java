@@ -1,6 +1,8 @@
 package a.baozouptu.tools;
 
 import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.graphics.RectF;
 
 /**
  * 几何操作的工具
@@ -51,5 +53,7 @@ public class GeoUtil {
         matrix.getValues(values);
         return values[Matrix.MTRANS_Y];
     }
-
+    public static Rect rectF2Rect(RectF rf){
+        return new Rect((int)rf.left,(int)rf.top,(int)rf.right,(int)rf.bottom);
+    }
 }

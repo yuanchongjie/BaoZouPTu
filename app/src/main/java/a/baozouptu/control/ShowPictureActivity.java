@@ -79,7 +79,35 @@ public class ShowPictureActivity extends Activity {
     private Button showPictureFileBn;
     private DrawerLayout fileListDrawer;
     private GridViewAdapter showPicAdpter;
-    private GridView gridview;
+    private GridView pictureGridview;
+    /**
+     * Called when the activity is first created.
+     * 过程描述：启动一个线程获取所有图片的路径，再启动一个子线程设置好GridView，而且要求这个子线程必须在ui线程之前启动
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        /*Intent intent = new Intent(ShowPictureActivity.this, PTuActivity.class);
+        intent.putExtra("picPath", "/storage/sdcard1/小图.jpg");
+        startActivity(intent);
+        Intent sintent = getIntent();*/
+
+        setContentView(R.layout.activity_show_picture);
+        getScreenWidth();
+        initView();
+        new Thread(null, new Runnable() {
+            public void run() {
+                getValues();
+            }
+        }).start();
+
+        m_ProgressDialog = ProgressDialog.show(ShowPictureActivity.this, "请稍后",
+                "数据读取中...", true);
+
+        // 跳转显示文件夹的button
+        setClick();
+    }
 
     /**
      * 获取所有图片的文件信息，最近的图片，
@@ -183,12 +211,13 @@ public class ShowPictureActivity extends Activity {
      * 为显示图片的gridView加载数据
      */
     private void disposeShowPicture() {
-        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        pictureGridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 Intent intent = new Intent(ShowPictureActivity.this, PTuActivity.class);
+                AsyncImageLoader3.getInstatnce().evitAll();
                 intent.putExtra("picPath", currentPicFilePathList.get(position));
                 startActivity(intent);
                 Intent sintent = getIntent();
@@ -201,7 +230,7 @@ public class ShowPictureActivity extends Activity {
         });
         showPicAdpter = new GridViewAdapter(
                 ShowPictureActivity.this, currentPicFilePathList);
-        gridview.setOnScrollListener(new AbsListView.OnScrollListener() {
+        pictureGridview.setOnScrollListener(new AbsListView.OnScrollListener() {
             AsyncImageLoader3 imageLoader = AsyncImageLoader3.getInstatnce();
 
             @Override
@@ -225,11 +254,11 @@ public class ShowPictureActivity extends Activity {
             };
 
             private void showAdjacentPic() {
-                int first = gridview.getFirstVisiblePosition();
-                int last = gridview.getLastVisiblePosition();
+                int first = pictureGridview.getFirstVisiblePosition();
+                int last = pictureGridview.getLastVisiblePosition();
                 for (int position = first; position <= last; position++) {
                     String path = currentPicFilePathList.get(position);
-                    final ImageView ivImage = (ImageView) gridview.findViewWithTag(position);
+                    final ImageView ivImage = (ImageView) pictureGridview.findViewWithTag(position);
                     imageLoader.loadBitmap(path, ivImage, position, imageCallback);
                 }
             }
@@ -238,7 +267,7 @@ public class ShowPictureActivity extends Activity {
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
             }
         });
-        gridview.setAdapter(showPicAdpter);
+        pictureGridview.setAdapter(showPicAdpter);
         m_ProgressDialog.dismiss();// 表示此处开始就解除这个进度条Dialog，应该是在相对起始线程的另一个中使用
     }
 
@@ -251,38 +280,10 @@ public class ShowPictureActivity extends Activity {
         AllDate.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
     }
 
-    /**
-     * Called when the activity is first created.
-     * 过程描述：启动一个线程获取所有图片的路径，再启动一个子线程设置好GridView，而且要求这个子线程必须在ui线程之前启动
-     */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        /*Intent intent = new Intent(ShowPictureActivity.this, PTuActivity.class);
-        intent.putExtra("picPath", "/storage/sdcard1/哈哈.jpg");
-        startActivity(intent);*/
-        Intent sintent = getIntent();
-
-        setContentView(R.layout.activity_show_picture);
-        getScreenWidth();
-        initView();
-        new Thread(null, new Runnable() {
-            public void run() {
-                getValues();
-            }
-        }).start();
-
-        m_ProgressDialog = ProgressDialog.show(ShowPictureActivity.this, "请稍后",
-                "数据读取中...", true);
-
-        // 跳转显示文件夹的button
-        setClick();
-    }
 
     private void initView() {
         fileListDrawer = (DrawerLayout) findViewById(R.id.drawer_layout_show_picture);
-        gridview = (GridView) findViewById(R.id.gv_photolist);
+        pictureGridview = (GridView) findViewById(R.id.gv_photolist);
     }
 
     void setClick() {
@@ -326,7 +327,7 @@ public class ShowPictureActivity extends Activity {
                 } else
                     getCurrentPicPathList(picFilePathList.get(position));
                 fileListDrawer.closeDrawer(GravityCompat.END);
-                gridview.setAdapter(showPicAdpter);
+                pictureGridview.setAdapter(showPicAdpter);
             }
 
             /**

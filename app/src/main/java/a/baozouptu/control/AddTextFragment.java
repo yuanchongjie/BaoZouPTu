@@ -334,6 +334,19 @@ public class AddTextFragment extends Fragment {
         private View createTouminduPopView() {
             View contentView = LayoutInflater.from(mContext).inflate(R.layout.popwindow_toumindu, null);
             SeekBar seekBar = (SeekBar) contentView.findViewById(R.id.seekbar_toumingdu);
+            seekBar.setMax(100);
+            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    floatTextView.setAlpha(1-(float)progress/100.0f);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {         }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {        }
+            });
             return contentView;
         }
 

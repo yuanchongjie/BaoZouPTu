@@ -57,6 +57,7 @@ public class BitmapTool {
         optsa.inDensity = 0;
         optsa.inTargetDensity = 0;
         optsa.inScaled = false;
+        optsa.inMutable=true;
         return BitmapFactory.decodeFile(path, optsa);
     }
 
