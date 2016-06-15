@@ -1,9 +1,11 @@
 package a.baozouptu.view;
 
+import a.baozouptu.R;
 import a.baozouptu.tools.BitmapTool;
 import a.baozouptu.tools.GeoUtil;
 import a.baozouptu.tools.Util;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -12,10 +14,13 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Bitmap.Config;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 /**
@@ -115,6 +120,7 @@ public class PtuView extends View {
      * 当前图片的宽和高
      */
     private int curPicWidth, curPicHeight;
+    private Canvas sourceCanvas;
 
     public PtuView(Context context) {
         super(context);
@@ -171,6 +177,7 @@ public class PtuView extends View {
             Util.P.le("PTuView.setBitmapAndInit", "sourceBitmap出现空指针");
             return;
         }
+        sourceCanvas=new Canvas(sourceBitmap);
         srcPicWidth = sourceBitmap.getWidth();
         srcPicHeight = sourceBitmap.getHeight();
         CURRENT_STATUS = STATUS_INIT;
@@ -410,41 +417,19 @@ public class PtuView extends View {
     }
 
     /**
-     * @param bitmap
-     * @param bp     子功能获取的bitmap的参数,0为获取图片相对原始图片的左边距，1为获取图片相对原始图片的上边距，
-     *               <p>2为获取图片的宽，3为获取图片的高度</p>
+     * 注意addBitmap大小和boundRect的一致
+     * @param addBitmap    需要添加的floatBitmap的局部
+     * @param boundRect rect代表view有效区域在底图上的位置的rect，相对于原始图片的左上角上下左右边的距离
      */
-    public Bitmap addBitmap(Bitmap bitmap, float finalRatio, float[] bp) {
-        //initRatio一开始的缩放倍数
-        //先将图放到原始图片上面
-        float cLeft = bp[0], cTop = bp[1],
-                cRight =cLeft + bp[2]/finalRatio, cBottom =cTop + bp[3]/finalRatio;
-        if (cLeft < 0) cLeft = 0;
-        if (cRight > sourceBitmap.getWidth()) cRight = sourceBitmap.getWidth();
-        if (cTop < 0) cTop = 0;
-        if (cBottom > sourceBitmap.getHeight()) cBottom = sourceBitmap.getHeight();
-
-        Rect addRect = new Rect((int) cLeft, (int) cTop, (int)cRight, (int) cBottom);
-        Bitmap tempBit=Bitmap.createBitmap(sourceBitmap.getWidth(),
-                sourceBitmap.getHeight(),Config.ARGB_8888);
-        Canvas canvas = new Canvas(tempBit);
-
-        //将原图画上去
-        BitmapDrawable sourceDrawable=new BitmapDrawable(mContext.getResources(),sourceBitmap);
-        sourceDrawable.setBounds(0,0,sourceBitmap.getWidth(),sourceBitmap.getHeight());
-        sourceDrawable.draw(canvas);
-        sourceBitmap.recycle();
-
-        //再将新图画上去
-        BitmapDrawable addDrawable = new BitmapDrawable(mContext.getResources(), bitmap);
+    public void addBitmap(Bitmap addBitmap, RectF boundRect) {
+        BitmapDrawable addDrawable = new BitmapDrawable(mContext.getResources(), addBitmap);
         addDrawable.setDither(true);
         addDrawable.setAntiAlias(true);
         addDrawable.setFilterBitmap(true);
-        addDrawable.setBounds(addRect);
-        addDrawable.draw(canvas);
-        sourceBitmap=tempBit;
+        addDrawable.setBounds(GeoUtil.rectF2Rect(boundRect));
+        addDrawable.draw(sourceCanvas);
+        addBitmap.recycle();
         resetDraw();
-        return tempBit;
     }
 
     @Override

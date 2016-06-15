@@ -51,12 +51,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent1 = new Intent(this, ShowPictureActivity.class);
         intent1.putExtra("myFlag", "hahah");
         startActivity(intent1);
-       /* setContentView(R.layout.activity_main);
+        /*setContentView(R.layout.activity_main);
 
         initToolbar();
 
-        initview();
-*/
+        initview();*/
+
     }
 
     private void initview() {

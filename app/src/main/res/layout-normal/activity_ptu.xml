@@ -16,10 +16,11 @@
             android:text="button" />
 
         <ImageButton
+            android:id="@+id/repeal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="70dp"
-            android:src="@mipmap/edit" />
+            android:src="@mipmap/repeal" />
 
         <ImageButton
             android:layout_width="wrap_content"

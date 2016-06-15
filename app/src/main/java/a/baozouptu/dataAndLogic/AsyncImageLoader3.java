@@ -133,4 +133,11 @@ public class AsyncImageLoader3 {
         void imageLoaded(Bitmap imageDrawable, ImageView image, int position,
                          String imageUrl);
     }
+
+    /**
+     * 清除调用的内存
+     */
+    public void evitAll(){
+        imageCache.evictAll();
+    }
 }
