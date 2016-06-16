@@ -8,10 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Handler;
 import android.view.Gravity;
 import android.view.View;
@@ -21,13 +19,13 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 
 import a.baozouptu.R;
 import a.baozouptu.dataAndLogic.MainStepData;
 import a.baozouptu.dataAndLogic.RePealRedoList;
 import a.baozouptu.tools.BitmapTool;
 import a.baozouptu.tools.FileTool;
-import a.baozouptu.tools.GeoUtil;
 import a.baozouptu.tools.Util;
 import a.baozouptu.view.FloatTextView;
 import a.baozouptu.view.FloatView;
@@ -55,7 +53,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
     private FloatTextView floatTextView;
     private RePealRedoList<MainStepData> rePealRedoList = new RePealRedoList<>();
     private float finalRatio = 1;
-    private Dialog redoDialog;
+    private PopupWindow redoPopWindow;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,32 +73,24 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
         repealBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (redoDialog == null) {
-                    redoDialog = new Dialog(PTuActivity.this);
-                    redoDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                if (redoPopWindow == null) {
+                    redoPopWindow = new PopupWindow(PTuActivity.this);
                     ImageView image = new ImageView(PTuActivity.this);
                     image.setImageResource(R.mipmap.redo);
                 /*image.setLayoutParams(new ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 */
-                    redoDialog.setContentView(image);
-                    Window window = redoDialog.getWindow();
-                    WindowManager.LayoutParams wl = new WindowManager.LayoutParams();
-                    wl.x = v.getLeft();
-                    wl.y = v.getBottom();
-                    wl.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-                    wl.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                    window.setAttributes(wl);
-                    window.setGravity(Gravity.LEFT | Gravity.TOP);
-                    redoDialog.show();
+                    redoPopWindow.setContentView(image);
+                    redoPopWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
+                    redoPopWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
                     image.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             redoMainFunction();
                         }
                     });
-                } else if (!redoDialog.isShowing())
-                    redoDialog.show();
+                } else if (!redoPopWindow.isShowing())
+                    redoPopWindow.showAsDropDown(v);
                 else repealMainFunction();
             }
         });

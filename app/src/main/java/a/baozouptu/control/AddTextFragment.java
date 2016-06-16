@@ -1,9 +1,9 @@
 package a.baozouptu.control;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.Gravity;
@@ -17,8 +17,10 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import a.baozouptu.R;
+import a.baozouptu.dataAndLogic.AllDate;
 import a.baozouptu.tools.Util;
 import a.baozouptu.view.ColorBar;
 import a.baozouptu.view.ColorLump;
@@ -41,6 +43,7 @@ public class AddTextFragment extends Fragment {
     private int lastColor = 0xff000000;
     private FunctionPopWindowBuilder textPopupBuilder;
     private FloatTextView floatTextView;
+    private Typeface curTypeface = Typeface.MONOSPACE;
 
     @Override
     public void onAttach(Context context) {
@@ -115,6 +118,7 @@ public class AddTextFragment extends Fragment {
     public class FunctionPopWindowBuilder {
         Context mContext;
         boolean isBold = false, isItalic = false, hasShadow = false;
+        int lastFontId = 0;
 
         public FunctionPopWindowBuilder(Context context) {
             mContext = context;
@@ -129,15 +133,13 @@ public class AddTextFragment extends Fragment {
 
             View contentView = LayoutInflater.from(mContext).inflate(R.layout.popwindow_text_typeface, null);
             HorizontalListView horizontalListView = (HorizontalListView) contentView.findViewById(R.id.hList_text_type);
-
-            final Typeface[] typefaces = new Typeface[]{Typeface.DEFAULT,
-                    Typeface.MONOSPACE, Typeface.SANS_SERIF};
-            final String[] textStyleNames = new String[]{"默认", "等宽", "serif"};
+            final String[] typefacePath;
+            final String[] typefaceNames = new String[]{"mono", "楷体", "默认", "更多"};
 
             horizontalListView.setAdapter(new BaseAdapter() {
                 @Override
                 public int getCount() {
-                    return typefaces.length;
+                    return typefaceNames.length;
                 }
 
                 @Override
@@ -153,12 +155,28 @@ public class AddTextFragment extends Fragment {
                 @Override
                 public View getView(int position, View convertView, ViewGroup parent) {
                     TextView textView = new TextView(mContext);
-                    textView.setText(textStyleNames[position]);
-                    textView.setTextSize(20);
-                    textView.setTextColor(mContext.getResources().getColor(R.color.text_color1));
-                    textView.setGravity(Gravity.CENTER);
 
-                    textView.setTypeface(typefaces[position]);
+                    textView.setTextSize(25);
+                    if (position == lastFontId) {
+                        textView.setTextColor(AllDate.text_choosed_color);
+                    } else {
+                        textView.setTextColor(AllDate.text_defualt_color);
+                    }
+                    textView.setGravity(Gravity.CENTER);
+                    textView.setTag(typefaceNames[position]);
+                    if (position == 0) {
+                        textView.setTextSize(30);//注意这里，英文字号增大了一些
+                        textView.setTypeface(Typeface.MONOSPACE);
+                    } else if (position == typefaceNames.length - 1) {
+                        textView.setTypeface(Typeface.MONOSPACE);
+                        textView.setTextColor(0xffaabbbb);
+                    } else if (position == 1) {
+                        Typeface typeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/kaiti.TTF");
+                        textView.setTypeface(typeface);
+                    } else if (position == 2) {
+                        textView.setTypeface(Typeface.DEFAULT);
+                    }
+                    textView.setText(typefaceNames[position]);
                     HorizontalListView.LayoutParams layoutParams = new HorizontalListView.LayoutParams(
                             ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
                     textView.setLayoutParams(layoutParams);
@@ -170,9 +188,29 @@ public class AddTextFragment extends Fragment {
             horizontalListView.setOnItemClickListener(new HorizontalListView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Util.P.le("字体", textStyleNames[position] + "被点击");
+                    if (position == typefaceNames.length - 1) {
+                        Toast.makeText(mContext, "暂不支持", Toast.LENGTH_SHORT).show();
+                    } else {
+                        if (position == 0) {
+                            curTypeface = Typeface.MONOSPACE;
+                            floatTextView.setTypeface(curTypeface);
+                        } else if (position == 1) {
+                            curTypeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/kaiti.TTF");
+                            floatTextView.setTypeface(curTypeface);
+                        } else if (position == 2) {
+                            curTypeface = Typeface.DEFAULT;
+                            floatTextView.setTypeface(curTypeface);
+                        }
+                        if (lastFontId != position) {
+                            ((TextView) view).setTextColor(AllDate.text_choosed_color);
+                            TextView textView = (TextView) ((HorizontalListView) view.getParent()).findViewWithTag(typefaceNames[lastFontId]);
+                            textView.setTextColor(AllDate.text_defualt_color);
+                            lastFontId = position;
+                        }
+                    }
                 }
             });
+            horizontalListView.setDividerWidth(Util.dp2Px(10));
             return contentView;
         }
 
@@ -186,18 +224,18 @@ public class AddTextFragment extends Fragment {
                 @Override
                 public void open() {
                     if (isItalic)
-                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.BOLD_ITALIC);
+                        floatTextView.setTypeface(curTypeface, Typeface.BOLD_ITALIC);
                     else
-                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
+                        floatTextView.setTypeface(curTypeface, Typeface.BOLD);
                     isBold = true;
                 }
 
                 @Override
                 public void close() {
                     if (isItalic)
-                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.ITALIC);
+                        floatTextView.setTypeface(curTypeface, Typeface.ITALIC);
                     else
-                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.NORMAL);
+                        floatTextView.setTypeface(curTypeface, Typeface.NORMAL);
                     isBold = false;
                 }
             });
@@ -208,18 +246,18 @@ public class AddTextFragment extends Fragment {
                 @Override
                 public void open() {
                     if (isBold)
-                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.BOLD_ITALIC);//斜体，中文有效
+                        floatTextView.setTypeface(curTypeface, Typeface.BOLD_ITALIC);//斜体，中文有效
                     else
-                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.ITALIC);//斜体，中文有效
+                        floatTextView.setTypeface(curTypeface, Typeface.ITALIC);//斜体，中文有效
                     isItalic = true;
                 }
 
                 @Override
                 public void close() {
                     if (isBold)
-                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
+                        floatTextView.setTypeface(curTypeface, Typeface.BOLD);
                     else
-                        floatTextView.setTypeface(Typeface.MONOSPACE, Typeface.NORMAL);
+                        floatTextView.setTypeface(curTypeface, Typeface.NORMAL);
                     isItalic = false;
                 }
             });
@@ -338,14 +376,16 @@ public class AddTextFragment extends Fragment {
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    floatTextView.setAlpha(1-(float)progress/100.0f);
+                    floatTextView.setAlpha(1 - (float) progress / 100.0f);
                 }
 
                 @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {         }
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                }
 
                 @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {        }
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                }
             });
             return contentView;
         }

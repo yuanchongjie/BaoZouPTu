@@ -32,7 +32,8 @@
 
 
     <color name="button_color_switch">#5677fc</color>
-
+    <color name="text_chose_color">#ff5722</color>
+    <color name="text_default_color">#ff111111</color>
 
     <drawable name="dialog_background">#80ffffff</drawable>
     <drawable name="hou">#dcdcdc</drawable>
