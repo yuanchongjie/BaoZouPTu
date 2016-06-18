@@ -21,15 +21,18 @@ import android.os.Message;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -198,10 +201,38 @@ public class ShowPictureActivity extends Activity {
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
             }
         });
-        pictureGridview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        pictureFileListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                LinearLayout linearLayout=new LinearLayout(ShowPictureActivity.this);
+                linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+                linearLayout.setGravity(Gravity.CENTER);
+                linearLayout.setDividerPadding(10);
+                linearLayout.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
+                linearLayout.setLayoutParams(
+                        new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                WindowManager.LayoutParams.WRAP_CONTENT));
 
+                TextView textView=new TextView(ShowPictureActivity.this);
+                textView.setText("设为常用");
+                textView.setGravity(Gravity.CENTER);
+                textView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addUsualyFile();
+                    }
+                });
+                linearLayout.addView(textView);
+
+                int[] popWH=new int[2];
+                Util.getMesureWH(textView,popWH);
+                PopupWindow popWindowFile=new PopupWindow(ShowPictureActivity.this);
+                popWindowFile.setContentView(linearLayout);
+                popWindowFile.setWidth(popWH[0]);
+                popWindowFile.setHeight(popWH[1]);
+                popWindowFile.showAsDropDown(view,
+                        (view.getWidth()-popWH[0])/2,
+                        -(view.getHeight()+popWH[1]));
                 return true;
             }
         });
@@ -271,10 +302,38 @@ public class ShowPictureActivity extends Activity {
                 picAdpter.setList(picPathInFile);
             }
         });
-        pictureFileListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        pictureGridview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Util.P.le("发生了Item长按");
+                LinearLayout linearLayout=new LinearLayout(ShowPictureActivity.this);
+                linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+                linearLayout.setGravity(Gravity.CENTER);
+                linearLayout.setDividerPadding(10);
+                linearLayout.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
+                linearLayout.setLayoutParams(
+                        new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                WindowManager.LayoutParams.WRAP_CONTENT));
+
+                TextView textView=new TextView(ShowPictureActivity.this);
+                textView.setText("设为常用");
+                textView.setGravity(Gravity.CENTER);
+                textView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+                linearLayout.addView(textView);
+
+                int[] popWH=new int[2];
+                Util.getMesureWH(textView,popWH);
+                PopupWindow popWindowFile=new PopupWindow(ShowPictureActivity.this);
+                popWindowFile.setContentView(linearLayout);
+                popWindowFile.setWidth(popWH[0]);
+                popWindowFile.setHeight(popWH[1]);
+                popWindowFile.showAsDropDown(view,
+                        (view.getWidth()-popWH[0])/2,
+                        -(view.getHeight()+popWH[1]));
                 return true;
             }
         });
