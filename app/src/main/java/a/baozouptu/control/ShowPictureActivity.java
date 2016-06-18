@@ -34,6 +34,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import a.baozouptu.R;
@@ -219,7 +220,6 @@ public class ShowPictureActivity extends Activity {
                 textView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        addUsualyFile();
                     }
                 });
                 linearLayout.addView(textView);
