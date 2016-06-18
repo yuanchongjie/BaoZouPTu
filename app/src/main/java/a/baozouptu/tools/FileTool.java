@@ -1,12 +1,17 @@
 package a.baozouptu.tools;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Path;
+import android.net.Uri;
+import android.provider.MediaStore;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import a.baozouptu.dataAndLogic.AllDate;
 
@@ -100,4 +105,6 @@ public class FileTool {
 		String suffix= oldPath.substring(oldPath.lastIndexOf("."),oldPath.length());
 		return prefix+"baozou"+suffix;
 	}
+
+
 }

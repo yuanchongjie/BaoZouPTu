@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -18,7 +17,13 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import a.baozouptu.R;
+import a.baozouptu.dataAndLogic.MyDatabase;
+import a.baozouptu.dataAndLogic.ProcessUsualyPicPath;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private int[] fab = {R.id.fab, R.id.fab1, R.id.fab2, R.id.fab3};
@@ -46,17 +51,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 /////第三步：启动通知栏，第一个参数是一个通知的唯一标识
         nm.notify(0, notification);
 
+
+       // testDB1();
+      //  testDB();
 //关闭通知
 //nm.cancel(0);
-        Intent intent1 = new Intent(this, ShowPictureActivity.class);
+         Intent intent1 = new Intent(this, ShowPictureActivity.class);
         intent1.putExtra("myFlag", "hahah");
         startActivity(intent1);
-        /*setContentView(R.layout.activity_main);
+       /*setContentView(R.layout.activity_main);
 
         initToolbar();
 
         initview();*/
 
+    }
+
+    private void testDB1() {
+        ProcessUsualyPicPath ups = new ProcessUsualyPicPath(this);
+        List<String> paths = new ArrayList<>();
+            ups.addUsedPath("1111");
+            ups.addUsedPath("2222");
+            ups.addUsedPath("3333");
+            ups.addUsedPath("4444");
+            ups.addUsedPath("cccc");
+            ups.addUsedPath("dddd");
+            ups.addUsedPath("eeee");
+            ups.addUsedPath("hhhh");
+            ups.addUsedPath("iiii");
+            ups.addUsedPath("jjjj");
+
+            paths = ups.getUsualyPathFromDB();
+    }
+
+    private void testDB() {
+        MyDatabase mdb = MyDatabase.getInstance(this);
+        List<String> paths = new ArrayList<>();
+        try {
+            mdb.tquaryAllUsedPic(paths);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            mdb.close();
+        }
     }
 
     private void initview() {
