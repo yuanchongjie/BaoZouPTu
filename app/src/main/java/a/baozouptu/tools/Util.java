@@ -123,7 +123,13 @@ public class Util {
             lastTime = -1;
         }
     }
-
+    public static void getMesureWH(View v, int[] WH) {
+        int width = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        int height = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        v.measure(width, height);
+        WH[0] = v.getMeasuredWidth();
+        WH[1] = v.getMeasuredHeight();
+    }
     /**
      * 获取两点间的位置
      *
