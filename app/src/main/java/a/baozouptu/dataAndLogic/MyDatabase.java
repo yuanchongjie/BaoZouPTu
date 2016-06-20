@@ -221,42 +221,6 @@ public class MyDatabase {
         }
     }
 
-    /**
-     * create table  IF NOT EXISTS usualyfile(path text primary key)
-     * inert时如果存在就替换，使用replace，不然就会出错
-     * 这样就不需要update了
-     */
-    public void insertUsualyFile(String path, long time) throws IOException {
-        db.execSQL("replace into usualyfile(path,time) values(?,?) ", new Object[]{path, String.valueOf(time)});
-    }
-
-    /**
-     * create table  IF NOT EXISTS usualyfile(path text primary key)
-     *
-     * @param path
-     */
-    public void deleteUsualyFile(String path) throws IOException {
-        db.execSQL("delete from usualyfile where path = ?", new Object[]{path});
-    }
-
-    /**
-     * 获取存入数据库的所有的选择出常用的得图片
-     * usualypic(path text primary key,time varchar(20))
-     *
-     * @param pathList
-     */
-    //    有两个返回值，不能直接返回，传入应用获取
-    public void quaryAllUsualyFile(List<String> pathList) throws IOException {
-        Cursor cursor = db.rawQuery("select path from usualyfile order by time desc ", new String[]{});
-        while (cursor.moveToNext()) {
-            String path = cursor.getString(0);
-            if (!(new File(path).exists()))
-                deleteUsualyFile(path);
-            else
-                pathList.add(path);
-        }
-    }
-
     public void close() {
         if (dbHelper != null) {
             dbHelper.close();

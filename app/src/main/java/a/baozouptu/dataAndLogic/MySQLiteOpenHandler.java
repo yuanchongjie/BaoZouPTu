@@ -20,7 +20,6 @@ public class MySQLiteOpenHandler extends SQLiteOpenHelper {
         db.execSQL("create table  IF NOT EXISTS usedpic(path text primary key,time varchar(50))");
         db.execSQL("create table  IF NOT EXISTS recentpic(path text primary key,time varchar(50))");
         db.execSQL("create table  IF NOT EXISTS usualypic(path text primary key,time varchar(50))");
-        db.execSQL("create table  IF NOT EXISTS usualyfile(path text primary key,time varchar(50))");
     }
 
     @Override

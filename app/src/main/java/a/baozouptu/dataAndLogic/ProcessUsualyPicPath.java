@@ -82,8 +82,6 @@ public class ProcessUsualyPicPath {
             mDB.quaryAllRecentPic(mUsualyPicPathList, recentTimesList);
             curRecentNumber = mUsualyPicPathList.size() - curUsedNumber;
             mDB.quaryAllUsualyPic(mUsualyPicPathList);
-            //查询所有的常用的图片
-            mDB.quaryAllUsualyFile(usualyFilesList);
             for (String path : usualyFilesList) {
                 fileTool.getOrderedPicListInFile(path, mUsualyPicPathList);
             }
@@ -333,40 +331,6 @@ public class ProcessUsualyPicPath {
 
     public List<String> getAllUsualyFile() {
         return usualyFilesList;
-    }
-
-
-    /**
-     * 添加常用文件夹信息
-     *
-     * @param path
-     */
-    public void addUsualyFile(String path) {
-        try {
-            mDB = MyDatabase.getInstance(mContext);
-            mDB.insertUsualyFile(path, lastTime++);
-            usualyFilesList.add(0, path);
-        } catch (IOException e) {
-
-        } finally {
-            mDB.close();
-        }
-    }
-
-    /**
-     * 删除常用文件夹信息
-     *
-     * @param path
-     */
-    public void deleteUsualyFile(String path) {
-        try {
-            mDB = MyDatabase.getInstance(mContext);
-            mDB.deleteUsualyFile(path);
-            usualyFilesList.remove(path);
-        } catch (IOException e) {
-        } finally {
-            mDB.close();
-        }
     }
 
     /**
