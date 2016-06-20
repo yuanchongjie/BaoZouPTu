@@ -5,5 +5,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">设置</string>
     <string name="title_activity_main">lol表情</string>
+    <string name="open">zzzz</string>
+    <string name="close">zzs</string>
 
 </resources>

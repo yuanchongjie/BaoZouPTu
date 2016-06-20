@@ -9,7 +9,6 @@ import a.baozouptu.dataAndLogic.ProcessUsualyPicPath;
 import a.baozouptu.tools.FileTool;
 import a.baozouptu.dataAndLogic.GridViewAdapter;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -20,9 +19,13 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -31,6 +34,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -44,7 +48,7 @@ import a.baozouptu.tools.Util;
  * 显示所选的最近的或某个文件夹下面的所有图片
  * 并且有选择文件夹，相机，空白图画图的功能
  */
-public class ShowPictureActivity extends Activity {
+public class ShowPictureActivity extends AppCompatActivity {
     private static final String DEBUG_TAG = "ShowPictureActivity";
     /**
      * 进度条
@@ -111,9 +115,6 @@ public class ShowPictureActivity extends Activity {
         m_ProgressDialog = ProgressDialog.show(ShowPictureActivity.this, "请稍后",
                 "数据读取中...", true);
         initPicInfo();
-
-        // 跳转显示文件夹的button
-        setClick();
     }
 
     /**
@@ -308,8 +309,6 @@ public class ShowPictureActivity extends Activity {
                             picFileInfoList.remove(0);
                             picFileInfoList.add(0, "  " + "常用图片(" + usualyPicPathList.size() + ")");
                         } else currentPicPathList.remove(path);
-
-
                         picAdpter.notifyDataSetChanged();
                         fileAdapter.notifyDataSetChanged();
                     }
@@ -331,18 +330,19 @@ public class ShowPictureActivity extends Activity {
     private void initView() {
         fileListDrawer = (DrawerLayout) findViewById(R.id.drawer_layout_show_picture);
         pictureGridview = (GridView) findViewById(R.id.gv_photolist);
-    }
-
-    void setClick() {
-        showPictureFileBn = (Button) findViewById(R.id.show_picture_file);
-        showPictureFileBn.setOnClickListener(new View.OnClickListener() {
-
+        Toolbar toolbar=(Toolbar)findViewById(R.id.show_picture_toolbar);
+        toolbar.setNavigationIcon(R.mipmap.icon1);
+        toolbar.setTitle("选择图片");
+        setSupportActionBar(toolbar);
+        final ImageButton showFile=(ImageButton)findViewById(R.id.show_pic_file);
+        showFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fileListDrawer.openDrawer(GravityCompat.END);
+                fileListDrawer.openDrawer();
             }
         });
     }
+
 
     /**
      * 加载Drawer的ListView数据

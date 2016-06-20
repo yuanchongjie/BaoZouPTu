@@ -1,7 +1,6 @@
 package a.baozouptu.control;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -11,10 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
@@ -48,7 +44,6 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
      * 子功能获取的bitmap的参数,0为获取图片相对原图片的左边距，1为获取图片相对原图片的上边距，
      * <p>2为获取图片的宽，3为获取图片的高度
      */
-    private float[] childFunctionbitmapPara;
     private String picPath = null;
     private FloatTextView floatTextView;
     private RePealRedoList<MainStepData> rePealRedoList = new RePealRedoList<>();
@@ -69,6 +64,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
     private void initView() {
         ptuFrame = (PtuFrameLayout) findViewById(R.id.ptu_frame);
         ptuView = (PtuView) findViewById(R.id.ptu_view);
+        ptuView.setBackgroundColor(getResources().getColor(R.color.grey));
         ImageButton repealBtn = (ImageButton) findViewById(R.id.repeal);
         repealBtn.setOnClickListener(new View.OnClickListener() {
             @Override

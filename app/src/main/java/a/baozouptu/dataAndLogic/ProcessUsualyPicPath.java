@@ -278,11 +278,12 @@ public class ProcessUsualyPicPath {
                         return o1.first.compareTo(o2.first);
                     }
                 });
-                if(oderedPicPathsByTime.get(0).first<AllDate.lastScanTime)
+                if(-oderedPicPathsByTime.get(0).first<AllDate.lastScanTime)
                 {
                     AllDate.lastScanTime=AllDate.scanTime;
                     return;
                 }
+                AllDate.lastScanTime=AllDate.scanTime;
                 //处理最近图片
                 try {
                     mDB = MyDatabase.getInstance(mContext);
