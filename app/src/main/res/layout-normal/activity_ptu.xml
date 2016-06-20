@@ -9,24 +9,28 @@
         android:layout_height="50dp"
         android:background="@color/toolbar_backgroud">
 
-        <Button
+        <ImageButton
+            android:id="@+id/cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/text_color1"
-            android:text="button" />
-
+            android:paddingRight="5dp"
+            android:minWidth="70dp"
+            android:src="@mipmap/cancel" />
         <ImageButton
             android:id="@+id/repeal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingRight="5dp"
             android:minWidth="70dp"
             android:src="@mipmap/repeal" />
 
         <ImageButton
+            android:id="@+id/sure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minWidth="70dp"
-            android:src="@mipmap/bold" />
+            android:background="@color/text_color1"
+            android:src="@mipmap/sure"
+            android:text="button" />
 
         <ImageButton
             android:id="@+id/menu_go_send"

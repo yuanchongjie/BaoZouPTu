@@ -1,9 +1,12 @@
 package a.baozouptu.tools;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapRegionDecoder;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.support.v4.graphics.BitmapCompat;
 import android.util.Log;
 import android.widget.ImageView;
@@ -67,7 +70,7 @@ public class BitmapTool {
      * @param path 路径必须不存在，存在时会覆盖文件，返回失败
      * @return 返回字符串代表不同的状态，成功是是返回"创建成功"四个字
      */
-    public static String saveBitmap(Bitmap bitmap,String path) {
+    public static String saveBitmap(Context context,Bitmap bitmap, String path) {
         String suffix= path.substring(path.lastIndexOf("."),path.length());
 
         Bitmap.CompressFormat bmc=null;
@@ -88,6 +91,13 @@ public class BitmapTool {
             fo=new FileOutputStream(path);
             bitmap.compress(bmc,100,fo);
             fo.flush();
+
+            //发送添加图片的广播
+            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            Uri uri = Uri.fromFile(file);
+            intent.setData(uri);
+            context.sendBroadcast(intent);
+
         } catch (FileNotFoundException e) {
             Util.P.le("Bitmaptool.savePicture","存储文件失败");
             e.printStackTrace();

@@ -34,6 +34,8 @@ public class AllDate {
     public static int text_defualt_color;
     public static int text_choosed_color;
     private static Context globleContext= Util.MyApplication.getAppContext();
+    public static long scanTime =0,lastScanTime=0;
+
     static{
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             text_defualt_color = globleContext.getResources().getColor(R.color.text_default_color, null);

@@ -56,10 +56,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
       //  testDB();
 //关闭通知
 //nm.cancel(0);
-         Intent intent1 = new Intent(this, ShowPictureActivity.class);
+       Intent intent1 = new Intent(this, ShowPictureActivity.class);
         intent1.putExtra("myFlag", "hahah");
         startActivity(intent1);
-       /*setContentView(R.layout.activity_main);
+        /* setContentView(R.layout.activity_main);
 
         initToolbar();
 
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MyDatabase mdb = MyDatabase.getInstance(this);
         List<String> paths = new ArrayList<>();
         try {
-            mdb.tquaryAllUsedPic(paths);
+            mdb.quaryAllUsedPicWithTime(paths);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

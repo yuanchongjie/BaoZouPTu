@@ -33,7 +33,7 @@ import a.baozouptu.view.PtuFrameLayout;
 import a.baozouptu.view.PtuView;
 
 public class PTuActivity extends Activity implements MainFunctionFragment.Listen {
-    public static final String DEBUG_TAG="PTuActivity";
+    public static final String DEBUG_TAG = "PTuActivity";
     /**
      * 主功能的fragment
      */
@@ -102,17 +102,24 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
                     public void onClick(View v) {
                         if (ptuFrame.getChildCount() > 1)
                             onReturnMainFunction();
-                        Bitmap bitmap = ptuView.getFinalPicture(finalRatio);
-                        String newPath = FileTool.getNewPicturePath(picPath);
-                        String result = BitmapTool.saveBitmap(bitmap, newPath);
-                        if (("创建成功".equals(result))) {//创建成功，退出应用，activity
-                            Util.P.le(result);
-                            PTuActivity.this.finish();
-                        } else
-                            Util.T(PTuActivity.this, result);
+                        savePtuView();
                     }
                 }
         );
+        ImageButton cancel = (ImageButton) findViewById(R.id.cancel);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ptuFrame.removeViewAt(1);
+            }
+        });
+        ImageButton sure = (ImageButton) findViewById(R.id.sure);
+        sure.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onReturnMainFunction();
+            }
+        });
     }
 
     private void addStep(MainStepData md) {
@@ -146,26 +153,27 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
     }
 
     /**
-     *  view的显示在图片上的部分的截图
+     * view的显示在图片上的部分的截图
+     *
      * @param view
      * @param innerRect view的显示在图片上的部分的区域
-     * @return  view的显示在图片上的部分的截图
+     * @return view的显示在图片上的部分的截图
      */
-    private Bitmap getInnerBmFromView(View view,RectF innerRect) {
+    private Bitmap getInnerBmFromView(View view, RectF innerRect) {
         Bitmap innerBitmap = null;
         try {
             Bitmap viewBitmap = Bitmap.createBitmap(floatTextView.getWidth(), floatTextView.getHeight(),
                     Bitmap.Config.ARGB_8888);
             view.draw(new Canvas(viewBitmap));
-            innerBitmap = Bitmap.createBitmap(viewBitmap, (int)innerRect.left,(int)innerRect.top,
-                    (int)(innerRect.right-innerRect.left),(int)(innerRect.bottom-innerRect.top));//获取floatview内部的内容
+            innerBitmap = Bitmap.createBitmap(viewBitmap, (int) innerRect.left, (int) innerRect.top,
+                    (int) (innerRect.right - innerRect.left), (int) (innerRect.bottom - innerRect.top));//获取floatview内部的内容
             viewBitmap.recycle();
         } catch (OutOfMemoryError e) {
             innerBitmap.recycle();
-            Util.T(this,"内存超限");
+            Util.T(this, "内存超限");
             e.printStackTrace();
         }
-        Util.P.le(DEBUG_TAG,"getInnerBmFromView完成");
+        Util.P.le(DEBUG_TAG, "getInnerBmFromView完成");
         return innerBitmap;
     }
 
@@ -199,14 +207,12 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
                         .addToBackStack("main")
                         .commit();
                 floatTextView = ptuFrame.initAddFloat(ptuView.getBound());
-                floatTextView.setText("我和\n我的\n小伙\n伴们");
                 fragText.setFloatView(floatTextView);
 
-                //让文本框一开始就获得输入法
+               /* //让文本框一开始就获得输入法
                 floatTextView.setFocusable(true);
                 floatTextView.requestFocus();
-                onFocusChange(floatTextView.isFocused());
-
+                onFocusChange(floatTextView.isFocused());*/
                 break;
         }
     }
@@ -229,12 +235,17 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
 
     @Override
     public void onBackPressed() {
-        onReturnMainFunction();
-        super.onBackPressed();
+        if(ptuFrame.getChildCount()>1) {
+            ptuFrame.removeViewAt(1);
+            super.onBackPressed();
+        }
+        else super.onBackPressed();
     }
 
     /**
-     * 回到主功能界面时,如果是从子功能回来，会添加子功能的view级参数到撤销重做list中。
+     * 回到主功能界面时,如果是从子功能回来，
+     * （1）会添加子功能的view级参数到撤销重做list中。
+     * （2）移除浮动图，获取浮动图的图片显示到putview上面
      */
     private void onReturnMainFunction() {
         if (ptuFrame.getChildCount() > 1) {
@@ -244,7 +255,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
                 boolean canGet = ((FloatView) view).prepareResultBitmap(ptuView.getInitRatio(),
                         innerRect, picRect);//先获取
                 if (!canGet) {//有些情况下会返回空
-                    Util.T(PTuActivity.this, "保存失败，获取到的图像为空");
+                    Util.T(PTuActivity.this, "操作失败，获取到的图像为空");
                     return;
                 } else {
                     //能获取到，将图绘制到sourceBitmap上，再绘制PtuView上，并且将view放入撤销重做list中
@@ -253,19 +264,35 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
                         @Override
                         public void run() {
                             ptuFrame.removeViewAt(1);
-                            textBitmap[0] = getInnerBmFromView(floatTextView,innerRect);
-                            Dialog dialog = new Dialog(PTuActivity.this);
+                            textBitmap[0] = getInnerBmFromView(floatTextView, innerRect);
+                           /* Dialog dialog = new Dialog(PTuActivity.this);
                             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                             dialog.setContentView(R.layout.test);
                             ImageView image = (ImageView) dialog.findViewById(R.id.test_image);
                             image.setImageBitmap(textBitmap[0]);
-                            dialog.show();
+                            dialog.show();*/
                             addStep(new MainStepData(view, innerRect, picRect));
                         }
-                    }, 800);
+                    }, 300);
                 }
             }
         }
     }
 
+    private void savePtuView() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap bitmap = ptuView.getFinalPicture(finalRatio);
+                String newPath = FileTool.getNewPicturePath(picPath);
+                String result = BitmapTool.saveBitmap(PTuActivity.this, bitmap, newPath);
+                setResult(0,new Intent().putExtra("path",picPath).putExtra("newPath",newPath));
+                if (("创建成功".equals(result))) {//创建成功，退出应用，activity
+                    Util.P.le(DEBUG_TAG,result);
+                    PTuActivity.this.finish();
+                } else
+                    Util.T(PTuActivity.this, result);
+            }
+        }, 600);
+    }
 }

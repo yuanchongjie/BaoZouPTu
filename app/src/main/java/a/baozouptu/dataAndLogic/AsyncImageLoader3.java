@@ -44,7 +44,6 @@ public class AsyncImageLoader3 {
 
     private AsyncImageLoader3() {
         int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-        Util.P.le("最大可用内存", maxMemory);
         imageCache = new LruCache<String, Bitmap>(maxMemory / 8) {
             @Override
             protected int sizeOf(String key, Bitmap value) {
