@@ -23,6 +23,7 @@ import android.widget.FrameLayout;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.MemoryHandler;
 
 import a.baozouptu.R;
@@ -35,6 +36,7 @@ import a.baozouptu.tools.Util;
  */
 public class FloatTextView extends EditText implements FloatView {
     private static String DEBUG_TAG = "FloatTextView";
+
     /**
      * 顶点的x，y坐标,相对于父组件的值，保证不会超出当前显示的图片的边界
      */
@@ -74,6 +76,7 @@ public class FloatTextView extends EditText implements FloatView {
      */
     private float initLeft, initTop;
     private String mText = "";
+    private int mBackGroundColor=0xffffffff;
 
     public void setDownState() {
         downShowState = SHOW_SATUS;
@@ -87,21 +90,6 @@ public class FloatTextView extends EditText implements FloatView {
         return mPadding;
     }
 
-    /**
-     * 表示item信息的类
-     */
-    private class Item {
-        float x;
-        float y;
-        String name;
-        Bitmap bitmap;
-
-        Item(float x, float y, String name) {
-            this.x = x;
-            this.y = y;
-            this.name = name;
-        }
-    }
 
     ArrayList<Item> items = new ArrayList<>(8);
     /**
@@ -133,12 +121,10 @@ public class FloatTextView extends EditText implements FloatView {
     }
 
     public float getfTop() {
-        Util.P.le(DEBUG_TAG, "");
         return fTop;
     }
 
     public float getfLeft() {
-        Util.P.le(DEBUG_TAG, "");
         return fLeft;
     }
 
@@ -232,8 +218,7 @@ public class FloatTextView extends EditText implements FloatView {
     }
 
 
-    private void initItems() {
-        Util.P.le(DEBUG_TAG, "initItems");
+    public void initItems() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             rimColor = mContext.getResources().getColor(R.color.float_rim_color, null);
             itemColor = mContext.getResources().getColor(R.color.float_item_color, null);
@@ -284,7 +269,7 @@ public class FloatTextView extends EditText implements FloatView {
         adjustEdegeBound();
     }
 
-    private void adjustSize(float ratio) {
+    public void adjustSize(float ratio) {
         Util.P.le(DEBUG_TAG, "adjustSize");
         currentRatio = ratio;
         //尝试直接设置
@@ -299,13 +284,13 @@ public class FloatTextView extends EditText implements FloatView {
                 currentRatio = 1f;
         }
         //让长宽大约多出两个汉字
-        float totalWidth = (pvBoundRect.right - pvBoundRect.left)*2;
+        float totalWidth = (pvBoundRect.right - pvBoundRect.left) * 2;
         if (mWidth > totalWidth) {
             float tr = totalWidth / mWidth;
             if (tr < 0.999) tr = 0.999f;//会产生小抖动，来回缩放，提醒用户不能说放了
             currentRatio = tr;
         }
-        float totalHeight = (pvBoundRect.bottom - pvBoundRect.top)*2;
+        float totalHeight = (pvBoundRect.bottom - pvBoundRect.top) * 2;
         if (mHeight > totalHeight) {
             float tr = currentRatio = totalHeight / mHeight;
             if (tr < 0.996) tr = 0.996f;
@@ -329,7 +314,6 @@ public class FloatTextView extends EditText implements FloatView {
      * @param ny 新的对应点的y坐标
      */
     public void drag(float nx, float ny) {
-        Util.P.le(DEBUG_TAG, "drag");
         fLeft = nx - relativeX;
         fTop = ny - relativeY;
         adjustEdegeBound();
@@ -339,7 +323,7 @@ public class FloatTextView extends EditText implements FloatView {
      * 适配floatview的位置,不能超出图片的边界,不算padding的内部就不能超出边界
      * 超出之后移动startx，starty,不影响其它数据
      */
-    private void adjustEdegeBound() {
+    public void adjustEdegeBound() {
         Util.P.le(DEBUG_TAG, "adjustEdegeBound");
         if (fLeft + mWidth - mPadding < pvBoundRect.left)//右边小于左边界
             fLeft = pvBoundRect.left - mWidth + mPadding;
@@ -408,28 +392,28 @@ public class FloatTextView extends EditText implements FloatView {
 
         //获取realratio比例下，内部text的宽高text
         float fTextWidth = textWidth * realRatio, fTextHeight = textHeight * realRatio;
-        float fWidth=fTextWidth+mPadding*2,fHeight=fTextHeight+mPadding*2;
+        float fWidth = fTextWidth + mPadding * 2, fHeight = fTextHeight + mPadding * 2;
 
         //如果要获取的view过大 ，超过总内存的1/5  ，减小放大比例
-        long limit=Runtime.getRuntime().maxMemory()/5;
-        if(fWidth*fHeight*4>limit){
-            innerLeft/=realRatio;//除去原来的比例
-            innerTop/=realRatio;
-            innerRight/=realRatio;
-            innerBottom/=realRatio;
-            float newRatio=(float)Math.sqrt(limit/(mWidth*mHeight*4));
+        long limit = Runtime.getRuntime().maxMemory() / 5;
+        if (fWidth * fHeight * 4 > limit) {
+            innerLeft /= realRatio;//除去原来的比例
+            innerTop /= realRatio;
+            innerRight /= realRatio;
+            innerBottom /= realRatio;
+            float newRatio = (float) Math.sqrt(limit / (mWidth * mHeight * 4));
             //获取ratio比例下，内部text的宽高text
-            innerLeft = innerLeft* newRatio;
+            innerLeft = innerLeft * newRatio;
             innerRight = innerRight * newRatio;
             innerTop = innerTop * newRatio;
             innerBottom = innerBottom * newRatio;
             fTextWidth = textWidth * newRatio;
-            fWidth=fTextWidth+mPadding*2;
+            fWidth = fTextWidth + mPadding * 2;
         }
-        innerRect.left = innerLeft+mPadding;
-        innerRect.top = innerTop+mPadding;
-        innerRect.right = innerRight+mPadding;
-        innerRect.bottom = innerBottom+mPadding;
+        innerRect.left = innerLeft + mPadding;
+        innerRect.top = innerTop + mPadding;
+        innerRect.right = innerRight + mPadding;
+        innerRect.bottom = innerBottom + mPadding;
         //根据最终比例，相应的缩放图片，但不能完全匹配
 
         mTextSize = getTextSizeByWidth(mTextSize, fWidth);
@@ -456,17 +440,17 @@ public class FloatTextView extends EditText implements FloatView {
      */
     private float getTextSizeByWidth(float curSize, float fWidth) {
         //缩放只针对内部的文本框，所以以为本匡长宽做比例运算
-        float textWidth=mWidth-mPadding*2,fTextWidth=fWidth-mPadding*2;
+        float textWidth = mWidth - mPadding * 2, fTextWidth = fWidth - mPadding * 2;
         while (textWidth < fTextWidth) {
-            float add = (fTextWidth - textWidth) / (textWidth+2) * curSize;//避免除以0，同时每次变化值少一点
+            float add = (fTextWidth - textWidth) / (textWidth + 2) * curSize;//避免除以0，同时每次变化值少一点
             if (add < 0.1) add = 0.1f;
             curSize += add;
             setTextSize(curSize);
             getRealSize();
-            textWidth=mWidth-mPadding*2;
+            textWidth = mWidth - mPadding * 2;
         }
         while (textWidth > fTextWidth) {
-            float red = (textWidth-fTextWidth) / (textWidth+2) * curSize;//避免除以0，同时每次变化值少一点
+            float red = (textWidth - fTextWidth) / (textWidth + 2) * curSize;//避免除以0，同时每次变化值少一点
             if (red < 0.1) red = 0.1f;
             curSize -= red;
             if (curSize <= 1) {
@@ -475,66 +459,69 @@ public class FloatTextView extends EditText implements FloatView {
             }
             setTextSize(curSize);
             getRealSize();
-            textWidth=mWidth-mPadding*2;
+            textWidth = mWidth - mPadding * 2;
         }
         return curSize;
     }
 
-        /**
-         * 调整文字的大小是文本框的高度与给定值误差在一定范围之内
-         * 文本缩放时缩放程度小于实际高高的缩放,另外，
-         * 文本框正常受到字数的限制，每个字都增加一些，所以总厂不能线性增加，而是阶梯增加的
-         * 所以循环增加的方式，让高高达到要求
-         * <p/>
-         * <p>注意操作的同时textsize和mwidth，mheight已经设置好了</p>
-         *
-         * @param curSize 当前的文字大小
-         * @param fHeight  最终要求的高度
-         * @return 达到要求的文字size
-         */
-        private float getTextSizeByHeight(float curSize, float fHeight) {
-            //缩放只针对内部的文本框，所以以为本匡长高做比例运算
-            float textHeight=mHeight-mPadding*2,fTextHeight=fHeight-mPadding*2;
-            while (textHeight < fTextHeight) {
-                float add = (fTextHeight - textHeight) /  (textHeight+2) * curSize;//避免除以0，同时每次变化值少一点
-                if (add < 0.1) add = 0.1f;
-                curSize += add;
-                setTextSize(curSize);
-                getRealSize();
-                textHeight=mHeight-mPadding*2;
-            }
-            while (textHeight > fTextHeight) {
-                float red = (textHeight-fTextHeight) /  (textHeight+2) * curSize;//避免除以0，同时每次变化值少一点
-                if (red < 0.1) red = 0.1f;
-                curSize -= red;
-                if (curSize <= 1) {
-                    curSize = 1;
-                    break;
-                }
-                setTextSize(curSize);
-                getRealSize();
-                textHeight=mHeight-mPadding*2;
-            }
-            return curSize;
+    /**
+     * 调整文字的大小是文本框的高度与给定值误差在一定范围之内
+     * 文本缩放时缩放程度小于实际高高的缩放,另外，
+     * 文本框正常受到字数的限制，每个字都增加一些，所以总厂不能线性增加，而是阶梯增加的
+     * 所以循环增加的方式，让高高达到要求
+     * <p/>
+     * <p>注意操作的同时textsize和mwidth，mheight已经设置好了</p>
+     *
+     * @param curSize 当前的文字大小
+     * @param fHeight 最终要求的高度
+     * @return 达到要求的文字size
+     */
+    private float getTextSizeByHeight(float curSize, float fHeight) {
+        //缩放只针对内部的文本框，所以以为本匡长高做比例运算
+        float textHeight = mHeight - mPadding * 2, fTextHeight = fHeight - mPadding * 2;
+        while (textHeight < fTextHeight) {
+            float add = (fTextHeight - textHeight) / (textHeight + 2) * curSize;//避免除以0，同时每次变化值少一点
+            if (add < 0.1) add = 0.1f;
+            curSize += add;
+            setTextSize(curSize);
+            getRealSize();
+            textHeight = mHeight - mPadding * 2;
         }
+        while (textHeight > fTextHeight) {
+            float red = (textHeight - fTextHeight) / (textHeight + 2) * curSize;//避免除以0，同时每次变化值少一点
+            if (red < 0.1) red = 0.1f;
+            curSize -= red;
+            if (curSize <= 1) {
+                curSize = 1;
+                break;
+            }
+            setTextSize(curSize);
+            getRealSize();
+            textHeight = mHeight - mPadding * 2;
+        }
+        return curSize;
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
         Util.P.le(DEBUG_TAG, "onDraw()");
+        mPaint.setTextSize(mTextSize);
+        Paint.FontMetrics fm = mPaint.getFontMetrics();
+        /**
+         * 文本默认不局中，计算中间位置
+         */
+        float md = sp2px(fm.ascent - fm.top), nd = sp2px(fm.bottom - fm.descent), dd = md - nd;
+        rimLeft = mPadding - md;
+        rimTop = mPadding + dd;
+        rimRight = mWidth - mPadding + md;
+        rimBottom = mHeight - mPadding;
+
+        mPaint.setColor(mBackGroundColor);
+        canvas.drawRect(rimLeft,rimTop,rimRight,rimBottom,mPaint);
+
         if (SHOW_SATUS >= STATUS_RIM) {//要显示的东西不止边框
             mPaint.setColor(rimColor);
             mPaint.setStrokeWidth(3);
-
-            mPaint.setTextSize(mTextSize);
-            Paint.FontMetrics fm = mPaint.getFontMetrics();
-            /**
-             * 文本默认不局中，计算中间位置
-             */
-            float md = sp2px(fm.ascent - fm.top), nd = sp2px(fm.bottom - fm.descent), dd = md - nd;
-            rimLeft = mPadding - md;
-            rimTop = mPadding + dd;
-            rimRight = mWidth - mPadding + md;
-            rimBottom = mHeight - mPadding;
             //上边的线
             canvas.drawLine(rimLeft, rimTop, rimRight, rimTop, mPaint);
             //左边的线
@@ -553,11 +540,15 @@ public class FloatTextView extends EditText implements FloatView {
             items.get(6).y = rimBottom;
             drawItem(canvas, items.get(6));
         }
-        super.onDraw(canvas);
+       super.onDraw(canvas);
     }
 
-
-    private void drawItem(Canvas canvas, Item item) {
+    /**
+     *
+     * @param canvas
+     * @param item
+     */
+    public void drawItem(Canvas canvas, Item item) {
         canvas.drawBitmap(item.bitmap, new Rect(0, 0, mPadding, mPadding),
                 new RectF(item.x, item.y,
                         item.x + mPadding,
@@ -615,10 +606,20 @@ public class FloatTextView extends EditText implements FloatView {
                     float y = event.getY();
                     //内部子item的处理
                     //点击到了重置位置按钮
-                    RectF item6Bound = new RectF(items.get(6).x - 10, items.get(6).y - 10,
+                    RectF item6Bound = new RectF(items.get(6).x - 10, items.get(6).y,
                             items.get(6).x + mPadding + 10, items.get(6).y + mPadding + 10);
                     if (SHOW_SATUS >= STATUS_ITEM && item6Bound.contains(x, y)) {
                         onClickBottomCenter();
+                        return true;
+                    }
+                    RectF item2Bound = new RectF(items.get(2).x, items.get(2).y - 10,
+                            items.get(2).x + mPadding + 10, items.get(2).y + mPadding);
+                    if (SHOW_SATUS >= STATUS_ITEM && item2Bound.contains(x, y)) {
+                        if (mBackGroundColor == 0x00000000)
+                            mBackGroundColor = 0xffffffff;
+                        else
+                            mBackGroundColor = 0x00000000;
+                        invalidate();
                         return true;
                     }
                     //点击到view的其他部分
@@ -637,7 +638,7 @@ public class FloatTextView extends EditText implements FloatView {
         return false;
     }
 
-    private void onClickBottomCenter() {
+    public void onClickBottomCenter() {
         Util.P.le(DEBUG_TAG, "onClickBottomCenter");
         fLeft = initLeft;
         fTop = initTop;

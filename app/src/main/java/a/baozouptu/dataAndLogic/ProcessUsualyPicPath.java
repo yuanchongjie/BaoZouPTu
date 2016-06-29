@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v4.util.Pair;
+import android.support.v4.util.TimeUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class ProcessUsualyPicPath {
     private final Handler mHandler;
     Context mContext;
     private final int MAX_USED_NUMBER = 6;
-    private final int MAX_RECENT_NUMBER = 20;
+    private final int MAX_RECENT_NUMBER = 6;
     /**
      * 当前拥有的编辑过的和最近的图片张数
      */
@@ -79,8 +80,6 @@ public class ProcessUsualyPicPath {
             mDB = MyDatabase.getInstance(mContext);
             mDB.quaryAllUsedPic(mUsualyPicPathList);
             curUsedNumber = mUsualyPicPathList.size();
-            mDB.quaryAllRecentPic(mUsualyPicPathList, recentTimesList);
-            curRecentNumber = mUsualyPicPathList.size() - curUsedNumber;
             mDB.quaryAllUsualyPic(mUsualyPicPathList);
             for (String path : usualyFilesList) {
                 fileTool.getOrderedPicListInFile(path, mUsualyPicPathList);
@@ -129,37 +128,13 @@ public class ProcessUsualyPicPath {
      */
     //注意数据库，内存双添加,以及相关参数改变
     public void addRecentPath(String path, int index, long time) {
-        try {
-            mDB = MyDatabase.getInstance(mContext);
-            if (curRecentNumber + 1 > MAX_RECENT_NUMBER) {
-                mDB.deleteOdlestRecentPic();//超过预定数量时，删除一个，再添加
-                mUsualyPicPathList.remove(curUsedNumber + curRecentNumber - 1);
-                curRecentNumber--;
-            }
-            mDB.insertRecentPic(path, time);
-            mUsualyPicPathList.add(curUsedNumber + index, path);
-            curRecentNumber++;
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            mDB.close();
-        }
-    }
-
-    /**
-     * 添加最近图片
-     *
-     * @param path
-     */
-    //注意数据库，内存双添加,以及相关参数改变
-    private void muitlAddRecentPath(String path, int index, long time) throws IOException {
         if (curRecentNumber + 1 > MAX_RECENT_NUMBER) {
-            mDB.deleteOdlestRecentPic();//超过预定数量时，删除一个，再添加
             mUsualyPicPathList.remove(curUsedNumber + curRecentNumber - 1);
+            recentTimesList.remove(recentTimesList.size()-1);
             curRecentNumber--;
         }
-        mDB.insertRecentPic(path, time);
         mUsualyPicPathList.add(curUsedNumber + index, path);
+        recentTimesList.add(index,time);
         curRecentNumber++;
     }
 
@@ -188,27 +163,6 @@ public class ProcessUsualyPicPath {
     }
 
     /**
-     * 通过文件列表添加选定的常用图片
-     *
-     * @param pathsList 常用文件的列表
-     */
-    private void muitlAddUsualyPath(List<String> pathsList) {
-        try {
-            mDB = MyDatabase.getInstance(mContext);
-            for (String path : pathsList) {
-                mDB.insertUsualyPic(path, lastTime++);
-                //不在常用列表时才添加
-                if (mUsualyPicPathList.lastIndexOf(path) < getUsualyStart())
-                    mUsualyPicPathList.add(curUsedNumber + curRecentNumber, path);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            mDB.close();
-        }
-    }
-
-    /**
      * 添加选定的常用图片
      *
      * @param path
@@ -226,41 +180,6 @@ public class ProcessUsualyPicPath {
     }
 
     /**
-     * 添加选定的常用图片
-     *
-     * @param pathsList
-     */
-    private void muitlDeleteUsualyPath(List<String> pathsList) {
-        try {
-            mDB = MyDatabase.getInstance(mContext);
-            for (String path : pathsList) {
-                mDB.deleteUsualyPic(path);
-                int index = mUsualyPicPathList.lastIndexOf(path);
-                //当有重复时，只删除常用列表里面的
-                //如果选定常用列表里面它还存在，没被删除
-                if (index >= getUsualyStart())
-                    mUsualyPicPathList.remove(index);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            mDB.close();
-        }
-    }
-
-    public void addAllUsuPathInFile(String filepath) {
-        List<String> pathsList = new ArrayList<>();
-        new FileTool().getOrderedPicListInFile(filepath, pathsList);
-        muitlAddUsualyPath(pathsList);
-    }
-
-    public void deleteAllUsuPathInFile(String filePath) {
-        List<String> pathsList = new ArrayList<>();
-        new FileTool().getOrderedPicListInFile(filePath, pathsList);
-        muitlDeleteUsualyPath(pathsList);
-    }
-
-    /**
      * 开启新线程，查询所有的图片
      */
     public void getAllPicInfoAndRecent() {
@@ -268,43 +187,43 @@ public class ProcessUsualyPicPath {
             @Override
             public void run() {
                 // 排序处理得到的图片的map
-                List<Pair<Long, String>> oderedPicPathsByTime = new ArrayList<>();
-                quaryPicInfoInSD(oderedPicPathsByTime, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                quaryPicInfoInSD(oderedPicPathsByTime, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                AllDate.scanTime =System.currentTimeMillis();
-                Collections.sort(oderedPicPathsByTime, new Comparator<Pair<Long, String>>() {
+                List<Pair<Long, String>> sortedPicPathsByTime = new ArrayList<>();
+                quaryPicInfoInSD(sortedPicPathsByTime, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                quaryPicInfoInSD(sortedPicPathsByTime, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                long scanTime = System.currentTimeMillis();
+                Collections.sort(sortedPicPathsByTime, new Comparator<Pair<Long, String>>() {
                     @Override
                     public int compare(Pair<Long, String> o1, Pair<Long, String> o2) {
                         return o1.first.compareTo(o2.first);
                     }
                 });
-                if(-oderedPicPathsByTime.get(0).first<AllDate.lastScanTime)
-                {
-                    AllDate.lastScanTime=AllDate.scanTime;
+
+                detectRecentExit();
+                if (-sortedPicPathsByTime.get(0).first < AllDate.lastScanTime&&curRecentNumber>=MAX_RECENT_NUMBER) {
+                    AllDate.lastScanTime = scanTime;
                     return;
                 }
-                AllDate.lastScanTime=AllDate.scanTime;
+                AllDate.lastScanTime = scanTime;
+
                 //处理最近图片
-                try {
-                    mDB = MyDatabase.getInstance(mContext);
-                    int index = 0;
-                    for (Pair<Long, String> pair : oderedPicPathsByTime) {
-                        long time = -pair.first;
-                        if ((recentTimesList.size() < MAX_RECENT_NUMBER || time < recentTimesList.get(index))
-                                && index < MAX_RECENT_NUMBER) {
-                            if (recentTimesList.size() > MAX_RECENT_NUMBER)
-                                recentTimesList.remove(recentTimesList.size() - 1);
-                            recentTimesList.add(index, time);
-                            muitlAddRecentPath(pair.second, index, time);
-                            index++;
-                        } else {
+                int index = 0;
+                for (Pair<Long, String> pair : sortedPicPathsByTime) {
+                    if(isInRecent(pair.second))continue;
+                    long time = -pair.first;
+                    int i=index;
+                    for(;i<recentTimesList.size();i++){
+                        if(time>recentTimesList.get(i)){
+                            addRecentPath(pair.second, i, time);
                             break;
                         }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    mDB.close();
+                    //当最近图片总数不足时，直接添加
+                    if(i==recentTimesList.size()&&i<MAX_RECENT_NUMBER)
+                    {
+                        addRecentPath(pair.second, i, time);
+                    }
+                    index=i+1;
+                    if(index>=MAX_RECENT_NUMBER)break;
                 }
 
                 // 处理文件信息,将要显示的文件信息获取出来
@@ -330,8 +249,26 @@ public class ProcessUsualyPicPath {
         new Thread(runnable).start();
     }
 
-    public List<String> getAllUsualyFile() {
-        return usualyFilesList;
+    /**
+     * 检测最近的图片时已删除
+     */
+    private void detectRecentExit() {
+        for(int i=curUsedNumber;i<curRecentNumber+curUsedNumber;i++){
+            String path=mUsualyPicPathList.get(i);
+            if(!new File(path).exists()){
+                mUsualyPicPathList.remove(i);
+                curRecentNumber--;
+                recentTimesList.remove(i-curUsedNumber);
+            }
+        }
+    }
+
+    private boolean isInRecent(String path) {
+        for (int i = curUsedNumber; i < curUsedNumber + curRecentNumber; i++) {
+            if (mUsualyPicPathList.get(i).equals(path))
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -352,8 +289,8 @@ public class ProcessUsualyPicPath {
                         .getColumnIndex(MediaStore.Images.Media.SIZE));
                 String path = cursor.getString(cursor
                         .getColumnIndex(MediaStore.Images.Media.DATA));
-                long modifyTime = cursor.getInt(cursor
-                        .getColumnIndex(MediaStore.Images.Media.DATE_MODIFIED));// 最近修改时间
+                long modifyTime = cursor.getLong(cursor
+                        .getColumnIndex(MediaStore.Images.Media.DATE_MODIFIED)) * 1000;// 最近修改时间
                 if (5000 < size && size < 16000000) {// 图片符合条件
                     sortPictureList.add(new Pair(-modifyTime, path));
                     String parentPath = path.substring(0,
@@ -372,6 +309,8 @@ public class ProcessUsualyPicPath {
 
     /**
      * 更新文件信息，文件名，图片张数
+     * 不会操作数据库
+     * 发送删除通知
      *
      * @param picPath
      */
@@ -430,15 +369,18 @@ public class ProcessUsualyPicPath {
 
     public void deletePicture(String path) {
         try {
-            mDB = MyDatabase.getInstance(mContext);
             //如果存在，需要先删除原来的
-            if (mUsualyPicPathList.indexOf(path) < curUsedNumber) {
+            int id = mUsualyPicPathList.indexOf(path);
+            if (0 <= id && id < curUsedNumber) {
                 mDB.deleteUsedPic(path);
-                mUsualyPicPathList.remove(path);
+                mUsualyPicPathList.remove(id);
+                curUsedNumber--;
             }
-            if (mUsualyPicPathList.indexOf(path) < curRecentNumber) {
-                mDB.deleteRecentPic(path);
-                mUsualyPicPathList.remove(path);
+            id = mUsualyPicPathList.indexOf(path);
+            if (curUsedNumber <= id && id < curUsedNumber + curRecentNumber) {
+                mUsualyPicPathList.remove(id);
+                recentTimesList.remove(id-curUsedNumber);
+                curRecentNumber--;
             }
             if (mUsualyPicPathList.contains(path)) {
                 mDB.deleteUsualyPic(path);

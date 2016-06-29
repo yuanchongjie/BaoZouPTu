@@ -18,7 +18,6 @@ public class MySQLiteOpenHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         Util.P.le("执行了创建数据库");
         db.execSQL("create table  IF NOT EXISTS usedpic(path text primary key,time varchar(50))");
-        db.execSQL("create table  IF NOT EXISTS recentpic(path text primary key,time varchar(50))");
         db.execSQL("create table  IF NOT EXISTS usualypic(path text primary key,time varchar(50))");
     }
 

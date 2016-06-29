@@ -109,10 +109,18 @@ public class FileTool {
      * @param oldPath 以前的路径
      * @return
      */
-    public static String getNewPicturePath(String oldPath) {
+    public static String getNewPictureFile(String oldPath) {
         String prefix = oldPath.substring(0, oldPath.lastIndexOf("."));
         String suffix = oldPath.substring(oldPath.lastIndexOf("."), oldPath.length());
-        return prefix + "baozou" + suffix;
+        String newPath=null;
+        File newFile;
+        for(int i=0;i<10000000;i++){
+            newPath=prefix + "baozou" + i + suffix;
+            newFile=new File(newPath);
+            if(!newFile.exists())
+                break;
+        }
+        return newPath;
     }
 
 

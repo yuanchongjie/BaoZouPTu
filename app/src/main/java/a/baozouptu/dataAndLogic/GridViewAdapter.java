@@ -48,7 +48,7 @@ public class GridViewAdapter extends BaseAdapter {
         mContext = context;
         layoutInflater = LayoutInflater.from(context);
         this.imgUrls = imgUrls;
-        imageLoader = AsyncImageLoader3.getInstatnce();
+        imageLoader =AllDate.imageLoader3;
     }
 
     public void setList(List<String> list) {
@@ -146,7 +146,7 @@ public class GridViewAdapter extends BaseAdapter {
         if (cachedImage != null && setter.ivImage != null) {
             setter.ivImage.setImageBitmap(cachedImage);
         } else if (setter.ivImage != null) {
-            setter.ivImage.setImageResource(R.mipmap.icon1);
+            setter.ivImage.setImageResource(R.mipmap.instead_icon);
         }
         return holder;// 返回最终ListView的子项目View
     }

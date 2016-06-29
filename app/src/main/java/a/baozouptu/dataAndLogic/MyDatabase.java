@@ -18,7 +18,7 @@ public class MyDatabase {
     private static MyDatabase myDatabase;
     private static MySQLiteOpenHandler dbHelper;
     private static SQLiteDatabase db;
-    private FileTool fileTool = new FileTool();
+
 
     private MyDatabase(Context context) {
         dbHelper = new MySQLiteOpenHandler(context);
@@ -102,80 +102,6 @@ public class MyDatabase {
     }
 
     /**
-     * recentpic(path text primary key,time varchar(20))
-     * inert时如果存在就替换，使用replace，不然就会出错，
-     * 这样就不需要update了
-     */
-    public void insertRecentPic(String path, long time) throws IOException {
-        db.execSQL("replace into recentpic(path,time) values(?,?) ", new Object[]{path, String.valueOf(time)});
-    }
-
-    /**
-     * recentpic(path text primary key,time varchar(20))
-     *
-     * @param path
-     */
-    public void deleteRecentPic(String path) throws IOException {
-        db.execSQL("delete from recentpic where path = ?", new Object[]{path});
-    }
-
-    /**
-     * 超出最多图片数时，删除最早添加进去的图片
-     * usedpic(path text primary key,time varchar(20))
-     */
-    public void deleteOdlestRecentPic() throws IOException {
-        db.execSQL("delete from recentpic where time = ( select min(time) from recentpic )", new Object[]{});
-    }
-
-    /**
-     * recentpic(path text primary key,time varchar(20))
-     *
-     * @param path
-     * @param time
-     */
-    public void updateRecentPic(String path, long time) throws IOException {
-        insertRecentPic(path, time);
-    }
-
-    /**
-     * * 获取存入数据库的所有使用最近的图片
-     * recentpic(path text primary key,time varchar(20))
-     *
-     * @param pathList
-     */
-    //    有两个返回值，不能直接返回，传入应用获取
-    public void quaryAllRecentPic(List<String> pathList) throws IOException {
-        Cursor cursor = db.rawQuery("select path from recentpic order by time desc ", new String[]{});
-        while (cursor.moveToNext()) {
-            String path = cursor.getString(0);
-            if (!(new File(path).exists()))
-                deleteRecentPic(path);
-            else
-                pathList.add(path);
-        }
-    }
-
-    /**
-     * 获取存入数据库的所有使用最近的图片的路径和时间
-     * recentpic(path text primary key,time varchar(20))
-     *
-     * @param pathList
-     */
-    //    有两个返回值，不能直接返回，传入应用获取
-    public void quaryAllRecentPic(List<String> pathList, List<Long> timesList) throws IOException {
-        Cursor cursor = db.rawQuery("select * from recentpic order by time desc ", new String[]{});
-        while (cursor.moveToNext()) {
-            String path = cursor.getString(0);
-            if (!(new File(path).exists()))
-                deleteRecentPic(path);
-            else {
-                pathList.add(path);
-                timesList.add(Long.valueOf(cursor.getString(1)));
-            }
-        }
-    }
-
-    /**
      * usualypic(path text primary key,time varchar(20))
      * inert时如果存在就替换，使用replace，不然就会出错，
      * 这样就不需要update了
@@ -222,14 +148,14 @@ public class MyDatabase {
     }
 
     public void close() {
-        if (dbHelper != null) {
-            dbHelper.close();
-            dbHelper = null;
-        }
         if (db != null) {
             db.close();
             db = null;
+        }if (dbHelper != null) {
+            dbHelper.close();
+            dbHelper = null;
         }
+
     }
 
 

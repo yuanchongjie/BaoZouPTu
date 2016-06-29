@@ -72,7 +72,6 @@ public class ShowPictureActivity extends AppCompatActivity {
      */
     private List<String> picFileInfoList, filePathList, fileRepresentPathList;
 
-    private Button showPictureFileBn;
     private DrawerLayout fileListDrawer;
     private GridViewAdapter picAdpter;
     private GridView pictureGridview;
@@ -80,7 +79,7 @@ public class ShowPictureActivity extends AppCompatActivity {
 
     private ListView pictureFileListView;
     private MyFileListAdapter fileAdapter;
-    private List<String> usualyFileList;
+    boolean isFirst = true;
 
     /**
      * Called when the activity is first created.
@@ -101,7 +100,13 @@ public class ShowPictureActivity extends AppCompatActivity {
             @Override
             public void handleMessage(Message msg) {
                 if (msg.obj.equals("change_pic")) {
-                    picAdpter.notifyDataSetChanged();
+                    if (isFirst) {
+                        pictureGridview.setAdapter(picAdpter);
+                        m_ProgressDialog.dismiss();// 表示此处开始就解除这个进度条Dialog，应该是在相对起始线程的另一个中使用
+                        isFirst = false;
+                    } else {
+                        picAdpter.notifyDataSetChanged();
+                    }
                     Util.P.le(DEBUG_TAG, "finish update picture");
                 } else if (msg.obj.equals("change_file")) {
                     Util.P.le(DEBUG_TAG, "finish update file");
@@ -123,14 +128,12 @@ public class ShowPictureActivity extends AppCompatActivity {
      */
     private void initPicInfo() {
         usualyPicPathList = usuPicProcess.getUsualyPathFromDB();
-        Util.P.le(DEBUG_TAG, "获取了上次数据库中的图片");
         currentPicPathList = usualyPicPathList;
+        Util.P.le(DEBUG_TAG, "获取了上次数据库中的图片");
         disposeShowPicture();
         Util.P.le(DEBUG_TAG, "初始化显示图片完成");
         disposeDrawer();
         Util.P.le(DEBUG_TAG, "初始化显示Drawer完成");
-        AllDate.lastScanTime=0;
-        AllDate.scanTime=0;
     }
 
     /**
@@ -139,22 +142,22 @@ public class ShowPictureActivity extends AppCompatActivity {
     private void disposeShowPicture() {
         picAdpter = new GridViewAdapter(
                 ShowPictureActivity.this, currentPicPathList);
-        pictureGridview.setAdapter(picAdpter);
-        usualyFileList = usuPicProcess.getAllUsualyFile();
         pictureGridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 Intent intent = new Intent(ShowPictureActivity.this, PTuActivity.class);
-                AsyncImageLoader3.getInstatnce().evitAll();
+
+                Intent sourceIntent = getIntent();
+                if (sourceIntent != null) {
+                    String s = sourceIntent.getExtras().getString("myFlag");
+                    if (s != null && s.equals("notify_text")) {
+                        intent.putExtra("action", "text");
+                    }
+                }
+
                 intent.putExtra("picPath", currentPicPathList.get(position));
                 startActivityForResult(intent, 0);
-                /*Intent sintent = getIntent();
-                if (sintent != null) {
-                    String s = sintent.getExtras().getString("myFlag");
-                    if (s != null && s.equals("notify"))
-                        finish();
-                }*/
             }
         });
 
@@ -214,9 +217,7 @@ public class ShowPictureActivity extends AppCompatActivity {
                 textView.setWidth(view.getWidth() / 2);
 
                 final String path = currentPicPathList.get(position);
-                if (usualyPicPathList.lastIndexOf(path) >= usuPicProcess.getUsualyStart()
-                        && currentPicPathList == usualyPicPathList
-                        && position >= usuPicProcess.getUsualyStart()) {
+                if (usualyPicPathList.lastIndexOf(path) >= usuPicProcess.getUsualyStart()) {
                     textView.setText("取消");
                     textView.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -274,7 +275,7 @@ public class ShowPictureActivity extends AppCompatActivity {
                 return true;
             }
         });
-        m_ProgressDialog.dismiss();// 表示此处开始就解除这个进度条Dialog，应该是在相对起始线程的另一个中使用
+
     }
 
     private void deletePicture(final String path) {
@@ -304,10 +305,11 @@ public class ShowPictureActivity extends AppCompatActivity {
                             alertDialog1.show();
                             return;
                         }
-                        if (usualyPicPathList.contains(path)) {
+                        if (usualyPicPathList.contains(path)) {//包含才常用列表里面
                             usuPicProcess.deletePicture(path);
                             picFileInfoList.remove(0);
                             picFileInfoList.add(0, "  " + "常用图片(" + usualyPicPathList.size() + ")");
+                            usuPicProcess.getAllPicInfoAndRecent();
                         } else currentPicPathList.remove(path);
                         picAdpter.notifyDataSetChanged();
                         fileAdapter.notifyDataSetChanged();
@@ -330,15 +332,16 @@ public class ShowPictureActivity extends AppCompatActivity {
     private void initView() {
         fileListDrawer = (DrawerLayout) findViewById(R.id.drawer_layout_show_picture);
         pictureGridview = (GridView) findViewById(R.id.gv_photolist);
-        Toolbar toolbar=(Toolbar)findViewById(R.id.show_picture_toolbar);
-        toolbar.setNavigationIcon(R.mipmap.icon1);
-        toolbar.setTitle("选择图片");
+        Toolbar toolbar = (Toolbar) findViewById(R.id.show_picture_toolbar);
         setSupportActionBar(toolbar);
-        final ImageButton showFile=(ImageButton)findViewById(R.id.show_pic_file);
+        final ImageButton showFile = (ImageButton) findViewById(R.id.show_pic_file);
         showFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fileListDrawer.openDrawer();
+                if (fileListDrawer.isDrawerOpen(GravityCompat.END))
+                    fileListDrawer.closeDrawer(GravityCompat.END);
+                else
+                    fileListDrawer.openDrawer(GravityCompat.END);
             }
         });
     }
@@ -477,9 +480,40 @@ public class ShowPictureActivity extends AppCompatActivity {
             String newPath = data.getStringExtra("newPath");
             if (path != null) {
                 usuPicProcess.addUsedPath(path);
-                usuPicProcess.addUsedPath(newPath);
+                usuPicProcess.addRecentPath(newPath, 0, System.currentTimeMillis());
+            }
+            String action = data.getAction();
+            if (action != null && action.equals("finish")) {
+                setResult(0, new Intent(action));
+                finish();
+            }
+            if (path != null && currentPicPathList == usualyPicPathList) {
+                picAdpter.notifyDataSetChanged();
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onPause() {
+        AsyncImageLoader3.getInstatnce().evitAll();
+        super.onPause();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (currentPicPathList == usualyPicPathList) {
+            super.onBackPressed();
+        } else {
+            currentPicPathList = usualyPicPathList;
+            picAdpter.setList(usualyPicPathList);
+            pictureGridview.setAdapter(picAdpter);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        AllDate.lastScanTime = 0;
+        super.onDestroy();
     }
 }

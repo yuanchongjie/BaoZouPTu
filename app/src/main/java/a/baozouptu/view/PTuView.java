@@ -75,6 +75,15 @@ public class PtuView extends View {
      * 用于处理图片的矩阵
      */
     private Matrix matrix = new Matrix();
+
+    public void setTotalWidth(int totalWidth) {
+        this.totalWidth = totalWidth;
+    }
+
+    public void setTotalHeight(int totalHeight) {
+        this.totalHeight = totalHeight;
+    }
+
     /**
      * 整个View的宽,高
      */
@@ -134,27 +143,19 @@ public class PtuView extends View {
         picPaint.setDither(true);
     }
 
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        totalWidth = w;
-        totalHeight = h;
-        bitmapToview = Bitmap.createBitmap(totalWidth, totalHeight,
-                Config.ARGB_8888);//创建一个空图做底图
-        secondCanvas = new Canvas(bitmapToview);//设置drawCanvas为底图
-        super.onSizeChanged(w, h, oldw, oldh);
-    }
-
     /**
      * 根据提供的缩放比例，将p图的图片缩放到原图*缩放比例大小，并返回
      *
      * @param finalRatio 缩放的比例
      */
     public Bitmap getFinalPicture(float finalRatio) {
-        /*Bitmap bitmap = Bitmap.createScaledBitmap(sourceBitmap, (int) (sourceBitmap.getWidth() * finalRatio),
-                (int) (sourceBitmap.getHeight() * finalRatio), true);
-        if (bitmap.equals(sourceBitmap))
-            sourceBitmap.recycle();
-        bitmapToview.recycle();*/
+        if(finalRatio!=1.0) {
+            Bitmap bitmap = Bitmap.createScaledBitmap(sourceBitmap, (int) (sourceBitmap.getWidth() * finalRatio),
+                    (int) (sourceBitmap.getHeight() * finalRatio), true);
+            if (bitmap.equals(sourceBitmap))
+                sourceBitmap.recycle();
+            bitmapToview.recycle();
+        }
         return sourceBitmap;
     }
 
@@ -170,7 +171,7 @@ public class PtuView extends View {
      *
      * @param path2
      */
-    public void setBitmapAndInit(String path2) {
+    public void setBitmapAndInit(String path2,int totalWidth,int totalHeight) {
         sourceBitmap = new BitmapTool().getLosslessBitmap(path2);
         if (sourceBitmap == null) {
             Toast.makeText(mContext, "图片不存在", Toast.LENGTH_SHORT).show();
@@ -180,8 +181,12 @@ public class PtuView extends View {
         sourceCanvas=new Canvas(sourceBitmap);
         srcPicWidth = sourceBitmap.getWidth();
         srcPicHeight = sourceBitmap.getHeight();
+        this.totalWidth=totalWidth;
+        this.totalHeight=totalHeight;
+        bitmapToview = Bitmap.createBitmap(totalWidth, totalHeight,
+                Config.ARGB_8888);//创建一个空图做底图
+        secondCanvas = new Canvas(bitmapToview);//设置drawCanvas为底图
         CURRENT_STATUS = STATUS_INIT;
-        invalidate();
     }
 
     /**
@@ -197,7 +202,6 @@ public class PtuView extends View {
         picTop = (totalHeight - curPicHeight) / 2;
         getConvertParameter(curPicWidth, curPicHeight);
         drawToBitmapToView();
-        //secondCanvas.drawBitmap(sourceBitmap, srcRect, dstRect, picPaint);//将原图填充到底图上
     }
 
     @Override

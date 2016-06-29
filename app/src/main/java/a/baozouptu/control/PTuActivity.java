@@ -3,7 +3,6 @@ package a.baozouptu.control;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -11,8 +10,8 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -49,7 +48,9 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
     private RePealRedoList<MainStepData> rePealRedoList = new RePealRedoList<>();
     private float finalRatio = 1;
     private PopupWindow redoPopWindow;
+    private Intent resultIntent = new Intent();
 
+    boolean hasChanged=false;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +60,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
         setViewContent();
         setFragment();
         setOnClick();
+
     }
 
     private void initView() {
@@ -98,6 +100,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
                     public void onClick(View v) {
                         if (ptuFrame.getChildCount() > 1)
                             onReturnMainFunction();
+                        resultIntent.setAction("finish");
                         savePtuView();
                     }
                 }
@@ -106,7 +109,8 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ptuFrame.removeViewAt(1);
+                if (ptuFrame.getChildCount() > 1)
+                    ptuFrame.removeViewAt(1);
             }
         });
         ImageButton sure = (ImageButton) findViewById(R.id.sure);
@@ -138,6 +142,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
     }
 
     private void addBitmapToPtuView(MainStepData md) {
+        hasChanged=true;
         Bitmap addBm = getInnerBmFromView(md.getView(), md.getInnerRect());
         ptuView.addBitmap(addBm, md.getOutRect());
     }
@@ -145,7 +150,30 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
     private void setViewContent() {
         Intent intent = getIntent();
         picPath = intent.getStringExtra("picPath");
-        ptuView.setBitmapAndInit(picPath);
+        ptuFrame.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                ptuView.setBitmapAndInit(picPath, ptuFrame.getWidth(), ptuFrame.getHeight());
+                ptuFrame.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                Intent intent = getIntent();
+                final String action = intent.getStringExtra("action");
+                if (action != null) {
+                    switch (action) {
+                        case "text":
+                            if (fragText == null) {
+                                fragText = new AddTextFragment();
+                            }
+                            ptuView.initialDraw();
+                            fm.beginTransaction().add(R.id.fragment_function, fragText)
+                                    .addToBackStack("main")
+                                    .commit();
+                            floatTextView = ptuFrame.initAddFloat(ptuView.getBound());
+                            fragText.setFloatView(floatTextView);
+                    }
+                }
+            }
+        });
+
     }
 
     /**
@@ -213,29 +241,12 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
         }
     }
 
-    private void onFocusChange(boolean hasFocus) {
-
-        final boolean isFocus = hasFocus;
-        (new Handler()).postDelayed(new Runnable() {
-            public void run() {
-                InputMethodManager imm = (InputMethodManager)
-                        floatTextView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (isFocus) {
-                    imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-                } else {
-                    imm.hideSoftInputFromWindow(floatTextView.getWindowToken(), 0);
-                }
-            }
-        }, 100);
-    }
-
     @Override
     public void onBackPressed() {
-        if(ptuFrame.getChildCount()>1) {
+        if (ptuFrame.getChildCount() > 1) {
             ptuFrame.removeViewAt(1);
             super.onBackPressed();
-        }
-        else super.onBackPressed();
+        } else super.onBackPressed();
     }
 
     /**
@@ -261,7 +272,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
                         public void run() {
                             ptuFrame.removeViewAt(1);
                             textBitmap[0] = getInnerBmFromView(floatTextView, innerRect);
-                           /* Dialog dialog = new Dialog(PTuActivity.this);
+                            /*Dialog dialog = new Dialog(PTuActivity.this);
                             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                             dialog.setContentView(R.layout.test);
                             ImageView image = (ImageView) dialog.findViewById(R.id.test_image);
@@ -277,17 +288,23 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
 
     private void savePtuView() {
         new Handler().postDelayed(new Runnable() {
+
+            private String result=null;
             @Override
             public void run() {
-                Bitmap bitmap = ptuView.getFinalPicture(finalRatio);
-                String newPath = FileTool.getNewPicturePath(picPath);
-                String result = BitmapTool.saveBitmap(PTuActivity.this, bitmap, newPath);
-                setResult(0,new Intent().putExtra("path",picPath).putExtra("newPath",newPath));
-                if (("创建成功".equals(result))) {//创建成功，退出应用，activity
-                    Util.P.le(DEBUG_TAG,result);
-                    PTuActivity.this.finish();
-                } else
-                    Util.T(PTuActivity.this, result);
+                if(hasChanged==false&&finalRatio==1){
+                    result="图片未改变";
+                }
+                else {
+                    Bitmap bitmap = ptuView.getFinalPicture(finalRatio);
+                    String newPath = FileTool.getNewPictureFile(picPath);
+                    result = BitmapTool.saveBitmap(PTuActivity.this, bitmap, newPath);
+                    resultIntent.putExtra("path", picPath);
+                    resultIntent.putExtra("newPath", newPath);
+                }
+                setResult(0,resultIntent);
+                Util.P.le(DEBUG_TAG, result);
+                PTuActivity.this.finish();
             }
         }, 600);
     }
