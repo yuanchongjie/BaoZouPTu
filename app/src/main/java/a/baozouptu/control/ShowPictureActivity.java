@@ -328,11 +328,11 @@ public class ShowPictureActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(metric);
         AllDate.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
     }
-
+    Toolbar toolbar;
     private void initView() {
         fileListDrawer = (DrawerLayout) findViewById(R.id.drawer_layout_show_picture);
         pictureGridview = (GridView) findViewById(R.id.gv_photolist);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.show_picture_toolbar);
+        toolbar = (Toolbar) findViewById(R.id.show_picture_toolbar);
         setSupportActionBar(toolbar);
         final ImageButton showFile = (ImageButton) findViewById(R.id.show_pic_file);
         showFile.setOnClickListener(new View.OnClickListener() {
