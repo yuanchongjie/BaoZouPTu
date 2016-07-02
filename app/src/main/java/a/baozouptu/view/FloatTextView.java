@@ -109,8 +109,28 @@ public class FloatTextView extends EditText implements FloatView {
         return relativeY;
     }
 
+    @Override
+    public void setRelativeY(float relativeY) {
+
+    }
+
+    @Override
+    public void setRelativeX(float relativeX) {
+
+    }
+
     public float getRelativeX() {
         return relativeX;
+    }
+
+    @Override
+    public float getmWidth() {
+        return mWidth;
+    }
+
+    @Override
+    public float getmHeight() {
+        return mHeight;
     }
 
     public float getfTop() {
@@ -533,7 +553,7 @@ public class FloatTextView extends EditText implements FloatView {
             items.get(6).y = rimBottom;
             drawItem(canvas, items.get(6));
         }
-       super.onDraw(canvas);
+        super.onDraw(canvas);
     }
 
     /**
