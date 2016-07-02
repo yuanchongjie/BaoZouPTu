@@ -37,7 +37,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 import a.baozouptu.R;
 
-
 public class MySwitchButton extends View {
 
     public static final int SHAPE_RECT = 1;

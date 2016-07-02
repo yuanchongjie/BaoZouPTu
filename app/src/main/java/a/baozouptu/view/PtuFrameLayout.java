@@ -5,8 +5,10 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.FrameLayout;
 
+import a.baozouptu.R;
 import a.baozouptu.tools.GeoUtil;
 import a.baozouptu.tools.Util;
 
@@ -21,7 +23,7 @@ public class PtuFrameLayout extends FrameLayout {
     private static final int STATUS_MOVE_FLOAT = 1;
     private static final int STATUS_SCALE_FLOAT = 2;
 
-    private FloatTextView floatView;
+    private FloatView floatView;
     Context mContext;
     private float lastFloatDis;
     private boolean onFloat = false;
@@ -42,20 +44,20 @@ public class PtuFrameLayout extends FrameLayout {
         mContext = context;
     }
 
-    public FloatTextView initAddFloat(Rect ptuViewBound) {
-        Util.P.le(DEBUG_TAG,"initAddFloat");
+    public FloatTextView initAddTextFloat(Rect ptuViewBound) {
+        Util.P.le(DEBUG_TAG,"initAddTextFloat");
         //设置floatText的基本属性
         floatView = new FloatTextView(mContext, ptuViewBound);
 
         //设置布局
         FrameLayout.LayoutParams floatParams =
-                new FrameLayout.LayoutParams((int) floatView.mWidth, (int) floatView.mHeight);
+                new FrameLayout.LayoutParams((int) floatView.getmWidth(), (int) floatView.getmHeight());
 
         floatParams.setMargins((int) floatView.getfLeft(), (int) floatView.getfTop(),
-                (int) (floatView.getfLeft() + floatView.mWidth),
-                (int) (floatView.getfTop() + floatView.mHeight));
-        addView(floatView, floatParams);
-        return floatView;
+                (int) (floatView.getfLeft() + floatView.getmWidth()),
+                (int) (floatView.getfTop() + floatView.getmHeight()));
+        addView((View)floatView, floatParams);
+        return (FloatTextView)floatView;
     }
 
     @Override
@@ -74,8 +76,8 @@ public class PtuFrameLayout extends FrameLayout {
                 downY = event.getY();
                 downTime = System.currentTimeMillis();
 
-                floatView.relativeX = event.getX() - floatView.getfLeft();
-                floatView.relativeY = event.getY() - floatView.getfTop();
+                floatView.setRelativeX (event.getX() - floatView.getfLeft());
+                floatView.setRelativeY( event.getY() - floatView.getfTop());
                 CURRENT_STATUS = STATUS_MOVE_FLOAT;
 
                 break;
@@ -85,8 +87,8 @@ public class PtuFrameLayout extends FrameLayout {
                         event.getX(1), event.getY(1));
                 scaleCenterX = (event.getX(0) + event.getX(1)) / 2;
                 scaleCenterY = (event.getY(0) + event.getY(1)) / 2;
-                floatView.relativeX = scaleCenterX - floatView.getfLeft();
-                floatView.relativeY = scaleCenterY - floatView.getfTop();
+                floatView.setRelativeX(scaleCenterX - floatView.getfLeft());
+                floatView.setRelativeY ( scaleCenterY - floatView.getfTop());
 
             case MotionEvent.ACTION_MOVE:
                 floatView.changeShowState(FloatView.STATUS_RIM);
@@ -95,25 +97,25 @@ public class PtuFrameLayout extends FrameLayout {
                     floatView.drag(event.getX(), event.getY());
                     redrawFloat();
                 } else if(event.getPointerCount()>=2){
-                //以缩放中心的为相对坐标，用于一边缩放一边移动
-                float ncenterX = (event.getX(0) + event.getX(1)) / 2,
-                        ncenterY = (event.getY(0) + event.getY(1)) / 2;
-                //缩放时移动距离大于2dp时移动
-                if (GeoUtil.getDis(scaleCenterX, scaleCenterY, ncenterX, ncenterY) > Util.dp2Px(1))
-                    floatView.drag(ncenterX, ncenterY);
-                scaleCenterX = ncenterX;
-                scaleCenterY = ncenterY;
+                    //以缩放中心的为相对坐标，用于一边缩放一边移动
+                    float ncenterX = (event.getX(0) + event.getX(1)) / 2,
+                            ncenterY = (event.getY(0) + event.getY(1)) / 2;
+                    //缩放时移动距离大于2dp时移动
+                    if (GeoUtil.getDis(scaleCenterX, scaleCenterY, ncenterX, ncenterY) > Util.dp2Px(1))
+                        floatView.drag(ncenterX, ncenterY);
+                    scaleCenterX = ncenterX;
+                    scaleCenterY = ncenterY;
 
-                //增加的距离
-                float endFloatDis = GeoUtil.getDis(event.getX(0), event.getY(0),
-                        event.getX(1), event.getY(1));
-                float ratio = (floatView.mWidth + (endFloatDis - lastFloatDis)) / floatView.mWidth;
-                if (ratio == 1.0) break;
-                floatView.scale(ratio);
-                redrawFloat();
-                lastFloatDis = endFloatDis;
+                    //增加的距离
+                    float endFloatDis = GeoUtil.getDis(event.getX(0), event.getY(0),
+                            event.getX(1), event.getY(1));
+                    float ratio = (floatView.getmWidth() + (endFloatDis - lastFloatDis)) / floatView.getmWidth();
+                    if (ratio == 1.0) break;
+                    floatView.scale(ratio);
+                    redrawFloat();
+                    lastFloatDis = endFloatDis;
 
-            }
+                }
                 break;
             case MotionEvent.ACTION_UP:
                 Util.P.le("经过了up");
@@ -122,7 +124,7 @@ public class PtuFrameLayout extends FrameLayout {
                         && System.currentTimeMillis() - downTime < 500) {
                     //点击发生在floatView之外
                     if (!(new RectF(floatView.getfLeft(),floatView.getfTop(),
-                            floatView.getLeft()+floatView.mWidth,floatView.getfTop()+floatView.mHeight)
+                            floatView.getfLeft()+floatView.getmWidth(),floatView.getfTop()+floatView.getmHeight())
                             .contains(event.getX(),event.getY())))
                         floatView.changeShowState(floatView.STATUS_TOUMING);
                     Util.P.le("经过了up2");
@@ -148,7 +150,7 @@ public class PtuFrameLayout extends FrameLayout {
             boolean isConsume=false;
             float sx=ev.getX(),sy=ev.getY();
             if ((new RectF(floatView.getfLeft(),floatView.getfTop(),
-                    floatView.getLeft()+floatView.mWidth,floatView.getfTop()+floatView.mHeight)
+                    floatView.getfLeft()+floatView.getmWidth(),floatView.getfTop()+floatView.getmHeight())
                     .contains(ev.getX(),ev.getY()))) {
                 ev.setLocation(ev.getX()-floatView.getfLeft(),ev.getY()-floatView.getfTop());
                 isConsume=getChildAt(1).dispatchTouchEvent(ev);
@@ -168,13 +170,25 @@ public class PtuFrameLayout extends FrameLayout {
 
     public void redrawFloat() {
         Util.P.le(DEBUG_TAG,"redrawFloat");
-        removeView(floatView);
+        removeView((View)floatView);
         FrameLayout.LayoutParams floatParams =
-                new FrameLayout.LayoutParams((int) floatView.mWidth,
-                        (int) floatView.mHeight);
+                new FrameLayout.LayoutParams((int) floatView.getmWidth(),
+                        (int) floatView.getmHeight());
         floatParams.setMargins((int) floatView.getfLeft(), (int) floatView.getfTop(),
-                (int) (floatView.getfLeft() + floatView.mWidth),
-                (int) (floatView.getfTop() + floatView.mHeight));
-        addView(floatView, floatParams);
+                (int) (floatView.getfLeft() + floatView.getmWidth()),
+                (int) (floatView.getfTop() + floatView.getmHeight()));
+        addView((View)floatView, floatParams);
+    }
+
+    public void initAddImageFloat(Rect bound) {
+        floatView=new FloatImageView(mContext,bound,getMeasuredWidth(),getMeasuredHeight());
+
+        //设置布局
+        FrameLayout.LayoutParams floatParams =
+                new FrameLayout.LayoutParams(getMeasuredWidth(),getMeasuredHeight());
+        floatParams.setMargins(0, 0,getMeasuredWidth(),getMeasuredHeight());
+        addView((View)floatView, floatParams);
+
+        ((FloatImageView)floatView).setSourceBitmapAndInit("/storage/sdcard1/哈哈哈.jpg");
     }
 }

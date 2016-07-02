@@ -1,6 +1,7 @@
 package a.baozouptu.control;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -37,6 +38,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
     FragmentManager fm;
     private MainFunctionFragment fragMain;
     private AddTextFragment fragText;
+    private TietuFragment fragTietu;
     private PtuView ptuView;
     private PtuFrameLayout ptuFrame;
     /**
@@ -50,7 +52,9 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
     private PopupWindow redoPopWindow;
     private Intent resultIntent = new Intent();
 
-    boolean hasChanged=false;
+    boolean hasChanged = false;
+    private Fragment currenFra;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +64,12 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
         setViewContent();
         setFragment();
         setOnClick();
-
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                changeFragment("tietu");
+            }
+        }, 500);
     }
 
     private void initView() {
@@ -142,7 +151,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
     }
 
     private void addBitmapToPtuView(MainStepData md) {
-        hasChanged=true;
+        hasChanged = true;
         Bitmap addBm = getInnerBmFromView(md.getView(), md.getInnerRect());
         ptuView.addBitmap(addBm, md.getOutRect());
     }
@@ -167,7 +176,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
                             fm.beginTransaction().add(R.id.fragment_function, fragText)
                                     .addToBackStack("main")
                                     .commit();
-                            floatTextView = ptuFrame.initAddFloat(ptuView.getBound());
+                            floatTextView = ptuFrame.initAddTextFloat(ptuView.getBound());
                             fragText.setFloatView(floatTextView);
                     }
                 }
@@ -227,10 +236,12 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
                 if (fragText == null) {
                     fragText = new AddTextFragment();
                 }
+                if (fm.getBackStackEntryCount() > 1) fm.beginTransaction().remove(currenFra);
                 fm.beginTransaction().add(R.id.fragment_function, fragText)
                         .addToBackStack("main")
                         .commit();
-                floatTextView = ptuFrame.initAddFloat(ptuView.getBound());
+                currenFra = fragText;
+                floatTextView = ptuFrame.initAddTextFloat(ptuView.getBound());
                 fragText.setFloatView(floatTextView);
 
                /* //让文本框一开始就获得输入法
@@ -238,6 +249,16 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
                 floatTextView.requestFocus();
                 onFocusChange(floatTextView.isFocused());*/
                 break;
+            case "tietu":
+                if (fm.getBackStackEntryCount() > 1) fm.beginTransaction().remove(currenFra);
+                if (fragTietu == null) {
+                    fragTietu = new TietuFragment();
+                }
+                ptuFrame.initAddImageFloat(ptuView.getBound());
+                fm.beginTransaction().add(R.id.fragment_function, fragTietu)
+                        .addToBackStack("main")
+                        .commit();
+                currenFra = fragTietu;
         }
     }
 
@@ -289,20 +310,20 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
     private void savePtuView() {
         new Handler().postDelayed(new Runnable() {
 
-            private String result=null;
+            private String result = null;
+
             @Override
             public void run() {
-                if(hasChanged==false&&finalRatio==1){
-                    result="图片未改变";
-                }
-                else {
+                if (hasChanged == false && finalRatio == 1) {
+                    result = "图片未改变";
+                } else {
                     Bitmap bitmap = ptuView.getFinalPicture(finalRatio);
                     String newPath = FileTool.getNewPictureFile(picPath);
                     result = BitmapTool.saveBitmap(PTuActivity.this, bitmap, newPath);
                     resultIntent.putExtra("path", picPath);
                     resultIntent.putExtra("newPath", newPath);
                 }
-                setResult(0,resultIntent);
+                setResult(0, resultIntent);
                 Util.P.le(DEBUG_TAG, result);
                 PTuActivity.this.finish();
             }
