@@ -68,32 +68,32 @@ public class FloatImageView extends View implements FloatView {
     private Canvas sourceCanvas;
 
     /**
-     *图片宽高
+     * 图片宽高
      */
     private int picWidth, picHeight;
     /**
-     *贴图原始宽高
+     * 贴图原始宽高
      */
     private int tietuWidth, tietuHeight;
     /**
-     *当前贴图宽高
+     * 当前贴图宽高
      */
     private int curTHeight, curTWidth;
     /**
-     *贴图当前中心的位置
+     * 贴图当前中心的位置
      */
     private int centerY, centerX;
     /**
-     *ptuView总的宽高
+     * ptuView总的宽高
      */
     private int totalHeight, totalWidth;
 
-    private float rotateAngle;
+    private float totalRotateAngle;
     private float lastRatio;
     private float totalRatio;
     private float lastX, lastY;
     private float lastDis;
-
+    private float lastAngle=0;
 
 
     public FloatImageView(Context context) {
@@ -152,7 +152,7 @@ public class FloatImageView extends View implements FloatView {
     private void init() {
         lastRatio = totalRatio = 1;
         tempBitmap = sourceBitmap;
-        rotateAngle = 0;
+        totalRotateAngle = 0;
 
         picWidth = picBoundRect.right - picBoundRect.left;
         picHeight = picBoundRect.bottom - picBoundRect.top;
@@ -160,8 +160,8 @@ public class FloatImageView extends View implements FloatView {
         tietuHeight = sourceBitmap.getHeight();
         centerX = totalWidth / 2;
         centerY = totalHeight / 2;
-        curTWidth=(int)(tietuWidth*totalRatio);
-        curTHeight=(int)(tietuHeight*totalRatio);
+        curTWidth = (int) (tietuWidth * totalRatio);
+        curTHeight = (int) (tietuHeight * totalRatio);
 
         tietuDitu = Bitmap.createBitmap(totalWidth,
                 totalHeight, Bitmap.Config.ARGB_8888);
@@ -170,8 +170,8 @@ public class FloatImageView extends View implements FloatView {
         if (tietuWidth > picWidth || tietuHeight > picHeight) {
             totalRatio = Math.min(picWidth * 1.0f / tietuWidth,
                     picHeight * 1.0f / tietuHeight);
-            curTWidth=(int)(tietuWidth*totalRatio);
-            curTHeight=(int)(tietuHeight*totalRatio);
+            curTWidth = (int) (tietuWidth * totalRatio);
+            curTHeight = (int) (tietuHeight * totalRatio);
         }
     }
 
@@ -264,8 +264,8 @@ public class FloatImageView extends View implements FloatView {
 
     private void moveTietu(float x, float y) {
         float dx = x - lastX, dy = y - lastY;
-        lastX=x;
-        lastY=y;
+        lastX = x;
+        lastY = y;
         if (adjustEdgeBound(centerX + dx, centerY + dy))//如果发生移动
         {
             invalidate();
@@ -274,15 +274,26 @@ public class FloatImageView extends View implements FloatView {
 
     @Override
     public void scale(float ratio) {
-        curTWidth=(int)(tietuWidth*totalRatio);
-        curTHeight=(int)(tietuHeight*totalRatio);
-        adjustEdgeBound(centerX,centerY);
+        curTWidth = (int) (tietuWidth * totalRatio);
+        curTHeight = (int) (tietuHeight * totalRatio);
+        adjustEdgeBound(centerX, centerY);
         invalidate();
+    }
+    private void rotate() {
+        invalidate();
+    }
+
+
+    private float getAngle(float x, float y, float x1, float y1) {
+        float dx = x1 - x, dy = y1 - y;
+        double angle = Math.atan2(dy, dx);
+        return (float) Math.toDegrees(angle);
     }
 
     /**
      * 适配边界，能移动返回true，否则false
      * 会改变数据centerX，centerY
+     *
      * @param nx
      * @param ny
      * @return
@@ -300,7 +311,7 @@ public class FloatImageView extends View implements FloatView {
 
         if ((int) nx == centerX && (int) ny == centerY) {
             return false;
-        }else {
+        } else {
             centerX = (int) nx;
             centerY = (int) ny;
             return true;
@@ -326,25 +337,6 @@ public class FloatImageView extends View implements FloatView {
         return 0;
     }
 
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        canvas.rotate(rotateAngle);
-        //先将图绘制到底图上面，再将底图绘制到view上面
-        if (totalRatio != lastRatio) {//如果发生了缩放
-            if (tempBitmap != sourceBitmap) tempBitmap.recycle();
-            tempBitmap = sourceBitmap.createScaledBitmap(
-                    sourceBitmap, curTWidth, curTHeight, true);
-            lastRatio=totalRatio;
-        }
-        BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), tempBitmap);
-        bitmapDrawable.setBounds(centerX - curTWidth / 2, centerY - curTHeight / 2,
-                centerX + curTWidth / 2, centerY + curTHeight / 2);
-        bitmapDrawable.draw(canvas);
-        canvas.restore();
-        super.onDraw(canvas);
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getActionMasked()) {
@@ -354,20 +346,37 @@ public class FloatImageView extends View implements FloatView {
                 Util.P.le(DEBUG_TAG, "经过了down");
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
+                //缩放
                 lastDis = GeoUtil.getDis(event.getX(0), event.getY(0), event.getX(1), event.getY(1));
+
+                //旋转
+                lastAngle=getAngle(event.getX(0), event.getY(0), event.getX(1), event.getY(1));
+
+                //移动
+                lastX = (event.getX(0) + event.getX(1)) / 2;
+                lastY = (event.getY(0) + event.getY(1)) / 2;
             case MotionEvent.ACTION_MOVE:
                 //移动
                 if (event.getPointerCount() == 1) {
                     moveTietu(event.getX(), event.getY());
-                } else {//缩放和旋转
+                } else {
+                    //缩放
                     float endD = GeoUtil.getDis(event.getX(0), event.getY(0), event.getX(1), event.getY(1));
                     float currentRatio = endD / lastDis;
                     lastDis = endD;
-                    float ratio=adjustSize(totalRatio * currentRatio);
-                    if (ratio!=-1&&ratio!=totalRatio) {
+                    float ratio = adjustSize(totalRatio * currentRatio);
+                    if (ratio != -1 && ratio != totalRatio) {
                         totalRatio = ratio;
                         scale(totalRatio);
                     }
+                    //旋转
+                    float curAngle=getAngle(event.getX(0), event.getY(0),
+                    event.getX(1), event.getY(1));
+                    totalRotateAngle += (curAngle-lastAngle);
+                    lastAngle=curAngle;
+                    rotate();
+                    //移动
+                    moveTietu((event.getX(0) + event.getX(1)) / 2, (event.getY(0) + event.getY(1)) / 2);
                 }
                 break;
             case MotionEvent.ACTION_POINTER_UP:
@@ -383,4 +392,21 @@ public class FloatImageView extends View implements FloatView {
         return true;
     }
 
+    @Override
+    protected void onDraw(Canvas canvas) {
+        canvas.rotate(totalRotateAngle,centerX,centerY);
+        //先将图绘制到底图上面，再将底图绘制到view上面
+        if (totalRatio != lastRatio) {//如果发生了缩放
+            if (tempBitmap != sourceBitmap) tempBitmap.recycle();
+            tempBitmap = sourceBitmap.createScaledBitmap(
+                    sourceBitmap, curTWidth, curTHeight, true);
+            lastRatio = totalRatio;
+        }
+        BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), tempBitmap);
+        bitmapDrawable.setBounds(centerX - curTWidth / 2, centerY - curTHeight / 2,
+                centerX + curTWidth / 2, centerY + curTHeight / 2);
+        bitmapDrawable.draw(canvas);
+        canvas.restore();
+        super.onDraw(canvas);
+    }
 }
