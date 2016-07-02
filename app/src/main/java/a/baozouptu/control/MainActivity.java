@@ -5,9 +5,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -41,25 +38,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //  testDB();
 //关闭通知
 //nm.cancel(0);
-        toPtuActivity();
-        /*startActivityForResult(intent1,0);
-         setContentView(R.layout.activity_main);
+        /*
+        Intent intent1 = new Intent(this, ShowPictureActivity.class);
+        intent1.putExtra("myFlag", "hahah");
+        startActivityForResult(intent1,0);
+        */
+        setContentView(R.layout.activity_main);
 
         initToolbar();
 
-        initview();*/
-        sendNotify();
-    }
-
-    private void toShowPicActivity() {
-        Intent intent1 = new Intent(this, ShowPictureActivity.class);
-        intent1.putExtra("myFlag", "hahah");
-    }
-
-    private void toPtuActivity() {
-        Intent intent = new Intent(this, PTuActivity.class);
-        intent.putExtra("picPath", "/storage/sdcard1/中大图.jpg");
-        startActivityForResult(intent, 0);
+        initview();
+       // sendNotify();
     }
 
     private void sendNotify() {
@@ -169,6 +158,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.fab2:
                 Snackbar.make(v, "手绘图主要是自己画个简单图保存为表情", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                Intent intent1 = new Intent(this, TuyaActivity.class);
+                startActivity(intent1);
                 break;
             case R.id.fab3:
                 Snackbar.make(v, "自拍相机主要", Snackbar.LENGTH_LONG)
@@ -185,6 +176,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 finish();
             }
         }
-        super.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode,resultCode,data);
     }
 }
