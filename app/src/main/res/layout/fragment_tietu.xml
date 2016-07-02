@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycle_list_tietu"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="4" />
+
+    <LinearLayout
+        android:id="@+id/function_tietu_more"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/white">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:paddingBottom="@dimen/pading_function_item_image"
+            android:paddingLeft="@dimen/pading_function_item_image"
+            android:paddingRight="@dimen/pading_function_item_image"
+            android:paddingTop="@dimen/pading_function_item_image"
+            android:src="@mipmap/more" />
+
+        <TextView
+            android:layout_width="@dimen/function_width"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="更多"
+            android:textColor="@color/text_color1"
+            android:textSize="@dimen/text_size_main_function" />
+
+    </LinearLayout>
+</LinearLayout>

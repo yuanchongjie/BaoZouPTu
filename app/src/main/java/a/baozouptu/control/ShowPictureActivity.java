@@ -89,10 +89,10 @@ public class ShowPictureActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /*Intent intent = new Intent(ShowPictureActivity.this, PTuActivity.class);
-        intent.putExtra("picPath", "/storage/sdcard1/小图.jpg");
-        startActivity(intent);
-        Intent sintent = getIntent();*/
+        Intent intent = new Intent(this, PTuActivity.class);
+        intent.putExtra("picPath", "/storage/sdcard1/中大图.jpg");
+        startActivityForResult(intent, 0);
+      /*  Intent sintent = getIntent();
 
         setContentView(R.layout.activity_show_picture);
 
@@ -119,7 +119,7 @@ public class ShowPictureActivity extends AppCompatActivity {
         initView();
         m_ProgressDialog = ProgressDialog.show(ShowPictureActivity.this, "请稍后",
                 "数据读取中...", true);
-        initPicInfo();
+        initPicInfo();*/
     }
 
     /**

@@ -1,15 +1,12 @@
 package a.baozouptu.view;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.v4.widget.TextViewCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -20,11 +17,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.MemoryHandler;
 
 import a.baozouptu.R;
 import a.baozouptu.tools.GeoUtil;
@@ -116,8 +109,28 @@ public class FloatTextView extends EditText implements FloatView {
         return relativeY;
     }
 
+    @Override
+    public void setRelativeY(float relativeY) {
+
+    }
+
+    @Override
+    public void setRelativeX(float relativeX) {
+
+    }
+
     public float getRelativeX() {
         return relativeX;
+    }
+
+    @Override
+    public float getmWidth() {
+        return mWidth;
+    }
+
+    @Override
+    public float getmHeight() {
+        return mHeight;
     }
 
     public float getfTop() {
@@ -266,10 +279,10 @@ public class FloatTextView extends EditText implements FloatView {
         fLeft = centerX - mWidth / 2;
         fTop = centerY - mHeight / 2;
         //发生缩放之后可能超出边界，然后适配边界
-        adjustEdegeBound();
+        adjustEdgeBound();
     }
 
-    public void adjustSize(float ratio) {
+    public float adjustSize(float ratio) {
         Util.P.le(DEBUG_TAG, "adjustSize");
         currentRatio = ratio;
         //尝试直接设置
@@ -299,10 +312,17 @@ public class FloatTextView extends EditText implements FloatView {
         //比例设置为调整后的大小
         mTextSize *= currentRatio;
         if (currentRatio == ratio)//没有变化，直接返回
-            return;
+            return -1;
 
         setTextSize(mTextSize);
         getRealSize();
+
+        return currentRatio;
+    }
+
+    @Override
+    public boolean adjustEdgeBound(float nx, float ny) {
+        return false;
     }
 
     /**
@@ -316,15 +336,15 @@ public class FloatTextView extends EditText implements FloatView {
     public void drag(float nx, float ny) {
         fLeft = nx - relativeX;
         fTop = ny - relativeY;
-        adjustEdegeBound();
+        adjustEdgeBound();
     }
 
     /**
      * 适配floatview的位置,不能超出图片的边界,不算padding的内部就不能超出边界
      * 超出之后移动startx，starty,不影响其它数据
      */
-    public void adjustEdegeBound() {
-        Util.P.le(DEBUG_TAG, "adjustEdegeBound");
+    public boolean adjustEdgeBound() {
+        Util.P.le(DEBUG_TAG, "adjustEdgeBound");
         if (fLeft + mWidth - mPadding < pvBoundRect.left)//右边小于左边界
             fLeft = pvBoundRect.left - mWidth + mPadding;
         if (fTop + mHeight - mPadding < pvBoundRect.top)//下边小于上边界
@@ -333,6 +353,7 @@ public class FloatTextView extends EditText implements FloatView {
             fLeft = pvBoundRect.right - mPadding;
         if (fTop + mPadding > pvBoundRect.bottom)//上边大于下边界
             fTop = pvBoundRect.bottom - mPadding;
+        return true;
     }
 
     /**
@@ -540,7 +561,7 @@ public class FloatTextView extends EditText implements FloatView {
             items.get(6).y = rimBottom;
             drawItem(canvas, items.get(6));
         }
-       super.onDraw(canvas);
+        super.onDraw(canvas);
     }
 
     /**

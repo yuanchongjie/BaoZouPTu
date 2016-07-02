@@ -41,15 +41,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //  testDB();
 //关闭通知
 //nm.cancel(0);
-        Intent intent1 = new Intent(this, ShowPictureActivity.class);
-        intent1.putExtra("myFlag", "hahah");
-        startActivityForResult(intent1,0);
-        /* setContentView(R.layout.activity_main);
+        toPtuActivity();
+        /*startActivityForResult(intent1,0);
+         setContentView(R.layout.activity_main);
 
         initToolbar();
 
         initview();*/
         sendNotify();
+    }
+
+    private void toShowPicActivity() {
+        Intent intent1 = new Intent(this, ShowPictureActivity.class);
+        intent1.putExtra("myFlag", "hahah");
+    }
+
+    private void toPtuActivity() {
+        Intent intent = new Intent(this, PTuActivity.class);
+        intent.putExtra("picPath", "/storage/sdcard1/中大图.jpg");
+        startActivityForResult(intent, 0);
     }
 
     private void sendNotify() {
@@ -175,6 +185,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 finish();
             }
         }
-        super.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

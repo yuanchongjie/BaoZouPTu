@@ -1,27 +1,23 @@
 package a.baozouptu.view;
 
-import a.baozouptu.R;
-import a.baozouptu.tools.BitmapTool;
-import a.baozouptu.tools.GeoUtil;
-import a.baozouptu.tools.Util;
-
-import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Bitmap.Config;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
-import android.widget.ImageView;
 import android.widget.Toast;
+
+import a.baozouptu.tools.BitmapTool;
+import a.baozouptu.tools.GeoUtil;
+import a.baozouptu.tools.Util;
 
 /**
  * 注意： 每次缩放要寻改的地方有三个，totalRatio，currentRatio,CURRENT_STATUS
