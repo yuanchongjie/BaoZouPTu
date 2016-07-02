@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import a.baozouptu.R;
 import a.baozouptu.tools.GeoUtil;
 import a.baozouptu.tools.Util;
 
@@ -43,8 +44,8 @@ public class PtuFrameLayout extends FrameLayout {
         mContext = context;
     }
 
-    public FloatTextView initAddFloat(Rect ptuViewBound) {
-        Util.P.le(DEBUG_TAG,"initAddFloat");
+    public FloatTextView initAddTextFloat(Rect ptuViewBound) {
+        Util.P.le(DEBUG_TAG,"initAddTextFloat");
         //设置floatText的基本属性
         floatView = new FloatTextView(mContext, ptuViewBound);
 
@@ -55,7 +56,7 @@ public class PtuFrameLayout extends FrameLayout {
         floatParams.setMargins((int) floatView.getfLeft(), (int) floatView.getfTop(),
                 (int) (floatView.getfLeft() + floatView.getmWidth()),
                 (int) (floatView.getfTop() + floatView.getmHeight()));
-        addView((FloatTextView)floatView, floatParams);
+        addView((View)floatView, floatParams);
         return (FloatTextView)floatView;
     }
 
@@ -177,5 +178,17 @@ public class PtuFrameLayout extends FrameLayout {
                 (int) (floatView.getfLeft() + floatView.getmWidth()),
                 (int) (floatView.getfTop() + floatView.getmHeight()));
         addView((View)floatView, floatParams);
+    }
+
+    public void initAddImageFloat(Rect bound) {
+        floatView=new FloatImageView(mContext,bound,getMeasuredWidth(),getMeasuredHeight());
+
+        //设置布局
+        FrameLayout.LayoutParams floatParams =
+                new FrameLayout.LayoutParams(getMeasuredWidth(),getMeasuredHeight());
+        floatParams.setMargins(0, 0,getMeasuredWidth(),getMeasuredHeight());
+        addView((View)floatView, floatParams);
+
+        ((FloatImageView)floatView).setSourceBitmapAndInit("/storage/sdcard1/哈哈哈.jpg");
     }
 }
