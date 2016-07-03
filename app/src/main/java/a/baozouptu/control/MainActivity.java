@@ -11,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import a.baozouptu.R;
+import a.baozouptu.dataAndLogic.AllDate;
 import a.baozouptu.dataAndLogic.MyDatabase;
 import a.baozouptu.dataAndLogic.ProcessUsualyPicPath;
 
@@ -40,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //nm.cancel(0);
 
 
-        toPtuactivity();
+        toPtuActivity();
        /* setContentView(R.layout.activity_main);
 
         initToolbar();
@@ -49,7 +51,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // sendNotify();
     }
 
-    private void toPtuactivity() {
+    private void toPtuActivity() {
+        DisplayMetrics metric = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metric);
+        AllDate.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
         Intent intent1 = new Intent(this, PtuActivity.class);
         intent1.putExtra("picPath", "/storage/sdcard1/中大图.jpg");
         startActivity(intent1);

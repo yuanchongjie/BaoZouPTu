@@ -23,13 +23,14 @@ import a.baozouptu.dataAndLogic.RePealRedoList;
 import a.baozouptu.tools.BitmapTool;
 import a.baozouptu.tools.FileTool;
 import a.baozouptu.tools.Util;
+import a.baozouptu.view.FloatImageView;
 import a.baozouptu.view.FloatTextView;
 import a.baozouptu.view.FloatView;
 import a.baozouptu.view.PtuFrameLayout;
 import a.baozouptu.view.PtuView;
 
-public class PTuActivity extends Activity implements MainFunctionFragment.Listen {
-    public static final String DEBUG_TAG = "PTuActivity";
+public class PtuActivity extends Activity implements MainFunctionFragment.Listen {
+    public static final String DEBUG_TAG = "PtuActivity";
     /**
      * 主功能的fragment
      */
@@ -57,6 +58,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Util.P.le("进入P图Activity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ptu);
 
@@ -81,8 +83,8 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
             @Override
             public void onClick(View v) {
                 if (redoPopWindow == null) {
-                    redoPopWindow = new PopupWindow(PTuActivity.this);
-                    ImageView image = new ImageView(PTuActivity.this);
+                    redoPopWindow = new PopupWindow(PtuActivity.this);
+                    ImageView image = new ImageView(PtuActivity.this);
                     image.setImageResource(R.mipmap.redo);
                 /*image.setLayoutParams(new ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -254,7 +256,9 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
                 if (fragTietu == null) {
                     fragTietu = new TietuFragment();
                 }
-                ptuFrame.initAddImageFloat(ptuView.getBound());
+                FloatImageView floatImageView=ptuFrame.initAddImageFloat(ptuView.getBound());
+                floatImageView.setBitmapAndInit("/storage/sdcard1/哈哈哈.jpg");
+                fragTietu.setFloatImageView(floatImageView);
                 fm.beginTransaction().add(R.id.fragment_function, fragTietu)
                         .addToBackStack("main")
                         .commit();
@@ -283,7 +287,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
                 boolean canGet = ((FloatView) view).prepareResultBitmap(ptuView.getInitRatio(),
                         innerRect, picRect);//先获取
                 if (!canGet) {//有些情况下会返回空
-                    Util.T(PTuActivity.this, "操作失败，获取到的图像为空");
+                    Util.T(PtuActivity.this, "操作失败，获取到的图像为空");
                     return;
                 } else {
                     //能获取到，将图绘制到sourceBitmap上，再绘制PtuView上，并且将view放入撤销重做list中
@@ -293,7 +297,7 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
                         public void run() {
                             ptuFrame.removeViewAt(1);
                             textBitmap[0] = getInnerBmFromView(floatTextView, innerRect);
-                            /*Dialog dialog = new Dialog(PTuActivity.this);
+                            /*Dialog dialog = new Dialog(PtuActivity.this);
                             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                             dialog.setContentView(R.layout.test);
                             ImageView image = (ImageView) dialog.findViewById(R.id.test_image);
@@ -319,13 +323,13 @@ public class PTuActivity extends Activity implements MainFunctionFragment.Listen
                 } else {
                     Bitmap bitmap = ptuView.getFinalPicture(finalRatio);
                     String newPath = FileTool.getNewPictureFile(picPath);
-                    result = BitmapTool.saveBitmap(PTuActivity.this, bitmap, newPath);
+                    result = BitmapTool.saveBitmap(PtuActivity.this, bitmap, newPath);
                     resultIntent.putExtra("path", picPath);
                     resultIntent.putExtra("newPath", newPath);
                 }
                 setResult(0, resultIntent);
                 Util.P.le(DEBUG_TAG, result);
-                PTuActivity.this.finish();
+                PtuActivity.this.finish();
             }
         }, 600);
     }

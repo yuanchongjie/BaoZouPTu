@@ -185,7 +185,8 @@ public class ShowPictureActivity extends AppCompatActivity {
                 for (int position = first; position <= last; position++) {
                     String path = currentPicPathList.get(position);
                     final ImageView ivImage = (ImageView) pictureGridview.findViewWithTag(position);
-                    imageLoader.loadBitmap(path, ivImage, position, imageCallback);
+                    imageLoader.loadBitmap(path, ivImage, position, imageCallback,
+                            AllDate.screenWidth/3);
                 }
             }
 
@@ -452,7 +453,8 @@ public class ShowPictureActivity extends AppCompatActivity {
                                                 ImageView image, int poition, String imageUrl) {
                             image.setImageBitmap(imageDrawable);
                         }
-                    });
+                    },
+                    AllDate.screenWidth/3);
             if (cacheBitmap == null) {
                 viewHolder.ivImage.setImageResource(R.mipmap.icon1);
             } else {

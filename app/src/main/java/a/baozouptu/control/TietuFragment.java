@@ -122,7 +122,7 @@ public class TietuFragment extends Fragment {
                 for (int position = first; position <= last; position++) {
                     String path = tietuPaths.get(position);
                     final ImageView ivImage = (ImageView) recyclerView.findViewWithTag(position);
-                    imageLoader.loadBitmap(path, ivImage, position, imageCallback);
+                    imageLoader.loadBitmap(path, ivImage, position, imageCallback,AllDate.screenWidth/5);
                 }
             }
         });
@@ -173,12 +173,15 @@ class RecyclerAdapter extends RecyclerView.Adapter<MyViewHolder> implements View
         FrameLayout itemView = (FrameLayout) LayoutInflater.from(mContext).inflate(
                 R.layout.list_item_tietu_founction, parent, false);
 
-        itemView.setOnClickListener(this);
+
 
         ImageView imageView = new ImageView(mContext);
         imageView.setLayoutParams(new ViewGroup.LayoutParams(AllDate.screenWidth / 5, ViewGroup.LayoutParams.MATCH_PARENT));
         imageView.setLayoutParams(new ViewGroup.LayoutParams(100,100));
         imageView.setTag("image");
+        imageView.setOnClickListener(this);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
         itemView.addView(imageView);
         MyViewHolder holder = new MyViewHolder(itemView);
         return holder;
@@ -191,7 +194,8 @@ class RecyclerAdapter extends RecyclerView.Adapter<MyViewHolder> implements View
         Bitmap cachedImage = null;
         cachedImage = imageLoader.getBitmap(tietuPaths.get(position));//从缓存中获取
         if (cachedImage == null && position <= 8) {//否则从内存中获取
-            imageLoader.loadBitmap(tietuPaths.get(position), holder.iv, position, imageCallback);
+            imageLoader.loadBitmap(tietuPaths.get(position), holder.iv,
+                    position, imageCallback,AllDate.screenWidth/5);
         }
         if (cachedImage != null && holder.iv != null) {
             holder.iv.setImageBitmap(cachedImage);
