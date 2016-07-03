@@ -3,6 +3,7 @@ package a.baozouptu.control;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import a.baozouptu.R;
 import a.baozouptu.dataAndLogic.AllDate;
+import a.baozouptu.dataAndLogic.AsyncImageLoader3;
 import a.baozouptu.dataAndLogic.MyDatabase;
 import a.baozouptu.tools.BitmapTool;
 import a.baozouptu.tools.Util;
@@ -77,6 +79,15 @@ public class TietuFragment extends Fragment {
      * Created by Administrator on 2016/6/17.
      */
     public class RecyclerAdapter extends RecyclerView.Adapter<MyViewHolder> {
+        AsyncImageLoader3 imageLoader=AsyncImageLoader3.getInstatnce();
+        AsyncImageLoader3.ImageCallback imageCallback = new AsyncImageLoader3.ImageCallback() {
+            @Override
+            public void imageLoaded(Bitmap imageDrawable, ImageView image, int position, String imageUrl) {
+                //if (image != null && position == (int) image.getTag()) {
+                    image.setImageBitmap(imageDrawable);
+                //}
+            }
+        };
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LinearLayout itemView=(LinearLayout)LayoutInflater.from(mContext).inflate(
@@ -92,12 +103,21 @@ public class TietuFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(MyViewHolder holder, int position) {
-            holder.iv.setImageResource(R.mipmap.icon1);
+            Bitmap cachedImage = null;
+            cachedImage = imageLoader.getBitmap(tietuPaths.get(position));//从缓存中获取
+            if (cachedImage == null && position <= 8) {//否则从内存中获取
+                imageLoader.loadBitmap(tietuPaths.get(position), holder.iv, position, imageCallback);
+            }
+            if (cachedImage != null && holder.iv != null) {
+                holder.iv.setImageBitmap(cachedImage);
+            } else if (holder.iv != null) {
+                holder.iv.setImageResource(R.mipmap.instead_icon);
+            }
         }
 
         @Override
         public int getItemCount() {
-            return 20;
+            return tietuPaths.size();
         }
     }
 
