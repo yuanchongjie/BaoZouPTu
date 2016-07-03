@@ -180,7 +180,7 @@ public class PtuFrameLayout extends FrameLayout {
         addView((View)floatView, floatParams);
     }
 
-    public void initAddImageFloat(Rect bound) {
+    public FloatImageView initAddImageFloat(Rect bound) {
         floatView=new FloatImageView(mContext,bound,getMeasuredWidth(),getMeasuredHeight());
 
         //设置布局
@@ -189,6 +189,6 @@ public class PtuFrameLayout extends FrameLayout {
         floatParams.setMargins(0, 0,getMeasuredWidth(),getMeasuredHeight());
         addView((View)floatView, floatParams);
 
-        ((FloatImageView)floatView).setSourceBitmapAndInit("/storage/sdcard1/哈哈哈.jpg");
+        return (FloatImageView)floatView;
     }
 }

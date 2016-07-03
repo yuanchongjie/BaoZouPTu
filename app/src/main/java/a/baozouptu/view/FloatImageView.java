@@ -129,7 +129,7 @@ public class FloatImageView extends View implements FloatView {
      *
      * @param bitmap
      */
-    public void setSourceBitmapAndInit(Bitmap bitmap) {
+    public void setBitmapAndInit(Bitmap bitmap) {
         sourceBitmap = bitmap;
         init();
         invalidate();
@@ -141,8 +141,8 @@ public class FloatImageView extends View implements FloatView {
      *
      * @param path
      */
-    public void setSourceBitmapAndInit(String path) {
-        setSourceBitmapAndInit(new BitmapTool().getLosslessBitmap(path));
+    public void setBitmapAndInit(String path) {
+        setBitmapAndInit(new BitmapTool().getLosslessBitmap(path));
     }
 
 

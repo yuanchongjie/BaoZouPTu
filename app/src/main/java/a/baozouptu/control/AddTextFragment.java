@@ -3,7 +3,6 @@ package a.baozouptu.control;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.Gravity;
@@ -33,7 +32,7 @@ import a.baozouptu.view.MySwitchButton;
  * Created by Administrator on 2016/5/1.
  */
 public class AddTextFragment extends Fragment {
-    PTuActivity mAcitivty;
+    PtuActivity mAcitivty;
     LinearLayout toumingdu;
     LinearLayout style;
     LinearLayout color;
@@ -52,7 +51,7 @@ public class AddTextFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mAcitivty = (PTuActivity) getActivity();//onAttach貌似不会执行，需要在这里获取context
+        mAcitivty = (PtuActivity) getActivity();//onAttach貌似不会执行，需要在这里获取context
         View view = inflater.inflate(R.layout.fragment_add_text_function, container, false);
         initView(view);
         textPopupBuilder = new FunctionPopWindowBuilder(mAcitivty);

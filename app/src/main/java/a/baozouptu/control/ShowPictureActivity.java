@@ -15,24 +15,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -89,7 +84,7 @@ public class ShowPictureActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent intent = new Intent(this, PTuActivity.class);
+        Intent intent = new Intent(this, PtuActivity.class);
         intent.putExtra("picPath", "/storage/sdcard1/中大图.jpg");
         startActivityForResult(intent, 0);
       /*  Intent sintent = getIntent();
@@ -146,7 +141,7 @@ public class ShowPictureActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                Intent intent = new Intent(ShowPictureActivity.this, PTuActivity.class);
+                Intent intent = new Intent(ShowPictureActivity.this, PtuActivity.class);
 
                 Intent sourceIntent = getIntent();
                 if (sourceIntent != null) {
