@@ -24,22 +24,27 @@ import a.baozouptu.R;
 import a.baozouptu.dataAndLogic.AllDate;
 import a.baozouptu.dataAndLogic.AsyncImageLoader3;
 import a.baozouptu.dataAndLogic.MyDatabase;
+import a.baozouptu.tools.Util;
 import a.baozouptu.view.FloatImageView;
 
 /**
  * Created by Administrator on 2016/7/1.
  */
 public class TietuFragment extends Fragment {
+    private static String TAG="TietuFragment";
     private FloatImageView floatImageView;
     Context mContext;
     List<String> tietuPaths = new ArrayList<>();
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
+    private RecyclerAdapter tietuAdapter;
 
     public void setFloatImageView(FloatImageView floatImageView) {
         this.floatImageView = floatImageView;
     }
+
     private void loadTietuPath() {
+        tietuPaths.clear();
         MyDatabase mDB = MyDatabase.getInstance(mContext);
         try {
             mDB.quaryAllUsedPic(tietuPaths);
@@ -51,14 +56,14 @@ public class TietuFragment extends Fragment {
         }
 
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         mContext = getActivity();
         loadTietuPath();
-        floatImageView.setBitmapAndInit(tietuPaths.get(0));
+
         super.onCreate(savedInstanceState);
     }
-
 
 
     @Nullable
@@ -66,17 +71,8 @@ public class TietuFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tietu, container, false);
 
-        LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.function_tietu_more);
-        linearLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(mContext, ShowTieTuActivity.class);
-                startActivityForResult(intent, 0);
-            }
-        });
-
-        RecyclerAdapter recyclerAdapter = new RecyclerAdapter(mContext, tietuPaths);
-        recyclerAdapter.setOnItemClickListener(new RecyclerAdapter.OnRecyclerViewItemClickListener() {
+        tietuAdapter = new RecyclerAdapter(mContext, tietuPaths);
+        tietuAdapter.setOnItemClickListener(new RecyclerAdapter.OnRecyclerViewItemClickListener() {
             @Override
             public void onItemClick(View view, String data) {
                 floatImageView.setBitmapAndInit(data);
@@ -86,9 +82,26 @@ public class TietuFragment extends Fragment {
         recyclerView.setBackgroundColor(Color.BLACK);
         layoutManager = new LinearLayoutManager(mContext, LinearLayout.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(recyclerAdapter);
+        recyclerView.setAdapter(tietuAdapter);
+
+        LinearLayout more= (LinearLayout) view.findViewById(R.id.function_tietu_more);
+        more.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(mContext,ShowPictureActivity.class);
+                intent.setAction("tietu");
+                startActivityForResult(intent,1);
+            }
+        });
         setOnclick();
         return view;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Util.P.le(TAG);
+        String path=data.getStringExtra("picPath");
+        floatImageView.setBitmapAndInit(path);
     }
 
     private void setOnclick() {
@@ -100,31 +113,23 @@ public class TietuFragment extends Fragment {
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 switch (newState) {
                     case RecyclerView.SCROLL_STATE_IDLE:
-                        showAdjacentPic();
+                        tietuAdapter.setScroll(false);
                         break;
                     case RecyclerView.SCROLL_STATE_DRAGGING:
+                        tietuAdapter.setScroll(true);
                         imageLoader.cancelLoad();//取消解析，提交的任务还没有执行的就不执行了
                         break;
                 }
             }
 
             AsyncImageLoader3.ImageCallback imageCallback = new AsyncImageLoader3.ImageCallback() {
+                @Override
                 public void imageLoaded(Bitmap imageBitmap, ImageView image, int position, String imageUrl) {
-                    if (image != null && position == (int) image.getTag()) {
+                    if (image != null) {
                         image.setImageBitmap(imageBitmap);
                     }
                 }
             };
-
-            private void showAdjacentPic() {
-                int first = layoutManager.findFirstVisibleItemPosition();
-                int last = layoutManager.findLastVisibleItemPosition();
-                for (int position = first; position <= last; position++) {
-                    String path = tietuPaths.get(position);
-                    final ImageView ivImage = (ImageView) recyclerView.findViewWithTag(position);
-                    imageLoader.loadBitmap(path, ivImage, position, imageCallback,AllDate.screenWidth/5);
-                }
-            }
         });
     }
 }
@@ -145,12 +150,15 @@ class MyViewHolder extends RecyclerView.ViewHolder {
  * Created by Administrator on 2016/6/17.
  */
 class RecyclerAdapter extends RecyclerView.Adapter<MyViewHolder> implements View.OnClickListener {
+
+    private boolean isScroll = false;
+
     private final List<String> tietuPaths;
     AsyncImageLoader3 imageLoader = AsyncImageLoader3.getInstatnce();
     AsyncImageLoader3.ImageCallback imageCallback = new AsyncImageLoader3.ImageCallback() {
         @Override
         public void imageLoaded(Bitmap imageDrawable, ImageView image, int position, String imageUrl) {
-            //if (image != null && position == (int) image.getTag()) {
+            //if (image != null) {
             image.setImageBitmap(imageDrawable);
             //}
         }
@@ -172,16 +180,13 @@ class RecyclerAdapter extends RecyclerView.Adapter<MyViewHolder> implements View
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         FrameLayout itemView = (FrameLayout) LayoutInflater.from(mContext).inflate(
                 R.layout.list_item_tietu_founction, parent, false);
-
-
+        itemView.setPadding(5, 0, 5, 0);
 
         ImageView imageView = new ImageView(mContext);
         imageView.setLayoutParams(new ViewGroup.LayoutParams(AllDate.screenWidth / 5, ViewGroup.LayoutParams.MATCH_PARENT));
-        imageView.setLayoutParams(new ViewGroup.LayoutParams(100,100));
         imageView.setTag("image");
         imageView.setOnClickListener(this);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
         itemView.addView(imageView);
         MyViewHolder holder = new MyViewHolder(itemView);
         return holder;
@@ -193,13 +198,12 @@ class RecyclerAdapter extends RecyclerView.Adapter<MyViewHolder> implements View
 
         Bitmap cachedImage = null;
         cachedImage = imageLoader.getBitmap(tietuPaths.get(position));//从缓存中获取
-        if (cachedImage == null && position <= 8) {//否则从内存中获取
-            imageLoader.loadBitmap(tietuPaths.get(position), holder.iv,
-                    position, imageCallback,AllDate.screenWidth/5);
-        }
-        if (cachedImage != null && holder.iv != null) {
+        if (cachedImage != null) {
             holder.iv.setImageBitmap(cachedImage);
-        }else
+        }else if (cachedImage == null&&!isScroll) {//图片存在，而且处于非滑动状态，从sd卡获取
+            imageLoader.loadBitmap(tietuPaths.get(position), holder.iv,
+                    position, imageCallback, AllDate.screenWidth / 5);
+        }else//获取替代图片
             holder.iv.setImageResource(R.mipmap.instead_icon);
     }
 
@@ -219,4 +223,9 @@ class RecyclerAdapter extends RecyclerView.Adapter<MyViewHolder> implements View
     public void setOnItemClickListener(OnRecyclerViewItemClickListener listener) {
         this.mOnItemClickListener = listener;
     }
+
+    public void setScroll(boolean scroll) {
+        isScroll = scroll;
+    }
+
 }

@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // 第二步：定义Notification
         Intent intent = new Intent(this, ShowPictureActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
-        intent.putExtra("myFlag", "notify_text");
+        intent.setAction("notify_text");
 
         //PendingIntent是待执行的Intent
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent,

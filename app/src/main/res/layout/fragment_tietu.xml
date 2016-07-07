@@ -8,15 +8,21 @@
         android:id="@+id/recycle_list_tietu"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="4" />
+        android:layout_weight="40"
+        android:background="#000" />
+
+    <FrameLayout
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:background="#000" />
 
     <LinearLayout
         android:id="@+id/function_tietu_more"
         android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_weight="9"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:orientation="vertical">
 
         <ImageView
             android:layout_width="match_parent"

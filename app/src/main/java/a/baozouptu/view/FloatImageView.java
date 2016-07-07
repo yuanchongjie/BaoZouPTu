@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
+import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -26,10 +27,6 @@ public class FloatImageView extends View implements FloatView {
      * 原图片的宽度,高度
      */
     private int srcPicWidth, srcPicHeight;
-    /**
-     * 当前图片的宽和高
-     */
-    private int curPicWidth, curPicHeight;
     /**
      * 移动的顶点最后的位置
      */
@@ -93,7 +90,8 @@ public class FloatImageView extends View implements FloatView {
     private float totalRatio;
     private float lastX, lastY;
     private float lastDis;
-    private float lastAngle=0;
+    private float lastAngle = 0;
+    private String mPath;
 
 
     public FloatImageView(Context context) {
@@ -142,6 +140,7 @@ public class FloatImageView extends View implements FloatView {
      * @param path
      */
     public void setBitmapAndInit(String path) {
+        mPath = path;
         setBitmapAndInit(new BitmapTool().getLosslessBitmap(path));
     }
 
@@ -239,8 +238,6 @@ public class FloatImageView extends View implements FloatView {
     @Override
     public void setRelativeY(float relativeY) {
         this.relativeY = relativeY;
-
-
     }
 
     @Override
@@ -259,7 +256,36 @@ public class FloatImageView extends View implements FloatView {
 
     @Override
     public boolean prepareResultBitmap(float initRatio, RectF innerRect, RectF picRect) {
+
         return false;
+    }
+
+    /**
+     * @param picInitRatio ptuView上图片的初始缩放比例
+     * @return bundle.putString("path", mPath);
+     * <p> bundle.putInt("locationX", centerX - curTWidth / 2);
+     * <p>bundle.putInt("locationY", centerY - curTHeight / 2);
+     * <p>bundle.putParcelable("bounRect",bounRect);
+     * <p>bundle.putFloat("angle",totalRotateAngle);
+     */
+    public Bundle getResultBundle(float picInitRatio) {
+        Bundle bundle = new Bundle();
+        bundle.putString("path", mPath);
+        int x = (int) ((centerX - curTWidth / 2 - picBoundRect.left) * 1.0 / picInitRatio);
+        bundle.putInt("locationX", x);
+
+        int y = (int) ((centerY - curTHeight / 2 - picBoundRect.top) * 1.0 / picInitRatio);
+        bundle.putInt("locationY", y);
+        RectF boundRect = new RectF(x, y, x + curTWidth / picInitRatio, y + curTHeight / picInitRatio);
+        if ((centerX - picBoundRect.left) / picInitRatio == (boundRect.left + boundRect.right) / 2)
+            Util.P.le("true");
+        bundle.putParcelable("boundRect", boundRect);
+        bundle.putFloat("angle", totalRotateAngle);
+        return bundle;
+    }
+
+    public Bitmap getSourceBitmap() {
+        return sourceBitmap;
     }
 
     private void moveTietu(float x, float y) {
@@ -279,6 +305,7 @@ public class FloatImageView extends View implements FloatView {
         adjustEdgeBound(centerX, centerY);
         invalidate();
     }
+
     private void rotate() {
         invalidate();
     }
@@ -350,7 +377,7 @@ public class FloatImageView extends View implements FloatView {
                 lastDis = GeoUtil.getDis(event.getX(0), event.getY(0), event.getX(1), event.getY(1));
 
                 //旋转
-                lastAngle=getAngle(event.getX(0), event.getY(0), event.getX(1), event.getY(1));
+                lastAngle = getAngle(event.getX(0), event.getY(0), event.getX(1), event.getY(1));
 
                 //移动
                 lastX = (event.getX(0) + event.getX(1)) / 2;
@@ -370,10 +397,10 @@ public class FloatImageView extends View implements FloatView {
                         scale(totalRatio);
                     }
                     //旋转
-                    float curAngle=getAngle(event.getX(0), event.getY(0),
-                    event.getX(1), event.getY(1));
-                    totalRotateAngle += (curAngle-lastAngle);
-                    lastAngle=curAngle;
+                    float curAngle = getAngle(event.getX(0), event.getY(0),
+                            event.getX(1), event.getY(1));
+                    totalRotateAngle += (curAngle - lastAngle);
+                    lastAngle = curAngle;
                     rotate();
                     //移动
                     moveTietu((event.getX(0) + event.getX(1)) / 2, (event.getY(0) + event.getY(1)) / 2);
@@ -386,6 +413,30 @@ public class FloatImageView extends View implements FloatView {
                     lastX = event.getX(index);
                     lastY = event.getY(index);
                 }
+                if (event.getPointerCount() == 3) {
+                    int index = event.getActionIndex();
+
+                    int i0, i1;
+                    if (index == 0) {
+                        i0 = 1;
+                        i1 = 2;
+                    } else if (index == 1) {
+                        i0 = 0;
+                        i1 = 2;
+                    } else {
+                        i0 = 0;
+                        i1 = 1;
+                    }
+                    //缩放
+                    lastDis = GeoUtil.getDis(event.getX(i0), event.getY(i0), event.getX(i1), event.getY(i1));
+
+                    //旋转
+                    lastAngle = getAngle(event.getX(i0), event.getY(i0), event.getX(i1), event.getY(i1));
+
+                    //移动
+                    lastX = (event.getX(i0) + event.getX(i1)) / 2;
+                    lastY = (event.getY(i0) + event.getY(i1)) / 2;
+                }
             default:
                 break;
         }
@@ -394,7 +445,7 @@ public class FloatImageView extends View implements FloatView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.rotate(totalRotateAngle,centerX,centerY);
+        canvas.rotate(totalRotateAngle, centerX, centerY);
         //先将图绘制到底图上面，再将底图绘制到view上面
         if (totalRatio != lastRatio) {//如果发生了缩放
             if (tempBitmap != sourceBitmap) tempBitmap.recycle();
@@ -408,5 +459,11 @@ public class FloatImageView extends View implements FloatView {
         bitmapDrawable.draw(canvas);
         canvas.restore();
         super.onDraw(canvas);
+    }
+
+    public void releaseResourse() {
+        sourceBitmap.recycle();
+        tietuDitu.recycle();
+        tempBitmap.recycle();
     }
 }
