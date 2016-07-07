@@ -71,6 +71,7 @@ public class PtuView extends View {
      * 用于处理图片的矩阵
      */
     private Matrix matrix = new Matrix();
+    private Bitmap realBm;
 
     public void setTotalWidth(int totalWidth) {
         this.totalWidth = totalWidth;
@@ -417,17 +418,34 @@ public class PtuView extends View {
     }
 
     /**
-     * 注意addBitmap大小和boundRect的一致
+     * 注意addBitmap调整到boundRect一样大,addBitmap以及缩放的bitmap会立即回收
      * @param addBitmap    需要添加的floatBitmap的局部
      * @param boundRect rect代表view有效区域在底图上的位置的rect，相对于原始图片的左上角上下左右边的距离
+     * @param rotateAngle 浮动视图旋转的角度
      */
-    public void addBitmap(Bitmap addBitmap, RectF boundRect) {
-        BitmapDrawable addDrawable = new BitmapDrawable(mContext.getResources(), addBitmap);
+    public void addBitmap(Bitmap addBitmap, RectF boundRect, float rotateAngle) {
+        //将addBitmap调整到boundRect一样大
+        int width=(int)(boundRect.right-boundRect.left);
+        int height=(int)(boundRect.bottom-boundRect.top);
+        Bitmap realBm=null;
+        if(addBitmap.getWidth()!=width){
+            realBm= Bitmap.createScaledBitmap(addBitmap,width,height,true);
+            addBitmap.recycle();
+        }
+
+        float centerX=(boundRect.left+boundRect.right)/2,centerY=(boundRect.bottom+boundRect.top)/2;
+        //将图画到图上
+        BitmapDrawable addDrawable = new BitmapDrawable(mContext.getResources(), realBm);
         addDrawable.setDither(true);
         addDrawable.setAntiAlias(true);
         addDrawable.setFilterBitmap(true);
+        sourceCanvas.rotate(rotateAngle,centerX,centerY);//旋转
         addDrawable.setBounds(GeoUtil.rectF2Rect(boundRect));
         addDrawable.draw(sourceCanvas);
+        sourceCanvas.save();
+        sourceCanvas.restore();
+
+
         addBitmap.recycle();
         resetDraw();
     }
