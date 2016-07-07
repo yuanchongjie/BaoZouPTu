@@ -69,7 +69,7 @@ public class FloatTextView extends EditText implements FloatView {
      */
     private float initLeft, initTop;
     private String mText = "";
-    private int mBackGroundColor=0xffffffff;
+    private int mBackGroundColor = 0xffffffff;
 
     public void setDownState() {
         downShowState = SHOW_SATUS;
@@ -110,14 +110,15 @@ public class FloatTextView extends EditText implements FloatView {
     }
 
     @Override
-    public void setRelativeY(float relativeY) {
-
+    public void setRelativeX(float relativeX) {
+        this.relativeX = relativeX;
     }
 
     @Override
-    public void setRelativeX(float relativeX) {
-
+    public void setRelativeY(float relativeY) {
+        this.relativeY = relativeY;
     }
+
 
     public float getRelativeX() {
         return relativeX;
@@ -538,7 +539,7 @@ public class FloatTextView extends EditText implements FloatView {
         rimBottom = mHeight - mPadding;
 
         mPaint.setColor(mBackGroundColor);
-        canvas.drawRect(rimLeft,rimTop,rimRight,rimBottom,mPaint);
+        canvas.drawRect(rimLeft, rimTop, rimRight, rimBottom, mPaint);
 
         if (SHOW_SATUS >= STATUS_RIM) {//要显示的东西不止边框
             mPaint.setColor(rimColor);
@@ -565,7 +566,6 @@ public class FloatTextView extends EditText implements FloatView {
     }
 
     /**
-     *
      * @param canvas
      * @param item
      */

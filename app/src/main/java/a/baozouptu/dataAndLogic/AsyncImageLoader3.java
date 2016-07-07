@@ -75,7 +75,7 @@ public class AsyncImageLoader3 {
      * @return 返回内存中缓存的图像，第一次加载返回null
      */
     public Bitmap loadBitmap(final String imageUrl, final ImageView image, final int position,
-                             final ImageCallback callback) {
+                             final ImageCallback callback,final int needWidth) {
         // 缓存中没有图像，则从SDcard取出数据，并将取出的数据缓存到内存中
         if (imageCache.get(imageUrl) != null) {
             return imageCache.get(imageUrl);
@@ -83,7 +83,7 @@ public class AsyncImageLoader3 {
         executorService.submit(new Runnable() {// 线程池执行取出图片的进程
             public void run() {
                 try {
-                    final Bitmap bitmap = loadImageFromSD(imageUrl);// 获取图片URL对应的图片Bitmap
+                    final Bitmap bitmap = loadImageFromSD(imageUrl,needWidth);// 获取图片URL对应的图片Bitmap
                     imageCache.put(imageUrl, bitmap);
                     handler.post(// handler的轻量级方法，利用handler的post方法，在attached的即handler依附的线程中执行下面的代码
                             new Runnable() {
@@ -103,18 +103,17 @@ public class AsyncImageLoader3 {
     public void cancelLoad() {
         while (!lque.isEmpty())lque.clear();
     }
-
     /**
      * 从所给路径，返回对应大小的图片Bitmap对象
      *
      * @param path String 路径
      * @return Bitmap对象
      */
-    private Bitmap loadImageFromSD(String path) {
+    private Bitmap loadImageFromSD(String path,int needWidth) {
         try {
             // 测试时，模拟网络延时，实际时这行代码不能有
             // SystemClock.sleep(2000);
-            Bitmap bm = new BitmapTool().charge(path);
+            Bitmap bm = new BitmapTool().charge(path,needWidth);
             return bm;
         } catch (Exception e) {
             throw new RuntimeException(e);

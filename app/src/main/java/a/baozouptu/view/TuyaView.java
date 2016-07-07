@@ -224,7 +224,7 @@ public class TuyaView extends View{
         Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.parse("file://" + Environment.getExternalStorageDirectory()));
         context.sendBroadcast(intent);
         Toast.makeText(context,"图片已保存",Toast.LENGTH_SHORT).show();
-         Log.e("TAG", "图片已保存");
+        Log.e("TAG", "图片已保存");
     }
     //以下为样式修改内容
     //设置画笔样式

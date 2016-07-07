@@ -6,9 +6,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,17 +112,13 @@ public class FileTool {
      * @return
      */
     public static String getNewPictureFile(String oldPath) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        Date curDate = new Date(System.currentTimeMillis());//获取当前时间
+        String time=formatter.format(curDate);
         String prefix = oldPath.substring(0, oldPath.lastIndexOf("."));
         String suffix = oldPath.substring(oldPath.lastIndexOf("."), oldPath.length());
-        String newPath=null;
-        File newFile;
-        for(int i=0;i<10000000;i++){
-            newPath=prefix + "baozou" + i + suffix;
-            newFile=new File(newPath);
-            if(!newFile.exists())
-                break;
-        }
-        return newPath;
+       
+        return  prefix + "baozou" + time + suffix;
     }
 
 

@@ -141,7 +141,7 @@ public class GridViewAdapter extends BaseAdapter {
         Bitmap cachedImage = null;
         cachedImage = imageLoader.getBitmap(path);
         if (cachedImage == null && position <= 25) {
-            imageLoader.loadBitmap(path, setter.ivImage, position, imageCallback);
+            imageLoader.loadBitmap(path, setter.ivImage, position, imageCallback,AllDate.screenWidth/3);
         }
         if (cachedImage != null && setter.ivImage != null) {
             setter.ivImage.setImageBitmap(cachedImage);
