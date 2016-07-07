@@ -11,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import a.baozouptu.R;
+import a.baozouptu.dataAndLogic.AllDate;
 import a.baozouptu.dataAndLogic.MyDatabase;
 import a.baozouptu.dataAndLogic.ProcessUsualyPicPath;
 
@@ -38,17 +40,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //  testDB();
 //关闭通知
 //nm.cancel(0);
-        /*
-        Intent intent1 = new Intent(this, ShowPictureActivity.class);
-        intent1.putExtra("myFlag", "hahah");
-        startActivityForResult(intent1,0);
-        */
-        setContentView(R.layout.activity_main);
+
+
+        toPtuActivity();
+       /* setContentView(R.layout.activity_main);
 
         initToolbar();
 
-        initview();
-       // sendNotify();
+        initview();*/
+        // sendNotify();
+    }
+
+    private void toPtuActivity() {
+        DisplayMetrics metric = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metric);
+        AllDate.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
+        Intent intent1 = new Intent(this, PtuActivity.class);
+        intent1.putExtra("picPath", "/storage/sdcard1/中大图.jpg");
+        startActivity(intent1);
     }
 
     private void sendNotify() {
@@ -59,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // 第二步：定义Notification
         Intent intent = new Intent(this, ShowPictureActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
-        intent.putExtra("myFlag", "notify_text");
+        intent.setAction("notify_text");
 
         //PendingIntent是待执行的Intent
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent,
@@ -176,6 +185,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 finish();
             }
         }
-        super.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
