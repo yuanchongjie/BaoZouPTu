@@ -431,6 +431,8 @@ public class PtuView extends View {
         if(addBitmap.getWidth()!=width){
             realBm= Bitmap.createScaledBitmap(addBitmap,width,height,true);
             addBitmap.recycle();
+        }else {
+            realBm=addBitmap;
         }
 
         float centerX=(boundRect.left+boundRect.right)/2,centerY=(boundRect.bottom+boundRect.top)/2;

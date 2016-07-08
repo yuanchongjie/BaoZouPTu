@@ -13,6 +13,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import a.baozouptu.R;
+import a.baozouptu.dataAndLogic.StepData;
 import a.baozouptu.tools.BitmapTool;
 import a.baozouptu.tools.GeoUtil;
 import a.baozouptu.tools.Util;
@@ -254,34 +255,28 @@ public class FloatImageView extends View implements FloatView {
         Util.P.le(DEBUG_TAG, "changeShowState=" + SHOW_SATUS);
     }
 
-    @Override
-    public boolean prepareResultBitmap(float initRatio, RectF innerRect, RectF picRect) {
-
-        return false;
-    }
-
     /**
      * @param picInitRatio ptuView上图片的初始缩放比例
      * @return bundle.putString("path", mPath);
      * <p> bundle.putInt("locationX", centerX - curTWidth / 2);
      * <p>bundle.putInt("locationY", centerY - curTHeight / 2);
-     * <p>bundle.putParcelable("bounRect",bounRect);
+     * <p>bundle.putParcelable("boundRectInPic",boundRectInPic);
      * <p>bundle.putFloat("angle",totalRotateAngle);
      */
-    public Bundle getResultBundle(float picInitRatio) {
-        Bundle bundle = new Bundle();
-        bundle.putString("path", mPath);
+    public StepData getResultData(float picInitRatio) {
+        StepData sd = new StepData();
+        sd.path=mPath;
         int x = (int) ((centerX - curTWidth / 2 - picBoundRect.left) * 1.0 / picInitRatio);
-        bundle.putInt("locationX", x);
+        sd.locationX= x;
 
         int y = (int) ((centerY - curTHeight / 2 - picBoundRect.top) * 1.0 / picInitRatio);
-        bundle.putInt("locationY", y);
-        RectF boundRect = new RectF(x, y, x + curTWidth / picInitRatio, y + curTHeight / picInitRatio);
-        if ((centerX - picBoundRect.left) / picInitRatio == (boundRect.left + boundRect.right) / 2)
+        sd.locationY=y;
+        RectF boundRectInPic = new RectF(x, y, x + curTWidth / picInitRatio, y + curTHeight / picInitRatio);
+        if ((centerX - picBoundRect.left) / picInitRatio == (boundRectInPic.left + boundRectInPic.right) / 2)
             Util.P.le("true");
-        bundle.putParcelable("boundRect", boundRect);
-        bundle.putFloat("angle", totalRotateAngle);
-        return bundle;
+        sd.boundRectInPic= boundRectInPic;
+        sd.angle=totalRotateAngle;
+        return sd;
     }
 
     public Bitmap getSourceBitmap() {

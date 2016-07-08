@@ -18,14 +18,14 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 
 import a.baozouptu.R;
-import a.baozouptu.dataAndLogic.AddTextData;
 import a.baozouptu.dataAndLogic.RePealRedoList;
+import a.baozouptu.dataAndLogic.StepData;
 import a.baozouptu.tools.BitmapTool;
 import a.baozouptu.tools.FileTool;
+import a.baozouptu.tools.TempUtil;
 import a.baozouptu.tools.Util;
 import a.baozouptu.view.FloatImageView;
 import a.baozouptu.view.FloatTextView;
-import a.baozouptu.view.FloatView;
 import a.baozouptu.view.PtuFrameLayout;
 import a.baozouptu.view.PtuView;
 
@@ -56,7 +56,7 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
      */
     private String picPath = null;
     private FloatTextView floatTextView;
-    private RePealRedoList<Bundle> rePealRedoList = new RePealRedoList<>();
+    private RePealRedoList<StepData> rePealRedoList = new RePealRedoList<>();
     private float finalRatio = 1;
     private PopupWindow redoPopWindow;
     private Intent resultIntent = new Intent();
@@ -73,12 +73,12 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
 
         initView();
         setViewContent();
-        setFragment();
+        initFragment();
         setOnClick();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                changeFragment("tietu");
+                changeFragment("text");
             }
         }, 500);
     }
@@ -119,7 +119,7 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
                     @Override
                     public void onClick(View v) {
                         if (ptuFrame.getChildCount() > 1)
-                            onReturnMainFunction();
+                            onFinishStep();
                         resultIntent.setAction("finish");
                         savePtuView();
                     }
@@ -137,36 +137,10 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
         sure.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onReturnMainFunction();
+                onFinishStep();
             }
         });
     }
-
-    private void addStep(Bundle md) {
-        rePealRedoList.addStep(md);
-        addBitmapToPtuView(md);
-    }
-
-    private void repealMainFunction() {
-        rePealRedoList.startRepeal();
-        int pointer = rePealRedoList.getCurrentPoint();
-        for (int i = 0; i < pointer; i++) {
-            Bundle md = rePealRedoList.get(i);
-            addBitmapToPtuView(md);
-        }
-    }
-
-    private void redoMainFunction() {
-        Bundle md = rePealRedoList.redo();
-        addBitmapToPtuView(md);
-    }
-
-    private void addBitmapToPtuView(Bundle md) {
-        hasChanged = true;
-        //Bitmap addBm = getInnerBmFromView(md.getParcelable("view"), md.get);
-        //ptuView.addBitmap(addBm, md.getOutRect(), bundle.getFloat("angle"));
-    }
-
     private void setViewContent() {
         Intent intent = getIntent();
         picPath = intent.getStringExtra("picPath");
@@ -195,30 +169,33 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
         });
 
     }
+    private void addStepData(StepData sd) {
+        rePealRedoList.addStep(sd);
+    }
 
-    /**
-     * view的显示在图片上的部分的截图
-     *
-     * @param view
-     * @param innerRect view的显示在图片上的部分的区域
-     * @return view的显示在图片上的部分的截图
-     */
-    private Bitmap getInnerBmFromView(View view, RectF innerRect) {
-        Bitmap innerBitmap = null;
-        try {
-            Bitmap viewBitmap = Bitmap.createBitmap(floatTextView.getWidth(), floatTextView.getHeight(),
-                    Bitmap.Config.ARGB_8888);
-            view.draw(new Canvas(viewBitmap));
-            innerBitmap = Bitmap.createBitmap(viewBitmap, (int) innerRect.left, (int) innerRect.top,
-                    (int) (innerRect.right - innerRect.left), (int) (innerRect.bottom - innerRect.top));//获取floatview内部的内容
-            viewBitmap.recycle();
-        } catch (OutOfMemoryError e) {
-            innerBitmap.recycle();
-            Util.T(this, "内存超限");
-            e.printStackTrace();
+    private void repealMainFunction() {
+        rePealRedoList.startRepeal();
+        int pointer = rePealRedoList.getCurrentPoint();
+        for (int i = 0; i < pointer; i++) {
+            StepData sd = rePealRedoList.get(i);
+            addStepToView(sd);
         }
-        Util.P.le(DEBUG_TAG, "getInnerBmFromView完成");
-        return innerBitmap;
+    }
+
+    private void redoMainFunction() {
+        StepData sd = rePealRedoList.redo();
+        addStepToView(sd);
+    }
+
+    private void addStepToView(StepData sd) {
+        hasChanged = true;
+
+        if (sd.EDIT_MODE == EDIT_TEXT) {
+            Bitmap textBitmap = getInnerBmFromView(floatTextView, sd.innerRect);
+            ptuView.addBitmap(textBitmap, sd.boundRectInPic, 0);
+        }else if(sd.EDIT_MODE==EDIT_TIETU){
+
+        }
     }
 
     private void setOnClick() {
@@ -230,7 +207,7 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
     //(2)执行不同的FragmentTransetion事务其反应如何
     //
 
-    private void setFragment() {
+    private void initFragment() {
         fragMain = new MainFunctionFragment();
         fm = getFragmentManager();
         ft = fm.beginTransaction();
@@ -257,6 +234,7 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
                 CURRENT_EDIT_MODE = EDIT_TEXT;
                 currenFra = fragText;
                 floatTextView = ptuFrame.initAddTextFloat(ptuView.getBound());
+                floatTextView.setText("ahas大S大航红啊");
                 fragText.setFloatView(floatTextView);
 
                /* //让文本框一开始就获得输入法
@@ -295,43 +273,83 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
     }
 
     /**
+     * view的显示在图片上的部分的截图
+     *
+     * @param view
+     * @param innerRect view的显示在图片上的部分的区域
+     * @return view的显示在图片上的部分的截图
+     */
+    private Bitmap getInnerBmFromView(View view, RectF innerRect) {
+        final Bitmap[] innerBitmap=new Bitmap[1];
+        try {
+
+            view.setDrawingCacheEnabled(true);
+            view.buildDrawingCache();
+            Bitmap viewBitmap=view.getDrawingCache();
+            innerBitmap[0] = Bitmap.createBitmap(viewBitmap, (int) innerRect.left, (int) innerRect.top,
+                    (int) (innerRect.right - innerRect.left),(int) (innerRect.bottom - innerRect.top));//获取floatview内部的内容
+
+            viewBitmap.recycle();
+        } catch (OutOfMemoryError e) {
+            innerBitmap[0].recycle();
+            Util.T(this, "内存超限");
+            e.printStackTrace();
+        }
+        Util.P.le(DEBUG_TAG, "getInnerBmFromView完成");
+        return innerBitmap[0];
+    }
+
+    /**
      * 回到主功能界面时,如果是从子功能回来，
      * （1）会添加子功能的view级参数到撤销重做list中。
      * （2）移除浮动图，获取浮动图的图片显示到putview上面
      */
-    private void onReturnMainFunction() {
+    private void onFinishStep() {
         if (CURRENT_EDIT_MODE == EDIT_CUT) {
-        } else if (CURRENT_EDIT_MODE == EDIT_TEXT) {
-            final View view = ptuFrame.getChildAt(1);
-            final RectF innerRect = new RectF(), picRect = new RectF();
-            boolean canGet = ((FloatView) view).prepareResultBitmap(ptuView.getInitRatio(),
-                    innerRect, picRect);//先获取
+        }//添加文字
+        else if (CURRENT_EDIT_MODE == EDIT_TEXT) {
+            final RectF innerRect = new RectF(), boundRectInPic = new RectF();
+            boolean canGet = floatTextView.prepareResultBitmap(ptuView.getInitRatio(),
+                    innerRect, boundRectInPic);//先获取
             if (!canGet) {//有些情况下会返回空
                 Util.T(PtuActivity.this, "操作失败，获取到的图像为空");
+                ptuFrame.removeViewAt(1);
                 return;
             }
-            //能获取到，将图绘制到sourceBitmap上，再绘制PtuView上，并且将view放入撤销重做list中
-            final Bitmap[] textBitmap = new Bitmap[1];
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ptuFrame.removeViewAt(1);
-                    textBitmap[0] = getInnerBmFromView(floatTextView, innerRect);
-                    new AddTextData(view, innerRect, picRect);
-                }
-            }, 300);
-        } else if (CURRENT_EDIT_MODE == EDIT_TIETU) {
-            Bundle bundle = floatImageView.getResultBundle(ptuView.getInitRatio());
+
+           floatTextView.getViewTreeObserver().
+                   addOnGlobalLayoutListener(
+                   new ViewTreeObserver.OnGlobalLayoutListener() {
+               @Override
+               public void onGlobalLayout() {
+                   Bitmap textBitmap = getInnerBmFromView(floatTextView, innerRect);
+                   ptuView.addBitmap(textBitmap, boundRectInPic, 0);
+
+                   StepData sd=new StepData(EDIT_TEXT);
+                   sd.floatTextView=floatTextView;
+                   sd.innerRect=innerRect;
+                   sd.boundRectInPic=boundRectInPic;
+
+                   addStepData(sd);
+
+                   floatTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                   ptuFrame.removeViewAt(1);
+               }
+           });
+        } //贴图
+        else if (CURRENT_EDIT_MODE == EDIT_TIETU) {
+            StepData sd = floatImageView.getResultData(ptuView.getInitRatio());
+            sd.EDIT_MODE=EDIT_TIETU;
             Bitmap source = floatImageView.getSourceBitmap();
 
             ptuView.addBitmap(source,
-                    (RectF) bundle.getParcelable("boundRect"),
-                    bundle.getFloat("angle"));
+                    sd.boundRectInPic,
+                    sd.angle);
             ptuFrame.removeViewAt(1);
             floatImageView.releaseResourse();
-            addStep(bundle);
+
+            rePealRedoList.addStep(sd);
         } else if (CURRENT_EDIT_MODE == EDIT_DRAW) {
-            Bundle bundle = ((FloatImageView) ptuFrame.getChildAt(1)).getResultBundle(ptuView.getInitRatio());
 
         }
 
