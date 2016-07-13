@@ -38,6 +38,7 @@ public class TietuFragment extends Fragment {
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private RecyclerAdapter tietuAdapter;
+    private LinearLayout more;
 
     public void setFloatImageView(FloatImageView floatImageView) {
         this.floatImageView = floatImageView;
@@ -76,6 +77,13 @@ public class TietuFragment extends Fragment {
             @Override
             public void onItemClick(View view, String data) {
                 floatImageView.setBitmapAndInit(data);
+                int clickPosition=tietuPaths.indexOf(data);
+                int lastPosition= layoutManager.findLastVisibleItemPosition();
+                if(clickPosition==lastPosition){//将下一个隐藏的item移出来
+                    int[] location = new  int[2] ;
+                    view.getLocationInWindow(location); //获取在当前窗口内的绝对坐标
+                    recyclerView.smoothScrollBy(view.getWidth()+location[0]+view.getWidth()-more.getLeft()+10,0);
+                }
             }
         });
         recyclerView = (RecyclerView) view.findViewById(R.id.recycle_list_tietu);
@@ -84,7 +92,7 @@ public class TietuFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(tietuAdapter);
 
-        LinearLayout more= (LinearLayout) view.findViewById(R.id.function_tietu_more);
+        more = (LinearLayout) view.findViewById(R.id.function_tietu_more);
         more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

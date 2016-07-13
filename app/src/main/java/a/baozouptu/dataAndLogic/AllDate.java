@@ -36,6 +36,7 @@ public class AllDate {
     private static Context globleContext = Util.MyApplication.getAppContext();
     public static long lastScanTime = 0;
     public static AsyncImageLoader3 imageLoader3 = AsyncImageLoader3.getInstatnce();
+    public static int toolbarHeight =Util.dp2Px(globleContext,40);
 
     static {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

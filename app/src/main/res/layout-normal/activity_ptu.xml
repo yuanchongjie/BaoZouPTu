@@ -7,34 +7,35 @@
 
     <android.support.v7.widget.Toolbar
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
+        android:clipToPadding="true"
+        android:fitsSystemWindows="true"
         app:contentInsetLeft="0dp"
         app:contentInsetStart="0dp"
-        android:background="@color/toolbar_backgroud">
+        android:background="@color/ptu_toolbar_background">
 
         <ImageButton
             android:id="@+id/cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="#0000"
             android:paddingRight="5dp"
             android:minWidth="70dp"
-            android:src="@mipmap/cancel" />
-        <ImageButton
-            android:id="@+id/repeal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingRight="5dp"
-            android:minWidth="70dp"
-            android:src="@mipmap/repeal" />
-
+            />
         <ImageButton
             android:id="@+id/sure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/text_color1"
-            android:src="@mipmap/sure"
+            android:background="#0000"
             android:text="button" />
-
+        <ImageButton
+            android:id="@+id/repeal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#00000000"
+            android:paddingRight="5dp"
+            android:minWidth="70dp"
+            android:src="@mipmap/repeal" />
         <ImageButton
             android:id="@+id/menu_go_send"
             android:layout_width="80dp"

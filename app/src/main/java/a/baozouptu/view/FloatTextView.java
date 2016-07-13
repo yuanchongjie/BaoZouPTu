@@ -242,15 +242,15 @@ public class FloatTextView extends EditText implements FloatView {
         }
         items.add(null);//第0个
         items.add(null);//第1个
-        FloatItemBitmap floatItemBitmap = new FloatItemBitmap();
+        IconBitmapCreator iconBitmapCreator = new IconBitmapCreator();
         Item item = new Item(-1, -1, ITEM_EDTI);
-        item.bitmap = floatItemBitmap.getEditBitmap(mContext, mPadding, itemColor);
+        item.bitmap = iconBitmapCreator.getEditBitmap(mContext, mPadding, itemColor);
         items.add(item);//第2个
         items.add(null);//第3个
         items.add(null);//第4个
         items.add(null);//第5个
         item = new Item(-1, -1, ITEM_BOTTOM_CENTER);
-        item.bitmap = floatItemBitmap.getToBottomCenterBitmap(mContext, mPadding, itemColor);
+        item.bitmap = iconBitmapCreator.getToBottomCenterBitmap(mContext, mPadding, itemColor);
         items.add(item);//第6个
         items.add(null);//第7个
     }

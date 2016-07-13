@@ -3,6 +3,7 @@ package a.baozouptu.control;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -27,6 +28,7 @@ import a.baozouptu.R;
 import a.baozouptu.dataAndLogic.AllDate;
 import a.baozouptu.dataAndLogic.MyDatabase;
 import a.baozouptu.dataAndLogic.ProcessUsualyPicPath;
+import a.baozouptu.tools.Util;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private int[] fab = {R.id.fab, R.id.fab1, R.id.fab2, R.id.fab3};
@@ -42,23 +44,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //nm.cancel(0);
 
 
-        toPtuActivity();
-       /* setContentView(R.layout.activity_main);
+
+        test();
+        setContentView(R.layout.activity_main);
 
         initToolbar();
 
-        initview();*/
+        initview();
         // sendNotify();
     }
 
-    private void toPtuActivity() {
+    private void test() {
+
         DisplayMetrics metric = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metric);
         AllDate.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
-        Intent intent1 = new Intent(this, PtuActivity.class);
-        intent1.putExtra("picPath", "/storage/sdcard1/中大图.jpg");
-        startActivity(intent1);
+        Intent intent = new Intent(this, ShowPictureActivity.class);
+        startActivity(intent);
+
     }
+
+
 
     private void sendNotify() {
         // 第一步：获取NotificationManager

@@ -8,7 +8,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
-import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -117,9 +116,9 @@ public class FloatImageView extends View implements FloatView {
             rimColor = mContext.getResources().getColor(R.color.float_rim_color);
             itemColor = mContext.getResources().getColor(R.color.float_item_color);
         }
-        FloatItemBitmap floatItemBitmap = new FloatItemBitmap();
+        IconBitmapCreator iconBitmapCreator = new IconBitmapCreator();
         Item item = new Item(-1, -1, ITEM_ROTATE);
-        item.bitmap = floatItemBitmap.getRotateBitmap(mContext, mPadding, itemColor);
+        item.bitmap = iconBitmapCreator.getRotateBitmap(mContext, mPadding, itemColor);
         items[7] = item;
     }
 
