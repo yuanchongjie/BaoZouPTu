@@ -1,6 +1,8 @@
 package a.baozouptu.tools;
 
 import android.graphics.Matrix;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -56,4 +58,5 @@ public class GeoUtil {
     public static Rect rectF2Rect(RectF rf){
         return new Rect((int)rf.left,(int)rf.top,(int)rf.right,(int)rf.bottom);
     }
+
 }

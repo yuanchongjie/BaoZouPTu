@@ -1,21 +1,22 @@
 package com.example.administrator.test;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+/**
+ * Created by Administrator on 2016/7/9.
+ */
+public class Activity2 extends AppCompatActivity {
 
     private List<String> mDatas;
     private RecyclerView recyclerView;
@@ -25,14 +26,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ImageView click=(ImageView)findViewById(R.id.click_test);
-        click.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this,"wowowo",Toast.LENGTH_LONG).show();
-            }
-        });
-        Log.e("启动成功","sadasda");
+        Log.e("启动成功","Activity2");
         recyclerView = (RecyclerView) findViewById(R.id.first_recycler_view);
 
         initData();
@@ -55,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     public class HomeAdapter extends RecyclerView.Adapter<MyViewHolder> {
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            MyViewHolder holder = new MyViewHolder(LayoutInflater.from(MainActivity.this).inflate(
+            MyViewHolder holder = new MyViewHolder(LayoutInflater.from(Activity2.this).inflate(
                     R.layout.recycler_view_item, parent, false));
             return holder;
         }

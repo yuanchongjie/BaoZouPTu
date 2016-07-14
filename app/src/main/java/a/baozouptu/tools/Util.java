@@ -3,10 +3,13 @@ package a.baozouptu.tools;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Toast;
+
+import a.baozouptu.R;
 
 /**
  * Created by Administrator on 2016/5/19.
@@ -123,6 +126,7 @@ public class Util {
             lastTime = -1;
         }
     }
+
     public static void getMesureWH(View v, int[] WH) {
         int width = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
         int height = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
@@ -130,6 +134,7 @@ public class Util {
         WH[0] = v.getMeasuredWidth();
         WH[1] = v.getMeasuredHeight();
     }
+
     /**
      * 获取两点间的位置
      *
@@ -142,5 +147,11 @@ public class Util {
     float getDis(float x1, float y1, float x2, float y2) {
         float dx = x1 - x2, dy = y1 - y2;
         return (float) Math.sqrt(dx * dx + dy * dy);
+    }
+
+    public static int getColor(Context context, int id) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            return context.getResources().getColor(id, null);
+        return context.getResources().getColor(id);
     }
 }

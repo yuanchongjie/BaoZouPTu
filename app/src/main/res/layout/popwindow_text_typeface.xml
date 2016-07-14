@@ -9,6 +9,6 @@
     android:id="@+id/hList_text_type"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:dividerWidth="@dimen/pading_function_item_image">
+    app:dividerWidth="@dimen/padding_function_item_image">
 </a.baozouptu.view.HorizontalListView>
 </LinearLayout>

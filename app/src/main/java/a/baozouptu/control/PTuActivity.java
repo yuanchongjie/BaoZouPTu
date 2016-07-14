@@ -1,13 +1,17 @@
 package a.baozouptu.control;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.RectF;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -17,20 +21,23 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 
+import com.readystatesoftware.systembartint.SystemBarTintManager;
+
 import a.baozouptu.R;
-import a.baozouptu.dataAndLogic.AddTextData;
+import a.baozouptu.dataAndLogic.AllDate;
 import a.baozouptu.dataAndLogic.RePealRedoList;
+import a.baozouptu.dataAndLogic.StepData;
 import a.baozouptu.tools.BitmapTool;
 import a.baozouptu.tools.FileTool;
 import a.baozouptu.tools.Util;
 import a.baozouptu.view.FloatImageView;
 import a.baozouptu.view.FloatTextView;
-import a.baozouptu.view.FloatView;
+import a.baozouptu.view.IconBitmapCreator;
 import a.baozouptu.view.PtuFrameLayout;
 import a.baozouptu.view.PtuView;
 
 public class PtuActivity extends Activity implements MainFunctionFragment.Listen {
-    public static final String DEBUG_TAG = "PtuActivity";
+    public static final String TAG = "PtuActivity";
     static int CURRENT_EDIT_MODE = 0;
     static final int EDIT_CUT = 1;
     static final int EDIT_TEXT = 2;
@@ -56,7 +63,7 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
      */
     private String picPath = null;
     private FloatTextView floatTextView;
-    private RePealRedoList<Bundle> rePealRedoList = new RePealRedoList<>();
+    private RePealRedoList<StepData> rePealRedoList = new RePealRedoList<>();
     private float finalRatio = 1;
     private PopupWindow redoPopWindow;
     private Intent resultIntent = new Intent();
@@ -64,21 +71,75 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
     boolean hasChanged = false;
     private Fragment currenFra;
     private FloatImageView floatImageView;
+    private Bitmap dituBitmap;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Util.P.le("进入P图Activity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ptu);
-
+        initWindow();
         initView();
+        //如果加载数据不成功，（图片加载失败）返回，
+        if (!initData()) return;
+        initFragment();
+
         setViewContent();
-        setFragment();
         setOnClick();
+        test();
+    }
+
+    @TargetApi(19)
+    private void initWindow() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            SystemBarTintManager tintManager = new SystemBarTintManager(this);
+            tintManager.setStatusBarTintColor(Util.getColor(this, R.color.ptu_toolbar_background));
+            tintManager.setStatusBarTintEnabled(true);
+        }
+    }
+
+    /**
+     * 如果加载数据不成功，（图片加载失败）返回false，
+     *
+     * @return
+     */
+    private boolean initData() {
+        //如果是从其它应用过来需要编辑图片的
+        Intent intent = getIntent();
+        Uri uri = intent.getData();
+        if (uri != null) {
+            Util.P.le(uri.getPath());
+            picPath = FileTool.getImagePathFromUri(this, uri);
+        } else {
+            picPath = intent.getStringExtra("picPath");
+        }
+
+        dituBitmap = new BitmapTool().getLosslessBitmap(picPath);
+        if (dituBitmap == null) {
+            ptuView.setBitmapAndInit(Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888),
+                    200, 200);
+            AlertDialog.Builder builder = new AlertDialog.Builder(PtuActivity.this);
+            builder.setTitle("图片加载失败");
+            builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    PtuActivity.this.finish();
+                }
+            });
+            builder.create().show();
+            return false;
+        }
+        return true;
+    }
+
+    private void test() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                changeFragment("tietu");
+                changeFragment("text");
             }
         }, 500);
     }
@@ -87,17 +148,49 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
         ptuFrame = (PtuFrameLayout) findViewById(R.id.ptu_frame);
         ptuView = (PtuView) findViewById(R.id.ptu_view);
         ptuView.setBackgroundColor(getResources().getColor(R.color.grey));
+
+        final int top_btn_width =getResources().getDimensionPixelSize(R.dimen.top_btn_width);
+
+//        Toolbar上的各个按钮
+        ImageButton cancel = (ImageButton) findViewById(R.id.cancel);
+        cancel.setImageBitmap(IconBitmapCreator.createCancelBitmap(this,
+                top_btn_width,
+                Util.getColor(this, R.color.text_color1)));
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ptuFrame.getChildCount() > 1) {
+                    ptuFrame.removeViewAt(1);
+                    changeFragment("main");
+                }
+            }
+        });
+
+        ImageButton sure = (ImageButton) findViewById(R.id.sure);
+        sure.setImageBitmap(IconBitmapCreator.createSureBitmap(this,
+                top_btn_width,
+                Util.getColor(this, R.color.text_color1) ));
+        sure.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onFinishStep();
+            }
+        });
+
         ImageButton repealBtn = (ImageButton) findViewById(R.id.repeal);
+        repealBtn.setImageBitmap(IconBitmapCreator.createRedpealBitmap(this,
+                top_btn_width,
+                Util.getColor(this, R.color.text_color1)));
         repealBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (redoPopWindow == null) {
                     redoPopWindow = new PopupWindow(PtuActivity.this);
                     ImageView image = new ImageView(PtuActivity.this);
-                    image.setImageResource(R.mipmap.redo);
-                     /*image.setLayoutParams(new ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                    */
+                    image.setImageBitmap(IconBitmapCreator.createRedpealBitmap(PtuActivity.this,
+                            top_btn_width,
+                            Util.getColor(PtuActivity.this, R.color.text_color1)));
+
                     redoPopWindow.setContentView(image);
                     redoPopWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
                     redoPopWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
@@ -119,106 +212,69 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
                     @Override
                     public void onClick(View v) {
                         if (ptuFrame.getChildCount() > 1)
-                            onReturnMainFunction();
+                            onFinishStep();
                         resultIntent.setAction("finish");
                         savePtuView();
                     }
                 }
         );
-        ImageButton cancel = (ImageButton) findViewById(R.id.cancel);
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ptuFrame.getChildCount() > 1)
-                    ptuFrame.removeViewAt(1);
-            }
-        });
-        ImageButton sure = (ImageButton) findViewById(R.id.sure);
-        sure.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onReturnMainFunction();
-            }
-        });
+
     }
 
-    private void addStep(Bundle md) {
-        rePealRedoList.addStep(md);
-        addBitmapToPtuView(md);
+    private void setViewContent() {
+        ptuFrame.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        ptuView.setBitmapAndInit(dituBitmap, ptuFrame.getWidth(), ptuFrame.getHeight());
+                        ptuFrame.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        Intent intent = getIntent();
+                        final String action = intent.getStringExtra("action");
+                        if (action != null) {
+                            switch (action) {
+                                case "text":
+                                    if (fragText == null) {
+                                        fragText = new AddTextFragment();
+                                    }
+                                    ptuView.initialDraw();
+                                    fm.beginTransaction().add(R.id.fragment_function, fragText)
+                                            .addToBackStack("main")
+                                            .commit();
+                                    floatTextView = ptuFrame.initAddTextFloat(ptuView.getBound());
+                                    fragText.setFloatView(floatTextView);
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void addStepData(StepData sd) {
+        rePealRedoList.addStep(sd);
     }
 
     private void repealMainFunction() {
         rePealRedoList.startRepeal();
         int pointer = rePealRedoList.getCurrentPoint();
         for (int i = 0; i < pointer; i++) {
-            Bundle md = rePealRedoList.get(i);
-            addBitmapToPtuView(md);
+            StepData sd = rePealRedoList.get(i);
+            addStepToView(sd);
         }
     }
 
     private void redoMainFunction() {
-        Bundle md = rePealRedoList.redo();
-        addBitmapToPtuView(md);
+        StepData sd = rePealRedoList.redo();
+        addStepToView(sd);
     }
 
-    private void addBitmapToPtuView(Bundle md) {
+    private void addStepToView(StepData sd) {
         hasChanged = true;
-        //Bitmap addBm = getInnerBmFromView(md.getParcelable("view"), md.get);
-        //ptuView.addBitmap(addBm, md.getOutRect(), bundle.getFloat("angle"));
-    }
 
-    private void setViewContent() {
-        Intent intent = getIntent();
-        picPath = intent.getStringExtra("picPath");
-        ptuFrame.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                ptuView.setBitmapAndInit(picPath, ptuFrame.getWidth(), ptuFrame.getHeight());
-                ptuFrame.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                Intent intent = getIntent();
-                final String action = intent.getStringExtra("action");
-                if (action != null) {
-                    switch (action) {
-                        case "text":
-                            if (fragText == null) {
-                                fragText = new AddTextFragment();
-                            }
-                            ptuView.initialDraw();
-                            fm.beginTransaction().add(R.id.fragment_function, fragText)
-                                    .addToBackStack("main")
-                                    .commit();
-                            floatTextView = ptuFrame.initAddTextFloat(ptuView.getBound());
-                            fragText.setFloatView(floatTextView);
-                    }
-                }
-            }
-        });
+        if (sd.EDIT_MODE == EDIT_TEXT) {
+            Bitmap textBitmap = getInnerBmFromView(floatTextView, sd.innerRect);
+            ptuView.addBitmap(textBitmap, sd.boundRectInPic, 0);
+        } else if (sd.EDIT_MODE == EDIT_TIETU) {
 
-    }
-
-    /**
-     * view的显示在图片上的部分的截图
-     *
-     * @param view
-     * @param innerRect view的显示在图片上的部分的区域
-     * @return view的显示在图片上的部分的截图
-     */
-    private Bitmap getInnerBmFromView(View view, RectF innerRect) {
-        Bitmap innerBitmap = null;
-        try {
-            Bitmap viewBitmap = Bitmap.createBitmap(floatTextView.getWidth(), floatTextView.getHeight(),
-                    Bitmap.Config.ARGB_8888);
-            view.draw(new Canvas(viewBitmap));
-            innerBitmap = Bitmap.createBitmap(viewBitmap, (int) innerRect.left, (int) innerRect.top,
-                    (int) (innerRect.right - innerRect.left), (int) (innerRect.bottom - innerRect.top));//获取floatview内部的内容
-            viewBitmap.recycle();
-        } catch (OutOfMemoryError e) {
-            innerBitmap.recycle();
-            Util.T(this, "内存超限");
-            e.printStackTrace();
         }
-        Util.P.le(DEBUG_TAG, "getInnerBmFromView完成");
-        return innerBitmap;
     }
 
     private void setOnClick() {
@@ -230,7 +286,7 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
     //(2)执行不同的FragmentTransetion事务其反应如何
     //
 
-    private void setFragment() {
+    private void initFragment() {
         fragMain = new MainFunctionFragment();
         fm = getFragmentManager();
         ft = fm.beginTransaction();
@@ -242,6 +298,9 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
     public void changeFragment(String function) {
         ptuView.resetDraw();
         switch (function) {
+            case "main":
+                if (fm.getBackStackEntryCount() > 1)
+                    fm.beginTransaction().remove(currenFra).commit();
             case "cut":
 
                 break;
@@ -250,13 +309,16 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
                 if (fragText == null) {
                     fragText = new AddTextFragment();
                 }
-                if (fm.getBackStackEntryCount() > 1) fm.beginTransaction().remove(currenFra);
-                fm.beginTransaction().add(R.id.fragment_function, fragText)
+                if (fm.getBackStackEntryCount() > 1)
+                    fm.beginTransaction().remove(currenFra);
+                fm.beginTransaction()
+                        .add(R.id.fragment_function, fragText)
                         .addToBackStack("main")
                         .commit();
                 CURRENT_EDIT_MODE = EDIT_TEXT;
                 currenFra = fragText;
                 floatTextView = ptuFrame.initAddTextFloat(ptuView.getBound());
+                floatTextView.setText("ahas大S大航红啊");
                 fragText.setFloatView(floatTextView);
 
                /* //让文本框一开始就获得输入法
@@ -271,7 +333,8 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
                 }
                 floatImageView = ptuFrame.initAddImageFloat(ptuView.getBound());
                 fragTietu.setFloatImageView(floatImageView);
-                fm.beginTransaction().add(R.id.fragment_function, fragTietu)
+                fm.beginTransaction()
+                        .add(R.id.fragment_function, fragTietu)
                         .addToBackStack("main")
                         .commit();
                 currenFra = fragTietu;
@@ -295,43 +358,83 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
     }
 
     /**
+     * view的显示在图片上的部分的截图
+     *
+     * @param view
+     * @param innerRect view的显示在图片上的部分的区域
+     * @return view的显示在图片上的部分的截图
+     */
+    private Bitmap getInnerBmFromView(View view, RectF innerRect) {
+        final Bitmap[] innerBitmap = new Bitmap[1];
+        try {
+
+            view.setDrawingCacheEnabled(true);
+            view.buildDrawingCache();
+            Bitmap viewBitmap = view.getDrawingCache();
+            innerBitmap[0] = Bitmap.createBitmap(viewBitmap, (int) innerRect.left, (int) innerRect.top,
+                    (int) (innerRect.right - innerRect.left), (int) (innerRect.bottom - innerRect.top));//获取floatview内部的内容
+
+            viewBitmap.recycle();
+        } catch (OutOfMemoryError e) {
+            innerBitmap[0].recycle();
+            Util.T(this, "内存超限");
+            e.printStackTrace();
+        }
+        Util.P.le(TAG, "getInnerBmFromView完成");
+        return innerBitmap[0];
+    }
+
+    /**
      * 回到主功能界面时,如果是从子功能回来，
      * （1）会添加子功能的view级参数到撤销重做list中。
      * （2）移除浮动图，获取浮动图的图片显示到putview上面
      */
-    private void onReturnMainFunction() {
+    private void onFinishStep() {
         if (CURRENT_EDIT_MODE == EDIT_CUT) {
-        } else if (CURRENT_EDIT_MODE == EDIT_TEXT) {
-            final View view = ptuFrame.getChildAt(1);
-            final RectF innerRect = new RectF(), picRect = new RectF();
-            boolean canGet = ((FloatView) view).prepareResultBitmap(ptuView.getInitRatio(),
-                    innerRect, picRect);//先获取
+        }//添加文字
+        else if (CURRENT_EDIT_MODE == EDIT_TEXT) {
+            final RectF innerRect = new RectF(), boundRectInPic = new RectF();
+            boolean canGet = floatTextView.prepareResultBitmap(ptuView.getInitRatio(),
+                    innerRect, boundRectInPic);//先获取
             if (!canGet) {//有些情况下会返回空
                 Util.T(PtuActivity.this, "操作失败，获取到的图像为空");
+                ptuFrame.removeViewAt(1);
                 return;
             }
-            //能获取到，将图绘制到sourceBitmap上，再绘制PtuView上，并且将view放入撤销重做list中
-            final Bitmap[] textBitmap = new Bitmap[1];
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ptuFrame.removeViewAt(1);
-                    textBitmap[0] = getInnerBmFromView(floatTextView, innerRect);
-                    new AddTextData(view, innerRect, picRect);
-                }
-            }, 300);
-        } else if (CURRENT_EDIT_MODE == EDIT_TIETU) {
-            Bundle bundle = floatImageView.getResultBundle(ptuView.getInitRatio());
+
+            floatTextView.getViewTreeObserver().
+                    addOnGlobalLayoutListener(
+                            new ViewTreeObserver.OnGlobalLayoutListener() {
+                                @Override
+                                public void onGlobalLayout() {
+                                    Bitmap textBitmap = getInnerBmFromView(floatTextView, innerRect);
+                                    ptuView.addBitmap(textBitmap, boundRectInPic, 0);
+
+                                    StepData sd = new StepData(EDIT_TEXT);
+                                    sd.floatTextView = floatTextView;
+                                    sd.innerRect = innerRect;
+                                    sd.boundRectInPic = boundRectInPic;
+
+                                    addStepData(sd);
+
+                                    floatTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                    ptuFrame.removeViewAt(1);
+                                }
+                            });
+        } //贴图
+        else if (CURRENT_EDIT_MODE == EDIT_TIETU) {
+            StepData sd = floatImageView.getResultData(ptuView.getInitRatio());
+            sd.EDIT_MODE = EDIT_TIETU;
             Bitmap source = floatImageView.getSourceBitmap();
 
             ptuView.addBitmap(source,
-                    (RectF) bundle.getParcelable("boundRect"),
-                    bundle.getFloat("angle"));
+                    sd.boundRectInPic,
+                    sd.angle);
             ptuFrame.removeViewAt(1);
             floatImageView.releaseResourse();
-            addStep(bundle);
+
+            rePealRedoList.addStep(sd);
         } else if (CURRENT_EDIT_MODE == EDIT_DRAW) {
-            Bundle bundle = ((FloatImageView) ptuFrame.getChildAt(1)).getResultBundle(ptuView.getInitRatio());
 
         }
 
@@ -354,7 +457,7 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
                     resultIntent.putExtra("newPath", newPath);
                 }
                 setResult(0, resultIntent);
-                Util.P.le(DEBUG_TAG, result);
+                Util.P.le(TAG, result);
                 PtuActivity.this.finish();
             }
         }, 600);

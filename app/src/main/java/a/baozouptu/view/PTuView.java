@@ -13,9 +13,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
-import a.baozouptu.tools.BitmapTool;
 import a.baozouptu.tools.GeoUtil;
 import a.baozouptu.tools.Util;
 
@@ -23,7 +21,7 @@ import a.baozouptu.tools.Util;
  * 注意： 每次缩放要寻改的地方有三个，totalRatio，currentRatio,CURRENT_STATUS
  */
 public class PtuView extends View {
-    String DEBUG_TAG = "PtuView";
+    String TAG = "PtuView";
     /**
      * 每次刷新0.0002倍
      */
@@ -88,15 +86,11 @@ public class PtuView extends View {
     /**
      * 原图片的宽度,高度
      */
-    private int srcPicWidth, srcPicHeight;
+    private int srcPicWidth=10, srcPicHeight=10;
     /**
-     * 右上角x坐标，以view的右上角为原点，（0,0）
+     * 右上角x坐标，y坐标，以view的右上角为原点，（0,0）
      */
-    private int picLeft;
-    /**
-     * 右上角y坐标，以view的右上角为原点，（0,0）
-     */
-    private int picTop;
+    private int picLeft=0,picTop=0;
     /**
      * 图片的局部，要现实出来的部分
      */
@@ -147,8 +141,8 @@ public class PtuView extends View {
      */
     public Bitmap getFinalPicture(float finalRatio) {
         if(finalRatio!=1.0) {
-            Bitmap bitmap = Bitmap.createScaledBitmap(sourceBitmap, (int) (sourceBitmap.getWidth() * finalRatio),
-                    (int) (sourceBitmap.getHeight() * finalRatio), true);
+            Bitmap bitmap = Bitmap.createScaledBitmap(sourceBitmap, (int) (srcPicWidth * finalRatio),
+                    (int) (srcPicHeight * finalRatio), true);
             if (bitmap.equals(sourceBitmap))
                 sourceBitmap.recycle();
             bitmapToview.recycle();
@@ -166,15 +160,10 @@ public class PtuView extends View {
      * <p>创建并设置好用于保存的Bitmap
      * <p>获取当前何种的Ratio
      *
-     * @param path2
+     * @param bitmap
      */
-    public void setBitmapAndInit(String path2,int totalWidth,int totalHeight) {
-        sourceBitmap = new BitmapTool().getLosslessBitmap(path2);
-        if (sourceBitmap == null) {
-            Toast.makeText(mContext, "图片不存在", Toast.LENGTH_SHORT).show();
-            Util.P.le("PTuView.setBitmapAndInit", "sourceBitmap出现空指针");
-            return;
-        }
+    public void setBitmapAndInit(Bitmap bitmap,int totalWidth,int totalHeight) {
+        sourceBitmap = bitmap;
         sourceCanvas=new Canvas(sourceBitmap);
         srcPicWidth = sourceBitmap.getWidth();
         srcPicHeight = sourceBitmap.getHeight();
@@ -207,7 +196,7 @@ public class PtuView extends View {
             case MotionEvent.ACTION_DOWN:
                 lastX = event.getX();
                 lastY = event.getY();
-                Util.P.le(DEBUG_TAG, "经过了down");
+                Util.P.le(TAG, "经过了down");
                 if (Util.DoubleClick.isDoubleClick()) {
                     if (lastX < dstRect.left || lastX > dstRect.right || lastY < dstRect.top
                             || lastY > dstRect.bottom)//点击不在图片范围内
@@ -304,7 +293,7 @@ public class PtuView extends View {
      */
     private void scalePic(float x1, float y1, float x2, float y2, float currentRatio) {
         // 获取当前图片的宽、高
-        Util.P.le(DEBUG_TAG, "缩放图片开始");
+        Util.P.le(TAG, "缩放图片开始");
         curPicWidth = (int) (srcPicWidth * totalRatio);
         curPicHeight = (int) (srcPicHeight * totalRatio);
 
@@ -327,7 +316,7 @@ public class PtuView extends View {
         getConvertParameter(curPicWidth, curPicHeight);
         drawToBitmapToView();
         invalidate();
-        Util.P.le(DEBUG_TAG, "缩放完成");
+        Util.P.le(TAG, "缩放完成");
     }
 
     /**
@@ -342,7 +331,7 @@ public class PtuView extends View {
      * @param curPicHeight
      */
     private void getConvertParameter(int curPicWidth, int curPicHeight) {
-        Util.P.le(DEBUG_TAG, "获取参数开始");
+        Util.P.le(TAG, "获取参数开始");
         // 显示在屏幕上绘制的宽度、高度
         int drawWidth = curPicWidth > totalWidth ? totalWidth : curPicWidth;
         int drawHeight = curPicHeight > totalHeight ? totalHeight : curPicHeight;
@@ -351,11 +340,11 @@ public class PtuView extends View {
         int leftInPic = picLeft > 0 ? 0 : -picLeft, topInPic = picTop > 0 ? 0 : -picTop;
         int x = (int) (leftInPic / totalRatio), y = (int) (topInPic / totalRatio);
         int x1 = x + (int) (drawWidth / totalRatio), y1 = y + (int) (drawHeight / totalRatio);
-        if (x1 > sourceBitmap.getWidth()) x1 = sourceBitmap.getWidth();
-        if (y1 > sourceBitmap.getHeight()) y1 = sourceBitmap.getHeight();
+        if (x1 > srcPicWidth) x1 = srcPicWidth;
+        if (y1 > srcPicHeight) y1 = srcPicHeight;
         srcRect.set(x, y, x1, y1);
         dstRect.set(leftInView, topInView, leftInView + drawWidth, topInView + drawHeight);
-        Util.P.le(DEBUG_TAG, "获取参数完成");
+        Util.P.le(TAG, "获取参数完成");
     }
 
 
@@ -431,6 +420,8 @@ public class PtuView extends View {
         if(addBitmap.getWidth()!=width){
             realBm= Bitmap.createScaledBitmap(addBitmap,width,height,true);
             addBitmap.recycle();
+        }else {
+            realBm=addBitmap;
         }
 
         float centerX=(boundRect.left+boundRect.right)/2,centerY=(boundRect.bottom+boundRect.top)/2;
