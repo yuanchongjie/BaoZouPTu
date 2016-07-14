@@ -16,7 +16,7 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:paddingTop="2dp"
-            android:paddingBottom="@dimen/pading_function_item_image">
+            android:paddingBottom="@dimen/padding_function_item_image">
 
             <LinearLayout
                 android:id="@+id/add_text_toumingdu"
@@ -29,10 +29,10 @@
                     android:layout_height="0dp"
                     android:layout_weight="2"
                     android:src="@mipmap/toumingdu"
-                    android:paddingLeft="@dimen/pading_function_item_image"
-                    android:paddingRight="@dimen/pading_function_item_image"
-                    android:paddingTop="@dimen/pading_function_item_image"
-                    android:paddingBottom="@dimen/pading_function_item_image"
+                    android:paddingLeft="@dimen/padding_function_item_image"
+                    android:paddingRight="@dimen/padding_function_item_image"
+                    android:paddingTop="@dimen/padding_function_item_image"
+                    android:paddingBottom="@dimen/padding_function_item_image"
                     />
 
                 <TextView
@@ -57,10 +57,10 @@
                     android:layout_height="0dp"
                     android:layout_weight="2"
                     android:src="@mipmap/bold"
-                    android:paddingLeft="@dimen/pading_function_item_image"
-                    android:paddingRight="@dimen/pading_function_item_image"
-                    android:paddingTop="@dimen/pading_function_item_image"
-                    android:paddingBottom="@dimen/pading_function_item_image"
+                    android:paddingLeft="@dimen/padding_function_item_image"
+                    android:paddingRight="@dimen/padding_function_item_image"
+                    android:paddingTop="@dimen/padding_function_item_image"
+                    android:paddingBottom="@dimen/padding_function_item_image"
                 />
 
                 <TextView
@@ -83,10 +83,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:src="@mipmap/color" android:paddingLeft="@dimen/pading_function_item_image"
-                    android:paddingRight="@dimen/pading_function_item_image"
-                    android:paddingTop="@dimen/pading_function_item_image"
-                    android:paddingBottom="@dimen/pading_function_item_image"
+                    android:src="@mipmap/color" android:paddingLeft="@dimen/padding_function_item_image"
+                    android:paddingRight="@dimen/padding_function_item_image"
+                    android:paddingTop="@dimen/padding_function_item_image"
+                    android:paddingBottom="@dimen/padding_function_item_image"
                     />
 
                 <TextView
@@ -110,10 +110,10 @@
                     android:layout_height="0dp"
                     android:layout_weight="2"
                     android:src="@mipmap/typeface"
-                    android:paddingLeft="@dimen/pading_function_item_image"
-                    android:paddingRight="@dimen/pading_function_item_image"
-                    android:paddingTop="@dimen/pading_function_item_image"
-                    android:paddingBottom="@dimen/pading_function_item_image"
+                    android:paddingLeft="@dimen/padding_function_item_image"
+                    android:paddingRight="@dimen/padding_function_item_image"
+                    android:paddingTop="@dimen/padding_function_item_image"
+                    android:paddingBottom="@dimen/padding_function_item_image"
                     />
 
                 <TextView
@@ -136,10 +136,10 @@
                     android:layout_height="0dp"
                     android:layout_weight="2"
                     android:src="@mipmap/special"
-                    android:paddingLeft="@dimen/pading_function_item_image"
-                    android:paddingRight="@dimen/pading_function_item_image"
-                    android:paddingTop="@dimen/pading_function_item_image"
-                    android:paddingBottom="@dimen/pading_function_item_image"
+                    android:paddingLeft="@dimen/padding_function_item_image"
+                    android:paddingRight="@dimen/padding_function_item_image"
+                    android:paddingTop="@dimen/padding_function_item_image"
+                    android:paddingBottom="@dimen/padding_function_item_image"
                     />
 
                 <TextView
@@ -163,10 +163,10 @@
                     android:layout_height="0dp"
                     android:layout_weight="2"
                     android:src="@mipmap/bubble"
-                    android:paddingLeft="@dimen/pading_function_item_image"
-                    android:paddingRight="@dimen/pading_function_item_image"
-                    android:paddingTop="@dimen/pading_function_item_image"
-                    android:paddingBottom="@dimen/pading_function_item_image"
+                    android:paddingLeft="@dimen/padding_function_item_image"
+                    android:paddingRight="@dimen/padding_function_item_image"
+                    android:paddingTop="@dimen/padding_function_item_image"
+                    android:paddingBottom="@dimen/padding_function_item_image"
                     />
 
                 <TextView

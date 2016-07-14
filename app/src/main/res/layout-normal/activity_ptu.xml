@@ -16,41 +16,42 @@
 
         <ImageButton
             android:id="@+id/cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="#0000"
-            android:paddingRight="5dp"
-            android:minWidth="70dp"
+            android:layout_width="@dimen/top_btn_width"
+            android:layout_height="@dimen/top_btn_width"
+            android:background="@drawable/top_btn_background"
+            android:paddingLeft="@dimen/padding_main_function"
+            android:paddingRight="@dimen/padding_main_function"
             />
         <ImageButton
             android:id="@+id/sure"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="#0000"
-            android:text="button" />
+            android:layout_width="@dimen/top_btn_width"
+            android:layout_height="@dimen/top_btn_width"
+            android:background="@drawable/top_btn_background"
+            android:paddingLeft="@dimen/padding_main_function"
+            android:paddingRight="@dimen/padding_main_function"
+            />
         <ImageButton
             android:id="@+id/repeal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="#00000000"
+            android:layout_width="@dimen/top_btn_width"
+            android:layout_height="@dimen/top_btn_width"
+            android:background="@drawable/top_btn_background"
             android:paddingRight="5dp"
-            android:minWidth="70dp"
-            android:src="@mipmap/repeal" />
+            />
         <ImageButton
             android:id="@+id/menu_go_send"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:background="#00000000"
-            android:paddingLeft="@dimen/pading_function_item_image"
-            android:paddingRight="@dimen/pading_function_item_image"
+            android:layout_width="@dimen/top_btn_width"
+            android:layout_height="@dimen/top_btn_width"
+            android:background="@drawable/top_btn_background"
+            android:paddingLeft="@dimen/padding_main_function"
+            android:paddingRight="@dimen/padding_main_function"
             android:src="@drawable/ic_menu_send" />
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="#00000000"
-            android:paddingLeft="@dimen/pading_function_item_image"
-            android:paddingRight="@dimen/pading_function_item_image"
+            android:layout_width="@dimen/top_btn_width"
+            android:layout_height="@dimen/top_btn_width"
+            android:background="@drawable/top_btn_background"
+            android:paddingLeft="@dimen/padding_main_function"
+            android:paddingRight="@dimen/padding_main_function"
             android:src="@drawable/ic_menu_share"
 
             />

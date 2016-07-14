@@ -25,7 +25,7 @@
             android:layout_width="35dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:paddingRight="@dimen/pading_function_item_image"/>
+            android:paddingRight="@dimen/padding_function_item_image"/>
 
         <a.baozouptu.view.HorizontalListView
             android:id="@+id/color_list"

@@ -148,17 +148,49 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
         ptuFrame = (PtuFrameLayout) findViewById(R.id.ptu_frame);
         ptuView = (PtuView) findViewById(R.id.ptu_view);
         ptuView.setBackgroundColor(getResources().getColor(R.color.grey));
+
+        final int top_btn_width =getResources().getDimensionPixelSize(R.dimen.top_btn_width);
+
+//        Toolbar上的各个按钮
+        ImageButton cancel = (ImageButton) findViewById(R.id.cancel);
+        cancel.setImageBitmap(IconBitmapCreator.createCancelBitmap(this,
+                top_btn_width,
+                Util.getColor(this, R.color.text_color1)));
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ptuFrame.getChildCount() > 1) {
+                    ptuFrame.removeViewAt(1);
+                    changeFragment("main");
+                }
+            }
+        });
+
+        ImageButton sure = (ImageButton) findViewById(R.id.sure);
+        sure.setImageBitmap(IconBitmapCreator.createSureBitmap(this,
+                top_btn_width,
+                Util.getColor(this, R.color.text_color1) ));
+        sure.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onFinishStep();
+            }
+        });
+
         ImageButton repealBtn = (ImageButton) findViewById(R.id.repeal);
+        repealBtn.setImageBitmap(IconBitmapCreator.createRedpealBitmap(this,
+                top_btn_width,
+                Util.getColor(this, R.color.text_color1)));
         repealBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (redoPopWindow == null) {
                     redoPopWindow = new PopupWindow(PtuActivity.this);
                     ImageView image = new ImageView(PtuActivity.this);
-                    image.setImageResource(R.mipmap.redo);
-                     /*image.setLayoutParams(new ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                    */
+                    image.setImageBitmap(IconBitmapCreator.createRedpealBitmap(PtuActivity.this,
+                            top_btn_width,
+                            Util.getColor(PtuActivity.this, R.color.text_color1)));
+
                     redoPopWindow.setContentView(image);
                     redoPopWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
                     redoPopWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
@@ -187,30 +219,6 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
                 }
         );
 
-        ImageButton cancel = (ImageButton) findViewById(R.id.cancel);
-        cancel.setImageBitmap(IconBitmapCreator.getCancelBitmap(this,
-                AllDate.toolbarHeight,
-                Util.getColor(this, R.color.text_color1), 0xffffffff));
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ptuFrame.getChildCount() > 1) {
-                    ptuFrame.removeViewAt(1);
-                    changeFragment("main");
-                }
-            }
-        });
-
-        ImageButton sure = (ImageButton) findViewById(R.id.sure);
-        sure.setImageBitmap(IconBitmapCreator.getSureBitmap(this,
-                AllDate.toolbarHeight,
-                Util.getColor(this, R.color.text_color1), 0xffffffff));
-        sure.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onFinishStep();
-            }
-        });
     }
 
     private void setViewContent() {
