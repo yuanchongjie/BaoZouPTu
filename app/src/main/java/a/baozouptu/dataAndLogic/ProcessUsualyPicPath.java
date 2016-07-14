@@ -51,8 +51,6 @@ public class ProcessUsualyPicPath {
     /**
      * 文件的信息
      */
-    private Map<String, Integer> picFileNumberMap = new TreeMap();
-    private Map<String, String> PicFileRepresentMap = new TreeMap();
     private List<String> filePathList = new ArrayList<>();
     private List<String> fileInfoList = new ArrayList<>();
     private List<String> fileRepresentPathList = new ArrayList<>();
@@ -126,15 +124,14 @@ public class ProcessUsualyPicPath {
      *
      * @param path
      */
-    //注意数据库，内存双添加,以及相关参数改变
     public void addRecentPath(String path, int index, long time) {
         if (curRecentNumber + 1 > MAX_RECENT_NUMBER) {
             mUsualyPicPathList.remove(curUsedNumber + curRecentNumber - 1);
-            recentTimesList.remove(recentTimesList.size()-1);
+            recentTimesList.remove(recentTimesList.size() - 1);
             curRecentNumber--;
         }
         mUsualyPicPathList.add(curUsedNumber + index, path);
-        recentTimesList.add(index,time);
+        recentTimesList.add(index, time);
         curRecentNumber++;
     }
 
@@ -180,7 +177,7 @@ public class ProcessUsualyPicPath {
     }
 
     /**
-     * 开启新线程，查询所有的图片
+     * 开启新线程，查询所有的图片,先清空以前的list里面的数据
      */
     public void getAllPicInfoAndRecent() {
         Runnable runnable = new Runnable() {
@@ -188,8 +185,12 @@ public class ProcessUsualyPicPath {
             public void run() {
                 // 排序处理得到的图片的map
                 List<Pair<Long, String>> sortedPicPathsByTime = new ArrayList<>();
-                quaryPicInfoInSD(sortedPicPathsByTime, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                quaryPicInfoInSD(sortedPicPathsByTime, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                Map<String, Integer> picFileNumberMap = new TreeMap();
+                Map<String, String> PicFileRepresentMap = new TreeMap();
+                quaryPicInfoInSD(sortedPicPathsByTime,picFileNumberMap,PicFileRepresentMap,
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                quaryPicInfoInSD(sortedPicPathsByTime,picFileNumberMap,PicFileRepresentMap,
+                        MediaStore.Images.Media.INTERNAL_CONTENT_URI);
                 long scanTime = System.currentTimeMillis();
                 Collections.sort(sortedPicPathsByTime, new Comparator<Pair<Long, String>>() {
                     @Override
@@ -199,7 +200,7 @@ public class ProcessUsualyPicPath {
                 });
 
                 detectRecentExit();
-                if (-sortedPicPathsByTime.get(0).first < AllDate.lastScanTime&&curRecentNumber>=MAX_RECENT_NUMBER) {
+                if (-sortedPicPathsByTime.get(0).first < AllDate.lastScanTime && curRecentNumber >= MAX_RECENT_NUMBER) {
                     AllDate.lastScanTime = scanTime;
                     return;
                 }
@@ -208,24 +209,26 @@ public class ProcessUsualyPicPath {
                 //处理最近图片
                 int index = 0;
                 for (Pair<Long, String> pair : sortedPicPathsByTime) {
-                    if(isInRecent(pair.second))continue;
+                    if (isInRecent(pair.second)) continue;
                     long time = -pair.first;
-                    int i=index;
-                    for(;i<recentTimesList.size();i++){
-                        if(time>recentTimesList.get(i)){
+                    int i = index;
+                    for (; i < recentTimesList.size(); i++) {
+                        if (time > recentTimesList.get(i)) {
                             addRecentPath(pair.second, i, time);
                             break;
                         }
                     }
                     //当最近图片总数不足时，直接添加
-                    if(i==recentTimesList.size()&&i<MAX_RECENT_NUMBER)
-                    {
+                    if (i == recentTimesList.size() && i < MAX_RECENT_NUMBER) {
                         addRecentPath(pair.second, i, time);
                     }
-                    index=i+1;
-                    if(index>=MAX_RECENT_NUMBER)break;
+                    index = i + 1;
+                    if (index >= MAX_RECENT_NUMBER) break;
                 }
 
+                filePathList.clear();
+                fileRepresentPathList.clear();
+                fileInfoList.clear();
                 // 处理文件信息,将要显示的文件信息获取出来
                 filePathList.add("aaaaa");
                 fileRepresentPathList.add(mUsualyPicPathList.get(0));
@@ -253,12 +256,12 @@ public class ProcessUsualyPicPath {
      * 检测最近的图片时已删除
      */
     private void detectRecentExit() {
-        for(int i=curUsedNumber;i<curRecentNumber+curUsedNumber;i++){
-            String path=mUsualyPicPathList.get(i);
-            if(!new File(path).exists()){
+        for (int i = curUsedNumber; i < curRecentNumber + curUsedNumber; i++) {
+            String path = mUsualyPicPathList.get(i);
+            if (!new File(path).exists()) {
                 mUsualyPicPathList.remove(i);
                 curRecentNumber--;
-                recentTimesList.remove(i-curUsedNumber);
+                recentTimesList.remove(i - curUsedNumber);
             }
         }
     }
@@ -274,7 +277,10 @@ public class ProcessUsualyPicPath {
     /**
      * 启动一个新线程从图片数据库中获取图片信息
      */
-    private void quaryPicInfoInSD(final List<Pair<Long, String>> sortPictureList, final Uri uri) {
+    private void quaryPicInfoInSD(final List<Pair<Long, String>> sortPictureList,
+                                  Map<String, Integer> picFileNumberMap,
+                                  Map<String, String> PicFileRepresentMap,
+                                  final Uri uri) {
         if (uri == null) return;//不为空，放入图片
 
         String[] projection = {MediaStore.Images.Media.DATE_MODIFIED,
@@ -379,7 +385,7 @@ public class ProcessUsualyPicPath {
             id = mUsualyPicPathList.indexOf(path);
             if (curUsedNumber <= id && id < curUsedNumber + curRecentNumber) {
                 mUsualyPicPathList.remove(id);
-                recentTimesList.remove(id-curUsedNumber);
+                recentTimesList.remove(id - curUsedNumber);
                 curRecentNumber--;
             }
             if (mUsualyPicPathList.contains(path)) {
