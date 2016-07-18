@@ -1,7 +1,6 @@
 package a.baozouptu.control;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -14,12 +13,18 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.support.v7.widget.Toolbar;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
@@ -36,7 +41,7 @@ import a.baozouptu.view.IconBitmapCreator;
 import a.baozouptu.view.PtuFrameLayout;
 import a.baozouptu.view.PtuView;
 
-public class PtuActivity extends Activity implements MainFunctionFragment.Listen {
+public class PtuActivity extends AppCompatActivity implements MainFunctionFragment.Listen {
     public static final String TAG = "PtuActivity";
     static int CURRENT_EDIT_MODE = 0;
     static final int EDIT_CUT = 1;
@@ -78,6 +83,10 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
         Util.P.le("进入P图Activity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ptu);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.ptu_toolbar);
+        setSupportActionBar(toolbar);
+        setTitle("");
         initWindow();
         initView();
         //如果加载数据不成功，（图片加载失败）返回，
@@ -149,10 +158,15 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
         ptuView = (PtuView) findViewById(R.id.ptu_view);
         ptuView.setBackgroundColor(getResources().getColor(R.color.grey));
 
-        final int top_btn_width =getResources().getDimensionPixelSize(R.dimen.top_btn_width);
+        int top_btn_width = AllDate.screenWidth / 8;
+        int smallDivider=(int) (AllDate.screenWidth * 5.0 / 112);
+        int bigDivider=(int) (AllDate.screenWidth * 7.5 / 112);
 
-//        Toolbar上的各个按钮
-        ImageButton cancel = (ImageButton) findViewById(R.id.cancel);
+        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.ptu_toolbar_linear);
+
+        addDivider(linearLayout, smallDivider);
+        //        Toolbar上的各个按钮
+        ImageButton cancel = createBaseToolbarBtn(top_btn_width);
         cancel.setImageBitmap(IconBitmapCreator.createCancelBitmap(this,
                 top_btn_width,
                 Util.getColor(this, R.color.text_color1)));
@@ -165,48 +179,56 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
                 }
             }
         });
+        linearLayout.addView(cancel, new ViewGroup.LayoutParams(top_btn_width, top_btn_width));
 
-        ImageButton sure = (ImageButton) findViewById(R.id.sure);
+
+        addDivider(linearLayout, smallDivider);
+        ImageButton sure = createBaseToolbarBtn(top_btn_width);
         sure.setImageBitmap(IconBitmapCreator.createSureBitmap(this,
                 top_btn_width,
-                Util.getColor(this, R.color.text_color1) ));
+                Util.getColor(this, R.color.text_color1)));
         sure.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onFinishStep();
             }
         });
+        linearLayout.addView(sure, new ViewGroup.LayoutParams(top_btn_width, top_btn_width));
 
-        ImageButton repealBtn = (ImageButton) findViewById(R.id.repeal);
-        repealBtn.setImageBitmap(IconBitmapCreator.createRedpealBitmap(this,
+
+        addDivider(linearLayout, smallDivider);
+        ImageButton repealBtn = createBaseToolbarBtn(top_btn_width);
+        repealBtn.setImageBitmap(IconBitmapCreator.createRedoBitmap(PtuActivity.this,
                 top_btn_width,
-                Util.getColor(this, R.color.text_color1)));
+                Util.getColor(PtuActivity.this, R.color.text_color1)));
         repealBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (redoPopWindow == null) {
-                    redoPopWindow = new PopupWindow(PtuActivity.this);
-                    ImageView image = new ImageView(PtuActivity.this);
-                    image.setImageBitmap(IconBitmapCreator.createRedpealBitmap(PtuActivity.this,
-                            top_btn_width,
-                            Util.getColor(PtuActivity.this, R.color.text_color1)));
-
-                    redoPopWindow.setContentView(image);
-                    redoPopWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
-                    redoPopWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
-                    image.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            redoMainFunction();
-                        }
-                    });
-                } else if (!redoPopWindow.isShowing())
-                    redoPopWindow.showAsDropDown(v);
-                else repealMainFunction();
+                repealMainFunction();
             }
         });
+        linearLayout.addView(repealBtn, new ViewGroup.LayoutParams(top_btn_width, top_btn_width));
+
+
+        addDivider(linearLayout, smallDivider);
+        ImageButton btnRedo = createBaseToolbarBtn(top_btn_width);
+        btnRedo.setImageBitmap(IconBitmapCreator.createRedpealBitmap(this,
+                top_btn_width,
+                Util.getColor(this, R.color.text_color1)));
+        btnRedo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                redoMainFunction();
+            }
+        });
+        linearLayout.addView(btnRedo, new ViewGroup.LayoutParams(top_btn_width, top_btn_width));
+
         //去发送按钮
-        ImageButton goSend = (ImageButton) findViewById(R.id.menu_go_send);
+        addDivider(linearLayout, smallDivider);
+        ImageButton goSend = createBaseToolbarBtn(top_btn_width);
+        goSend.setImageBitmap(IconBitmapCreator.createSendBitmap(this,
+                top_btn_width,
+                Util.getColor(this, R.color.text_color1)));
         goSend.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -218,7 +240,24 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
                     }
                 }
         );
+        linearLayout.addView(goSend, new ViewGroup.LayoutParams(top_btn_width, top_btn_width));
 
+        addDivider(linearLayout, bigDivider);
+
+    }
+
+    private void addDivider(LinearLayout linear, int width) {
+        FrameLayout fm = new FrameLayout(this);
+        fm.setLayoutParams(new ViewGroup.LayoutParams(
+                width, ViewGroup.LayoutParams.MATCH_PARENT));
+        linear.addView(fm);
+    }
+
+    private ImageButton createBaseToolbarBtn(int width) {
+        ImageButton button = new ImageButton(this);
+        button.setBackground(getResources().getDrawable(R.drawable.ptu_top_btn_background));
+        button.setLayoutParams(new ViewGroup.LayoutParams(width, width));
+        return button;
     }
 
     private void setViewContent() {
@@ -461,6 +500,14 @@ public class PtuActivity extends Activity implements MainFunctionFragment.Listen
                 PtuActivity.this.finish();
             }
         }, 600);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //	为ActionBar扩展菜单项
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.ptu_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
 }

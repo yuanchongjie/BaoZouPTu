@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //nm.cancel(0);
 
 
-
         test();
         setContentView(R.layout.activity_main);
 
@@ -61,9 +60,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AllDate.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
         Intent intent = new Intent(this, ShowPictureActivity.class);
         startActivity(intent);
-
+        sendNotify();
     }
-
 
 
     private void sendNotify() {

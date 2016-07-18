@@ -14,7 +14,9 @@ import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.text.style.LineHeightSpan;
 import android.text.style.TtsSpan;
+import android.util.DisplayMetrics;
 
 import a.baozouptu.tools.TempUtil;
 
@@ -64,11 +66,12 @@ public class IconBitmapCreator {
         Canvas canvas = new Canvas(bitmap);
         paint.setDither(true);
         paint.setColor(color);
-        paint.setStrokeWidth(3.5f);
-        canvas.drawLine(0, width / 4, width, width / 4, paint);
+        paint.setStrokeWidth(2f);
+        canvas.drawLine(0, width / 4 - width / 11, width, width / 4 - width / 11, paint);
+        canvas.drawLine(0, width / 4 + width / 16, width, width / 4 + width / 16, paint);
         canvas.drawLine(0, width / 2 - 3, width, width / 2 - 3, paint);
-        canvas.drawLine(0, width / 2 - 3, width / 2 + 1.5f, width - 15, paint);
-        canvas.drawLine(width, width / 2 - 3, width / 2 - 1.5f, width - 15, paint);
+        canvas.drawLine(0, width / 2 - 3, width / 2 + 1f, width - 15, paint);
+        canvas.drawLine(width, width / 2 - 3, width / 2 - 1f, width - 15, paint);
         return bitmap;
     }
 
@@ -138,7 +141,7 @@ public class IconBitmapCreator {
         paint.setStrokeWidth(7.5f);
         paint.setColor(foregroundColor);
         double dx = (2 - Math.sqrt(2)) / 4.0 * width;
-        int x = (int) (dx * 1.5);
+        int x = (int) (dx * 2);
         canvas.drawLine(x, x, width - x, width - x, paint);
         canvas.drawLine(width - x, x, x, width - x, paint);
         return bitmap;
@@ -154,8 +157,8 @@ public class IconBitmapCreator {
         paint.setStrokeWidth(7.5f);
         paint.setColor(foregroundColor);
         float w = (float) width;
-        canvas.drawLine(w * (35.0f / 200), w * (83.0f / 200), w * (72.0f / 200), w * (143.0f / 200), paint);
-        canvas.drawLine(w * (72.0f / 200), w * (143.0f / 200), w * (168.0f / 200), w * (69.0f / 200), paint);
+        canvas.drawLine(w * (35.0f / 200), w * (83.0f / 200), w * (72.0f / 200)+2, w * (143.0f / 200)+2, paint);
+        canvas.drawLine(w * (72.0f / 200)-2, w * (143.0f / 200)+2, w * (168.0f / 200), w * (69.0f / 200), paint);
         return bitmap;
     }
 
@@ -169,11 +172,12 @@ public class IconBitmapCreator {
         paint.setAntiAlias(true);
         paint.setDither(true);
 
-        float r1 = width / 4;
-        float r2 = width / 3;
         PointF c1 = new PointF(width * 100f / 200, width * 61f / 200),
                 c2 = new PointF(width * 100f / 200, width * 100f / 200),
                 c3 = new PointF(width * 28f / 200, width * 156f / 200);
+        PointF rectP1=new PointF(c3.x,c1.y),rectP2=new PointF(c3.x-(c1.x-c3.x)/4,c2.x-(c1.x-c3.x)/10);
+        float r1 =c1.x-c3.x;
+        float r2 = width / 3;
 
         PointF a1 = new PointF(width * 100f / 200, width * 20f / 200),
                 a2 = new PointF(width * 175f / 200, width * 86f / 200),
@@ -227,16 +231,44 @@ public class IconBitmapCreator {
      * @return
      */
     public static Bitmap createRedoBitmap(Context context, int width, int foregroundColor) {
+        Bitmap tempBitmap = createRedpealBitmap(context, width, foregroundColor);
+        Matrix m = new Matrix();
+        m.setScale(-1, 1);
+        m.postTranslate(tempBitmap.getWidth(), 0); //镜像水平翻转
+        return tempBitmap.createBitmap(tempBitmap, 0, 0, tempBitmap.getWidth(), tempBitmap.getHeight(), m
+                , true);
+    }
+
+    public static Bitmap createSendBitmap(Context context, int width, int foregroundColor) {
+        width=(int)(width*(0.75));
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        Bitmap tempBitmap = createRedpealBitmap(context, width, foregroundColor);
 
         Paint paint = new Paint();
         paint.setAntiAlias(true);
-        canvas.rotate(180);
-        Matrix matrix = new Matrix();
-        matrix.postScale(-1, 1);
-        canvas.drawBitmap(tempBitmap, matrix, paint);
+        paint.setDither(true);
+        paint.setColor(foregroundColor);
+        paint.setStrokeWidth(1);
+        paint.setStyle(Paint.Style.FILL);
+
+        Path path = new Path();
+        path.moveTo(60 / 720.0f * width, 90 / 720.0f * width);
+        path.lineTo(690 / 720.0f * width, 360 / 720.0f * width);
+        path.lineTo(60 / 720.0f * width, 630 / 720.0f * width);
+        path.close();
+        canvas.drawPath(path, paint);
+
+        Paint paint1=new Paint();
+        paint1.setAntiAlias(true);
+        paint1.setDither(true);
+        path.reset();
+        path.moveTo(60 / 720.0f * width, 300 / 720.0f * width);
+        path.lineTo(508 / 720.0f * width, 360 / 720.0f * width);
+        path.lineTo(60 / 720.0f * width, 420 / 720.0f * width);
+        path.close();
+        paint1.setStyle(Paint.Style.FILL);
+        paint1.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        canvas.drawPath(path, paint1);
         return bitmap;
     }
 }
