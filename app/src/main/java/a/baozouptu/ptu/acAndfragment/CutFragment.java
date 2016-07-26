@@ -1,7 +1,7 @@
 package a.baozouptu.ptu.acAndfragment;
 
-import android.support.v4.app.Fragment;
-import android.widget.Button;
+
+import android.app.Fragment;
 
 /**
  * Created by Administrator on 2016/7/25.

@@ -280,7 +280,10 @@ public class IconBitmapCreator {
      * @return
      */
     public static Bitmap createReturnIcon(Context context, int w, int foregroundColor) {
-        Bitmap bitmap = Bitmap.createBitmap(w, (int) (w * (140f / 200)), Bitmap.Config.ARGB_8888);
+        w=(int)(w*0.55);
+        int h=w;
+        w=(int) (w * (140f / 200));
+        Bitmap bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
         int strokeWidth = 6;
@@ -289,8 +292,8 @@ public class IconBitmapCreator {
         paint.setDither(true);
         paint.setStrokeWidth(strokeWidth);
         paint.setColor(foregroundColor);
-        PointF p1 = new PointF(120f / 140 * w, 5f / 200 * w), p2 = new PointF(20f / 140 * w, 105f / 200 * w);
-        PointF p3 = new PointF(30f / 140 * w, 103f / 200 * w), p4 = new PointF(120f / 140 * w, 195f / 200 * w);
+        PointF p1 = new PointF(120f / 140 * w, 5f / 200 * h), p2 = new PointF(18f / 140 * w, 106f / 200 * h);
+        PointF p3 = new PointF(30f / 140 * w, 103f / 200 * h), p4 = new PointF(120f / 140 * w, 195f / 200 * h);
         canvas.drawLine(p1.x, p1.y, p2.x, p2.y, paint);
         canvas.drawLine(p3.x, p3.y, p4.x, p4.y, paint);
         return bitmap;

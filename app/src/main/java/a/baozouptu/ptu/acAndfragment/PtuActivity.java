@@ -14,15 +14,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.support.v7.widget.Toolbar;
 
@@ -32,13 +27,13 @@ import a.baozouptu.R;
 import a.baozouptu.base.dataAndLogic.AllDate;
 import a.baozouptu.ptu.repealRedo.RePealRedoList;
 import a.baozouptu.ptu.repealRedo.StepData;
-import a.baozouptu.ptu.view.IconBitmapCreator;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.FileTool;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.view.FloatImageView;
 import a.baozouptu.ptu.view.FloatTextView;
 import a.baozouptu.ptu.view.PtuFrameLayout;
+import a.baozouptu.ptu.view.PtuTopRealtiveLayout;
 import a.baozouptu.ptu.view.PtuView;
 
 public class PtuActivity extends AppCompatActivity implements MainFunctionFragment.Listen {
@@ -57,8 +52,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     static final int EDTI_MAT = 5;
     static final int EDIT_NO = 0;
 
-    Bitmap canRedoBm, canotRedoBm;
-    Bitmap canRepealBm, canotRepealBm;
     /**
      * 主功能的fragment
      */
@@ -68,6 +61,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     private MainFunctionFragment fragMain;
     private AddTextFragment fragText;
     private TietuFragment fragTietu;
+    private DrawFragment drawFrag;
     private PtuView ptuView;
     private PtuFrameLayout ptuFrame;
     /**
@@ -88,7 +82,13 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     private ImageButton redoBtn;
     private ImageButton repealBtn;
     private CutFragment cutFragment;
-    private LinearLayout topLinearLayout;
+    private PtuTopRealtiveLayout topRelativeLayout;
+    private ImageButton cancelBtn;
+    private ImageButton sureBtn;
+    private ImageButton goSendBtn;
+    private View returnBtn;
+    private View saveSetBtn;
+    private Fragment matFrag;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -170,37 +170,29 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         ptuView.setBackgroundColor(getResources().getColor(R.color.grey));
 
         int top_btn_width = AllDate.screenWidth / 8;
-        int smallDivider = (int) (AllDate.screenWidth * 5.0 / 112);
-        int bigDivider = (int) (AllDate.screenWidth * 7.5 / 112);
+        int smallDividerWidth = Util.dp2Px(16);
+        int bigDividerWidth = (int) (AllDate.screenWidth * 7.5 / 112);
 
-        topLinearLayout = (LinearLayout) findViewById(R.id.ptu_toolbar_linear);
+        topRelativeLayout = (PtuTopRealtiveLayout) findViewById(R.id.ptu_toolbar_relative);
 
-        addDivider(topLinearLayout, smallDivider);
-        //        Toolbar上的各个按钮
-        ImageButton cancel = createBaseToolbarBtn(top_btn_width);
-        cancel.setImageBitmap(IconBitmapCreator.createCancelBitmap(this,
-                top_btn_width,
-                Util.getColor(this, R.color.text_color1)));
-        cancel.setOnClickListener(new View.OnClickListener() {
+        //初始化中间的按钮
+        ImageButton[] btns = topRelativeLayout.createCenterView(top_btn_width, bigDividerWidth);
+        repealBtn = btns[0];
+        redoBtn = btns[1];
+        goSendBtn = btns[2];
+        repealBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ptuFrame.getChildCount() > 1) {
-                    ptuFrame.removeViewAt(1);
-                    changeFragment("main");
-                }
+                redoClick(repealBtn, redoBtn);
             }
         });
-        topLinearLayout.addView(cancel, new ViewGroup.LayoutParams(top_btn_width, top_btn_width));
-
-        initRepealRedoView(topLinearLayout, smallDivider, top_btn_width);
-
-        //去发送按钮
-        addDivider(topLinearLayout, smallDivider);
-        ImageButton goSend = createBaseToolbarBtn(top_btn_width);
-        goSend.setImageBitmap(IconBitmapCreator.createSendBitmap(this,
-                top_btn_width,
-                Util.getColor(this, R.color.text_color1)));
-        goSend.setOnClickListener(
+        redoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                repealClick(repealBtn, redoBtn);
+            }
+        });
+        goSendBtn.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -211,78 +203,47 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     }
                 }
         );
-        topLinearLayout.addView(goSend, new ViewGroup.LayoutParams(top_btn_width, top_btn_width));
 
-        addDivider(topLinearLayout, smallDivider);
-        ImageButton sure = createBaseToolbarBtn(top_btn_width);
-        sure.setImageBitmap(IconBitmapCreator.createSureBitmap(this,
-                top_btn_width,
-                Util.getColor(this, R.color.text_color1)));
-        sure.setOnClickListener(new View.OnClickListener() {
+        cancelBtn = topRelativeLayout.createCancel(top_btn_width, smallDividerWidth);
+        sureBtn = topRelativeLayout.createSure(top_btn_width, smallDividerWidth);
+        returnBtn = topRelativeLayout.createReturn(top_btn_width, smallDividerWidth);
+        saveSetBtn = topRelativeLayout.createSaveSet(top_btn_width, smallDividerWidth);
+
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancel();
+            }
+        });
+        returnBtn.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                }
+        );
+        saveSetBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveSet();
+            }
+        });
+        sureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sure();
             }
         });
-        topLinearLayout.addView(sure, new ViewGroup.LayoutParams(top_btn_width, top_btn_width));
 
-        addDivider(topLinearLayout, bigDivider);
+        topRelativeLayout.addReturn();
+        topRelativeLayout.addSaveSet();
+    }
+
+    private void saveSet() {
 
     }
 
-    private void initRepealRedoView(LinearLayout linearLayout, int smallerDividerWidth, int topBtnWidth) {
-        addDivider(linearLayout, smallerDividerWidth);
-        repealBtn = createBaseToolbarBtn(topBtnWidth);
-        canRepealBm = IconBitmapCreator.createRepealBitmap(this,
-                topBtnWidth,
-                Util.getColor(this, R.color.can_repeal_redo));
-        canotRepealBm = IconBitmapCreator.createRepealBitmap(PtuActivity.this,
-                topBtnWidth,
-                Util.getColor(PtuActivity.this, R.color.canot_repeal_redo));
-        repealBtn.setImageBitmap(canotRepealBm);
-        repealBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                redoClick(repealBtn, redoBtn);
-            }
-        });
-        linearLayout.addView(repealBtn, new ViewGroup.LayoutParams(topBtnWidth, topBtnWidth));
-
-        //设置repeal和redo的button
-        addDivider(linearLayout, smallerDividerWidth);
-        redoBtn = createBaseToolbarBtn(topBtnWidth);
-        canRedoBm = IconBitmapCreator.createRedoBitmap(PtuActivity.this,
-                topBtnWidth,
-                Util.getColor(PtuActivity.this, R.color.can_repeal_redo));
-        canotRedoBm = IconBitmapCreator.createRedoBitmap(PtuActivity.this,
-                topBtnWidth,
-                Util.getColor(PtuActivity.this, R.color.canot_repeal_redo));
-
-        redoBtn.setImageBitmap(canotRedoBm);
-        redoBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                repealClick(repealBtn, redoBtn);
-            }
-        });
-        linearLayout.addView(redoBtn, new ViewGroup.LayoutParams(topBtnWidth, topBtnWidth));
-
-
-    }
-
-    private void addDivider(LinearLayout linear, int width) {
-        FrameLayout fm = new FrameLayout(this);
-        fm.setLayoutParams(new ViewGroup.LayoutParams(
-                width, ViewGroup.LayoutParams.MATCH_PARENT));
-        linear.addView(fm);
-    }
-
-    private ImageButton createBaseToolbarBtn(int width) {
-        ImageButton button = new ImageButton(this);
-        button.setBackground(getResources().getDrawable(R.drawable.ptu_top_btn_background));
-        button.setLayoutParams(new ViewGroup.LayoutParams(width, width));
-        return button;
-    }
 
     private void setViewContent() {
         ptuFrame.getViewTreeObserver().addOnGlobalLayoutListener(
@@ -358,16 +319,8 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     }
 
     private void checkRepealRedo() {
-        if (rePealRedoList.canRedo()) {
-            redoBtn.setImageBitmap(canRedoBm);
-        } else {
-            redoBtn.setImageBitmap(canotRedoBm);
-        }
-        if (rePealRedoList.canRepeal()) {
-            repealBtn.setImageBitmap(canRepealBm);
-        } else {
-            repealBtn.setImageBitmap(canotRepealBm);
-        }
+        topRelativeLayout.setRedoStatusColor(rePealRedoList.canRedo());
+        topRelativeLayout.setRepealStatusColor(rePealRedoList.canRepeal());
     }
 
     private void addStepToView(StepData sd) {
@@ -429,6 +382,8 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     fm.beginTransaction().remove(currenFra).commit();
             case "cut":
 
+                currenFra = cutFragment;
+                CURRENT_EDIT_MODE = EDIT_TEXT;
                 break;
             case "text":
 
@@ -468,23 +423,31 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 break;
             case "draw":
 
+
+                currenFra = drawFrag;
+                CURRENT_EDIT_MODE = EDIT_TIETU;
                 break;
             case "mat":
 
+
+                currenFra = matFrag;
+                CURRENT_EDIT_MODE = EDIT_TIETU;
                 break;
         }
     }
 
     private void onReturnMainFunction() {
-        topLinearLayout.removeViewAt(0);
-        topLinearLayout.removeViewAt(1);
-        topLinearLayout.removeViewAt(2);
-//        topLinearLayout.addView();
+        topRelativeLayout.removeCancle();
+        topRelativeLayout.removeSure();
+        topRelativeLayout.addCancel();
+        topRelativeLayout.addSure();
     }
 
     private void onToSecondFunction() {
-
-
+        topRelativeLayout.removeReturn();
+        topRelativeLayout.removeSaveSet();
+        topRelativeLayout.addCancel();
+        topRelativeLayout.addSure();
     }
 
     @Override
@@ -585,6 +548,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         if (ptuFrame.getChildCount() > 1) {
             ptuFrame.removeViewAt(1);
         }
+        onReturnMainFunction();
         CURRENT_EDIT_MODE = EDIT_NO;
     }
 
@@ -610,5 +574,4 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             }
         }, 600);
     }
-
 }

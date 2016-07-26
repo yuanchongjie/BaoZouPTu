@@ -14,12 +14,19 @@
         android:fitsSystemWindows="true"
         app:contentInsetLeft="0dp"
         app:contentInsetStart="0dp">
-        <LinearLayout
-            android:id="@+id/ptu_toolbar_linear"
+        <a.baozouptu.ptu.view.PtuTopRealtiveLayout
+            android:id="@+id/ptu_toolbar_relative"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ptu_top_center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:orientation="horizontal">
+            </LinearLayout>
+        </a.baozouptu.ptu.view.PtuTopRealtiveLayout>
     </android.support.v7.widget.Toolbar>
 
     <a.baozouptu.ptu.view.PtuFrameLayout
