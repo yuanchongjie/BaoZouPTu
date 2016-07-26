@@ -22,17 +22,17 @@
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
 
-    <a.baozouptu.view.PtuFrameLayout
+    <a.baozouptu.ptu.view.PtuFrameLayout
         android:id="@+id/ptu_frame"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="85">
 
-        <a.baozouptu.view.PtuView
+        <a.baozouptu.ptu.view.PtuView
             android:id="@+id/ptu_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-    </a.baozouptu.view.PtuFrameLayout>
+    </a.baozouptu.ptu.view.PtuFrameLayout>
 
     <FrameLayout
         android:id="@+id/fragment_function"

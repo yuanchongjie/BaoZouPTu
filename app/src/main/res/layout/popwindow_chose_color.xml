@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
     <!--颜色选择条-->
-    <a.baozouptu.view.ColorBar
+    <a.baozouptu.ptu.view.ColorBar
         android:id="@+id/color_picker"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -20,17 +20,17 @@
         android:paddingLeft="5dp"
         android:paddingRight="5dp">
         <!--最近的颜色-->
-        <a.baozouptu.view.ColorLump
+        <a.baozouptu.ptu.view.ColorLump
             android:id="@+id/chosed_color"
             android:layout_width="35dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:paddingRight="@dimen/padding_function_item_image"/>
 
-        <a.baozouptu.view.HorizontalListView
+        <a.baozouptu.base.view.HorizontalListView
             android:id="@+id/color_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-        </a.baozouptu.view.HorizontalListView>
+        </a.baozouptu.base.view.HorizontalListView>
     </LinearLayout>
 </LinearLayout>
