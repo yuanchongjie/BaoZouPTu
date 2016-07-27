@@ -64,6 +64,7 @@ public class Activity2 extends AppCompatActivity {
             return mDatas.size();
         }
     }
+    //从github的devolop添加了一行
 
     private class MyViewHolder extends RecyclerView.ViewHolder {
         TextView tv;
