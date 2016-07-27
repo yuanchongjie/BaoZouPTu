@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <a.baozouptu.view.HorizontalListView
+    <a.baozouptu.base.view.HorizontalListView
         android:id="@+id/HorizontalListView_main_function"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

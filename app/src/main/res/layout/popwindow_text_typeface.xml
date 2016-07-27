@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_vertical">
-<a.baozouptu.view.HorizontalListView
+<a.baozouptu.base.view.HorizontalListView
     android:id="@+id/hList_text_type"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:dividerWidth="@dimen/padding_function_item_image">
-</a.baozouptu.view.HorizontalListView>
+</a.baozouptu.base.view.HorizontalListView>
 </LinearLayout>
