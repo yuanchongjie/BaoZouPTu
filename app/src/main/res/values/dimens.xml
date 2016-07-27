@@ -20,5 +20,6 @@
     <dimen name="color_lump_width">35dp</dimen>
     <dimen name="pading_3dp">3dp</dimen>
     <dimen name="top_btn_width">40dp</dimen>
+    <dimen name="padding_top_btn">15dp</dimen>
 
 </resources>

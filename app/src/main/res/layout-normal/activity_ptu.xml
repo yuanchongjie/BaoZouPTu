@@ -6,72 +6,40 @@
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
+        android:id="@+id/ptu_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/ptu_toolbar_background"
         android:clipToPadding="true"
         android:fitsSystemWindows="true"
         app:contentInsetLeft="0dp"
-        app:contentInsetStart="0dp"
-        android:background="@color/ptu_toolbar_background">
-
-        <ImageButton
-            android:id="@+id/cancel"
-            android:layout_width="@dimen/top_btn_width"
-            android:layout_height="@dimen/top_btn_width"
-            android:background="@drawable/top_btn_background"
-            android:paddingLeft="@dimen/padding_main_function"
-            android:paddingRight="@dimen/padding_main_function"
-            />
-        <ImageButton
-            android:id="@+id/sure"
-            android:layout_width="@dimen/top_btn_width"
-            android:layout_height="@dimen/top_btn_width"
-            android:background="@drawable/top_btn_background"
-            android:paddingLeft="@dimen/padding_main_function"
-            android:paddingRight="@dimen/padding_main_function"
-            />
-        <ImageButton
-            android:id="@+id/repeal"
-            android:layout_width="@dimen/top_btn_width"
-            android:layout_height="@dimen/top_btn_width"
-            android:background="@drawable/top_btn_background"
-            android:paddingRight="5dp"
-            />
-        <ImageButton
-            android:id="@+id/menu_go_send"
-            android:layout_width="@dimen/top_btn_width"
-            android:layout_height="@dimen/top_btn_width"
-            android:background="@drawable/top_btn_background"
-            android:paddingLeft="@dimen/padding_main_function"
-            android:paddingRight="@dimen/padding_main_function"
-            android:src="@drawable/ic_menu_send" />
-
-        <ImageButton
-            android:layout_width="@dimen/top_btn_width"
-            android:layout_height="@dimen/top_btn_width"
-            android:background="@drawable/top_btn_background"
-            android:paddingLeft="@dimen/padding_main_function"
-            android:paddingRight="@dimen/padding_main_function"
-            android:src="@drawable/ic_menu_share"
-
-            />
-
-        <Button
-            android:layout_width="wrap_content"
+        app:contentInsetStart="0dp">
+        <a.baozouptu.ptu.view.PtuTopRealtiveLayout
+            android:id="@+id/ptu_toolbar_relative"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="选项" />
+            android:orientation="horizontal">
+            <LinearLayout
+                android:id="@+id/ptu_top_center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:orientation="horizontal">
+            </LinearLayout>
+        </a.baozouptu.ptu.view.PtuTopRealtiveLayout>
     </android.support.v7.widget.Toolbar>
 
-    <a.baozouptu.view.PtuFrameLayout
+    <a.baozouptu.ptu.view.PtuFrameLayout
         android:id="@+id/ptu_frame"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="85">
-        <a.baozouptu.view.PtuView
+
+        <a.baozouptu.ptu.view.PtuView
             android:id="@+id/ptu_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </a.baozouptu.view.PtuFrameLayout>
+            android:layout_height="match_parent" />
+    </a.baozouptu.ptu.view.PtuFrameLayout>
 
     <FrameLayout
         android:id="@+id/fragment_function"

@@ -35,8 +35,11 @@
     <color name="text_chose_color">#ff5722</color>
     <color name="text_default_color">#ff111111</color>
 
+
+<!--ptu功能-->
+    <color name="can_repeal_redo">#ffff5722</color>
+    <color name="canot_repeal_redo">#80ffffff</color>
     <drawable name="dialog_background">#80ffffff</drawable>
     <drawable name="hou">#dcdcdc</drawable>
     <drawable name="qian">#039be5</drawable>
-
 </resources>
