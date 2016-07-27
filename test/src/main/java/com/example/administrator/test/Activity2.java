@@ -42,6 +42,7 @@ public class Activity2 extends AppCompatActivity {
         }
 
     }
+    //从github上面添加了一行
 
     /**
      * Created by Administrator on 2016/6/17.
