@@ -1,4 +1,4 @@
-package a.baozouptu.ptu.view;
+package a.baozouptu.ptu.tietu;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -12,10 +12,14 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import a.baozouptu.R;
+import a.baozouptu.ptu.Item;
+import a.baozouptu.ptu.repealRedo.TietuStepData;
+import a.baozouptu.ptu.view.IconBitmapCreator;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
+import a.baozouptu.ptu.FloatView;
 
 /**
  * Created by Administrator on 2016/6/30.
@@ -256,15 +260,15 @@ public class FloatImageView extends View implements FloatView {
 
     /**
      * @param picInitRatio ptuView上图片的初始缩放比例
-     * @return bundle.putString("path", mPath);
+     * @return bundle.putString("picPath", mPath);
      * <p> bundle.putInt("locationX", centerX - curTWidth / 2);
      * <p>bundle.putInt("locationY", centerY - curTHeight / 2);
      * <p>bundle.putParcelable("boundRectInPic",boundRectInPic);
-     * <p>bundle.putFloat("angle",totalRotateAngle);
+     * <p>bundle.putFloat("rotateAngle",totalRotateAngle);
      */
     public StepData getResultData(float picInitRatio) {
-        StepData sd = new StepData();
-        sd.path=mPath;
+        TietuStepData sd = new TietuStepData();
+        sd.picPath =mPath;
         int x = (int) ((centerX - curTWidth / 2 - picBoundRect.left) * 1.0 / picInitRatio);
         sd.locationX= x;
 
@@ -274,7 +278,7 @@ public class FloatImageView extends View implements FloatView {
         if ((centerX - picBoundRect.left) / picInitRatio == (boundRectInPic.left + boundRectInPic.right) / 2)
             Util.P.le("true");
         sd.boundRectInPic= boundRectInPic;
-        sd.angle=totalRotateAngle;
+        sd.rotateAngle =totalRotateAngle;
         return sd;
     }
 

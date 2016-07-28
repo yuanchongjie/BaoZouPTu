@@ -1,4 +1,4 @@
-package a.baozouptu.ptu;
+package a.baozouptu.ptu.draw;
 
 import android.content.DialogInterface;
 import android.os.Bundle;

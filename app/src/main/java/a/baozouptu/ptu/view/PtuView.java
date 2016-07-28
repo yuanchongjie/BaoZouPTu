@@ -2,9 +2,7 @@ package a.baozouptu.ptu.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -14,13 +12,14 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
 
 /**
  * 注意： 每次缩放要寻改的地方有三个，totalRatio，currentRatio,CURRENT_STATUS
  */
-public class PtuView extends View {
+public class PtuView extends View implements GestureImageView{
     String TAG = "PtuView";
     /**
      * 每次刷新0.0002倍
@@ -86,11 +85,11 @@ public class PtuView extends View {
     /**
      * 原图片的宽度,高度
      */
-    private int srcPicWidth=10, srcPicHeight=10;
+    private int srcPicWidth = 10, srcPicHeight = 10;
     /**
      * 右上角x坐标，y坐标，以view的右上角为原点，（0,0）
      */
-    private int picLeft=0,picTop=0;
+    private int picLeft = 0, picTop = 0;
     /**
      * 图片的局部，要现实出来的部分
      */
@@ -103,15 +102,6 @@ public class PtuView extends View {
     Rect dstRect = new Rect(1, 2, 3, 4);
 
     Paint picPaint = new Paint();
-    /**
-     * 显示到view上的bitmap，长宽为ptuView的总长，背景透明，刷新时会将背景刷新
-     */
-    Bitmap bitmapToview;
-    /**
-     * 将内容绘制到底图上，view再讲地图绘制到自己的canvas上面
-     * 其宽和高为view的宽和高
-     */
-    Canvas secondCanvas;
 
     private float initRatio = 1f;
     private Bitmap tempBitmap;
@@ -140,12 +130,11 @@ public class PtuView extends View {
      * @param finalRatio 缩放的比例
      */
     public Bitmap getFinalPicture(float finalRatio) {
-        if(finalRatio!=1.0) {
+        if (finalRatio != 1.0) {
             Bitmap bitmap = Bitmap.createScaledBitmap(sourceBitmap, (int) (srcPicWidth * finalRatio),
                     (int) (srcPicHeight * finalRatio), true);
             if (bitmap.equals(sourceBitmap))
                 sourceBitmap.recycle();
-            bitmapToview.recycle();
         }
         return sourceBitmap;
     }
@@ -159,19 +148,16 @@ public class PtuView extends View {
      * 获取原始bitmap的宽和高
      * <p>创建并设置好用于保存的Bitmap
      * <p>获取当前何种的Ratio
-     *
-     * @param bitmap
      */
-    public void setBitmapAndInit(Bitmap bitmap,int totalWidth,int totalHeight) {
-        sourceBitmap = bitmap;
-        sourceCanvas=new Canvas(sourceBitmap);
+    public void setBitmapAndInit(String path, int totalWidth, int totalHeight) {
+        sourceBitmap = BitmapTool.getLosslessBitmap(path);
+        if (sourceBitmap == null)
+            sourceBitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
+        sourceCanvas = new Canvas(sourceBitmap);
         srcPicWidth = sourceBitmap.getWidth();
         srcPicHeight = sourceBitmap.getHeight();
-        this.totalWidth=totalWidth;
-        this.totalHeight=totalHeight;
-        bitmapToview = Bitmap.createBitmap(totalWidth, totalHeight,
-                Config.ARGB_8888);//创建一个空图做底图
-        secondCanvas = new Canvas(bitmapToview);//设置drawCanvas为底图
+        this.totalWidth = totalWidth;
+        this.totalHeight = totalHeight;
         CURRENT_STATUS = STATUS_INIT;
     }
 
@@ -187,7 +173,6 @@ public class PtuView extends View {
         picLeft = (totalWidth - curPicWidth) / 2;
         picTop = (totalHeight - curPicHeight) / 2;
         getConvertParameter(curPicWidth, curPicHeight);
-        drawToBitmapToView();
     }
 
     @Override
@@ -215,11 +200,15 @@ public class PtuView extends View {
             case MotionEvent.ACTION_POINTER_DOWN:
                 Util.DoubleClick.cancel();//多个手指，或者移动了，双击取消
                 lastDis = GeoUtil.getDis(event.getX(0), event.getY(0), event.getX(1), event.getY(1));
+
+                //移动
+                lastX = (event.getX(0) + event.getX(1)) / 2;
+                lastY = (event.getY(0) + event.getY(1)) / 2;
             case MotionEvent.ACTION_MOVE:
                 Util.DoubleClick.cancel();
                 if (event.getPointerCount() == 1) {
                     CURRENT_STATUS = STATUS_MOVE;
-                    movePic(event.getX(), event.getY());
+                    move(event.getX(), event.getY());
                 } else {
                     float endD = GeoUtil.getDis(event.getX(0), event.getY(0), event.getX(1), event.getY(1));
                     float currentRatio = endD / lastDis;
@@ -227,14 +216,15 @@ public class PtuView extends View {
 
                     if (currentRatio > 1 - SCALE_FREQUENCE && currentRatio < 1 + SCALE_FREQUENCE)
                         return true;//本次缩放比例不够大
-                    if (totalRatio * currentRatio > MAX_RATIO ||
-                            totalRatio * currentRatio * srcPicWidth < totalWidth / 2
-                                    && totalRatio * currentRatio * srcPicHeight < totalHeight / 2)
-                        return true;//总的缩放比例超出了最大最小范围
+                    if (totalRatio * currentRatio > MAX_RATIO)
+                        return true;//总的缩放比例超出了最大范围
 
                     CURRENT_STATUS = STATUS_SCALE;
                     totalRatio *= currentRatio;
                     scalePic(event, currentRatio);
+
+                    //移动
+                    move((event.getX(0) + event.getX(1)) / 2, (event.getY(0) + event.getY(1)) / 2);
                 }
                 invalidate();
                 break;
@@ -244,6 +234,35 @@ public class PtuView extends View {
                     int index = event.getActionIndex() == 0 ? 1 : 0;
                     lastX = event.getX(index);
                     lastY = event.getY(index);
+                    //当缩小范围超过最小值时
+                    if (totalRatio * srcPicWidth < totalWidth / 2
+                            && totalRatio * srcPicHeight < totalHeight / 3) {
+                        float t=totalRatio;
+                        totalRatio = Math.min(totalWidth * 1.0f / 2 / srcPicWidth, totalHeight * 1.0f / 3 / srcPicHeight);
+                        CURRENT_STATUS = STATUS_SCALE;
+                        scale(totalWidth/2,totalHeight/2,totalRatio/t);
+                    }
+                }
+                if (event.getPointerCount() == 3) {
+                    int index = event.getActionIndex();
+
+                    int i0, i1;
+                    if (index == 0) {
+                        i0 = 1;
+                        i1 = 2;
+                    } else if (index == 1) {
+                        i0 = 0;
+                        i1 = 2;
+                    } else {
+                        i0 = 0;
+                        i1 = 1;
+                    }
+                    //缩放
+                    lastDis = GeoUtil.getDis(event.getX(i0), event.getY(i0), event.getX(i1), event.getY(i1));
+
+                    //移动
+                    lastX = (event.getX(i0) + event.getX(i1)) / 2;
+                    lastY = (event.getY(i0) + event.getY(i1)) / 2;
                 }
             default:
                 break;
@@ -251,8 +270,7 @@ public class PtuView extends View {
         return true;
     }
 
-    private void movePic(float curX, float curY) {
-
+    public void move(float curX, float curY) {
         int tx = picLeft;
         picLeft += curX - lastX;
         lastX = curX;
@@ -268,8 +286,11 @@ public class PtuView extends View {
         if (picLeft == tx && picTop == ty)//x，y方向都移动不了，就不移动的标志
             return;
         getConvertParameter((int) (srcPicWidth * totalRatio), (int) (srcPicHeight * totalRatio));
-        drawToBitmapToView();
         invalidate();
+    }
+
+    @Override
+    public void rotate(float angle) {
     }
 
     /**
@@ -292,6 +313,17 @@ public class PtuView extends View {
      * @param currentRatio
      */
     private void scalePic(float x1, float y1, float x2, float y2, float currentRatio) {
+        float scaleCenterX = (x1 + x2) / 2, scaleCenterY = (y1 + y2) / 2;
+        scale(scaleCenterX,scaleCenterY,currentRatio);
+    }
+
+    /**
+     *
+     * @param scaleCenterX
+     * @param scaleCenterY
+     * @param currentRatio
+     */
+    public void scale(float scaleCenterX, float scaleCenterY,float currentRatio) {
         // 获取当前图片的宽、高
         Util.P.le(TAG, "缩放图片开始");
         curPicWidth = (int) (srcPicWidth * totalRatio);
@@ -299,7 +331,6 @@ public class PtuView extends View {
 
         //如果某一边超出边界，则使用手指的中心，否则使用图片的中心
         //缩放中心随手指移动，因为缩放时双指同时移动也会导致图片移动，故不采用固定的缩放中心
-        float scaleCenterX = (x1 + x2) / 2, scaleCenterY = (y1 + y2) / 2;
 
         float x = GeoUtil.getScaledX(picLeft, picTop, scaleCenterX, scaleCenterY, currentRatio);
         float y = GeoUtil.getScaledY(picLeft, picTop, scaleCenterX, scaleCenterY, currentRatio);
@@ -314,7 +345,6 @@ public class PtuView extends View {
         else if (picTop > 0 && curPicHeight > totalHeight) picTop = 0;
 
         getConvertParameter(curPicWidth, curPicHeight);
-        drawToBitmapToView();
         invalidate();
         Util.P.le(TAG, "缩放完成");
     }
@@ -362,7 +392,6 @@ public class PtuView extends View {
      */
     @Override
     public void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
         switch (CURRENT_STATUS) {
             case STATUS_INIT:
                 initialDraw();
@@ -370,13 +399,24 @@ public class PtuView extends View {
             default:
                 break;
         }
-        BitmapDrawable bitmapDrawable = new BitmapDrawable(mContext.getResources(), bitmapToview);
-        bitmapDrawable.setBounds(0, 0, bitmapToview.getWidth(), bitmapToview.getHeight());
-        bitmapDrawable.setDither(true);
-        bitmapDrawable.setAntiAlias(true);
-        bitmapDrawable.setFilterBitmap(true);
-        bitmapDrawable.draw(canvas);//将底图绘制到View上面到
-        //canvas.drawBitmap(bitmapToview, matrix, null);
+        if (srcRect.right - srcRect.left > dstRect.right - dstRect.left) {
+            float ratio = (dstRect.right - dstRect.left) * 1.0f / (srcRect.right - srcRect.left);
+            matrix.reset();
+            matrix.setScale(ratio, ratio);
+            tempBitmap = Bitmap.createBitmap(sourceBitmap, srcRect.left, srcRect.top,
+                    srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, matrix, true);
+        } else {
+            tempBitmap = Bitmap.createBitmap(sourceBitmap, srcRect.left, srcRect.top,
+                    srcRect.right - srcRect.left, srcRect.bottom - srcRect.top);
+        }
+        tempDrawable = new BitmapDrawable(mContext.getResources(), tempBitmap);
+        tempDrawable.setDither(true);
+        tempDrawable.setAntiAlias(true);
+        tempDrawable.setFilterBitmap(true);
+        tempDrawable.setBounds(dstRect);
+        tempDrawable.draw(canvas);//将底图绘制到View上面到
+        tempBitmap.recycle();
+        super.onDraw(canvas);
     }
 
     /**
@@ -389,59 +429,38 @@ public class PtuView extends View {
         picLeft = (totalWidth - curPicWidth) / 2;
         picTop = (totalHeight - curPicHeight) / 2;
         getConvertParameter(curPicWidth, curPicHeight);
-        drawToBitmapToView();
         invalidate();
     }
 
-    private void drawToBitmapToView() {
-        bitmapToview.eraseColor(Color.alpha(00));
-        tempBitmap = Bitmap.createBitmap(sourceBitmap, srcRect.left, srcRect.top,
-                srcRect.right - srcRect.left, srcRect.bottom - srcRect.top);
-        tempDrawable = new BitmapDrawable(mContext.getResources(), tempBitmap);
-        tempDrawable.setDither(true);
-        tempDrawable.setAntiAlias(true);
-        tempDrawable.setFilterBitmap(true);
-        tempDrawable.setBounds(dstRect);
-        tempDrawable.draw(secondCanvas);
-        tempBitmap.recycle();
-    }
-
     /**
-     *  addBitmap以及缩放的bitmap会立即回收
-     * @param addBitmap    需要添加的floatBitmap的局部
-     * @param boundRect rect代表view有效区域在底图上的位置的rect，相对于原始图片的左上角上下左右边的距离
+     * addBitmap以及缩放的bitmap会立即回收
+     *
+     * @param addBitmap   需要添加的floatBitmap的局部
+     * @param boundRect   rect代表view有效区域在底图上的位置的rect，相对于原始图片的左上角上下左右边的距离
      * @param rotateAngle 浮动视图旋转的角度
      */
     public void addBitmap(Bitmap addBitmap, RectF boundRect, float rotateAngle) {
-        int width=(int)(boundRect.right-boundRect.left);
-        int height=(int)(boundRect.bottom-boundRect.top);
-        Bitmap realBm=null;
-        if(addBitmap.getWidth()!=width){
-            realBm= Bitmap.createScaledBitmap(addBitmap,width,height,true);
-            addBitmap.recycle();
-        }else {
-            realBm=addBitmap;
-        }
 
-        float centerX=(boundRect.left+boundRect.right)/2,centerY=(boundRect.bottom+boundRect.top)/2;
-        //将realBm到图上
-        BitmapDrawable addDrawable = new BitmapDrawable(mContext.getResources(), realBm);
-        addDrawable.setDither(true);
-        addDrawable.setAntiAlias(true);
-        addDrawable.setFilterBitmap(true);
-        sourceCanvas.rotate(rotateAngle,centerX,centerY);//旋转
-        addDrawable.setBounds(GeoUtil.rectF2Rect(boundRect));
-        addDrawable.draw(sourceCanvas);
-        sourceCanvas.save();
-        sourceCanvas.restore();
-
-        addBitmap.recycle();
         resetDraw();
+    }
+
+    /**
+     * 将原始的图片换掉
+     *
+     * @param newBm
+     */
+    public void replaceSourceBm(Bitmap newBm) {
+        sourceBitmap.recycle();
+        sourceBitmap = newBm;
+        srcPicWidth = sourceBitmap.getWidth();
+        srcPicHeight = sourceBitmap.getHeight();
+        CURRENT_STATUS = STATUS_INIT;
+        invalidate();
     }
 
     @Override
     protected void onDetachedFromWindow() {
-        bitmapToview.recycle();
+        tempBitmap.recycle();
         sourceBitmap.recycle();
         super.onDetachedFromWindow();
     }

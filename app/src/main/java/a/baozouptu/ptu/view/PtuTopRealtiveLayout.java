@@ -92,9 +92,9 @@ public class PtuTopRealtiveLayout extends RelativeLayout {
     }
 
     public void addReturn() {
-        RelativeLayout.LayoutParams params=new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.CENTER_VERTICAL);
-        addView(returnLayout,params);
+        addView(returnLayout, params);
     }
 
     public void removeReturn() {
@@ -146,7 +146,10 @@ public class PtuTopRealtiveLayout extends RelativeLayout {
         removeView(sure);
     }
 
-    public void setRepealStatusColor(boolean canRepeal) {
+    /**
+     * @param canRepeal 能否撤销
+     */
+    public void setRepealBtnColor(boolean canRepeal) {
         if (canRepeal) {
             repealBtn.setImageBitmap(canRepealBm);
         } else {
@@ -154,7 +157,10 @@ public class PtuTopRealtiveLayout extends RelativeLayout {
         }
     }
 
-    public void setRedoStatusColor(boolean canRedo) {
+    /**
+     * 能否重做
+     */
+    public void setRedoBtnColor(boolean canRedo) {
         if (canRedo) {
             redoBtn.setImageBitmap(canRedoBm);
         } else {

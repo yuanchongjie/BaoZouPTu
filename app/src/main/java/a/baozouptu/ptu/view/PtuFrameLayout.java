@@ -10,6 +10,9 @@ import android.widget.FrameLayout;
 
 import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
+import a.baozouptu.ptu.FloatView;
+import a.baozouptu.ptu.addtext.FloatTextView;
+import a.baozouptu.ptu.tietu.FloatImageView;
 
 /**
  * 重绘子视图是一个重要的功能，应该写得简洁有力
