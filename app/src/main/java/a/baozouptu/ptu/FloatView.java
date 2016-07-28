@@ -1,9 +1,7 @@
-package a.baozouptu.ptu.view;
+package a.baozouptu.ptu;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.RectF;
-import android.support.annotation.Nullable;
 
 /**
  * Created by Administrator on 2016/5/31.
@@ -26,21 +24,6 @@ public interface FloatView {
      */
     int STATUS_INPUT = 4;
 
-    /**
-     * 表示item信息的类
-     */
-    class Item {
-        float x;
-        float y;
-        String name;
-        Bitmap bitmap;
-
-        Item(float x, float y, String name) {
-            this.x = x;
-            this.y = y;
-            this.name = name;
-        }
-    }
 
     /**
      * 获取中的宽度

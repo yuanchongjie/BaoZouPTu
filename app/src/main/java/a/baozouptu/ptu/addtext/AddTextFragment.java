@@ -1,4 +1,4 @@
-package a.baozouptu.ptu.acAndfragment;
+package a.baozouptu.ptu.addtext;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -21,9 +21,10 @@ import android.widget.Toast;
 import a.baozouptu.R;
 import a.baozouptu.base.dataAndLogic.AllDate;
 import a.baozouptu.base.util.Util;
+import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.ptu.view.ColorBar;
 import a.baozouptu.ptu.view.ColorLump;
-import a.baozouptu.ptu.view.FloatTextView;
+import a.baozouptu.ptu.addtext.FloatTextView;
 import a.baozouptu.base.view.HorizontalListView;
 import a.baozouptu.base.view.MySwitchButton;
 

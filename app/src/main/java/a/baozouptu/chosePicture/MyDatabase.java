@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import a.baozouptu.chosePicture.MySQLiteOpenHandler;
+
 /**
  * 一定注意，使用这个类时，使用完了关闭数据库
  */

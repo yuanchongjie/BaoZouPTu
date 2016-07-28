@@ -5,7 +5,7 @@ import java.util.List;
 
 import a.baozouptu.base.dataAndLogic.AsyncImageLoader3;
 import a.baozouptu.base.dataAndLogic.AllDate;
-import a.baozouptu.ptu.acAndfragment.PtuActivity;
+import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.base.util.FileTool;
 
 import android.app.AlertDialog;
@@ -44,8 +44,8 @@ import a.baozouptu.base.util.Util;
  * 显示所选的最近的或某个文件夹下面的所有图片
  * 并且有选择文件夹，相机，空白图画图的功能
  */
-public class ShowPictureActivity extends AppCompatActivity {
-    private static final String DEBUG_TAG = "ShowPictureActivity";
+public class ChosePictureActivity extends AppCompatActivity {
+    private static final String DEBUG_TAG = "ChosePictureActivity";
     /**
      * 进度条
      */
@@ -108,7 +108,7 @@ public class ShowPictureActivity extends AppCompatActivity {
         usuPicProcess = new ProcessUsualyPicPath(this, handler);
         getScreenWidth();
         initView();
-        m_ProgressDialog = ProgressDialog.show(ShowPictureActivity.this, "请稍后",
+        m_ProgressDialog = ProgressDialog.show(ChosePictureActivity.this, "请稍后",
                 "数据读取中...", true);
         initPicInfo();
     }
@@ -138,7 +138,7 @@ public class ShowPictureActivity extends AppCompatActivity {
      */
     private void disposeShowPicture() {
         picAdpter = new GridViewAdapter(
-                ShowPictureActivity.this, currentPicPathList);
+                ChosePictureActivity.this, currentPicPathList);
         pictureGridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
@@ -149,7 +149,7 @@ public class ShowPictureActivity extends AppCompatActivity {
                     String s = sourceIntent.getAction();
                     if (s != null) {
                         if (s.equals("notify_text")) {
-                            Intent intent = new Intent(ShowPictureActivity.this, PtuActivity.class);
+                            Intent intent = new Intent(ChosePictureActivity.this, PtuActivity.class);
                             intent.putExtra("action", "text");
                             intent.putExtra("picPath", currentPicPathList.get(position));
                             startActivityForResult(intent, 0);
@@ -157,10 +157,10 @@ public class ShowPictureActivity extends AppCompatActivity {
                             Intent intent1 = new Intent();
                             intent1.putExtra("picPath", currentPicPathList.get(position));
                             setResult(3, intent1);
-                            ShowPictureActivity.this.finish();
+                            ChosePictureActivity.this.finish();
                         }
                     }else{//正常的选择
-                        Intent intent = new Intent(ShowPictureActivity.this, PtuActivity.class);
+                        Intent intent = new Intent(ChosePictureActivity.this, PtuActivity.class);
                         intent.putExtra("picPath", currentPicPathList.get(position));
                         startActivity(intent);
                     }
@@ -209,8 +209,8 @@ public class ShowPictureActivity extends AppCompatActivity {
         pictureGridview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-                final PopupWindow popWindowFile = new PopupWindow(ShowPictureActivity.this);
-                LinearLayout linearLayout = new LinearLayout(ShowPictureActivity.this);
+                final PopupWindow popWindowFile = new PopupWindow(ChosePictureActivity.this);
+                LinearLayout linearLayout = new LinearLayout(ChosePictureActivity.this);
                 linearLayout.setOrientation(LinearLayout.HORIZONTAL);
                 linearLayout.setGravity(Gravity.CENTER);
                 linearLayout.setDividerPadding(10);
@@ -219,7 +219,7 @@ public class ShowPictureActivity extends AppCompatActivity {
                         new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                                 WindowManager.LayoutParams.WRAP_CONTENT));
 
-                TextView textView = new TextView(ShowPictureActivity.this);
+                TextView textView = new TextView(ChosePictureActivity.this);
                 textView.setTextSize(25);
                 textView.setGravity(Gravity.CENTER);
                 textView.setWidth(view.getWidth() / 2);
@@ -255,7 +255,7 @@ public class ShowPictureActivity extends AppCompatActivity {
                 }
                 linearLayout.addView(textView);
 
-                TextView deleteTextView = new TextView(ShowPictureActivity.this);
+                TextView deleteTextView = new TextView(ChosePictureActivity.this);
                 deleteTextView.setTextSize(25);
                 deleteTextView.setGravity(Gravity.CENTER);
                 deleteTextView.setText("删除");
@@ -301,7 +301,7 @@ public class ShowPictureActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
 //                        先从文件中删除，不能删除则不行
                         if (!usuPicProcess.deleteOnePicInfile(path)) {
-                            AlertDialog alertDialog1 = new AlertDialog.Builder(ShowPictureActivity.this)
+                            AlertDialog alertDialog1 = new AlertDialog.Builder(ChosePictureActivity.this)
                                     .setTitle("删除失败，此图片不能删除")
                                     .setPositiveButton("确定", new AlertDialog.OnClickListener() {
                                         @Override
@@ -415,7 +415,7 @@ public class ShowPictureActivity extends AppCompatActivity {
         AsyncImageLoader3 asyLoader3 = AsyncImageLoader3.getInstatnce();
 
         private LayoutInflater layoutInflater = LayoutInflater
-                .from(ShowPictureActivity.this);
+                .from(ChosePictureActivity.this);
 
         @Override
         public int getCount() {
@@ -487,7 +487,7 @@ public class ShowPictureActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (data != null) {
-            String path = data.getStringExtra("path");
+            String path = data.getStringExtra("picPath");
             String newPath = data.getStringExtra("newPath");
             if (path != null) {
                 usuPicProcess.addUsedPath(path);

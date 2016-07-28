@@ -1,6 +1,5 @@
 package a.baozouptu.ptu.repealRedo;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -9,25 +8,25 @@ import java.util.ListIterator;
  */
 
 public class RePealRedoList<T> extends LinkedList<T> {
-    private ListIterator<T> listIt = listIterator();
+    private ListIterator<T> curIdIter = listIterator();
     //撤销重做的最大步数
     private static int maxStep = 5;
     private boolean hasChangePic;
     private int pointer;
     public boolean canRepeal() {
-        return listIt.hasPrevious();
+        return curIdIter.hasPrevious();
     }
 
     public int getCurrentPoint() {
-        return listIt.previousIndex();
+        return curIdIter.previousIndex();
     }
 
     public boolean canRedo() {
-        return listIt.hasNext();
+        return curIdIter.hasNext();
     }
 
     public T redo() {
-        return listIt.next();
+        return curIdIter.next();
     }
 
     /**
@@ -36,10 +35,10 @@ public class RePealRedoList<T> extends LinkedList<T> {
      * @param t
      */
     public void addStep(T t){
-        while(listIt.hasNext()){
-            listIt.remove();
+        while(curIdIter.hasNext()){
+            curIdIter.remove();
         }
-        listIt.add(t);
+        curIdIter.add(t);
         if(size()>maxStep) {
             hasChangePic=true;
             remove(0);
@@ -50,7 +49,7 @@ public class RePealRedoList<T> extends LinkedList<T> {
      * 开始前移,将当前指针前移，后面撤销时就处理到指针位置时
      */
     public void startRepeal() {
-        listIt.previous();
+        curIdIter.previous();
     }
 
     /**
