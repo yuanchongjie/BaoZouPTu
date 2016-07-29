@@ -34,7 +34,7 @@ public class Activity2 extends AppCompatActivity {
         recyclerView.setAdapter(mAdapter = new HomeAdapter());
         recyclerView.addItemDecoration(new DividerGridItemDecoration(this));
     }
-
+//从github上添加的内容
     private void initData() {
         mDatas = new ArrayList<>();
         for (int i = 'A'; i < 'Z'+50; i++) {
