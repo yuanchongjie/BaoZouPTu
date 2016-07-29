@@ -83,7 +83,8 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
      */
     private String picPath = null;
     private FloatTextView floatTextView;
-    private RepealRedoManager repealRedoManager = new RepealRedoManager(6);
+    private final int MAX_STEP=10;
+    private RepealRedoManager repealRedoManager = new RepealRedoManager(MAX_STEP);
     private float finalRatio = 1;
     private Intent resultIntent = new Intent();
 
@@ -151,7 +152,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         }
 
         if (!new File(picPath).exists()) {
-            ptuView.setBitmapAndInit(picPath,200, 200);
+            ptuView.setBitmapAndInit(picPath, 200, 200);
             AlertDialog.Builder builder = new AlertDialog.Builder(PtuActivity.this);
             builder.setTitle("图片加载失败");
             builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
@@ -196,20 +197,20 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         repealBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bigRedo();
+                bigRepeal();
             }
         });
         redoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bigRepeal();
+                bigRedo();
             }
         });
         goSendBtn.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (ptuFrame.getChildCount() > 1)
+                        if (CURRENT_EDIT_MODE != EDIT_NO)
                             sure();
                         resultIntent.setAction("finish");
                         savePtuView();
@@ -245,7 +246,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         sureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(CURRENT_EDIT_MODE!=EDIT_NO)
+                if (CURRENT_EDIT_MODE != EDIT_NO)
                     sure();
             }
         });
@@ -258,13 +259,14 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     }
 
-
     private void setViewContent() {
         ptuFrame.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
                         ptuView.setBitmapAndInit(picPath, ptuFrame.getWidth(), ptuFrame.getHeight());
+                        repealRedoManager.setBaseBm(ptuView.getSourceBm()
+                                .copy(Bitmap.Config.ARGB_8888,true));
                         ptuFrame.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                         Intent intent = getIntent();
                         final String action = intent.getStringExtra("action");
@@ -286,51 +288,57 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 });
     }
 
+
+    /*************************************************************
+     * repealRedo部分
+     *************************************************/
+
     private void addStep(Bitmap bm, StepData sd) {
         switch (sd.EDIT_MODE) {
             case EDIT_CUT:
-                CutFragment.addBigStep(bm,sd);
+                CutFragment.addBigStep(bm, sd);
                 break;
             case EDIT_TEXT:
-                AddTextFragment.addBigStep(bm,sd);
+                AddTextFragment.addBigStep(bm, sd);
                 break;
             case EDIT_TIETU:
-                FloatImageView.addBigStep(bm,sd);
+                FloatImageView.addBigStep(bm, sd);
                 break;
             case EDIT_DRAW:
-                DrawFragment.addBigStep(bm,sd);
+                DrawFragment.addBigStep(bm, sd);
                 break;
         }
-        checkRepealRedo();
+
     }
 
-    private void bigRepeal(){
-        if(repealRedoManager.canRepeal()) {
-            ptuView.resetDraw();
+    private void bigRepeal() {
+        if (repealRedoManager.canRepeal()) {
             ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.show();
 
+            repealRedoManager.repeal();
             ptuView.releaseSource();
             Bitmap newSourceBm = repealRedoManager.getBaseBitmap().
-                    copy(Bitmap.Config.ARGB_8888,true);
+                    copy(Bitmap.Config.ARGB_8888, true);
             ptuView.replaceSourceBm(newSourceBm);
 
             int index = repealRedoManager.getCurrentIndex();
-            for (int i = 0; i < index; i++) {
+            for (int i = 0; i <= index; i++) {
                 StepData sd = repealRedoManager.getStepdata(i);
                 addStep(newSourceBm, sd);
             }
-            ptuView.invalidate();
+            ptuView.resetDraw();
             progressDialog.dismiss();
+            checkRepealRedo();
         }
     }
 
     public void bigRedo() {
-        if(repealRedoManager.canRedo()) {
-            ptuView.resetDraw();
+        if (repealRedoManager.canRedo()) {
             Bitmap sourceBm = ptuView.getSourceBm();
             addStep(sourceBm, repealRedoManager.redo());
-            ptuView.invalidate();
+            ptuView.resetDraw();
+            checkRepealRedo();
         }
     }
 
@@ -339,12 +347,25 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         topRelativeLayout.setRepealBtnColor(repealRedoManager.canRepeal());
     }
 
+
+    public void setRedoBtnColor(boolean canRedo) {
+        topRelativeLayout.setRedoBtnColor(canRedo);
+    }
+
+    /**
+     * @param canRepeal 能否撤销
+     */
+    public void setRepealBtnColor(boolean canRepeal) {
+        topRelativeLayout.setRepealBtnColor(canRepeal);
+    }
+
+    /**************************************************************************************************************/
+
     //
     //观察Fragment的生命周期，
     // （1）是否Activity创建，不管有没有添加，都会执行
     //(2)执行不同的FragmentTransetion事务其反应如何
     //
-
     private void initFragment() {
         mainFrg = new MainFunctionFragment();
         fm = getFragmentManager();
@@ -401,7 +422,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
                 currentFra = drawFrag;
                 CURRENT_EDIT_MODE = EDIT_TIETU;
-            } else if (function.equals(NAME_MAT)){
+            } else if (function.equals(NAME_MAT)) {
 
 
                 currentFra = matFrag;
@@ -428,42 +449,12 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     }
 
     /**
-     * view的显示在图片上的部分的截图
-     *
-     * @param view
-     * @param innerRect view的显示在图片上的部分的区域
-     * @return view的显示在图片上的部分的截图
-     */
-    private Bitmap getInnerBmFromView(View view, RectF innerRect) {
-        final Bitmap[] innerBitmap = new Bitmap[1];
-        try {
-
-            view.setDrawingCacheEnabled(true);
-            view.buildDrawingCache();
-            Bitmap viewBitmap = view.getDrawingCache();
-            innerBitmap[0] = Bitmap.createBitmap(viewBitmap, (int) innerRect.left, (int) innerRect.top,
-                    (int) (innerRect.right - innerRect.left), (int) (innerRect.bottom - innerRect.top));//获取floatview内部的内容
-
-            viewBitmap.recycle();
-        } catch (OutOfMemoryError e) {
-            innerBitmap[0].recycle();
-            Util.T(this, "内存超限");
-            e.printStackTrace();
-        }
-        Util.P.le(TAG, "getInnerBmFromView完成");
-        return innerBitmap[0];
-    }
-
-    /**
      * 回到主功能界面时,如果是从子功能回来，
      * （1）会添加子功能的view级参数到撤销重做list中。
      * （2）移除浮动图，获取浮动图的图片显示到putview上面
      * 注意sure会使用延时，不要在它后面字节写函数
      */
     private void sure() {
-        if (CURRENT_EDIT_MODE == EDIT_NO) {
-
-        }
         if (CURRENT_EDIT_MODE == EDIT_CUT) {
         }//添加文字
         else if (CURRENT_EDIT_MODE == EDIT_TEXT) {
@@ -481,7 +472,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                             new ViewTreeObserver.OnGlobalLayoutListener() {
                                 @Override
                                 public void onGlobalLayout() {
-                                    Bitmap textBitmap = getInnerBmFromView(floatTextView, innerRect);
+                                    Bitmap textBitmap = RepealRedoManager.getInnerBmFromView(floatTextView, innerRect);
                                     ptuView.addBitmap(textBitmap, boundRectInPic, 0);
 
                                     TextStepData tsd = new TextStepData(EDIT_TEXT);
@@ -489,31 +480,44 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                                     tsd.innerRect = innerRect;
                                     tsd.boundRectInPic = boundRectInPic;
 
+                                    //释放，删除等部分
+                                    textBitmap.recycle();
                                     floatTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                                     ptuFrame.removeViewAt(1);
+
                                     afterSure(tsd);
                                 }
                             });
         } //贴图
         else if (CURRENT_EDIT_MODE == EDIT_TIETU) {
-            TietuStepData ttsd = (TietuStepData)tietuFrag.getResultData(finalRatio);
-            ttsd.EDIT_MODE = EDIT_NO;
-            Bitmap source = tietuFrag.getResultBm(finalRatio);
 
+            TietuStepData ttsd = (TietuStepData) tietuFrag.getResultData(finalRatio);
+            ttsd.EDIT_MODE = EDIT_TIETU;
+            Bitmap source = tietuFrag.getResultBm(finalRatio);
             ptuView.addBitmap(source,
                     ttsd.boundRectInPic,
                     ttsd.rotateAngle);
+
+            //释放，删除等部分
             ptuFrame.removeViewAt(1);
             tietuFrag.releaseResourse();
+
             afterSure(ttsd);
-        } else if (CURRENT_EDIT_MODE == EDIT_DRAW) {
+        } //绘图
+        else if (CURRENT_EDIT_MODE == EDIT_DRAW) {
 
         }
     }
 
+    /**
+     * 将步骤数据提交，如果步数超限，则让BaseBitmap前进一步
+     * @param sd
+     */
     private void afterSure(StepData sd) {
-        repealRedoManager.commit(sd);
-        addStep(repealRedoManager.getBaseBitmap(),sd);
+        StepData resd=repealRedoManager.commit(sd);
+        if (resd!=null)//超限了，爸最开始的的一步添加到基图上
+            addStep(repealRedoManager.getBaseBitmap(), resd);
+        checkRepealRedo();
         cancel();
     }
 
@@ -553,14 +557,5 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 PtuActivity.this.finish();
             }
         }, 600);
-    }
-    public void setRedoBtnColor(boolean canRedo) {
-        topRelativeLayout.setRedoBtnColor(canRedo);
-    }
-    /**
-     * @param canRepeal 能否撤销
-     */
-    public void setRepealBtnColor(boolean canRepeal) {
-        topRelativeLayout.setRepealBtnColor(canRepeal);
     }
 }

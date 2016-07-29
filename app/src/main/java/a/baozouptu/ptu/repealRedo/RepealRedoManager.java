@@ -37,20 +37,28 @@ public class RepealRedoManager {
      * 提交操作，返回是否需要超出最大步数，
      * <p>超出则删除最列表开始的stepData，
      * <p>然后需要将BaseBitmap前进一步，
+     *
      * @param sd
      * @return
      */
-    public boolean commit(StepData sd){
-        while(iter.hasNext()){
+    public StepData commit(StepData sd) {
+        while (iter.hasNext()) {
             iter.next();
             iter.remove();
         }
         iter.add(sd);
-        if(stepList.size()>maxStep){
-            stepList.remove(0);
-            return true;
+        if (stepList.size() > maxStep) {
+            while(iter.hasPrevious()){
+                iter.previous();
+            }
+            StepData resd=iter.next();
+            iter.remove();
+            while(iter.hasNext()){
+                iter.next();
+            }
+            return resd;
         }
-        return false;
+        return null;
     }
 
     public Bitmap getBaseBitmap() {
@@ -118,16 +126,14 @@ public class RepealRedoManager {
      * @param innerRect view的显示在图片上的部分的区域
      * @return view的显示在图片上的部分的截图
      */
-    public  static Bitmap getInnerBmFromView(View view, RectF innerRect) {
+    public static Bitmap getInnerBmFromView(View view, RectF innerRect) {
         final Bitmap[] innerBitmap = new Bitmap[1];
         try {
-
-            view.setDrawingCacheEnabled(true);
-            view.buildDrawingCache();
-            Bitmap viewBitmap = view.getDrawingCache();
+            Bitmap viewBitmap = Bitmap.createBitmap(view.getWidth(),view.getHeight(),
+                    Bitmap.Config.ARGB_8888);
+            view.draw(new Canvas(viewBitmap));
             innerBitmap[0] = Bitmap.createBitmap(viewBitmap, (int) innerRect.left, (int) innerRect.top,
                     (int) (innerRect.right - innerRect.left), (int) (innerRect.bottom - innerRect.top));//获取floatview内部的内容
-
             viewBitmap.recycle();
         } catch (OutOfMemoryError e) {
             innerBitmap[0].recycle();
@@ -141,4 +147,11 @@ public class RepealRedoManager {
         return stepList.get(i);
     }
 
+    public void setBaseBm(Bitmap baseBitmap) {
+        this.baseBitmap = baseBitmap;
+    }
+
+    public void repeal() {
+        iter.previous();
+    }
 }

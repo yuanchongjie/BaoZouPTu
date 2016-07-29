@@ -422,7 +422,7 @@ public class PtuView extends View implements GestureImageView{
 
     /**
      * 比较常用的方法，将图片还原到开始的位置，即长边与父布局长边对齐
-     * <p>将基本参数还原到初始化状态,可用于撤销重做等
+     * <p>基本参数还原到初始化状态,可用于撤销重做等
      */
     public void resetDraw() {
         totalRatio = initRatio;
