@@ -15,6 +15,7 @@ import android.view.View;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
+import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 
 /**
  * 注意： 每次缩放要寻改的地方有三个，totalRatio，currentRatio,CURRENT_STATUS
@@ -421,6 +422,7 @@ public class PtuView extends View implements GestureImageView{
 
     /**
      * 比较常用的方法，将图片还原到开始的位置，即长边与父布局长边对齐
+     * <p>将基本参数还原到初始化状态,可用于撤销重做等
      */
     public void resetDraw() {
         totalRatio = initRatio;
@@ -440,12 +442,12 @@ public class PtuView extends View implements GestureImageView{
      * @param rotateAngle 浮动视图旋转的角度
      */
     public void addBitmap(Bitmap addBitmap, RectF boundRect, float rotateAngle) {
-
+        sourceCanvas= RepealRedoManager.addBm2Canvas(sourceCanvas,addBitmap,boundRect,rotateAngle);
         resetDraw();
     }
 
     /**
-     * 将原始的图片换掉
+     * 将原始的图片换掉,并且粗话的显示出来
      *
      * @param newBm
      */
@@ -454,14 +456,23 @@ public class PtuView extends View implements GestureImageView{
         sourceBitmap = newBm;
         srcPicWidth = sourceBitmap.getWidth();
         srcPicHeight = sourceBitmap.getHeight();
-        CURRENT_STATUS = STATUS_INIT;
-        invalidate();
+        sourceCanvas=new Canvas(sourceBitmap);
     }
 
     @Override
     protected void onDetachedFromWindow() {
-        tempBitmap.recycle();
-        sourceBitmap.recycle();
+        releaseSource();
         super.onDetachedFromWindow();
+    }
+
+    /**
+     * 释放资源，目前只有SourceBitmap一个
+     */
+    public void releaseSource(){
+        sourceBitmap.recycle();
+    }
+
+    public Bitmap getSourceBm() {
+        return sourceBitmap;
     }
 }

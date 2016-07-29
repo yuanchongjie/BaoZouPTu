@@ -31,6 +31,20 @@ public class AllDate {
      */
     public final static int PIC_FILE_SIZE_MAX = 40000;
 
+    public static int CURRENT_EDIT_MODE = 0;
+    public static final int EDIT_NO = 0;
+    public static final int EDIT_CUT = 1;
+    /**
+     * 包含三个元素
+     * sd.floatTextView = floatTextView;
+     * sd.innerRect = innerRect;
+     * sd.boundRectInPic = boundRectInPic;
+     */
+    public static final int EDIT_TEXT = 2;
+    public static final int EDIT_TIETU = 3;
+    public static final int EDIT_DRAW = 4;
+    public static final int EDTI_MAT = 5;
+
     public static int text_defualt_color;
     public static int text_choosed_color;
     private static Context globleContext = Util.MyApplication.getAppContext();

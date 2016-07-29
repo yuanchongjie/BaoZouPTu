@@ -36,10 +36,11 @@ import a.baozouptu.ptu.control.MainFunctionFragment;
 import a.baozouptu.ptu.cut.CutFragment;
 import a.baozouptu.ptu.draw.DrawFragment;
 import a.baozouptu.ptu.mat.MatFragment;
-import a.baozouptu.ptu.repealRedo.RePealRedoList;
+import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TextStepData;
 import a.baozouptu.ptu.repealRedo.TietuStepData;
+import a.baozouptu.ptu.tietu.FloatImageView;
 import a.baozouptu.ptu.tietu.TietuFragment;
 import a.baozouptu.ptu.view.PtuFrameLayout;
 import a.baozouptu.ptu.view.PtuTopRealtiveLayout;
@@ -82,7 +83,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
      */
     private String picPath = null;
     private FloatTextView floatTextView;
-    private RePealRedoList<StepData> rePealRedoList = new RePealRedoList<>();
+    private RepealRedoManager repealRedoManager = new RepealRedoManager(6);
     private float finalRatio = 1;
     private Intent resultIntent = new Intent();
 
@@ -195,13 +196,13 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         repealBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                redo(repealBtn, redoBtn);
+                bigRedo();
             }
         });
         redoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                repeal(repealBtn, redoBtn);
+                bigRepeal();
             }
         });
         goSendBtn.setOnClickListener(
@@ -285,106 +286,57 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 });
     }
 
-    private void addStep(StepData sd) {
-        rePealRedoList.addStep(sd);
-        checkRepealRedo();
-    }
-
-    private void repeal(ImageButton repealBtn, ImageButton btn) {
-        switch (CURRENT_EDIT_MODE) {
-            case EDIT_NO:
-                repeal();
-                break;
-            case EDIT_DRAW:
-                drawFrag.repeal();
-                break;
-            case EDIT_TIETU:
-                tietuFrag.repeal();
-                break;
-        }
-    }
-
-    private void redoMainFunction() {
-        StepData sd = rePealRedoList.redo();
+    private void addStep(Bitmap bm, StepData sd) {
         switch (sd.EDIT_MODE) {
             case EDIT_CUT:
+                CutFragment.addBigStep(bm,sd);
                 break;
             case EDIT_TEXT:
-                Bitmap textBitmap = getInnerBmFromView(((TextStepData)sd).floatTextView, sd.innerRect);
-                ptuView.addBitmap(textBitmap, sd.boundRectInPic, 0);
+                AddTextFragment.addBigStep(bm,sd);
                 break;
             case EDIT_TIETU:
-                ptuView.addBitmap(BitmapTool.getLosslessBitmap(((TietuStepData)sd).picPath),sd.boundRectInPic,sd.rotateAngle);
+                FloatImageView.addBigStep(bm,sd);
                 break;
             case EDIT_DRAW:
-                break;
-        }
-        hasChanged = true;
-    }
-
-
-    public void repeal() {
-        rePealRedoList.startRepeal();
-        ProgressDialog progressDialog=new ProgressDialog(this);
-        progressDialog.show();
-
-        ptuView.resetDraw();
-        int pointer = rePealRedoList.getCurrentPoint();
-        for (int i = 0; i < pointer; i++) {
-            StepData sd = rePealRedoList.get(i);
-            addStepToView(sd);
-        }
-        progressDialog.dismiss();
-        checkRepealRedo();
-    }
-
-    public void redo() {
-
-    }
-
-    public StepData getResultBm(float ratio) {
-        return null;
-    }
-
-    private void addStepToView(StepData sd) {
-        switch (sd.EDIT_MODE) {
-            case EDIT_CUT:
-                break;
-            case EDIT_TEXT:
-                TextStepData tsd=(TextStepData)sd;
-                Bitmap textBitmap = getInnerBmFromView(tsd.floatTextView, sd.innerRect);
-                ptuView.addBitmap(textBitmap, tsd.boundRectInPic, 0);
-                break;
-            case EDIT_TIETU:
-                TietuStepData ttsd=(TietuStepData)sd;
-                Bitmap source = BitmapTool.getLosslessBitmap(ttsd.picPath);
-                ptuView.addBitmap(source,
-                        ttsd.boundRectInPic,
-                        ttsd.rotateAngle);
-                break;
-            case EDIT_DRAW:
-                break;
-        }
-        hasChanged = true;
-    }
-
-    private void redo(ImageButton repealBtn, ImageButton btn) {
-        switch (CURRENT_EDIT_MODE) {
-            case EDIT_NO:
-                redoMainFunction();
-                break;
-            case EDIT_DRAW:
-                drawFrag.redo();
-                break;
-            case EDIT_TIETU:
-                tietuFrag.redo();
+                DrawFragment.addBigStep(bm,sd);
                 break;
         }
         checkRepealRedo();
     }
+
+    private void bigRepeal(){
+        if(repealRedoManager.canRepeal()) {
+            ptuView.resetDraw();
+            ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.show();
+
+            ptuView.releaseSource();
+            Bitmap newSourceBm = repealRedoManager.getBaseBitmap().
+                    copy(Bitmap.Config.ARGB_8888,true);
+            ptuView.replaceSourceBm(newSourceBm);
+
+            int index = repealRedoManager.getCurrentIndex();
+            for (int i = 0; i < index; i++) {
+                StepData sd = repealRedoManager.getStepdata(i);
+                addStep(newSourceBm, sd);
+            }
+            ptuView.invalidate();
+            progressDialog.dismiss();
+        }
+    }
+
+    public void bigRedo() {
+        if(repealRedoManager.canRedo()) {
+            ptuView.resetDraw();
+            Bitmap sourceBm = ptuView.getSourceBm();
+            addStep(sourceBm, repealRedoManager.redo());
+            ptuView.invalidate();
+        }
+    }
+
     private void checkRepealRedo() {
-        topRelativeLayout.setRedoBtnColor(rePealRedoList.canRedo());
-        topRelativeLayout.setRepealBtnColor(rePealRedoList.canRepeal());
+        topRelativeLayout.setRedoBtnColor(repealRedoManager.canRedo());
+        topRelativeLayout.setRepealBtnColor(repealRedoManager.canRepeal());
     }
 
     //
@@ -560,7 +512,8 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     }
 
     private void afterSure(StepData sd) {
-        addStep(sd);
+        repealRedoManager.commit(sd);
+        addStep(repealRedoManager.getBaseBitmap(),sd);
         cancel();
     }
 

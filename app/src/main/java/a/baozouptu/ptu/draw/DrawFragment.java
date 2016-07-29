@@ -39,4 +39,8 @@ public class DrawFragment extends Fragment implements DrawBaseFunction {
     public void releaseResourse() {
 
     }
+
+    public static void addBigStep(Bitmap bm, StepData sd) {
+
+    }
 }

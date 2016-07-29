@@ -1,6 +1,7 @@
 package a.baozouptu.ptu.addtext;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -22,6 +23,9 @@ import a.baozouptu.R;
 import a.baozouptu.base.dataAndLogic.AllDate;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.PtuActivity;
+import a.baozouptu.ptu.repealRedo.RepealRedoManager;
+import a.baozouptu.ptu.repealRedo.StepData;
+import a.baozouptu.ptu.repealRedo.TextStepData;
 import a.baozouptu.ptu.view.ColorBar;
 import a.baozouptu.ptu.view.ColorLump;
 import a.baozouptu.ptu.addtext.FloatTextView;
@@ -44,6 +48,14 @@ public class AddTextFragment extends Fragment {
     private FunctionPopWindowBuilder textPopupBuilder;
     private FloatTextView floatTextView;
     private Typeface curTypeface = Typeface.MONOSPACE;
+
+
+    public static void addBigStep(Bitmap bm, StepData sd) {
+        TextStepData tsd=(TextStepData)sd;
+        Bitmap textBitmap = RepealRedoManager.getInnerBmFromView(tsd.floatTextView, sd.innerRect);
+        RepealRedoManager.addBm2Bm(bm,textBitmap,tsd.boundRectInPic,tsd.rotateAngle);
+        textBitmap.recycle();
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -110,6 +122,7 @@ public class AddTextFragment extends Fragment {
         this.floatTextView = floatView;
         floatTextView.setTypeface(Typeface.DEFAULT);
     }
+
 
     /**
      * 创建添加文字模块功能区的功能操作视图

@@ -13,6 +13,7 @@ import android.view.View;
 
 import a.baozouptu.R;
 import a.baozouptu.ptu.Item;
+import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.repealRedo.TietuStepData;
 import a.baozouptu.ptu.view.IconBitmapCreator;
 import a.baozouptu.ptu.repealRedo.StepData;
@@ -463,5 +464,12 @@ public class FloatImageView extends View implements FloatView {
         sourceBitmap.recycle();
         tietuDitu.recycle();
         tempBitmap.recycle();
+    }
+
+    public static void addBigStep(Bitmap bm, StepData sd) {
+        TietuStepData ttsd=(TietuStepData)sd;
+        Bitmap imageBitmap=BitmapTool.getLosslessBitmap(ttsd.picPath);
+        RepealRedoManager.addBm2Bm(bm,imageBitmap,sd.boundRectInPic,sd.rotateAngle);
+        imageBitmap.recycle();
     }
 }
