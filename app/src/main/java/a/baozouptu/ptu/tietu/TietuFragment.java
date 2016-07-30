@@ -1,4 +1,4 @@
-package a.baozouptu.ptu.acAndfragment;
+package a.baozouptu.ptu.tietu;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -22,17 +21,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import a.baozouptu.R;
-import a.baozouptu.chosePicture.ShowPictureActivity;
+import a.baozouptu.chosePicture.ChosePictureActivity;
 import a.baozouptu.base.dataAndLogic.AllDate;
 import a.baozouptu.base.dataAndLogic.AsyncImageLoader3;
 import a.baozouptu.chosePicture.MyDatabase;
 import a.baozouptu.base.util.Util;
-import a.baozouptu.ptu.view.FloatImageView;
+import a.baozouptu.ptu.BaseFunction;
+import a.baozouptu.ptu.repealRedo.StepData;
 
 /**
  * Created by Administrator on 2016/7/1.
  */
-public class TietuFragment extends Fragment {
+public class TietuFragment extends Fragment implements BaseFunction {
     private static String TAG="TietuFragment";
     private FloatImageView floatImageView;
     Context mContext;
@@ -98,7 +98,7 @@ public class TietuFragment extends Fragment {
         more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(mContext,ShowPictureActivity.class);
+                Intent intent=new Intent(mContext,ChosePictureActivity.class);
                 intent.setAction("tietu");
                 startActivityForResult(intent,1);
             }
@@ -143,11 +143,29 @@ public class TietuFragment extends Fragment {
         });
     }
 
-    public static void redo(ImageButton btn) {
+    @Override
+    public void repeal() {
+
     }
 
-    public static void repeal(ImageButton btn) {
+    @Override
+    public void redo() {
 
+    }
+
+    @Override
+    public Bitmap getResultBm(float ratio) {
+        return floatImageView.getSourceBitmap() ;
+    }
+
+    @Override
+    public StepData getResultData(float ratio) {
+        return floatImageView.getResultData(ratio);
+    }
+
+    @Override
+    public void releaseResourse() {
+        floatImageView.releaseResourse();
     }
 }
 

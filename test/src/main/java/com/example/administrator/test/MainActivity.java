@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,14 +18,14 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private List<String> mDatas;
-    private RecyclerView recyclerView;
-    private HomeAdapter mAdapter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        LinearLayout linearLayout=(LinearLayout)findViewById(R.id.layout_anim_test);
+
+    }
+}/*
         ImageView click=(ImageView)findViewById(R.id.click_test);
         click.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /**
+    *//**
      * Created by Administrator on 2016/6/17.
-     */
+     *//*
     public class HomeAdapter extends RecyclerView.Adapter<MyViewHolder> {
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -80,3 +81,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
+*/

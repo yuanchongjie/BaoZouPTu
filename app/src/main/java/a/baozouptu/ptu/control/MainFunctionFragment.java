@@ -1,4 +1,4 @@
-package a.baozouptu.ptu.acAndfragment;
+package a.baozouptu.ptu.control;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -44,7 +44,7 @@ public class MainFunctionFragment extends Fragment {
     private Listen listen;
 
     public interface Listen {
-        void changeFragment(String function);
+        void switchFragment(String function);
     }
 
     @Override
@@ -72,31 +72,31 @@ public class MainFunctionFragment extends Fragment {
         cutFunction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listen.changeFragment("cut");
+                listen.switchFragment("cut");
             }
         });
         textFunction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listen.changeFragment("text");
+                listen.switchFragment("text");
             }
         });
         tietuFunction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listen.changeFragment("tietu");
+                listen.switchFragment("tietu");
             }
         });
         huituFunction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listen.changeFragment("huitu");
+                listen.switchFragment("huitu");
             }
         });
         koutuFunction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listen.changeFragment("koutu");
+                listen.switchFragment("koutu");
             }
         });
 

@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import a.baozouptu.R;
-import a.baozouptu.chosePicture.ShowPictureActivity;
-import a.baozouptu.ptu.TuyaActivity;
+import a.baozouptu.chosePicture.ChosePictureActivity;
+import a.baozouptu.ptu.draw.TuyaActivity;
 import a.baozouptu.base.dataAndLogic.AllDate;
 import a.baozouptu.chosePicture.MyDatabase;
 import a.baozouptu.chosePicture.ProcessUsualyPicPath;
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         DisplayMetrics metric = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metric);
         AllDate.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
-        Intent intent = new Intent(this, ShowPictureActivity.class);
+        Intent intent = new Intent(this, ChosePictureActivity.class);
         startActivity(intent);
         sendNotify();
     }
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 getSystemService(Context.NOTIFICATION_SERVICE);
 
         // 第二步：定义Notification
-        Intent intent = new Intent(this, ShowPictureActivity.class);
+        Intent intent = new Intent(this, ChosePictureActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
         intent.setAction("notify_text");
 
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .setAction("Action", null).show();
                 break;
             case R.id.fab1:
-                Intent intent = new Intent(this, ShowPictureActivity.class);
+                Intent intent = new Intent(this, ChosePictureActivity.class);
                 startActivity(intent);
                 break;
             case R.id.fab2:

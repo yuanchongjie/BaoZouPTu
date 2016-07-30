@@ -1,4 +1,4 @@
-package a.baozouptu.ptu.view;
+package a.baozouptu.ptu.addtext;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -22,6 +22,10 @@ import java.util.ArrayList;
 import a.baozouptu.R;
 import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
+import a.baozouptu.ptu.Item;
+import a.baozouptu.ptu.view.IconBitmapCreator;
+import a.baozouptu.ptu.FloatView;
+import a.baozouptu.ptu.view.PtuFrameLayout;
 
 /**
  * 添加textView的顶部视图
@@ -237,7 +241,8 @@ public class FloatTextView extends EditText implements FloatView {
             rimColor = mContext.getResources().getColor(R.color.float_rim_color, null);
             itemColor = mContext.getResources().getColor(R.color.float_item_color, null);
         } else {
-            rimColor = mContext.getResources().getColor(R.color.float_rim_color);
+            rimColor = mContext.getResources().
+                    getColor(R.color.float_rim_color);
             itemColor = mContext.getResources().getColor(R.color.float_item_color);
         }
         items.add(null);//第0个
