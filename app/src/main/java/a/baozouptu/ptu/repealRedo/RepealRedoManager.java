@@ -1,6 +1,5 @@
 package a.baozouptu.ptu.repealRedo;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.RectF;
@@ -48,6 +47,7 @@ public class RepealRedoManager {
         }
         iter.add(sd);
         if (stepList.size() > maxStep) {
+            hasChangePic=true;
             while(iter.hasPrevious()){
                 iter.previous();
             }
@@ -153,5 +153,19 @@ public class RepealRedoManager {
 
     public void repeal() {
         iter.previous();
+    }
+
+    /**
+     * 待用
+     * @return
+     */
+    public boolean hasChangePic(){
+        if(hasChangePic==true)
+            return true;
+        else if(getCurrentIndex()!=0){
+            return true;
+        }else {
+            return false;
+        }
     }
 }

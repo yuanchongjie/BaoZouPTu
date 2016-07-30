@@ -193,7 +193,7 @@ public class PtuView extends View implements GestureImageView{
                         CURRENT_STATUS = STATUS_SCALE;
                         scalePic(event.getX(), event.getY(), event.getX(), event.getY(), curRatio);
                     } else {
-                        resetDraw();
+                        resetShow();
                     }
                     invalidate();
                 }
@@ -424,7 +424,7 @@ public class PtuView extends View implements GestureImageView{
      * 比较常用的方法，将图片还原到开始的位置，即长边与父布局长边对齐
      * <p>基本参数还原到初始化状态,可用于撤销重做等
      */
-    public void resetDraw() {
+    public void resetShow() {
         totalRatio = initRatio;
         curPicWidth = (int) (srcPicWidth * totalRatio);
         curPicHeight = (int) (srcPicHeight * totalRatio);
@@ -443,11 +443,12 @@ public class PtuView extends View implements GestureImageView{
      */
     public void addBitmap(Bitmap addBitmap, RectF boundRect, float rotateAngle) {
         sourceCanvas= RepealRedoManager.addBm2Canvas(sourceCanvas,addBitmap,boundRect,rotateAngle);
-        resetDraw();
+        resetShow();
     }
 
     /**
-     * 将原始的图片换掉,并且粗话的显示出来
+     * 将原始的图片换掉,并且回收原始图片的资源，
+     * 不显示出来
      *
      * @param newBm
      */

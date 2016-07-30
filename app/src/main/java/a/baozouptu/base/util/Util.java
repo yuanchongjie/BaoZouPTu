@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Build;
+import android.support.annotation.ColorRes;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -149,7 +150,7 @@ public class Util {
         return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
-    public static int getColor(Context context, int id) {
+    public static int getColor(Context context, @ColorRes int id) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             return context.getResources().getColor(id, null);
         return context.getResources().getColor(id);

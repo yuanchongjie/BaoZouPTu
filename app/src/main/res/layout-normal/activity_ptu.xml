@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@drawable/ptu_background">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/ptu_toolbar"
@@ -13,7 +14,8 @@
         android:clipToPadding="true"
         android:fitsSystemWindows="true"
         app:contentInsetLeft="0dp"
-        app:contentInsetStart="0dp">
+        app:contentInsetStart="0dp"
+        >
         <a.baozouptu.ptu.view.PtuTopRealtiveLayout
             android:id="@+id/ptu_toolbar_relative"
             android:layout_width="match_parent"
@@ -24,7 +26,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:background="#0000">
             </LinearLayout>
         </a.baozouptu.ptu.view.PtuTopRealtiveLayout>
     </android.support.v7.widget.Toolbar>
@@ -33,17 +36,20 @@
         android:id="@+id/ptu_frame"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="85">
+        android:layout_weight="85"
+        android:background="#0000">
 
         <a.baozouptu.ptu.view.PtuView
             android:id="@+id/ptu_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:background="#0000"/>
     </a.baozouptu.ptu.view.PtuFrameLayout>
 
     <FrameLayout
         android:id="@+id/fragment_function"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="10" />
+        android:layout_weight="10"
+        android:background="#0000" />
 </LinearLayout>
