@@ -18,10 +18,23 @@ import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 
 /**
+ * 内部原理：添加什么东西上去就在sourceBitmap上面添加（用了一个全局的sourceCanvas，除此之外，此canvas不起其它作用）
+ * <P>绘图时，根据手势会改变相应的参数，然后根据相应的参数，到sourceBitmap上面剪切一个子图下来，用BitmapDrawable显示出来</P>
+ * <p>sourceBitmap可能会被替换，此时尺寸大小也可能会被改变</p>
  * 注意： 每次缩放要寻改的地方有三个，totalRatio，currentRatio,CURRENT_STATUS
  */
 public class PtuView extends View implements GestureImageView{
     String TAG = "PtuView";
+
+    public void setCanRotate(boolean canRotate) {
+        this.canRotate = canRotate;
+    }
+
+    public boolean isCanRotate() {
+        return canRotate;
+    }
+
+    boolean canRotate=false;
     /**
      * 每次刷新0.0002倍
      */
@@ -296,9 +309,6 @@ public class PtuView extends View implements GestureImageView{
 
     /**
      * 要先计算出totalRatio
-     *
-     * @param event
-     * @param currentRatio
      */
     private void scalePic(MotionEvent event, float currentRatio) {
         scalePic(event.getX(0), event.getY(0), event.getX(1), event.getY(1), currentRatio);
@@ -306,24 +316,13 @@ public class PtuView extends View implements GestureImageView{
 
     /**
      * 要先计算出totalRatio
-     *
-     * @param x1
-     * @param y1
-     * @param x2
-     * @param y2
-     * @param currentRatio
+     * <p>参数是两个手指所在点的位置</p>
      */
     private void scalePic(float x1, float y1, float x2, float y2, float currentRatio) {
         float scaleCenterX = (x1 + x2) / 2, scaleCenterY = (y1 + y2) / 2;
         scale(scaleCenterX,scaleCenterY,currentRatio);
     }
 
-    /**
-     *
-     * @param scaleCenterX
-     * @param scaleCenterY
-     * @param currentRatio
-     */
     public void scale(float scaleCenterX, float scaleCenterY,float currentRatio) {
         // 获取当前图片的宽、高
         Util.P.le(TAG, "缩放图片开始");
@@ -358,8 +357,6 @@ public class PtuView extends View implements GestureImageView{
      * <p>绘画时用到的矩形，原图裁剪矩形srcRect，在画布上的位置矩形dstRect
      * <p/>
      *
-     * @param curPicWidth
-     * @param curPicHeight
      */
     private void getConvertParameter(int curPicWidth, int curPicHeight) {
         Util.P.le(TAG, "获取参数开始");
@@ -380,9 +377,7 @@ public class PtuView extends View implements GestureImageView{
 
 
     /**
-     * 图片在PtuFrameLayout上的相对位置
-     *
-     * @return
+     * @return 图片在PtuFrameLayout上的相对位置
      */
     public Rect getBound() {
         return dstRect;
@@ -449,8 +444,6 @@ public class PtuView extends View implements GestureImageView{
     /**
      * 将原始的图片换掉,并且回收原始图片的资源，
      * 不显示出来
-     *
-     * @param newBm
      */
     public void replaceSourceBm(Bitmap newBm) {
         sourceBitmap.recycle();

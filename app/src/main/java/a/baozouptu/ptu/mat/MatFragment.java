@@ -1,8 +1,16 @@
 package a.baozouptu.ptu.mat;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
+import a.baozouptu.R;
 import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.repealRedo.StepData;
 
@@ -10,6 +18,49 @@ import a.baozouptu.ptu.repealRedo.StepData;
  * Created by Administrator on 2016/7/26.
  */
 public class MatFragment extends Fragment implements BaseFunction {
+    private Context mContext;
+    private LinearLayout shape;
+    private LinearLayout mear;
+    private LinearLayout pen;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mContext=getActivity();
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view=inflater.inflate(R.layout.fragment_mat,null);
+        pen = (LinearLayout)view.findViewById(R.id.mat_pen);
+        mear = (LinearLayout)view.findViewById(R.id.mat_smear);
+        shape = (LinearLayout)view.findViewById(R.id.mat_shape);
+        setCkick();
+        return view;
+    }
+
+    private void setCkick() {
+        pen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        mear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        shape.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+    }
+
     @Override
     public void repeal() {
 
@@ -34,4 +85,5 @@ public class MatFragment extends Fragment implements BaseFunction {
     public void releaseResourse() {
 
     }
+
 }

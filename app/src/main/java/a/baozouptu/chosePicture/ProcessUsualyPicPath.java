@@ -298,7 +298,7 @@ public class ProcessUsualyPicPath {
                         .getColumnIndex(MediaStore.Images.Media.DATA));
                 long modifyTime = cursor.getLong(cursor
                         .getColumnIndex(MediaStore.Images.Media.DATE_MODIFIED)) * 1000;// 最近修改时间
-                if (5000 < size && size < 16000000) {// 图片符合条件
+                if (AllDate.PIC_FILE_SIZE_MIN < size && size < AllDate.PIC_FILE_SIZE_MAX) {// 图片符合条件
                     sortPictureList.add(new Pair(-modifyTime, path));
                     String parentPath = path.substring(0,
                             path.lastIndexOf('/'));

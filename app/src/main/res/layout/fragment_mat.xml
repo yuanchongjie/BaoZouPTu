@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 
     <HorizontalScrollView
         android:layout_width="wrap_content"
@@ -17,8 +16,9 @@
             android:orientation="horizontal"
             android:paddingBottom="@dimen/padding_function_item_image"
             android:paddingTop="2dp">
+
             <LinearLayout
-                android:id="@+id/main_function_cut"
+                android:id="@+id/mat_pen"
                 android:layout_width="@dimen/function_width"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -31,70 +31,20 @@
                     android:paddingLeft="@dimen/padding_function_item_image"
                     android:paddingRight="@dimen/padding_function_item_image"
                     android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/edit" />
+                    android:src="@mipmap/pen" />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="裁剪旋转"
-                    android:textColor="@color/text_color1"
-                    android:textSize="@dimen/text_size_main_function" />
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/main_function_text"
-                android:layout_width="@dimen/function_width"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="2"
-                    android:paddingBottom="@dimen/padding_function_item_image"
-                    android:paddingLeft="@dimen/padding_function_item_image"
-                    android:paddingRight="@dimen/padding_function_item_image"
-                    android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/function_text" />
-
-                <TextView
-                    android:layout_width="@dimen/function_width"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="文字"
-                    android:textColor="@color/text_color1"
-                    android:textSize="@dimen/text_size_main_function" />
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/main_function_tietu"
-                android:layout_width="@dimen/function_width"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="2"
-                    android:paddingBottom="@dimen/padding_function_item_image"
-                    android:paddingLeft="@dimen/padding_function_item_image"
-                    android:paddingRight="@dimen/padding_function_item_image"
-                    android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/tietu" />
-
-                <TextView
-                    android:layout_width="@dimen/function_width"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="贴图"
+                    android:text="@string/pen"
                     android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/main_function_huitu"
+                android:id="@+id/mat_smear"
                 android:layout_width="@dimen/function_width"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -107,19 +57,20 @@
                     android:paddingLeft="@dimen/padding_function_item_image"
                     android:paddingRight="@dimen/padding_function_item_image"
                     android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/pencil" />
+                    android:src="@mipmap/smear" />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="绘图"
+                    android:text="@string/swear"
                     android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
+
             <LinearLayout
-                android:id="@+id/main_function_mat"
+                android:id="@+id/mat_shape"
                 android:layout_width="@dimen/function_width"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -132,14 +83,14 @@
                     android:paddingLeft="@dimen/padding_function_item_image"
                     android:paddingRight="@dimen/padding_function_item_image"
                     android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/mat" />
+                    android:src="@mipmap/shape" />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="抠图"
+                    android:text="@string/shape"
                     android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>

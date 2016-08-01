@@ -60,7 +60,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     static final int EDIT_TEXT = 2;
     static final int EDIT_TIETU = 3;
     static final int EDIT_DRAW = 4;
-    static final int EDTI_MAT = 5;
+    static final int EDIT_MAT = 5;
 
     /**
      * 主功能的fragment
@@ -302,34 +302,64 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     }
 
     private void bigRepeal() {
-        if (repealRedoManager.canRepeal()) {
-            ProgressDialog progressDialog = new ProgressDialog(this);
-            progressDialog.show();
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        switch (CURRENT_EDIT_MODE) {
+            case EDIT_NO:
+                if (repealRedoManager.canRepeal()) {
 
-            repealRedoManager.repeal();
-            ptuView.releaseSource();
-            Bitmap newSourceBm = repealRedoManager.getBaseBitmap().
-                    copy(Bitmap.Config.ARGB_8888, true);
-            ptuView.replaceSourceBm(newSourceBm);
+                    repealRedoManager.repeal();
+                    ptuView.releaseSource();
+                    Bitmap newSourceBm = repealRedoManager.getBaseBitmap().
+                            copy(Bitmap.Config.ARGB_8888, true);
+                    ptuView.replaceSourceBm(newSourceBm);
 
-            int index = repealRedoManager.getCurrentIndex();
-            for (int i = 0; i <= index; i++) {
-                StepData sd = repealRedoManager.getStepdata(i);
-                addStep(newSourceBm, sd);
-            }
-            ptuView.resetShow();
-            progressDialog.dismiss();
-            checkRepealRedo();
+                    int index = repealRedoManager.getCurrentIndex();
+                    for (int i = 0; i <= index; i++) {
+                        StepData sd = repealRedoManager.getStepdata(i);
+                        addStep(newSourceBm, sd);
+                    }
+                    ptuView.resetShow();
+                }
+                break;
+            case EDIT_DRAW:
+                drawFrag.repeal();
+                break;
+            case EDIT_TIETU:
+                tietuFrag.repeal();
+                break;
+            case EDIT_MAT:
+                matFrag.repeal();
+                break;
         }
+        progressDialog.dismiss();
+        checkRepealRedo();
     }
 
     public void bigRedo() {
-        if (repealRedoManager.canRedo()) {
-            Bitmap sourceBm = ptuView.getSourceBm();
-            addStep(sourceBm, repealRedoManager.redo());
-            ptuView.resetShow();
-            checkRepealRedo();
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        switch (CURRENT_EDIT_MODE) {
+            case EDIT_NO:
+                if (repealRedoManager.canRedo()) {
+                    Bitmap sourceBm = ptuView.getSourceBm();
+                    addStep(sourceBm, repealRedoManager.redo());
+                    ptuView.resetShow();
+                    checkRepealRedo();
+                }
+                break;
+            case EDIT_TIETU:
+                tietuFrag.redo();
+                break;
+            case EDIT_DRAW:
+                drawFrag.redo();
+                break;
+            case EDIT_MAT:
+                matFrag.redo();
+                break;
         }
+        progressDialog.dismiss();
+        checkRepealRedo();
     }
 
     private void checkRepealRedo() {
@@ -416,7 +446,14 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     CURRENT_EDIT_MODE = EDIT_TIETU;
                     break;
                 case NAME_MAT:
-
+                    if (matFrag == null) {
+                        matFrag = new MatFragment();
+                    }
+                    fm.beginTransaction()
+                            .setCustomAnimations(R.animator.slide_bottom_in, R.animator.slide_bottom_out,
+                                    R.animator.slide_bottom_in, R.animator.slide_bottom_out)
+                            .replace(R.id.fragment_function, matFrag)
+                            .commit();
 
                     CURRENT_EDIT_MODE = EDIT_TIETU;
                     break;

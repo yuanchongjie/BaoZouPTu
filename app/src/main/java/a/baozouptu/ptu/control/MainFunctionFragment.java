@@ -38,7 +38,7 @@ public class MainFunctionFragment extends Fragment {
     /**
      * 代表主功能的组件,抠图
      */
-    private LinearLayout koutuFunction;
+    private LinearLayout matFunction;
 
     private View view;
     private Listen listen;
@@ -93,10 +93,10 @@ public class MainFunctionFragment extends Fragment {
                 listen.switchFragment("huitu");
             }
         });
-        koutuFunction.setOnClickListener(new View.OnClickListener() {
+        matFunction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listen.switchFragment("koutu");
+                listen.switchFragment("mat");
             }
         });
 
@@ -107,6 +107,6 @@ public class MainFunctionFragment extends Fragment {
         textFunction = (LinearLayout) view.findViewById(R.id.main_function_text);
         tietuFunction = (LinearLayout) view.findViewById(R.id.main_function_tietu);
         huituFunction = (LinearLayout) view.findViewById(R.id.main_function_huitu);
-        koutuFunction = (LinearLayout) view.findViewById(R.id.main_function_koutu);
+        matFunction = (LinearLayout) view.findViewById(R.id.main_function_mat);
     }
 }

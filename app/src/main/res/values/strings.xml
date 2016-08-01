@@ -7,5 +7,8 @@
     <string name="title_activity_main">lol表情</string>
     <string name="open">zzzz</string>
     <string name="close">zzs</string>
+    <string name="pen">钢笔</string>
+    <string name="shape">形状</string>
+    <string name="swear">涂抹</string>
 
 </resources>

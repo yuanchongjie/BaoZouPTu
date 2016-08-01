@@ -16,6 +16,7 @@ import a.baozouptu.R;
  * Created by Administrator on 2016/5/19.
  */
 public class Util {
+    private static MyApplication gloableContext;
     public static int dp2Px(Context context, float dp) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
@@ -47,6 +48,7 @@ public class Util {
             // TODO Auto-generated method stub
             super.onCreate();
             mcontext = this;
+            gloableContext=this;
         }
 
         public static Context getAppContext() {
@@ -154,5 +156,10 @@ public class Util {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             return context.getResources().getColor(id, null);
         return context.getResources().getColor(id);
+    }
+    public static int getColor(@ColorRes int id){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            return gloableContext.getResources().getColor(id, null);
+        return gloableContext.getResources().getColor(id);
     }
 }
