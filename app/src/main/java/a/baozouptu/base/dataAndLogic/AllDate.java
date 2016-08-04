@@ -25,11 +25,11 @@ public class AllDate {
     /**
      * 图片内存最小值 5K
      */
-    public final static int PIC_FILE_SIZE_MIN = 5;
+    public final static int PIC_FILE_SIZE_MIN = 1;
     /**
-     * 图片内存最大值 6000K
+     * 图片内存最大值 80000K=80M
      */
-    public final static int PIC_FILE_SIZE_MAX = 40000;
+    public final static int PIC_FILE_SIZE_MAX = 100000;
 
     public static int CURRENT_EDIT_MODE = 0;
     public static final int EDIT_NO = 0;

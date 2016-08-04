@@ -119,7 +119,7 @@
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
             <LinearLayout
-                android:id="@+id/main_function_koutu"
+                android:id="@+id/main_function_mat"
                 android:layout_width="@dimen/function_width"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -132,7 +132,7 @@
                     android:paddingLeft="@dimen/padding_function_item_image"
                     android:paddingRight="@dimen/padding_function_item_image"
                     android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/koutu" />
+                    android:src="@mipmap/mat" />
 
                 <TextView
                     android:layout_width="@dimen/function_width"

@@ -149,13 +149,14 @@ public class PtuFrameLayout extends FrameLayout {
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if(getChildCount()>1){
+            View childView=getChildAt(1);
             boolean isConsume=false;
             float sx=ev.getX(),sy=ev.getY();
-            if ((new RectF(floatView.getfLeft(),floatView.getfTop(),
-                    floatView.getfLeft()+floatView.getmWidth(),floatView.getfTop()+floatView.getmHeight())
+            if ((new RectF(childView.getLeft(),childView.getTop(),
+                    childView.getLeft()+childView.getWidth(),childView.getTop()+childView.getHeight())
                     .contains(ev.getX(),ev.getY()))) {
-                ev.setLocation(ev.getX()-floatView.getfLeft(),ev.getY()-floatView.getfTop());
-                isConsume=getChildAt(1).dispatchTouchEvent(ev);
+                ev.setLocation(ev.getX()-childView.getLeft(),ev.getY()-childView.getTop());
+                isConsume=childView.dispatchTouchEvent(ev);
                 if(isConsume)//消费了up事件，up置为true
                     hasUp=true;
             }

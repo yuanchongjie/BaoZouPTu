@@ -1,15 +1,18 @@
 package a.baozouptu.ptu.view;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.view.animation.PathInterpolator;
 
 import a.baozouptu.base.util.TempUtil;
 
@@ -17,7 +20,6 @@ import a.baozouptu.base.util.TempUtil;
  * Created by Administrator on 2016/6/1.
  */
 public class IconBitmapCreator {
-
 
     /**
      * 获取编辑按钮的bitmap对象
@@ -280,10 +282,10 @@ public class IconBitmapCreator {
      * @return
      */
     public static Bitmap createReturnIcon(Context context, int w, int foregroundColor) {
-        w=(int)(w*0.55);
-        int h=w;
-        w=(int) (w * (140f / 200));
-        Bitmap bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
+        w = (int) (w * 0.55);
+        int h = w;
+        w = (int) (w * (140f / 200));
+        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
         int strokeWidth = 6;
@@ -296,6 +298,46 @@ public class IconBitmapCreator {
         PointF p3 = new PointF(30f / 140 * w, 103f / 200 * h), p4 = new PointF(120f / 140 * w, 195f / 200 * h);
         canvas.drawLine(p1.x, p1.y, p2.x, p2.y, paint);
         canvas.drawLine(p3.x, p3.y, p4.x, p4.y, paint);
+        return bitmap;
+    }
+
+    public static Bitmap createPen(Context context, int w, int color1,int color2) {
+        float h = w * 2.5f, bottomH = h * 1f / 6, bottomW = w * 4f / 5;
+        int strokeWidth = 6;
+        Bitmap bitmap=Bitmap.createBitmap(w,(int)h, Bitmap.Config.ARGB_8888);
+        Canvas canvas=new Canvas(bitmap);
+        Path path = new Path();
+        Paint paint=new Paint();
+        paint.setAntiAlias(true);
+        paint.setDither(true);
+        float edge=(float)(strokeWidth* Math.sqrt(2));
+        path.moveTo(w / 2, 0+edge);
+        path.lineTo(0+edge, (h - bottomH) / 2);
+        path.lineTo(w / 2, h - bottomH);
+        path.lineTo(w-edge, (h - bottomH) / 2);
+        path.close();
+
+        paint.setStrokeWidth(strokeWidth);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(color1);
+        paint.setStrokeJoin(Paint.Join.MITER);
+        paint.setStrokeMiter(30);
+        canvas.drawPath(path,paint);
+
+
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        canvas.drawLine(w/2,0+strokeWidth*2,w/2,(h-bottomH)/2,paint);
+        paint.setStrokeCap(Paint.Cap.BUTT);
+        path.rewind();
+        path.moveTo((w-bottomW)/2,h-bottomH);
+        path.rLineTo(bottomW,0);
+        path.rLineTo(0,bottomH-strokeWidth/2);
+        path.rLineTo(-bottomW,0);
+        path.close();
+        paint.setColor(color1);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(strokeWidth);
+        canvas.drawPath(path,paint);
         return bitmap;
     }
 }

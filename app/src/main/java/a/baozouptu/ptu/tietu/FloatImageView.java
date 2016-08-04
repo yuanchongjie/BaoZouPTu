@@ -23,7 +23,8 @@ import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.FloatView;
 
 /**
- * Created by Administrator on 2016/6/30.
+ * Created by liuguicen on 2016/6/30.
+ * @description 浮动的视图
  */
 public class FloatImageView extends View implements FloatView {
     private static String DEBUG_TAG = "FloatImageView";
@@ -36,16 +37,12 @@ public class FloatImageView extends View implements FloatView {
      * 移动的顶点最后的位置
      */
     public float relativeX, relativeY;
-    private static final String ITEM_ROTATE = "rotate";
+    private static final String ITEM_ROTATE = "rotateTo";
 
     private Context mContext;
     public int mPadding = Util.dp2Px(24);
 
-
     private Rect picBoundRect;
-
-
-    private Paint mPaint = new Paint();
 
     /**
      * floatView的宽和高，包括padding，保证加上mleft，mtop之后不会超出原图片的边界
@@ -67,7 +64,6 @@ public class FloatImageView extends View implements FloatView {
     private Bitmap sourceBitmap;
     private Bitmap tietuDitu;
     private Bitmap tempBitmap;
-    private Canvas sourceCanvas;
 
     /**
      * 图片宽高
@@ -114,23 +110,15 @@ public class FloatImageView extends View implements FloatView {
 
     @Override
     public void initItems() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            rimColor = mContext.getResources().getColor(R.color.float_rim_color, null);
-            itemColor = mContext.getResources().getColor(R.color.float_item_color, null);
-        } else {
-            rimColor = mContext.getResources().getColor(R.color.float_rim_color);
-            itemColor = mContext.getResources().getColor(R.color.float_item_color);
-        }
-        IconBitmapCreator iconBitmapCreator = new IconBitmapCreator();
+        rimColor = Util.getColor(R.color.float_rim_color);
+        itemColor = Util.getColor(R.color.float_item_color);
         Item item = new Item(-1, -1, ITEM_ROTATE);
-        item.bitmap = iconBitmapCreator.getRotateBitmap(mContext, mPadding, itemColor);
+        item.bitmap = IconBitmapCreator.getRotateBitmap(mContext, mPadding, itemColor);
         items[7] = item;
     }
 
     /**
      * 设置贴图的bitmap并初始化
-     *
-     * @param bitmap
      */
     public void setBitmapAndInit(Bitmap bitmap) {
         sourceBitmap = bitmap;
@@ -141,12 +129,10 @@ public class FloatImageView extends View implements FloatView {
 
     /**
      * 设置贴图的bitmap并初始化
-     *
-     * @param path
      */
     public void setBitmapAndInit(String path) {
         mPath = path;
-        setBitmapAndInit(new BitmapTool().getLosslessBitmap(path));
+        setBitmapAndInit(BitmapTool.getLosslessBitmap(path));
     }
 
 
@@ -169,7 +155,6 @@ public class FloatImageView extends View implements FloatView {
 
         tietuDitu = Bitmap.createBitmap(totalWidth,
                 totalHeight, Bitmap.Config.ARGB_8888);
-        sourceCanvas = new Canvas(tietuDitu);
 
         if (tietuWidth > picWidth || tietuHeight > picHeight) {
             totalRatio = Math.min(picWidth * 1.0f / tietuWidth,
@@ -261,25 +246,20 @@ public class FloatImageView extends View implements FloatView {
 
     /**
      * @param picInitRatio ptuView上图片的初始缩放比例
-     * @return bundle.putString("picPath", mPath);
-     * <p> bundle.putInt("locationX", centerX - curTWidth / 2);
-     * <p>bundle.putInt("locationY", centerY - curTHeight / 2);
-     * <p>bundle.putParcelable("boundRectInPic",boundRectInPic);
-     * <p>bundle.putFloat("rotateAngle",totalRotateAngle);
      */
     public StepData getResultData(float picInitRatio) {
         TietuStepData sd = new TietuStepData();
-        sd.picPath =mPath;
+        sd.picPath = mPath;
         int x = (int) ((centerX - curTWidth / 2 - picBoundRect.left) * 1.0 / picInitRatio);
-        sd.locationX= x;
+        sd.locationX = x;
 
         int y = (int) ((centerY - curTHeight / 2 - picBoundRect.top) * 1.0 / picInitRatio);
-        sd.locationY=y;
+        sd.locationY = y;
         RectF boundRectInPic = new RectF(x, y, x + curTWidth / picInitRatio, y + curTHeight / picInitRatio);
         if ((centerX - picBoundRect.left) / picInitRatio == (boundRectInPic.left + boundRectInPic.right) / 2)
             Util.P.le("true");
-        sd.boundRectInPic= boundRectInPic;
-        sd.rotateAngle =totalRotateAngle;
+        sd.boundRectInPic = boundRectInPic;
+        sd.rotateAngle = totalRotateAngle;
         return sd;
     }
 
@@ -377,7 +357,6 @@ public class FloatImageView extends View implements FloatView {
 
                 //旋转
                 lastAngle = getAngle(event.getX(0), event.getY(0), event.getX(1), event.getY(1));
-
                 //移动
                 lastX = (event.getX(0) + event.getX(1)) / 2;
                 lastY = (event.getY(0) + event.getY(1)) / 2;
@@ -448,7 +427,7 @@ public class FloatImageView extends View implements FloatView {
         //先将图绘制到底图上面，再将底图绘制到view上面
         if (totalRatio != lastRatio) {//如果发生了缩放
             if (tempBitmap != sourceBitmap) tempBitmap.recycle();
-            tempBitmap = sourceBitmap.createScaledBitmap(
+            tempBitmap = Bitmap.createScaledBitmap(
                     sourceBitmap, curTWidth, curTHeight, true);
             lastRatio = totalRatio;
         }
@@ -467,9 +446,9 @@ public class FloatImageView extends View implements FloatView {
     }
 
     public static void addBigStep(Bitmap bm, StepData sd) {
-        TietuStepData ttsd=(TietuStepData)sd;
-        Bitmap imageBitmap=BitmapTool.getLosslessBitmap(ttsd.picPath);
-        RepealRedoManager.addBm2Bm(bm,imageBitmap,sd.boundRectInPic,sd.rotateAngle);
+        TietuStepData ttsd = (TietuStepData) sd;
+        Bitmap imageBitmap = BitmapTool.getLosslessBitmap(ttsd.picPath);
+        RepealRedoManager.addBm2Bm(bm, imageBitmap, sd.boundRectInPic, sd.rotateAngle);
         imageBitmap.recycle();
     }
 }

@@ -8,6 +8,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
@@ -60,7 +61,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     static final int EDIT_TEXT = 2;
     static final int EDIT_TIETU = 3;
     static final int EDIT_DRAW = 4;
-    static final int EDTI_MAT = 5;
+    static final int EDIT_MAT = 5;
 
     /**
      * 主功能的fragment
@@ -98,6 +99,10 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     private final String NAME_MAT = "mat";
     private final String NAME_DRAW = "draw";
     private final String NAME_MAIN = "main";
+    /**
+     * 整个PtuFragment的范围
+     */
+    private Rect ptuBoundRect;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -166,8 +171,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                switchFragment(NAME_TEXT);
-                floatTextView.setText("ahas大S大航红啊");
+                switchFragment(NAME_MAT);
             }
         }, 500);
     }
@@ -257,6 +261,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
+                        ptuBoundRect=new Rect(0,0,ptuFrame.getWidth(),ptuFrame.getHeight());
                         ptuView.setBitmapAndInit(picPath, ptuFrame.getWidth(), ptuFrame.getHeight());
                         repealRedoManager.setBaseBm(ptuView.getSourceBm()
                                 .copy(Bitmap.Config.ARGB_8888, true));
@@ -302,34 +307,64 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     }
 
     private void bigRepeal() {
-        if (repealRedoManager.canRepeal()) {
-            ProgressDialog progressDialog = new ProgressDialog(this);
-            progressDialog.show();
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        switch (CURRENT_EDIT_MODE) {
+            case EDIT_NO:
+                if (repealRedoManager.canRepeal()) {
 
-            repealRedoManager.repeal();
-            ptuView.releaseSource();
-            Bitmap newSourceBm = repealRedoManager.getBaseBitmap().
-                    copy(Bitmap.Config.ARGB_8888, true);
-            ptuView.replaceSourceBm(newSourceBm);
+                    repealRedoManager.repeal();
+                    ptuView.releaseResource();
+                    Bitmap newSourceBm = repealRedoManager.getBaseBitmap().
+                            copy(Bitmap.Config.ARGB_8888, true);
+                    ptuView.replaceSourceBm(newSourceBm);
 
-            int index = repealRedoManager.getCurrentIndex();
-            for (int i = 0; i <= index; i++) {
-                StepData sd = repealRedoManager.getStepdata(i);
-                addStep(newSourceBm, sd);
-            }
-            ptuView.resetShow();
-            progressDialog.dismiss();
-            checkRepealRedo();
+                    int index = repealRedoManager.getCurrentIndex();
+                    for (int i = 0; i <= index; i++) {
+                        StepData sd = repealRedoManager.getStepdata(i);
+                        addStep(newSourceBm, sd);
+                    }
+                    ptuView.resetShow();
+                }
+                break;
+            case EDIT_DRAW:
+                drawFrag.repeal();
+                break;
+            case EDIT_TIETU:
+                tietuFrag.repeal();
+                break;
+            case EDIT_MAT:
+                matFrag.repeal();
+                break;
         }
+        progressDialog.dismiss();
+        checkRepealRedo();
     }
 
     public void bigRedo() {
-        if (repealRedoManager.canRedo()) {
-            Bitmap sourceBm = ptuView.getSourceBm();
-            addStep(sourceBm, repealRedoManager.redo());
-            ptuView.resetShow();
-            checkRepealRedo();
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        switch (CURRENT_EDIT_MODE) {
+            case EDIT_NO:
+                if (repealRedoManager.canRedo()) {
+                    Bitmap sourceBm = ptuView.getSourceBm();
+                    addStep(sourceBm, repealRedoManager.redo());
+                    ptuView.resetShow();
+                    checkRepealRedo();
+                }
+                break;
+            case EDIT_TIETU:
+                tietuFrag.redo();
+                break;
+            case EDIT_DRAW:
+                drawFrag.redo();
+                break;
+            case EDIT_MAT:
+                matFrag.redo();
+                break;
         }
+        progressDialog.dismiss();
+        checkRepealRedo();
     }
 
     private void checkRepealRedo() {
@@ -416,9 +451,21 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     CURRENT_EDIT_MODE = EDIT_TIETU;
                     break;
                 case NAME_MAT:
+                    if (matFrag == null) {
+                        matFrag = new MatFragment(this);
+                    }
 
+                    fm.beginTransaction()
+                            .setCustomAnimations(R.animator.slide_bottom_in, R.animator.slide_bottom_out,
+                                    R.animator.slide_bottom_in, R.animator.slide_bottom_out)
+                            .replace(R.id.fragment_function, matFrag)
+                            .commit();
 
-                    CURRENT_EDIT_MODE = EDIT_TIETU;
+                    //设置布局
+                    FrameLayout.LayoutParams floatParams =
+                            new FrameLayout.LayoutParams(ptuBoundRect.width(), ptuBoundRect.height());
+                    ptuFrame.addView(matFrag.createMatView(ptuBoundRect,ptuView.getSourceBm()), floatParams);
+                    CURRENT_EDIT_MODE = EDIT_MAT;
                     break;
             }
         }

@@ -18,10 +18,26 @@ import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 
 /**
+ * 内部原理：添加什么东西上去就在sourceBitmap上面添加（用了一个全局的sourceCanvas，除此之外，此canvas不起其它作用）
+ * <P>绘图时，根据手势会改变相应的参数，然后根据相应的参数，到sourceBitmap上面剪切一个子图下来，用BitmapDrawable显示出来</P>
+ * <p>sourceBitmap可能会被替换，此时尺寸大小也可能会被改变</p>
  * 注意： 每次缩放要寻改的地方有三个，totalRatio，currentRatio,CURRENT_STATUS
  */
-public class PtuView extends View implements GestureImageView{
+public class PtuView extends View implements GestureImageView {
     String TAG = "PtuView";
+    private boolean canDoubleCilick = true;
+    private int minRatio;
+    private boolean canMinish=true;
+
+    public void setCanRotate(boolean canRotate) {
+        this.canRotate = canRotate;
+    }
+
+    public boolean isCanRotate() {
+        return canRotate;
+    }
+
+    boolean canRotate = false;
     /**
      * 每次刷新0.0002倍
      */
@@ -64,20 +80,12 @@ public class PtuView extends View implements GestureImageView{
     /**
      * 原图片
      */
-    private Bitmap sourceBitmap;
+    protected Bitmap sourceBitmap;
     /**
      * 用于处理图片的矩阵
      */
     private Matrix matrix = new Matrix();
-    private Bitmap realBm;
 
-    public void setTotalWidth(int totalWidth) {
-        this.totalWidth = totalWidth;
-    }
-
-    public void setTotalHeight(int totalHeight) {
-        this.totalHeight = totalHeight;
-    }
 
     /**
      * 整个View的宽,高
@@ -94,13 +102,11 @@ public class PtuView extends View implements GestureImageView{
     /**
      * 图片的局部，要现实出来的部分
      */
-    Rect srcRect = new Rect(0, 0, 1, 1);
+    protected Rect srcRect = new Rect(0, 0, 1, 1);
     /**
      * 要绘制的总图在view的canvas上面的位置,
-     * <P>也即是在bitmapToView上的位置
-     * <p>也是在secondcanvas上的位置</p>
      */
-    Rect dstRect = new Rect(1, 2, 3, 4);
+    protected  Rect dstRect = new Rect(1, 2, 3, 4);
 
     Paint picPaint = new Paint();
 
@@ -110,11 +116,12 @@ public class PtuView extends View implements GestureImageView{
     /**
      * 当前图片的宽和高
      */
-    private int curPicWidth, curPicHeight;
-    private Canvas sourceCanvas;
+    private int curPicWidth=10, curPicHeight=10;
+    protected Canvas sourceCanvas;
 
     public PtuView(Context context) {
         super(context);
+        CURRENT_STATUS = STATUS_INIT;
         this.mContext = context;
     }
 
@@ -125,6 +132,21 @@ public class PtuView extends View implements GestureImageView{
         picPaint.setDither(true);
     }
 
+    public PtuView(Context context,String path, int totalWidth, int totalHeight) {
+        super(context);
+        this.mContext = context;
+        CURRENT_STATUS = STATUS_INIT;
+        picPaint.setDither(true);
+        setBitmapAndInit(path,totalWidth,totalHeight);
+    }
+
+    public PtuView(Context context,Bitmap bitmap, int totalWidth, int totalHeight) {
+        super(context);
+        this.mContext = context;
+        CURRENT_STATUS = STATUS_INIT;
+        picPaint.setDither(true);
+        setBitmapAndInit(bitmap,totalWidth,totalHeight);
+    }
     /**
      * 根据提供的缩放比例，将p图的图片缩放到原图*缩放比例大小，并返回
      *
@@ -151,14 +173,19 @@ public class PtuView extends View implements GestureImageView{
      * <p>获取当前何种的Ratio
      */
     public void setBitmapAndInit(String path, int totalWidth, int totalHeight) {
-        sourceBitmap = BitmapTool.getLosslessBitmap(path);
-        if (sourceBitmap == null)
+        setBitmapAndInit(BitmapTool.getLosslessBitmap(path), totalWidth, totalHeight);
+    }
+
+    public void setBitmapAndInit(Bitmap bitmap, int totalWidth, int totalHeight) {
+        if (bitmap == null)
             sourceBitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
+        else sourceBitmap = bitmap;
         sourceCanvas = new Canvas(sourceBitmap);
         srcPicWidth = sourceBitmap.getWidth();
         srcPicHeight = sourceBitmap.getHeight();
         this.totalWidth = totalWidth;
         this.totalHeight = totalHeight;
+        setCanMinish(false);
         CURRENT_STATUS = STATUS_INIT;
     }
 
@@ -184,6 +211,7 @@ public class PtuView extends View implements GestureImageView{
                 lastY = event.getY();
                 Util.P.le(TAG, "经过了down");
                 if (Util.DoubleClick.isDoubleClick()) {
+                    if (!canDoubleCilick) return true;//不支持双击
                     if (lastX < dstRect.left || lastX > dstRect.right || lastY < dstRect.top
                             || lastY > dstRect.bottom)//点击不在图片范围内
                         return true;
@@ -236,12 +264,10 @@ public class PtuView extends View implements GestureImageView{
                     lastX = event.getX(index);
                     lastY = event.getY(index);
                     //当缩小范围超过最小值时
-                    if (totalRatio * srcPicWidth < totalWidth / 2
-                            && totalRatio * srcPicHeight < totalHeight / 3) {
-                        float t=totalRatio;
-                        totalRatio = Math.min(totalWidth * 1.0f / 2 / srcPicWidth, totalHeight * 1.0f / 3 / srcPicHeight);
+                    if (totalRatio < minRatio) {
+                        totalRatio = minRatio;
                         CURRENT_STATUS = STATUS_SCALE;
-                        scale(totalWidth/2,totalHeight/2,totalRatio/t);
+                        scale(totalWidth / 2, totalHeight / 2, minRatio / totalRatio);
                     }
                 }
                 if (event.getPointerCount() == 3) {
@@ -296,9 +322,6 @@ public class PtuView extends View implements GestureImageView{
 
     /**
      * 要先计算出totalRatio
-     *
-     * @param event
-     * @param currentRatio
      */
     private void scalePic(MotionEvent event, float currentRatio) {
         scalePic(event.getX(0), event.getY(0), event.getX(1), event.getY(1), currentRatio);
@@ -306,25 +329,14 @@ public class PtuView extends View implements GestureImageView{
 
     /**
      * 要先计算出totalRatio
-     *
-     * @param x1
-     * @param y1
-     * @param x2
-     * @param y2
-     * @param currentRatio
+     * <p>参数是两个手指所在点的位置</p>
      */
     private void scalePic(float x1, float y1, float x2, float y2, float currentRatio) {
         float scaleCenterX = (x1 + x2) / 2, scaleCenterY = (y1 + y2) / 2;
-        scale(scaleCenterX,scaleCenterY,currentRatio);
+        scale(scaleCenterX, scaleCenterY, currentRatio);
     }
 
-    /**
-     *
-     * @param scaleCenterX
-     * @param scaleCenterY
-     * @param currentRatio
-     */
-    public void scale(float scaleCenterX, float scaleCenterY,float currentRatio) {
+    public void scale(float scaleCenterX, float scaleCenterY, float currentRatio) {
         // 获取当前图片的宽、高
         Util.P.le(TAG, "缩放图片开始");
         curPicWidth = (int) (srcPicWidth * totalRatio);
@@ -357,12 +369,8 @@ public class PtuView extends View implements GestureImageView{
      * <p>缩放后图片右上角顶点的位置
      * <p>绘画时用到的矩形，原图裁剪矩形srcRect，在画布上的位置矩形dstRect
      * <p/>
-     *
-     * @param curPicWidth
-     * @param curPicHeight
      */
     private void getConvertParameter(int curPicWidth, int curPicHeight) {
-        Util.P.le(TAG, "获取参数开始");
         // 显示在屏幕上绘制的宽度、高度
         int drawWidth = curPicWidth > totalWidth ? totalWidth : curPicWidth;
         int drawHeight = curPicHeight > totalHeight ? totalHeight : curPicHeight;
@@ -375,14 +383,11 @@ public class PtuView extends View implements GestureImageView{
         if (y1 > srcPicHeight) y1 = srcPicHeight;
         srcRect.set(x, y, x1, y1);
         dstRect.set(leftInView, topInView, leftInView + drawWidth, topInView + drawHeight);
-        Util.P.le(TAG, "获取参数完成");
     }
 
 
     /**
-     * 图片在PtuFrameLayout上的相对位置
-     *
-     * @return
+     * @return 图片在PtuFrameLayout上的相对位置
      */
     public Rect getBound() {
         return dstRect;
@@ -442,38 +447,51 @@ public class PtuView extends View implements GestureImageView{
      * @param rotateAngle 浮动视图旋转的角度
      */
     public void addBitmap(Bitmap addBitmap, RectF boundRect, float rotateAngle) {
-        sourceCanvas= RepealRedoManager.addBm2Canvas(sourceCanvas,addBitmap,boundRect,rotateAngle);
+        sourceCanvas = RepealRedoManager.addBm2Canvas(sourceCanvas, addBitmap, boundRect, rotateAngle);
         resetShow();
     }
 
     /**
      * 将原始的图片换掉,并且回收原始图片的资源，
      * 不显示出来
-     *
-     * @param newBm
      */
     public void replaceSourceBm(Bitmap newBm) {
         sourceBitmap.recycle();
         sourceBitmap = newBm;
         srcPicWidth = sourceBitmap.getWidth();
         srcPicHeight = sourceBitmap.getHeight();
-        sourceCanvas=new Canvas(sourceBitmap);
+        sourceCanvas = new Canvas(sourceBitmap);
     }
 
     @Override
     protected void onDetachedFromWindow() {
-        releaseSource();
+        releaseResource();
         super.onDetachedFromWindow();
     }
 
     /**
      * 释放资源，目前只有SourceBitmap一个
      */
-    public void releaseSource(){
+    public void releaseResource() {
         sourceBitmap.recycle();
     }
 
     public Bitmap getSourceBm() {
         return sourceBitmap;
+    }
+
+    public void canDoubleClick(boolean b) {
+        canDoubleCilick = b;
+    }
+
+    /**
+     * 必须在setBitmapAndInit后面调用
+     * @param canMinish
+     */
+    public void setCanMinish(boolean canMinish) {
+        this.canMinish = canMinish;
+        if(canMinish){
+            minRatio = Math.min(totalWidth / 2 / curPicWidth, totalHeight / 3 / curPicHeight);
+        }else minRatio=1;
     }
 }
