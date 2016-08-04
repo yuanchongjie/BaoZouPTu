@@ -5,7 +5,7 @@
     android:background="#FFBBFFBB"
     android:orientation="vertical" >
 
-    <ImageView
+    <a.baozouptu.Test
         android:id="@+id/test_image"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"/>

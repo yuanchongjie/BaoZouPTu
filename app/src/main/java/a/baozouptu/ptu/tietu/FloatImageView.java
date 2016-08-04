@@ -37,7 +37,7 @@ public class FloatImageView extends View implements FloatView {
      * 移动的顶点最后的位置
      */
     public float relativeX, relativeY;
-    private static final String ITEM_ROTATE = "rotate";
+    private static final String ITEM_ROTATE = "rotateTo";
 
     private Context mContext;
     public int mPadding = Util.dp2Px(24);

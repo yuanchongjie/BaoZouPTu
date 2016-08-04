@@ -2,98 +2,127 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/padding_function_item_image"
+    android:paddingTop="2dp">
+
+    <LinearLayout
+        android:id="@+id/mat_pen"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:layout_gravity="center"
+            android:paddingBottom="@dimen/padding_function_item_image"
+            android:paddingLeft="@dimen/padding_function_item_image"
+            android:paddingRight="@dimen/padding_function_item_image"
+            android:paddingTop="@dimen/padding_function_item_image"
+            android:src="@mipmap/pen" />
+
+        <TextView
+            android:layout_width="@dimen/function_width"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/pen"
+            android:textColor="@color/text_color1"
+            android:textSize="@dimen/text_size_main_function" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/mat_smear"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:layout_gravity="center"
+            android:paddingBottom="@dimen/padding_function_item_image"
+            android:paddingLeft="@dimen/padding_function_item_image"
+            android:paddingRight="@dimen/padding_function_item_image"
+            android:paddingTop="@dimen/padding_function_item_image"
+            android:src="@mipmap/smear" />
+
+        <TextView
+            android:layout_width="@dimen/function_width"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/swear"
+            android:textColor="@color/text_color1"
+            android:textSize="@dimen/text_size_main_function" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/mat_shape"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:layout_gravity="center"
+            android:paddingBottom="@dimen/padding_function_item_image"
+            android:paddingLeft="@dimen/padding_function_item_image"
+            android:paddingRight="@dimen/padding_function_item_image"
+            android:paddingTop="@dimen/padding_function_item_image"
+            android:src="@mipmap/shape" />
+
+        <TextView
+            android:layout_width="@dimen/function_width"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/shape"
+            android:textColor="@color/text_color1"
+            android:textSize="@dimen/text_size_main_function" />
+    </LinearLayout>
+    <LinearLayout
+    android:id="@+id/mat_rubber"
+    android:layout_width="0dp"
+    android:layout_weight="1"
+    android:layout_height="match_parent"
+    android:layout_alignParentEnd="true"
+    android:layout_alignParentRight="true"
     android:orientation="vertical">
 
-    <HorizontalScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:scrollbarAlwaysDrawHorizontalTrack="false"
-        android:scrollbars="none">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:layout_gravity="center"
+        android:paddingBottom="@dimen/padding_function_item_image"
+        android:paddingLeft="@dimen/padding_function_item_image"
+        android:paddingRight="@dimen/padding_function_item_image"
+        android:paddingTop="@dimen/padding_function_item_image"
+        android:src="@mipmap/rubber" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:paddingBottom="@dimen/padding_function_item_image"
-            android:paddingTop="2dp">
-
-            <LinearLayout
-                android:id="@+id/mat_pen"
-                android:layout_width="@dimen/function_width"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="2"
-                    android:paddingBottom="@dimen/padding_function_item_image"
-                    android:paddingLeft="@dimen/padding_function_item_image"
-                    android:paddingRight="@dimen/padding_function_item_image"
-                    android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/pen" />
-
-                <TextView
-                    android:layout_width="@dimen/function_width"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="@string/pen"
-                    android:textColor="@color/text_color1"
-                    android:textSize="@dimen/text_size_main_function" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/mat_smear"
-                android:layout_width="@dimen/function_width"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="2"
-                    android:paddingBottom="@dimen/padding_function_item_image"
-                    android:paddingLeft="@dimen/padding_function_item_image"
-                    android:paddingRight="@dimen/padding_function_item_image"
-                    android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/smear" />
-
-                <TextView
-                    android:layout_width="@dimen/function_width"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="@string/swear"
-                    android:textColor="@color/text_color1"
-                    android:textSize="@dimen/text_size_main_function" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/mat_shape"
-                android:layout_width="@dimen/function_width"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="2"
-                    android:paddingBottom="@dimen/padding_function_item_image"
-                    android:paddingLeft="@dimen/padding_function_item_image"
-                    android:paddingRight="@dimen/padding_function_item_image"
-                    android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/shape" />
-
-                <TextView
-                    android:layout_width="@dimen/function_width"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="@string/shape"
-                    android:textColor="@color/text_color1"
-                    android:textSize="@dimen/text_size_main_function" />
-            </LinearLayout>
-        </LinearLayout>
-    </HorizontalScrollView>
+    <TextView
+        android:layout_width="@dimen/function_width"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/rubber"
+        android:textColor="@color/text_color1"
+        android:textSize="@dimen/text_size_main_function" />
+</LinearLayout>
 </LinearLayout>

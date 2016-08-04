@@ -176,7 +176,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
     protected int mNextX;
 
     /**
-     * Used to hold the scroll position to restore to post rotate
+     * Used to hold the scroll position to restore to post rotateTo
      */
     private Integer mRestoreX = null;
 
@@ -406,7 +406,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
     }
 
     /**
-     * Will re-initialize the HorizontalListView to remove all child views rendered and reset to initial configuration.
+     * Will re-initialize the HorizontalListView to remove all child views rendered and reSet to initial configuration.
      */
     private void reset() {
         initView();
@@ -970,7 +970,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
      */
     private void drawEdgeGlow(Canvas canvas) {
         if (mEdgeGlowLeft != null && !mEdgeGlowLeft.isFinished() && isEdgeGlowEnabled()) {
-            // The Edge glow is meant to come from the top of the screen, so rotate it to draw on the left side.
+            // The Edge glow is meant to come from the top of the screen, so rotateTo it to draw on the left side.
             final int restoreCount = canvas.save();
             final int height = getHeight();
 
@@ -984,7 +984,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
 
             canvas.restoreToCount(restoreCount);
         } else if (mEdgeGlowRight != null && !mEdgeGlowRight.isFinished() && isEdgeGlowEnabled()) {
-            // The Edge glow is meant to come from the top of the screen, so rotate it to draw on the right side.
+            // The Edge glow is meant to come from the top of the screen, so rotateTo it to draw on the right side.
             final int restoreCount = canvas.save();
             final int width = getWidth();
 

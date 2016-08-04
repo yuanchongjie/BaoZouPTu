@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--  应用的基础色-->
+
+    <color name="base_color1">#ffff5722</color>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
@@ -39,6 +42,8 @@
 <!--ptu功能-->
     <color name="can_repeal_redo">#ffff5722</color>
     <color name="canot_repeal_redo">#80ffffff</color>
+    <color name="mat_pen_line1">#ff111111</color>
+    <color name="mat_pen_line2">#ff5e5e5e</color>
     <drawable name="dialog_background">#80ffffff</drawable>
     <drawable name="hou">#dcdcdc</drawable>
     <drawable name="qian">#039be5</drawable>
