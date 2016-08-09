@@ -16,19 +16,22 @@ import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.repealRedo.StepData;
 
 /**
- * Created by Administrator on 2016/7/26.
+ * Created by liuguicen on 2016/7/26.
+ * @description
  */
 public class MatFragment extends Fragment implements BaseFunction {
     private Context mContext;
     private LinearLayout shape;
-    private LinearLayout mear;
+    private LinearLayout smear;
     private LinearLayout pen;
+    private LinearLayout rubber;
     private MatView matView;
 
     public MatFragment(Context context) {
         super();
         mContext = context;
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,23 +40,25 @@ public class MatFragment extends Fragment implements BaseFunction {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.fragment_mat,null);
-        pen = (LinearLayout)view.findViewById(R.id.mat_pen);
-        mear = (LinearLayout)view.findViewById(R.id.mat_smear);
-        shape = (LinearLayout)view.findViewById(R.id.mat_shape);
-        mContext=getActivity();
-        setCkick();
+        View view = inflater.inflate(R.layout.fragment_mat, null);
+        mContext = getActivity();
+
+        pen = (LinearLayout) view.findViewById(R.id.mat_pen);
+        smear = (LinearLayout) view.findViewById(R.id.mat_smear);
+        shape = (LinearLayout) view.findViewById(R.id.mat_shape);
+        rubber = (LinearLayout) view.findViewById(R.id.mat_rubber);
+        setClick();
         return view;
     }
 
-    private void setCkick() {
+    private void setClick() {
         pen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 matView.startDrawLine();
             }
         });
-        mear.setOnClickListener(new View.OnClickListener() {
+        smear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 matView.startSmear();
@@ -63,6 +68,12 @@ public class MatFragment extends Fragment implements BaseFunction {
             @Override
             public void onClick(View v) {
                 matView.startMatByShape();
+            }
+        });
+        rubber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                matView.startRubber();
             }
         });
     }
@@ -88,13 +99,15 @@ public class MatFragment extends Fragment implements BaseFunction {
     }
 
     @Override
-    public void releaseResourse() {
+    public void releaseResource() {
         matView.releaseResource();
     }
 
-    public MatView createMatView(Rect bound,Bitmap bitmap) {
-        matView = new MatView(mContext,bound);
-        matView.setBitmapAndInit(bitmap,bound.width(),bound.height());
+    public MatView createMatView(Rect bound, Bitmap bitmap) {
+        matView = new MatView(mContext, bound);
+        matView.setBitmapAndInit(bitmap, bound.width(), bound.height());
+        matView.canDoubleClick(false);
+        matView.setCanLessThanScreen(false);
         return matView;
     }
 }

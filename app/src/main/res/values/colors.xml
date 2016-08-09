@@ -44,6 +44,8 @@
     <color name="canot_repeal_redo">#80ffffff</color>
     <color name="mat_pen_line1">#ff111111</color>
     <color name="mat_pen_line2">#ff5e5e5e</color>
+    <color name="cut_frame">#ffffff</color>
+    <color name="black_deep">#333333</color>
     <drawable name="dialog_background">#80ffffff</drawable>
     <drawable name="hou">#dcdcdc</drawable>
     <drawable name="qian">#039be5</drawable>

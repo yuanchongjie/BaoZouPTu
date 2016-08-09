@@ -3,11 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
+    android:baselineAligned="true"
     android:paddingBottom="@dimen/padding_function_item_image"
     android:paddingTop="2dp">
-
     <LinearLayout
-        android:id="@+id/mat_pen"
+        android:id="@+id/cut_reset"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="match_parent"
@@ -22,7 +22,7 @@
             android:paddingLeft="@dimen/padding_function_item_image"
             android:paddingRight="@dimen/padding_function_item_image"
             android:paddingTop="@dimen/padding_function_item_image"
-            android:src="@mipmap/pen" />
+            android:src="@mipmap/reset" />
 
         <TextView
             android:layout_width="@dimen/function_width"
@@ -30,13 +30,13 @@
             android:layout_weight="1"
             android:layout_gravity="center"
             android:gravity="center"
-            android:text="@string/pen"
+            android:text="@string/cut_reset"
             android:textColor="@color/text_color1"
             android:textSize="@dimen/text_size_main_function" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/mat_smear"
+        android:id="@+id/cut_scale"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="match_parent"
@@ -51,7 +51,7 @@
             android:paddingLeft="@dimen/padding_function_item_image"
             android:paddingRight="@dimen/padding_function_item_image"
             android:paddingTop="@dimen/padding_function_item_image"
-            android:src="@mipmap/smear" />
+            android:src="@mipmap/scale" />
 
         <TextView
             android:layout_width="@dimen/function_width"
@@ -59,13 +59,13 @@
             android:layout_weight="1"
             android:layout_gravity="center"
             android:gravity="center"
-            android:text="@string/swear"
+            android:text="@string/cut_scale"
             android:textColor="@color/text_color1"
             android:textSize="@dimen/text_size_main_function" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/mat_shape"
+        android:id="@+id/cut_rotate"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="match_parent"
@@ -80,7 +80,7 @@
             android:paddingLeft="@dimen/padding_function_item_image"
             android:paddingRight="@dimen/padding_function_item_image"
             android:paddingTop="@dimen/padding_function_item_image"
-            android:src="@mipmap/shape" />
+            android:src="@mipmap/rotate" />
 
         <TextView
             android:layout_width="@dimen/function_width"
@@ -88,36 +88,37 @@
             android:layout_weight="1"
             android:layout_gravity="center"
             android:gravity="center"
-            android:text="@string/shape"
+            android:text="@string/cut_rotate"
             android:textColor="@color/text_color1"
             android:textSize="@dimen/text_size_main_function" />
     </LinearLayout>
+
     <LinearLayout
-    android:id="@+id/mat_rubber"
-    android:layout_width="0dp"
-    android:layout_weight="1"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:layout_gravity="center"
-        android:paddingBottom="@dimen/padding_function_item_image"
-        android:paddingLeft="@dimen/padding_function_item_image"
-        android:paddingRight="@dimen/padding_function_item_image"
-        android:paddingTop="@dimen/padding_function_item_image"
-        android:src="@mipmap/rubber" />
-
-    <TextView
-        android:layout_width="@dimen/function_width"
-        android:layout_height="0dp"
+        android:id="@+id/cut_reversal"
+        android:layout_width="0dp"
         android:layout_weight="1"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:text="@string/rubber"
-        android:textColor="@color/text_color1"
-        android:textSize="@dimen/text_size_main_function" />
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:layout_gravity="center"
+            android:paddingBottom="@dimen/padding_function_item_image"
+            android:paddingLeft="@dimen/padding_function_item_image"
+            android:paddingRight="@dimen/padding_function_item_image"
+            android:paddingTop="@dimen/padding_function_item_image"
+            android:src="@mipmap/reversal" />
+
+        <TextView
+            android:layout_width="@dimen/function_width"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/cut_reversal"
+            android:textColor="@color/text_color1"
+            android:textSize="@dimen/text_size_main_function" />
+    </LinearLayout>
 </LinearLayout>

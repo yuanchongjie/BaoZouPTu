@@ -11,5 +11,10 @@
     <string name="shape">形状</string>
     <string name="swear">涂抹</string>
     <string name="rubber">橡皮</string>
+    <string name="cut_scale">比例</string>
+    <string name="cut_rotate">旋转</string>
+    <string name="cut_reversal">翻转</string>
+    <string name="cut_reset">重置</string>
+    <string name="title_chose_picture">选择图片</string>
 
 </resources>

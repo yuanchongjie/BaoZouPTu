@@ -16,7 +16,7 @@
         app:contentInsetLeft="0dp"
         app:contentInsetStart="0dp"
         >
-        <a.baozouptu.ptu.view.PtuTopRealtiveLayout
+        <a.baozouptu.ptu.view.PtuTopRelativeLayout
             android:id="@+id/ptu_toolbar_relative"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
                 android:orientation="horizontal"
                 android:background="#0000">
             </LinearLayout>
-        </a.baozouptu.ptu.view.PtuTopRealtiveLayout>
+        </a.baozouptu.ptu.view.PtuTopRelativeLayout>
     </android.support.v7.widget.Toolbar>
 
     <a.baozouptu.ptu.view.PtuFrameLayout

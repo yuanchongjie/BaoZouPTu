@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -18,10 +19,13 @@ import a.baozouptu.ptu.view.IconBitmapCreator;
  */
 public class Test extends View {
     Context mContext;
-    public Test(Context context, AttributeSet attrs) {
+    private Paint textPaint;
 
+    public Test(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext=context;
+        textPaint=new Paint();
+        textPaint.setTextSize(20);
     }
 
     public Test(Context context) {
@@ -30,13 +34,17 @@ public class Test extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        int c1 = Util.getColor(R.color.mat_pen_line1);
-        int c_1 = Color.argb(Color.alpha(c1) / 3, Color.red(c1), Color.green(c1), Color.blue(c1));
-        int c2 = Util.getColor(R.color.mat_pen_line2);
-        int c_2 = Color.argb(Color.alpha(c2) / 3, Color.red(c2), Color.green(c2), Color.blue(c2));
-        Object penWidth=50;
-        Bitmap penBmLine = IconBitmapCreator.createPen(mContext, (int) penWidth, c1, c2);
-        canvas.drawBitmap(penBmLine,100,100,new Paint());
-        super.onDraw(canvas);
+        float mWidth=canvas.getWidth();
+        float mHeight=canvas.getHeight();
+
+        //中间的数字
+        String sWidth = String.valueOf(mWidth), sHeight = String.valueOf(mHeight);
+        String show = sWidth + " × " + sHeight;
+        float textWidth=textPaint.measureText(show);
+        Paint.FontMetrics fm=textPaint.getFontMetrics();
+        float textY = mHeight / 2 - fm.descent + (fm.bottom - fm.top) / 2;
+        canvas.drawText(show,(mWidth-textWidth)/2,textY,textPaint);
+        textPaint.setStrokeWidth(5);
+        canvas.drawLine(0,mHeight/2,mWidth,mHeight/2,textPaint);
     }
 }

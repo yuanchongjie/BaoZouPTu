@@ -11,7 +11,7 @@ import android.widget.FrameLayout;
 import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.FloatView;
-import a.baozouptu.ptu.addtext.FloatTextView;
+import a.baozouptu.ptu.text.FloatTextView;
 import a.baozouptu.ptu.tietu.FloatImageView;
 
 /**
@@ -19,7 +19,8 @@ import a.baozouptu.ptu.tietu.FloatImageView;
  * Created by Administrator on 2016/5/30.
  */
 public class PtuFrameLayout extends FrameLayout {
-    private String DEBUG_TAG ="PtuFrameLayout";
+    private static final String TAG = "PtuFrameLayout";
+    private String DEBUG_TAG = "PtuFrameLayout";
     private static int CURRENT_STATUS = 0;
     private static final int STATUS_INIT = 0;
     private static final int STATUS_MOVE_FLOAT = 1;
@@ -47,7 +48,6 @@ public class PtuFrameLayout extends FrameLayout {
     }
 
     public FloatTextView initAddTextFloat(Rect ptuViewBound) {
-        Util.P.le(DEBUG_TAG,"initAddTextFloat");
         //设置floatText的基本属性
         floatView = new FloatTextView(mContext, ptuViewBound);
 
@@ -58,28 +58,28 @@ public class PtuFrameLayout extends FrameLayout {
         floatParams.setMargins((int) floatView.getfLeft(), (int) floatView.getfTop(),
                 (int) (floatView.getfLeft() + floatView.getmWidth()),
                 (int) (floatView.getfTop() + floatView.getmHeight()));
-        addView((View)floatView, floatParams);
-        return (FloatTextView)floatView;
+        addView((View) floatView, floatParams);
+        return (FloatTextView) floatView;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Util.P.le(DEBUG_TAG,"onTouchEvent");
+        Util.P.le(DEBUG_TAG, "onTouchEvent");
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 if (hasUp) {
                     hasUp = false;
                     floatView.setDownState();
                 }
-                Util.P.le("经过了down",floatView.getDownState());
+                Util.P.le("经过了down", floatView.getDownState());
 
                 //获取点击下去时的数据，位置，时间，
                 downX = event.getX();
                 downY = event.getY();
                 downTime = System.currentTimeMillis();
 
-                floatView.setRelativeX (event.getX() - floatView.getfLeft());
-                floatView.setRelativeY( event.getY() - floatView.getfTop());
+                floatView.setRelativeX(event.getX() - floatView.getfLeft());
+                floatView.setRelativeY(event.getY() - floatView.getfTop());
                 CURRENT_STATUS = STATUS_MOVE_FLOAT;
 
                 break;
@@ -90,15 +90,15 @@ public class PtuFrameLayout extends FrameLayout {
                 scaleCenterX = (event.getX(0) + event.getX(1)) / 2;
                 scaleCenterY = (event.getY(0) + event.getY(1)) / 2;
                 floatView.setRelativeX(scaleCenterX - floatView.getfLeft());
-                floatView.setRelativeY ( scaleCenterY - floatView.getfTop());
+                floatView.setRelativeY(scaleCenterY - floatView.getfTop());
 
             case MotionEvent.ACTION_MOVE:
                 floatView.changeShowState(FloatView.STATUS_RIM);
                 if (event.getPointerCount() == 1 &&
                         CURRENT_STATUS == STATUS_MOVE_FLOAT) {//是在移动浮动view
                     floatView.drag(event.getX(), event.getY());
-                    redrawFloat();
-                } else if(event.getPointerCount()>=2){
+                    changeLocation();
+                } else if (event.getPointerCount() >= 2) {
                     //以缩放中心的为相对坐标，用于一边缩放一边移动
                     float ncenterX = (event.getX(0) + event.getX(1)) / 2,
                             ncenterY = (event.getY(0) + event.getY(1)) / 2;
@@ -114,7 +114,7 @@ public class PtuFrameLayout extends FrameLayout {
                     float ratio = (floatView.getmWidth() + (endFloatDis - lastFloatDis)) / floatView.getmWidth();
                     if (ratio == 1.0) break;
                     floatView.scale(ratio);
-                    redrawFloat();
+                    changeLocation();
                     lastFloatDis = endFloatDis;
 
                 }
@@ -125,14 +125,14 @@ public class PtuFrameLayout extends FrameLayout {
                 if (hasUp == false && GeoUtil.getDis(downX, downY, event.getX(), event.getY()) < minMoveDis
                         && System.currentTimeMillis() - downTime < 500) {
                     //点击发生在floatView之外
-                    if (!(new RectF(floatView.getfLeft(),floatView.getfTop(),
-                            floatView.getfLeft()+floatView.getmWidth(),floatView.getfTop()+floatView.getmHeight())
-                            .contains(event.getX(),event.getY())))
+                    if (!(new RectF(floatView.getfLeft(), floatView.getfTop(),
+                            floatView.getfLeft() + floatView.getmWidth(), floatView.getfTop() + floatView.getmHeight())
+                            .contains(event.getX(), event.getY())))
                         floatView.changeShowState(floatView.STATUS_TOUMING);
                     Util.P.le("经过了up2");
                 } else {//不是点击事件，将之前状态显示出来
                     floatView.changeShowState(floatView.getDownState());
-                    Util.P.le("经过了up3",floatView.getDownState());
+                    Util.P.le("经过了up3", floatView.getDownState());
                 }
                 Util.P.le("经过了up4");
                 hasUp = true;
@@ -148,21 +148,27 @@ public class PtuFrameLayout extends FrameLayout {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if(getChildCount()>1){
-            View childView=getChildAt(1);
-            boolean isConsume=false;
-            float sx=ev.getX(),sy=ev.getY();
-            if ((new RectF(childView.getLeft(),childView.getTop(),
-                    childView.getLeft()+childView.getWidth(),childView.getTop()+childView.getHeight())
-                    .contains(ev.getX(),ev.getY()))) {
-                ev.setLocation(ev.getX()-childView.getLeft(),ev.getY()-childView.getTop());
-                isConsume=childView.dispatchTouchEvent(ev);
-                if(isConsume)//消费了up事件，up置为true
-                    hasUp=true;
+        if (getChildCount() > 1) {
+            View childView = getChildAt(1);
+            boolean isConsume = false;
+
+            float sx = ev.getX(), sy = ev.getY();
+            if (
+                    ( childView instanceof FloatView &&
+                    (new RectF(childView.getLeft(), childView.getTop(),
+                    childView.getLeft() + childView.getWidth(), childView.getTop() + childView.getHeight())
+                    .contains(sx, sy)) )//是浮动图，这判断是否在内部
+                    ||!(childView instanceof FloatView)//不是浮动图
+            )
+             {
+                ev.setLocation(sx - childView.getLeft(), sy - childView.getTop());
+                isConsume = childView.dispatchTouchEvent(ev);
+                if (isConsume)//消费了up事件，up置为true
+                    hasUp = true;
             }
             //没有消费才分发事件，不然就不分发
-            if(!isConsume){
-                ev.setLocation(sx,sy);
+            if (!isConsume) {
+                ev.setLocation(sx, sy);
                 onTouchEvent(ev);
             }
         }
@@ -171,27 +177,28 @@ public class PtuFrameLayout extends FrameLayout {
         return true;
     }
 
-    public void redrawFloat() {
-        Util.P.le(DEBUG_TAG,"redrawFloat");
-        removeView((View)floatView);
+    /**
+     *改变位置，不能在float为空时调用
+     */
+    public void changeLocation() {
         FrameLayout.LayoutParams floatParams =
                 new FrameLayout.LayoutParams((int) floatView.getmWidth(),
                         (int) floatView.getmHeight());
         floatParams.setMargins((int) floatView.getfLeft(), (int) floatView.getfTop(),
                 (int) (floatView.getfLeft() + floatView.getmWidth()),
                 (int) (floatView.getfTop() + floatView.getmHeight()));
-        addView((View)floatView, floatParams);
+        updateViewLayout((View) floatView, floatParams);
     }
 
     public FloatImageView initAddImageFloat(Rect bound) {
-        floatView=new FloatImageView(mContext,bound,getMeasuredWidth(),getMeasuredHeight());
+        floatView = new FloatImageView(mContext, bound, getMeasuredWidth(), getMeasuredHeight());
 
         //设置布局
         FrameLayout.LayoutParams floatParams =
-                new FrameLayout.LayoutParams(getMeasuredWidth(),getMeasuredHeight());
-        floatParams.setMargins(0, 0,getMeasuredWidth(),getMeasuredHeight());
-        addView((View)floatView, floatParams);
+                new FrameLayout.LayoutParams(getMeasuredWidth(), getMeasuredHeight());
+        floatParams.setMargins(0, 0, getMeasuredWidth(), getMeasuredHeight());
+        addView((View) floatView, floatParams);
 
-        return (FloatImageView)floatView;
+        return (FloatImageView) floatView;
     }
 }

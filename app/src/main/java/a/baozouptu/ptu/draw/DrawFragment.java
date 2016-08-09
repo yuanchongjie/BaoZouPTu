@@ -36,7 +36,7 @@ public class DrawFragment extends Fragment implements DrawBaseFunction {
     }
 
     @Override
-    public void releaseResourse() {
+    public void releaseResource() {
 
     }
 

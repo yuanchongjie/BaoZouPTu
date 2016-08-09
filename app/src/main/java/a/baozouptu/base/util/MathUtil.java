@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class MathUtil {
     //默认除法运算精度
 
-    private static final int DEFAULT_DIV_SCALE = 10;
+    private static final int DEFAULT_DIV_SCALE = 15;
 
 
     /**

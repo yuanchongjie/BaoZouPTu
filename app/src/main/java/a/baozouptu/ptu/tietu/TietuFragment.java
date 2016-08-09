@@ -50,8 +50,8 @@ public class TietuFragment extends Fragment implements BaseFunction {
         tietuPaths.clear();
         MyDatabase mDB = MyDatabase.getInstance(mContext);
         try {
-            mDB.quaryAllUsedPic(tietuPaths);
-            mDB.quaryAllUsualyPic(tietuPaths);
+            mDB.queryAllUsedPic(tietuPaths);
+            mDB.queryAllFrequentlyPic(tietuPaths);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -164,7 +164,7 @@ public class TietuFragment extends Fragment implements BaseFunction {
     }
 
     @Override
-    public void releaseResourse() {
+    public void releaseResource() {
         floatImageView.releaseResourse();
     }
 }
@@ -214,7 +214,7 @@ class RecyclerAdapter extends RecyclerView.Adapter<MyViewHolder> implements View
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         FrameLayout itemView = (FrameLayout) LayoutInflater.from(mContext).inflate(
-                R.layout.list_item_tietu_founction, parent, false);
+                R.layout.item_list_tietu_icon, parent, false);
         itemView.setPadding(5, 0, 5, 0);
 
         ImageView imageView = new ImageView(mContext);

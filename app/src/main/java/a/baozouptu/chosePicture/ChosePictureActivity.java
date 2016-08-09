@@ -57,7 +57,7 @@ public class ChosePictureActivity extends AppCompatActivity {
     /**
      * 获取和保存某个文件下面所有图片的路径
      */
-    private List<String> picPathInFile = new ArrayList<String>();
+    private List<String> picPathInFile = new ArrayList<>();
     /**
      * 当前要现实的所有图片的路径
      */
@@ -71,7 +71,7 @@ public class ChosePictureActivity extends AppCompatActivity {
     private DrawerLayout fileListDrawer;
     private GridViewAdapter picAdpter;
     private GridView pictureGridview;
-    private ProcessUsualyPicPath usuPicProcess;
+    private ProcessUsuallyPicPath usuPicProcess;
 
     private ListView pictureFileListView;
     private MyFileListAdapter fileAdapter;
@@ -85,8 +85,8 @@ public class ChosePictureActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_show_picture);
-        test();
+        setContentView(R.layout.activity_chose_picture);
+        //test();
         Handler handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -105,7 +105,7 @@ public class ChosePictureActivity extends AppCompatActivity {
                 }
             }
         };
-        usuPicProcess = new ProcessUsualyPicPath(this, handler);
+        usuPicProcess = new ProcessUsuallyPicPath(this, handler);
         getScreenWidth();
         initView();
         m_ProgressDialog = ProgressDialog.show(ChosePictureActivity.this, "请稍后",
@@ -114,6 +114,7 @@ public class ChosePictureActivity extends AppCompatActivity {
     }
 
     private void test() {
+        m_ProgressDialog.dismiss();
         Intent intent1 = new Intent(this, PtuActivity.class);
         intent1.putExtra("picPath", "/storage/sdcard1/中大图.jpg");
         startActivity(intent1);
@@ -316,8 +317,7 @@ public class ChosePictureActivity extends AppCompatActivity {
                         if (usualyPicPathList.contains(path)) {//包含才常用列表里面
                             usuPicProcess.deletePicture(path);
                             picFileInfoList.remove(0);
-                            picFileInfoList.add(0, "  " + "常用图片(" + usualyPicPathList.size() + ")");
-                            usuPicProcess.getAllPicInfoAndRecent();
+                            picFileInfoList.add(0, "常用图片(" + usualyPicPathList.size() + ")");
                         } else currentPicPathList.remove(path);
                         picAdpter.notifyDataSetChanged();
                         fileAdapter.notifyDataSetChanged();
@@ -342,7 +342,7 @@ public class ChosePictureActivity extends AppCompatActivity {
     private void initView() {
         fileListDrawer = (DrawerLayout) findViewById(R.id.drawer_layout_show_picture);
         pictureGridview = (GridView) findViewById(R.id.gv_photolist);
-        toolbar = (Toolbar) findViewById(R.id.show_picture_toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_show_picture);
         setSupportActionBar(toolbar);
         final ImageButton showFile = (ImageButton) findViewById(R.id.show_pic_file);
         showFile.setOnClickListener(new View.OnClickListener() {
@@ -445,7 +445,7 @@ public class ChosePictureActivity extends AppCompatActivity {
             if (convertView == null) {
                 viewHolder = new ViewHolder();
                 convertView = layoutInflater.inflate(
-                        R.layout.list_item_picture_file, null);
+                        R.layout.item_list_picfile, null);
 
                 viewHolder.ivImage = (ImageView) convertView
                         .findViewById(R.id.represent_picture);

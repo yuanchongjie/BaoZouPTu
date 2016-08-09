@@ -4,18 +4,23 @@ package a.baozouptu.ptu.mat;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.view.MotionEvent;
 
+import a.baozouptu.base.util.MathUtil;
+import a.baozouptu.base.util.Util;
+import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.view.PtuView;
 
 /**
  * Created by liuguicen on 2016/8/2.
  *
- * @description
+ * @description 抠图视图
  */
 public class MatView extends PtuView {
 
     private static final int NO = 0;
+    private static final String TAG = "MatView";
     private int CUR_STATUS;
     private static final int PEN = 0x00000008;
     private static final int SMEAR = 2;
@@ -26,78 +31,119 @@ public class MatView extends PtuView {
 
     Context mContext;
     Rect totalBound;
-    Rect picBound;
     private Pen pen;
+    private final MatPathManager matPathManager;
 
     /**
+     * 必须在
+     *
      * @param totalBound 整个PtuFragment的bound
      */
     public MatView(Context context, Rect totalBound) {
         super(context);
-        mContext=context;
+
+        mContext = context;
         this.totalBound = new Rect(totalBound);
         CUR_STATUS = PEN;
         pen = new Pen(context, totalBound);
-
-        super.canDoubleClick(false);
-        super.setCanMinish(false);
+        matPathManager = new MatPathManager();
     }
 
+    //考虑各种各样的触摸事件发生
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-//                处于pen状态,点击发生在钢笔上面
                 if ((CUR_STATUS & PEN) != 0) {
+//                处于pen状态,根据点击发生的位置设置状态，状态设置好之后，移动和离开根据状态进行处理，一般都不变的
+//                    点击发生在钢笔上面
                     if (pen.contain(event.getX(), event.getY())) {
-                        pen.onClick();
-                        if (pen.isDrawLine())
-                            CUR_STATUS = PEN_DRAW_LINE;
-                        else
-                            CUR_STATUS = PEN_MOVE;
-                        pen.startAt(event.getX(), event.getY());
-                    } else {
+                        pen.prepareMove(event.getX(), event.getY());//不管哪种状态，按下之后就可能移动，所以准备好移动的操作
+                        if (pen.isDoubleClick()) {//检测是否是双击，如果是，设置isDrawLine变量
+                            if (pen.isDrawLine()) {//转换到划线状态
+                                CUR_STATUS = PEN_DRAW_LINE;
+                                matPathManager.startDrawLine(
+                                        PtuUtil.getLocationAtPicture(pen.pointLeft, pen.pointTop, srcRect, dstRect));
+                            } else {//转换到move状态
+                                CUR_STATUS = PEN_MOVE;
+                                matPathManager.finishDrawLine();
+                            }
+                        } else {//不是双击，只是点击，
+                            //pen的状态由如果是PEN，PEN变回MOVE或者DRAW_LINE
+                            if (pen.isDrawLine()) {
+                                CUR_STATUS = PEN_DRAW_LINE;
+                                matPathManager.startDrawLine(
+                                        PtuUtil.getLocationAtPicture(pen.pointLeft, pen.pointTop, srcRect, dstRect));
+                            } else {
+                                CUR_STATUS = PEN_MOVE;
+                            }
+                        }
+                    } else {//没点到PEN上面，状态变为PEN，此时缩放移动底图
                         CUR_STATUS = PEN;
                     }
                 }
                 break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                CUR_STATUS = PEN;//多个手指，进行缩放
             case MotionEvent.ACTION_MOVE:
                 float h = event.getHistorySize();
-                for (int i = 0; i < h; i++) {
+                for (int i = 0; i < h; i+=3) {
                     float x = event.getHistoricalX(i), y = event.getHistoricalY(i);
-                    if ((CUR_STATUS & PEN) != 0) {
+                    if ((CUR_STATUS & PEN) != 0) {//在PEN相关状态下发生移动
                         if (pen.contain(x, y)) {
-                            pen.move(x, y, srcRect, dstRect);
-                        } else {//移出了pen
-                            CUR_STATUS = PEN;
-                            pen.reStart();
+                            if (CUR_STATUS == PEN) {//从外面移入了钢笔,不管,钢笔不动
+
+                            } else {
+                                pen.move(x, y, dstRect);
+                                if (CUR_STATUS == PEN_DRAW_LINE)//如果是划线状态，添加移动到路径上
+                                    matPathManager.addLinePoint(
+                                            PtuUtil.getLocationAtPicture(pen.pointLeft, pen.pointTop, srcRect, dstRect));
+                            }
+                        } else if (CUR_STATUS != PEN) {
+                            //移出了pen,移动太快没检测到,或者移到了手指不能到的地方，
+                            // 不改变状态，用户仍然想移动钢笔
+                            pen.outTouch();
                         }
                     }
                 }
                 break;
+            case MotionEvent.ACTION_CANCEL:
+                Util.P.le(TAG,"接受到了cancel事件");
             case MotionEvent.ACTION_UP:
-                if ((CUR_STATUS & PEN) != 0) {
-                    pen.reStart();
+                switch (CUR_STATUS) {
+                    case PEN:
+                        break;
+                    case PEN_MOVE:
+                        pen.outTouch();
+                        break;
+                    case PEN_DRAW_LINE:
+                        pen.outTouch();
+                        matPathManager.finishDrawLine();
                 }
                 break;
         }
-        if (CUR_STATUS == NO)
+        if (CUR_STATUS == NO || CUR_STATUS == PEN)
             return super.onTouchEvent(event);
         invalidate();
         return true;
     }
 
+
     @Override
     public void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
         switch (CUR_STATUS) {
             case PEN:
+                super.onDraw(canvas);
+                pen.drawPen(canvas);
+                break;
             case PEN_MOVE:
+                super.onDraw(canvas);
                 pen.drawPen(canvas);
                 break;
             case PEN_DRAW_LINE:
+                matPathManager.drawLine(sourceCanvas);
+                super.onDraw(canvas);
                 pen.drawPen(canvas);
-                pen.drawLine(sourceCanvas);
         }
     }
 
@@ -108,7 +154,7 @@ public class MatView extends PtuView {
             if (pen != null)
                 pen.reSet(totalBound);
             else
-                pen = new Pen(mContext,totalBound);
+                pen = new Pen(mContext, totalBound);
             invalidate();
         }
     }
@@ -144,4 +190,5 @@ public class MatView extends PtuView {
     public void releaseResource() {
         pen.releaseResource();
     }
+
 }

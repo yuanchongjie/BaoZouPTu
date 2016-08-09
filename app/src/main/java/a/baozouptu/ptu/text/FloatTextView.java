@@ -1,4 +1,4 @@
-package a.baozouptu.ptu.addtext;
+package a.baozouptu.ptu.text;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -217,7 +217,7 @@ public class FloatTextView extends EditText implements FloatView {
                 //按原来的的中心坐标缩放
                 fLeft = cx - mWidth / 2;
                 fTop = cy - mHeight / 2;
-                ((PtuFrameLayout) getParent()).redrawFloat();
+                ((PtuFrameLayout) getParent()).changeLocation();
                 if (lastSelectionId > 0) {
                     setCursorVisible(true);
                     requestFocus();
@@ -466,7 +466,7 @@ public class FloatTextView extends EditText implements FloatView {
         setCursorVisible(false);
         requestFocus();
         SHOW_SATUS = STATUS_TOUMING;
-        ((PtuFrameLayout) getParent()).redrawFloat();
+        ((PtuFrameLayout) getParent()).changeLocation();
         return true;
     }
 
@@ -550,6 +550,7 @@ public class FloatTextView extends EditText implements FloatView {
     protected void onDraw(Canvas canvas) {
         Util.P.le(DEBUG_TAG, "onDraw()");
         mPaint.setTextSize(mTextSize);
+
         Paint.FontMetrics fm = mPaint.getFontMetrics();
         /**
          * 文本默认不局中，计算中间位置
@@ -686,6 +687,6 @@ public class FloatTextView extends EditText implements FloatView {
         fTop = initTop;
         changeShowState(STATUS_ITEM);
         //请求重绘
-        ((PtuFrameLayout) getParent()).redrawFloat();
+        ((PtuFrameLayout) getParent()).changeLocation();
     }
 }

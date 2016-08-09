@@ -36,5 +36,5 @@ public interface BaseFunction {
      */
     StepData getResultData(float ratio);
 
-    void releaseResourse();
+    void releaseResource();
 }

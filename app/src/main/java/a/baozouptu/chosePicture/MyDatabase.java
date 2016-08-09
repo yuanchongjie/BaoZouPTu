@@ -8,8 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import a.baozouptu.chosePicture.MySQLiteOpenHandler;
-
 /**
  * 一定注意，使用这个类时，使用完了关闭数据库
  */
@@ -74,7 +72,7 @@ public class MyDatabase {
      * @param pathList
      */
     //    有两个返回值，不能直接返回，传入应用获取
-    public void quaryAllUsedPic(List<String> pathList) throws IOException {
+    public void queryAllUsedPic(List<String> pathList) throws IOException {
         Cursor cursor = db.rawQuery("select path from usedpic order by time desc ", new String[]{});
         while (cursor.moveToNext()) {
             String path = cursor.getString(0);
@@ -89,7 +87,7 @@ public class MyDatabase {
     /**
      * 查询图片路径加上时间
      */
-    public void quaryAllUsedPicWithTime(List<String> pathList) throws IOException {
+    public void queryAllUsedPicWithTime(List<String> pathList) throws IOException {
         Cursor cursor = db.rawQuery("select * from usedpic order by time desc ", new String[]{});
         while (cursor.moveToNext()) {
             String path = cursor.getString(0);
@@ -105,7 +103,7 @@ public class MyDatabase {
      * inert时如果存在就替换，使用replace，不然就会出错，
      * 这样就不需要update了
      */
-    public void insertUsualyPic(String path, long time) throws IOException {
+    public void insertFrequentlyPic(String path, long time) throws IOException {
         db.execSQL("replace into usualypic(path,time) values(?,?) ", new Object[]{path, String.valueOf(time)});
     }
 
@@ -114,7 +112,7 @@ public class MyDatabase {
      *
      * @param path
      */
-    public void deleteUsualyPic(String path) throws IOException {
+    public void deleteFrequentlyPic(String path) throws IOException {
         db.execSQL("delete from usualypic where path = ?", new Object[]{path});
     }
 
@@ -124,8 +122,8 @@ public class MyDatabase {
      * @param path
      * @param time
      */
-    public void updateUsualyPic(String path, long time) throws IOException {
-        insertUsualyPic(path, time);
+    public void updateFrequentlyPic(String path, long time) throws IOException {
+        insertFrequentlyPic(path, time);
     }
 
     /**
@@ -135,12 +133,12 @@ public class MyDatabase {
      * @param pathList
      */
     //    有两个返回值，不能直接返回，传入应用获取
-    public void quaryAllUsualyPic(List<String> pathList) throws IOException {
+    public void queryAllFrequentlyPic(List<String> pathList) throws IOException {
         Cursor cursor = db.rawQuery("select path from usualypic order by time desc ", new String[]{});
         while (cursor.moveToNext()) {
             String path = cursor.getString(0);
             if (!(new File(path).exists()))
-                deleteUsualyPic(path);
+                deleteFrequentlyPic(path);
             else
                 pathList.add(path);
         }
