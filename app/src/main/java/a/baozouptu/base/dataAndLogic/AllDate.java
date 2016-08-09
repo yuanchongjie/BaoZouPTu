@@ -23,13 +23,13 @@ public class AllDate {
     public final static String[] normalPictureFormat = new String[]{"png", "gif", "bmp", "jpg", "jpeg", "tiff", "jpeg2000", "psd", "icon"};
     public static float thumbnailSize = 10000.0f;
     /**
-     * 图片内存最小值 5K
+     * 图片内存最小值,单位byte
      */
-    public final static int PIC_FILE_SIZE_MIN = 1;
+    public final static int PIC_FILE_SIZE_MIN = 1*1000;
     /**
-     * 图片内存最大值 80000K=80M
+     * 图片内存最大值,单位byte
      */
-    public final static int PIC_FILE_SIZE_MAX = 100000;
+    public final static int PIC_FILE_SIZE_MAX = 100000*1000;
 
     public static int CURRENT_EDIT_MODE = 0;
     public static final int EDIT_NO = 0;

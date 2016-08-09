@@ -18,7 +18,7 @@ import android.widget.RelativeLayout;
 import a.baozouptu.R;
 import a.baozouptu.base.util.Util;
 
-public class PtuTopRealtiveLayout extends RelativeLayout {
+public class PtuTopRelativeLayout extends RelativeLayout {
     Context mContext;
     private ImageButton cancel;
     private ImageButton sure;
@@ -34,12 +34,12 @@ public class PtuTopRealtiveLayout extends RelativeLayout {
     private TextView save;
     private LayoutParams saveParams;
 
-    public PtuTopRealtiveLayout(Context context) {
+    public PtuTopRelativeLayout(Context context) {
         super(context);
         mContext = context;
     }
 
-    public PtuTopRealtiveLayout(Context context, AttributeSet attrs) {
+    public PtuTopRelativeLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
     }

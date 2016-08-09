@@ -142,7 +142,7 @@ public class TuyaActivity extends AppCompatActivity implements View.OnClickListe
             alertDialogBuilder.setTitle("选择画笔大小：");
             alertDialogBuilder.setSingleChoiceItems(R.array.paintsize, select_paint_size_index, new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
+                public void isDoubleClick(DialogInterface dialog, int which) {
                     select_paint_size_index = which;
                     tuyaView.selectPaintSize(which);
                     dialog.dismiss();
@@ -150,7 +150,7 @@ public class TuyaActivity extends AppCompatActivity implements View.OnClickListe
             });
             alertDialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
+                public void isDoubleClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
                 }
             });

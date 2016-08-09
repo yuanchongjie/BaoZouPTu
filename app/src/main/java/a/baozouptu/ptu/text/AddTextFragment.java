@@ -1,4 +1,4 @@
-package a.baozouptu.ptu.addtext;
+package a.baozouptu.ptu.text;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -28,7 +28,6 @@ import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TextStepData;
 import a.baozouptu.ptu.view.ColorBar;
 import a.baozouptu.ptu.view.ColorLump;
-import a.baozouptu.ptu.addtext.FloatTextView;
 import a.baozouptu.base.view.HorizontalListView;
 import a.baozouptu.base.view.MySwitchButton;
 
@@ -65,7 +64,7 @@ public class AddTextFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mAcitivty = (PtuActivity) getActivity();//onAttach貌似不会执行，需要在这里获取context
-        View view = inflater.inflate(R.layout.fragment_add_text_function, container, false);
+        View view = inflater.inflate(R.layout.fragment_text, container, false);
         initView(view);
         textPopupBuilder = new FunctionPopWindowBuilder(mAcitivty);
         setClick();

@@ -62,7 +62,7 @@ public class MainFunctionFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_main_function, container, false);
+        view = inflater.inflate(R.layout.fragment_main, container, false);
         initView(view);
         setOnClick();
         return view;

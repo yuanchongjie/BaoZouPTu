@@ -11,6 +11,7 @@ import java.util.ListIterator;
 
 import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
+import a.baozouptu.ptu.cut.CutView;
 
 /**
  * Created by Administrator on 2016/7/28.
@@ -23,13 +24,22 @@ public class RepealRedoManager {
     private static int maxStep = 5;
     Bitmap baseBitmap;
     boolean hasChangePic;
+    private static RepealRedoManager instanceTotal;
 
-    private Bitmap newSourceBm;
-
-    public RepealRedoManager(int maxStep) {
+    private RepealRedoManager(int maxStep) {
         this.maxStep = maxStep;
         stepList = new LinkedList<>();
         iter = stepList.listIterator();
+    }
+
+    /**
+     * @param externalMaxStep 构造器输入负数表示使用默认最大步数，5
+     * @return
+     */
+    public static RepealRedoManager getInstanceTotal(int externalMaxStep) {
+        if (instanceTotal == null)
+            instanceTotal =new  RepealRedoManager(externalMaxStep < 0 ? maxStep : externalMaxStep);
+        return instanceTotal;
     }
 
     /**
@@ -47,13 +57,13 @@ public class RepealRedoManager {
         }
         iter.add(sd);
         if (stepList.size() > maxStep) {
-            hasChangePic=true;
-            while(iter.hasPrevious()){
+            hasChangePic = true;
+            while (iter.hasPrevious()) {
                 iter.previous();
             }
-            StepData resd=iter.next();
+            StepData resd = iter.next();
             iter.remove();
-            while(iter.hasNext()){
+            while (iter.hasNext()) {
                 iter.next();
             }
             return resd;
@@ -129,7 +139,7 @@ public class RepealRedoManager {
     public static Bitmap getInnerBmFromView(View view, RectF innerRect) {
         final Bitmap[] innerBitmap = new Bitmap[1];
         try {
-            Bitmap viewBitmap = Bitmap.createBitmap(view.getWidth(),view.getHeight(),
+            Bitmap viewBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),
                     Bitmap.Config.ARGB_8888);
             view.draw(new Canvas(viewBitmap));
             innerBitmap[0] = Bitmap.createBitmap(viewBitmap, (int) innerRect.left, (int) innerRect.top,
@@ -157,14 +167,15 @@ public class RepealRedoManager {
 
     /**
      * 待用
+     *
      * @return
      */
-    public boolean hasChangePic(){
-        if(hasChangePic==true)
+    public boolean hasChangePic() {
+        if (hasChangePic == true)
             return true;
-        else if(getCurrentIndex()!=0){
+        else if (getCurrentIndex() != 0) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }

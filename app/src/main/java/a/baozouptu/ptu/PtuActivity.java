@@ -2,6 +2,7 @@ package a.baozouptu.ptu;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
@@ -17,6 +18,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -31,8 +33,8 @@ import a.baozouptu.base.dataAndLogic.AllDate;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.FileTool;
 import a.baozouptu.base.util.Util;
-import a.baozouptu.ptu.addtext.AddTextFragment;
-import a.baozouptu.ptu.addtext.FloatTextView;
+import a.baozouptu.ptu.text.AddTextFragment;
+import a.baozouptu.ptu.text.FloatTextView;
 import a.baozouptu.ptu.control.MainFunctionFragment;
 import a.baozouptu.ptu.cut.CutFragment;
 import a.baozouptu.ptu.draw.DrawFragment;
@@ -44,7 +46,7 @@ import a.baozouptu.ptu.repealRedo.TietuStepData;
 import a.baozouptu.ptu.tietu.FloatImageView;
 import a.baozouptu.ptu.tietu.TietuFragment;
 import a.baozouptu.ptu.view.PtuFrameLayout;
-import a.baozouptu.ptu.view.PtuTopRealtiveLayout;
+import a.baozouptu.ptu.view.PtuTopRelativeLayout;
 import a.baozouptu.ptu.view.PtuView;
 
 public class PtuActivity extends AppCompatActivity implements MainFunctionFragment.Listen {
@@ -83,13 +85,13 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     private String picPath = null;
     private FloatTextView floatTextView;
     private final int MAX_STEP = 10;
-    private RepealRedoManager repealRedoManager = new RepealRedoManager(MAX_STEP);
+    private RepealRedoManager repealRedoManager = RepealRedoManager.getInstanceTotal(MAX_STEP);
     private float finalRatio = 1;
     private Intent resultIntent = new Intent();
 
     boolean hasChanged = false;
 
-    private PtuTopRealtiveLayout topRelativeLayout;
+    private PtuTopRelativeLayout topRelativeLayout;
     private ImageButton cancelBtn;
     private ImageButton sureBtn;
     private ImageButton goSendBtn;
@@ -102,7 +104,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     /**
      * 整个PtuFragment的范围
      */
-    private Rect ptuBoundRect;
+    private Rect totalBound;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -171,7 +173,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                switchFragment(NAME_MAT);
+                switchFragment(NAME_TEXT);
             }
         }, 500);
     }
@@ -184,7 +186,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         int smallDividerWidth = Util.dp2Px(16);
         int bigDividerWidth = (int) (AllDate.screenWidth * 7.5 / 112);
 
-        topRelativeLayout = (PtuTopRealtiveLayout) findViewById(R.id.ptu_toolbar_relative);
+        topRelativeLayout = (PtuTopRelativeLayout) findViewById(R.id.ptu_toolbar_relative);
 
         //初始化中间的按钮
         ImageButton[] btns = topRelativeLayout.createCenterView(top_btn_width, bigDividerWidth);
@@ -253,7 +255,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     }
 
     private void saveSet() {
-
+        Dialog dialog=new Dialog(this);
     }
 
     private void setViewContent() {
@@ -261,7 +263,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
-                        ptuBoundRect=new Rect(0,0,ptuFrame.getWidth(),ptuFrame.getHeight());
+                        totalBound =new Rect(0,0,ptuFrame.getWidth(),ptuFrame.getHeight());
                         ptuView.setBitmapAndInit(picPath, ptuFrame.getWidth(), ptuFrame.getHeight());
                         repealRedoManager.setBaseBm(ptuView.getSourceBm()
                                 .copy(Bitmap.Config.ARGB_8888, true));
@@ -283,7 +285,8 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                             }
                         }
                     }
-                });
+                }
+        );
     }
 
 
@@ -412,11 +415,21 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             onToSecondFunction();
             switch (function) {
                 case NAME_CUT:
+                    if(cutFrag==null){
+                        cutFrag=new CutFragment(PtuActivity.this);
+                    }
+                    fm.beginTransaction()
+                            .setCustomAnimations(R.animator.slide_bottom_in, R.animator.slide_bottom_out,
+                                    R.animator.slide_bottom_in, R.animator.slide_bottom_out)
+                            .replace(R.id.fragment_function, cutFrag)
+                            .commit();
+                    FrameLayout.LayoutParams cutFloatParams =
+                            new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                    ptuFrame.addView(cutFrag.createCutView(totalBound,ptuView.getSourceBm()), cutFloatParams);
 
                     CURRENT_EDIT_MODE = EDIT_CUT;
                     break;
                 case NAME_TEXT:
-
                     if (textFrag == null) {
                         textFrag = new AddTextFragment();
                     }
@@ -463,8 +476,8 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
                     //设置布局
                     FrameLayout.LayoutParams floatParams =
-                            new FrameLayout.LayoutParams(ptuBoundRect.width(), ptuBoundRect.height());
-                    ptuFrame.addView(matFrag.createMatView(ptuBoundRect,ptuView.getSourceBm()), floatParams);
+                            new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                    ptuFrame.addView(matFrag.createMatView(totalBound,ptuView.getSourceBm()), floatParams);
                     CURRENT_EDIT_MODE = EDIT_MAT;
                     break;
             }
@@ -496,7 +509,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
      */
     private void sure() {
         if (CURRENT_EDIT_MODE == EDIT_CUT) {
-            Bitmap newSourceBm = cutFrag.getResultBm(1);
+            Bitmap newSourceBm = cutFrag.getResultBm(finalRatio);
             ptuView.replaceSourceBm(newSourceBm);
             ptuView.resetShow();
         }//添加文字
@@ -543,7 +556,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
             //释放，删除等部分
             ptuFrame.removeViewAt(1);
-            tietuFrag.releaseResourse();
+            tietuFrag.releaseResource();
 
             afterSure(ttsd);
         } //绘图

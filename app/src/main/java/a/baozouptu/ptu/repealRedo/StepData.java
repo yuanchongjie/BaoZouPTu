@@ -2,8 +2,6 @@ package a.baozouptu.ptu.repealRedo;
 
 import android.graphics.RectF;
 
-import a.baozouptu.ptu.addtext.FloatTextView;
-
 /**
  * Created by Administrator on 2016/7/8.
  */

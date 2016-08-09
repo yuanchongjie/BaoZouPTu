@@ -23,11 +23,11 @@ import a.baozouptu.ptu.repealRedo.RepealRedoManager;
  * <p>sourceBitmap可能会被替换，此时尺寸大小也可能会被改变</p>
  * 注意： 每次缩放要寻改的地方有三个，totalRatio，currentRatio,CURRENT_STATUS
  */
-public class PtuView extends View implements GestureImageView {
+public class PtuView extends View implements TSRView {
     String TAG = "PtuView";
     private boolean canDoubleCilick = true;
-    private int minRatio;
-    private boolean canMinish=true;
+    private float minRatio;
+    private boolean canDiminish=true;
 
     public void setCanRotate(boolean canRotate) {
         this.canRotate = canRotate;
@@ -90,7 +90,7 @@ public class PtuView extends View implements GestureImageView {
     /**
      * 整个View的宽,高
      */
-    private int totalWidth, totalHeight;
+    protected int viewWidth, viewHeigh;
     /**
      * 原图片的宽度,高度
      */
@@ -100,7 +100,7 @@ public class PtuView extends View implements GestureImageView {
      */
     private int picLeft = 0, picTop = 0;
     /**
-     * 图片的局部，要现实出来的部分
+     * 图片的局部，要显示出来的部分
      */
     protected Rect srcRect = new Rect(0, 0, 1, 1);
     /**
@@ -116,7 +116,7 @@ public class PtuView extends View implements GestureImageView {
     /**
      * 当前图片的宽和高
      */
-    private int curPicWidth=10, curPicHeight=10;
+    protected int curPicWidth=10, curPicHeight=10;
     protected Canvas sourceCanvas;
 
     public PtuView(Context context) {
@@ -132,20 +132,20 @@ public class PtuView extends View implements GestureImageView {
         picPaint.setDither(true);
     }
 
-    public PtuView(Context context,String path, int totalWidth, int totalHeight) {
+    public PtuView(Context context, String path, int viewWidth, int viewHeigh) {
         super(context);
         this.mContext = context;
         CURRENT_STATUS = STATUS_INIT;
         picPaint.setDither(true);
-        setBitmapAndInit(path,totalWidth,totalHeight);
+        setBitmapAndInit(path, viewWidth, viewHeigh);
     }
 
-    public PtuView(Context context,Bitmap bitmap, int totalWidth, int totalHeight) {
+    public PtuView(Context context, Bitmap bitmap, int viewWidth, int viewHeigh) {
         super(context);
         this.mContext = context;
         CURRENT_STATUS = STATUS_INIT;
         picPaint.setDither(true);
-        setBitmapAndInit(bitmap,totalWidth,totalHeight);
+        setBitmapAndInit(bitmap, viewWidth, viewHeigh);
     }
     /**
      * 根据提供的缩放比例，将p图的图片缩放到原图*缩放比例大小，并返回
@@ -183,23 +183,26 @@ public class PtuView extends View implements GestureImageView {
         sourceCanvas = new Canvas(sourceBitmap);
         srcPicWidth = sourceBitmap.getWidth();
         srcPicHeight = sourceBitmap.getHeight();
-        this.totalWidth = totalWidth;
-        this.totalHeight = totalHeight;
-        setCanMinish(false);
+        this.viewWidth = totalWidth;
+        this.viewHeigh = totalHeight;
+        totalRatio = Math.min(totalWidth * 1f / srcPicWidth,
+                totalHeight * 1f / srcPicHeight );
+        initRatio = totalRatio;
+        setCanLessThanScreen(true);
         CURRENT_STATUS = STATUS_INIT;
     }
 
     /**
-     * 这个必须在onsizechaged后面调用，那是{@code totalWidth}和{@code totalHeight}才会获取到
+     * 那是{@code viewWidth}和{@code viewHeigh}才会获取到
      */
     public void initialDraw() {
-        totalRatio = Math.min(totalWidth * 1.0f / (srcPicWidth * 1.0f),
-                totalHeight * 1.0f / (srcPicHeight * 1.0f));
+        totalRatio = Math.min(viewWidth * 1f / srcPicWidth,
+                viewHeigh * 1f / srcPicHeight );
         initRatio = totalRatio;
         curPicWidth = (int) (srcPicWidth * totalRatio);
         curPicHeight = (int) (srcPicHeight * totalRatio);
-        picLeft = (totalWidth - curPicWidth) / 2;
-        picTop = (totalHeight - curPicHeight) / 2;
+        picLeft = (viewWidth - curPicWidth) / 2;
+        picTop = (viewHeigh - curPicHeight) / 2;
         getConvertParameter(curPicWidth, curPicHeight);
     }
 
@@ -239,6 +242,7 @@ public class PtuView extends View implements GestureImageView {
                     CURRENT_STATUS = STATUS_MOVE;
                     move(event.getX(), event.getY());
                 } else {
+                    //缩放
                     float endD = GeoUtil.getDis(event.getX(0), event.getY(0), event.getX(1), event.getY(1));
                     float currentRatio = endD / lastDis;
                     lastDis = endD;
@@ -247,6 +251,8 @@ public class PtuView extends View implements GestureImageView {
                         return true;//本次缩放比例不够大
                     if (totalRatio * currentRatio > MAX_RATIO)
                         return true;//总的缩放比例超出了最大范围
+                    if(!canDiminish&&currentRatio*totalRatio<initRatio)//不支持缩小时
+                        currentRatio=initRatio/totalRatio;
 
                     CURRENT_STATUS = STATUS_SCALE;
                     totalRatio *= currentRatio;
@@ -264,10 +270,10 @@ public class PtuView extends View implements GestureImageView {
                     lastX = event.getX(index);
                     lastY = event.getY(index);
                     //当缩小范围超过最小值时
-                    if (totalRatio < minRatio) {
+                    if (canDiminish&&totalRatio < minRatio) {
                         totalRatio = minRatio;
                         CURRENT_STATUS = STATUS_SCALE;
-                        scale(totalWidth / 2, totalHeight / 2, minRatio / totalRatio);
+                        scale(viewWidth / 2, viewHeigh / 2, minRatio / totalRatio);
                     }
                 }
                 if (event.getPointerCount() == 3) {
@@ -301,13 +307,13 @@ public class PtuView extends View implements GestureImageView {
         int tx = picLeft;
         picLeft += curX - lastX;
         lastX = curX;
-        if (picLeft >= 0 || Math.abs(picLeft) + totalWidth > curPicWidth)//如果x超出界限，x方向就不移动了
+        if (picLeft >= 0 || Math.abs(picLeft) + viewWidth > curPicWidth)//如果x超出界限，x方向就不移动了
             picLeft = tx;
 
         int ty = picTop;
         picTop += curY - lastY;
         lastY = curY;
-        if (picTop >= 0 || Math.abs(picTop) + totalHeight > curPicHeight)//如果y超出界限，y方向就不移动了
+        if (picTop >= 0 || Math.abs(picTop) + viewHeigh > curPicHeight)//如果y超出界限，y方向就不移动了
             picTop = ty;
 
         if (picLeft == tx && picTop == ty)//x，y方向都移动不了，就不移动的标志
@@ -338,7 +344,6 @@ public class PtuView extends View implements GestureImageView {
 
     public void scale(float scaleCenterX, float scaleCenterY, float currentRatio) {
         // 获取当前图片的宽、高
-        Util.P.le(TAG, "缩放图片开始");
         curPicWidth = (int) (srcPicWidth * totalRatio);
         curPicHeight = (int) (srcPicHeight * totalRatio);
 
@@ -351,15 +356,14 @@ public class PtuView extends View implements GestureImageView {
         picTop = (int) y;
 
         //当缩放到view内部是，调整图片的边界
-        if (curPicWidth < totalWidth) picLeft = (totalWidth - curPicWidth) / 2;
-        else if (picLeft > 0 && curPicWidth > totalWidth) picLeft = 0;
+        if (curPicWidth < viewWidth) picLeft = (viewWidth - curPicWidth) / 2;
+        else if (picLeft > 0 && curPicWidth > viewWidth) picLeft = 0;
 
-        if (curPicHeight < totalHeight) picTop = (totalHeight - curPicHeight) / 2;
-        else if (picTop > 0 && curPicHeight > totalHeight) picTop = 0;
+        if (curPicHeight < viewHeigh) picTop = (viewHeigh - curPicHeight) / 2;
+        else if (picTop > 0 && curPicHeight > viewHeigh) picTop = 0;
 
         getConvertParameter(curPicWidth, curPicHeight);
         invalidate();
-        Util.P.le(TAG, "缩放完成");
     }
 
     /**
@@ -372,8 +376,8 @@ public class PtuView extends View implements GestureImageView {
      */
     private void getConvertParameter(int curPicWidth, int curPicHeight) {
         // 显示在屏幕上绘制的宽度、高度
-        int drawWidth = curPicWidth > totalWidth ? totalWidth : curPicWidth;
-        int drawHeight = curPicHeight > totalHeight ? totalHeight : curPicHeight;
+        int drawWidth = curPicWidth > viewWidth ? viewWidth : curPicWidth;
+        int drawHeight = curPicHeight > viewHeigh ? viewHeigh : curPicHeight;
 
         int leftInView = picLeft < 0 ? 0 : picLeft, topInView = picTop < 0 ? 0 : picTop;
         int leftInPic = picLeft > 0 ? 0 : -picLeft, topInPic = picTop > 0 ? 0 : -picTop;
@@ -433,8 +437,8 @@ public class PtuView extends View implements GestureImageView {
         totalRatio = initRatio;
         curPicWidth = (int) (srcPicWidth * totalRatio);
         curPicHeight = (int) (srcPicHeight * totalRatio);
-        picLeft = (totalWidth - curPicWidth) / 2;
-        picTop = (totalHeight - curPicHeight) / 2;
+        picLeft = (viewWidth - curPicWidth) / 2;
+        picTop = (viewHeigh - curPicHeight) / 2;
         getConvertParameter(curPicWidth, curPicHeight);
         invalidate();
     }
@@ -486,12 +490,12 @@ public class PtuView extends View implements GestureImageView {
 
     /**
      * 必须在setBitmapAndInit后面调用
-     * @param canMinish
+     * @param canLessThanScreen 是否能小于屏幕
      */
-    public void setCanMinish(boolean canMinish) {
-        this.canMinish = canMinish;
-        if(canMinish){
-            minRatio = Math.min(totalWidth / 2 / curPicWidth, totalHeight / 3 / curPicHeight);
-        }else minRatio=1;
+    public void setCanLessThanScreen(boolean canLessThanScreen) {
+        this.canDiminish=canLessThanScreen;
+        if(canLessThanScreen){
+            minRatio = Math.min(viewWidth *1f / 2 / srcPicWidth, viewHeigh *1f / 3 / srcPicHeight);
+        }else minRatio=initRatio;
     }
 }

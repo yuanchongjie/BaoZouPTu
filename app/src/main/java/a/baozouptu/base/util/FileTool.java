@@ -40,7 +40,7 @@ public class FileTool {
      * @param lstPaths List《String》括号用不了？？？ , 返回的结构， 文件夹下及子文件夹下所有符合条件的图片的路径,
      *                 因为要得到子文件夹路径下的图片路径，所以使用传参赋值更好
      */
-    public void getOrderedPicListInFile(String path, List<String> lstPaths) {
+    public static void getOrderedPicListInFile(String path, List<String> lstPaths) {
         List<Pair<Long, String>> oderedPaths = new ArrayList<>();
 
         File file = new File(path);
@@ -83,7 +83,7 @@ public class FileTool {
      * @param path 图片的路径
      * @return 图片大小是否符合要求
      */
-    private boolean fileSizeValidity(String path) {
+    private static boolean fileSizeValidity(String path) {
         File f = new File(path);
         if (f.exists()) {
             int cur = 0;
@@ -91,7 +91,7 @@ public class FileTool {
             try {
                 fis = new FileInputStream(f);
 
-                cur = fis.available() / 1000;
+                cur = fis.available();
 
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

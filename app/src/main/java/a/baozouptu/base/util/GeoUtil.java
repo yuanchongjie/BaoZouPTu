@@ -18,18 +18,18 @@ public class GeoUtil {
     /**
      * 利用matrix进行缩放
      *
-     * @param tstartX      被缩放的x
-     * @param tstartY      被缩放的y
+     * @param scalingX      被缩放的x
+     * @param scalingY      被缩放的y
      * @param scaleCenterX 缩放中心x
      * @param scaleCenterY 缩放中心y
      * @param scale        缩放倍数
      * @return 缩放后的x坐标
      */
-    public static float getScaledX(float tstartX, float tstartY, float scaleCenterX, float scaleCenterY, float scale) {
+    public static float getScaledX(float scalingX, float scalingY, float scaleCenterX, float scaleCenterY, float scale) {
         Matrix matrix = new Matrix();
         // 将Matrix移到到当前圆所在的位置，
         // 然后再以某个点为中心进行缩放
-        matrix.preTranslate(tstartX, tstartY);
+        matrix.preTranslate(scalingX, scalingY);
         matrix.postScale(scale, scale, scaleCenterX, scaleCenterY);
         float[] values = new float[9];
         matrix.getValues(values);
@@ -39,18 +39,18 @@ public class GeoUtil {
     /**
      * 利用matrix进行缩放
      *
-     * @param tstartX      被缩放的x
-     * @param tstartY      被缩放的y
+     * @param scalingX      被缩放的x
+     * @param scalingY      被缩放的y
      * @param scaleCenterX 缩放中心x
      * @param scaleCenterY 缩放中心y
      * @param scale        缩放倍数
      * @return 缩放后的Y坐标
      */
-    public static float getScaledY(float tstartX, float tstartY, float scaleCenterX, float scaleCenterY, float scale) {
+    public static float getScaledY(float scalingX, float scalingY, float scaleCenterX, float scaleCenterY, float scale) {
         Matrix matrix = new Matrix();
         // 将Matrix移到到当前圆所在的位置，
         // 然后再以某个点为中心进行缩放
-        matrix.preTranslate(tstartX, tstartY);
+        matrix.preTranslate(scalingX, scalingY);
         matrix.postScale(scale, scale, scaleCenterX, scaleCenterY);
         float[] values = new float[9];
         matrix.getValues(values);

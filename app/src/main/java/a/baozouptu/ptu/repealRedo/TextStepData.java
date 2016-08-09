@@ -1,6 +1,6 @@
 package a.baozouptu.ptu.repealRedo;
 
-import a.baozouptu.ptu.addtext.FloatTextView;
+import a.baozouptu.ptu.text.FloatTextView;
 
 /**
  * Created by Administrator on 2016/7/27.

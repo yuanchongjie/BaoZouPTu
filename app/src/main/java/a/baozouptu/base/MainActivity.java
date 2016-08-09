@@ -28,7 +28,7 @@ import a.baozouptu.chosePicture.ChosePictureActivity;
 import a.baozouptu.ptu.draw.TuyaActivity;
 import a.baozouptu.base.dataAndLogic.AllDate;
 import a.baozouptu.chosePicture.MyDatabase;
-import a.baozouptu.chosePicture.ProcessUsualyPicPath;
+import a.baozouptu.chosePicture.ProcessUsuallyPicPath;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private int[] fab = {R.id.fab, R.id.fab1, R.id.fab2, R.id.fab3};
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initToolbar();
 
         initview();
-        // sendNotify();
+        sendNotify();
     }
 
     private void test() {
@@ -96,8 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void testDB1() {
-        ProcessUsualyPicPath ups = new ProcessUsualyPicPath(this);
-        List<String> paths = new ArrayList<>();
+        ProcessUsuallyPicPath ups = new ProcessUsuallyPicPath(this);
         ups.addUsedPath("1111");
         ups.addUsedPath("2222");
         ups.addUsedPath("3333");
@@ -108,15 +107,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ups.addUsedPath("hhhh");
         ups.addUsedPath("iiii");
         ups.addUsedPath("jjjj");
-
-        paths = ups.getUsualyPathFromDB();
     }
 
     private void testDB() {
         MyDatabase mdb = MyDatabase.getInstance(this);
         List<String> paths = new ArrayList<>();
         try {
-            mdb.quaryAllUsedPicWithTime(paths);
+            mdb.queryAllUsedPicWithTime(paths);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

@@ -4,23 +4,20 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.DashPathEffect;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.view.ViewConfiguration;
 
 import a.baozouptu.R;
 import a.baozouptu.base.util.GeoUtil;
-import a.baozouptu.base.util.MathUtil;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.view.IconBitmapCreator;
 
 /**
  * Created by liuguicen on 2016/8/3.
  *
- * @description
+ * @description 底图移动，钢笔不动
  */
 public class Pen {
 
@@ -36,35 +33,21 @@ public class Pen {
      * <p> penLeft和penTop是旋转中心，也是
      * <P>钢笔的笔记所在位置，不会因为旋转改变
      */
-    private float pointLeft, pointTop, penWidth, penHeight;
+    float pointLeft, pointTop, penWidth, penHeight;
 
     private final GeoUtil.UnLevelRect mBound;
-    /**
-     * 保存的是在原图中的位置
-     */
-    private Path mLinePath;
-    private Paint mPenPaint, mlinePaint;
+    private Paint mPenPaint;
     private Bitmap penBm;
     public float lastX, lastY;
-    private float lastLineTop, lastLineLeft;
+    private float startAngle;
 
     Pen(Context context, Rect bound) {
         mContext = context;
-        mLinePath = new Path();
-
         mPenPaint = new Paint();
         mPenPaint.setAntiAlias(true);
         mPenPaint.setDither(true);
 
         isDrawLine = false;
-        mlinePaint = new Paint();
-        mlinePaint.setAntiAlias(true);
-        mlinePaint.setDither(true);
-        mlinePaint.setStrokeWidth(5);
-        mlinePaint.setStyle(Paint.Style.STROKE);
-        mlinePaint.setPathEffect(new DashPathEffect(new float[]{10, 10}, 0));
-        mlinePaint.setColor(Util.getColor(R.color.base_color1));
-
         penWidth = 60;
         int c1 = Util.getColor(R.color.mat_pen_line1);
         int c_1 = Color.argb(Color.alpha(c1) / 3, Color.red(c1), Color.green(c1), Color.blue(c1));
@@ -72,28 +55,26 @@ public class Pen {
         int c_2 = Color.argb(Color.alpha(c2) / 3, Color.red(c2), Color.green(c2), Color.blue(c2));
         penBmLine = IconBitmapCreator.createPen(mContext, (int) penWidth, c1, c2);
         penBm = penBmMove = IconBitmapCreator.createPen(mContext, (int) penWidth, c_1, c_2);
-
         penHeight = penBm.getHeight();
 
         pointLeft = bound.width() / 2;
         pointTop = bound.height() / 2;
         totalBound = bound;
 
+        angle=startAngle=-30;
         this.mBound = new GeoUtil.UnLevelRect();
         resetBound();
     }
 
-    //动作以及包含区域范围部分
 
+    //动作以及包含区域范围部分
     /*********************************************************************************************/
 
     /**
      * 移动，会先检测边界(图片边界和总的边界）
-     *
-     * @param srcRect  在图片中的范围
      * @param picBound 图片的范围
      */
-    public void move(float nx, float ny, Rect srcRect, Rect picBound) {
+    public void move(float nx, float ny, Rect picBound) {
         if (lastX < 0) {//从外面突然移进了Pen时
             lastX = nx;
             lastY = ny;
@@ -112,6 +93,21 @@ public class Pen {
         if (pointTop + dy > picBound.bottom) {
             dy = picBound.bottom - pointTop;
         }
+
+        //钢笔尖不能超出总的边界
+        if (pointLeft + dx < totalBound.left) {
+            dx = totalBound.left - pointLeft;
+        }
+        if (pointLeft + dx > totalBound.right) {
+            dx = totalBound.right - pointLeft;
+        }
+        if (pointTop + dy < totalBound.top) {
+            dy = totalBound.top - pointTop;
+        }
+        if (pointTop + dy > totalBound.bottom) {
+            dy = totalBound.bottom - pointTop;
+        }
+
         //总的边界
         GeoUtil.UnLevelRect tempRect = new GeoUtil.UnLevelRect(mBound);
         tempRect.translate(dx, dy);
@@ -128,49 +124,26 @@ public class Pen {
                 rotateTo(150);
         }
         if (tempRect.getTop() + penHeight / 3 < totalBound.top) {//上边超出
-            if (pointLeft < totalBound.width() - penWidth)//在左部
-                rotateTo(-30);
-            else//在右部
-                rotateTo(-150);
-        }
-        if (tempRect.getButtom() - penHeight / 3 > totalBound.bottom) {//下边超出
             if (pointLeft < totalBound.width() - penWidth)
                 rotateTo(-30);
-            else
+            else//在右部
+                rotateTo(30);
+        }
+        if (tempRect.getButtom() - penHeight / 3 > totalBound.bottom) {//下边超出
+            if (pointLeft < totalBound.width() - penWidth)//在左部
                 rotateTo(-150);
+            else
+                rotateTo(150);
         }
 
         lastX = nx;
         lastY = ny;
-        Util.P.le("lastX = " + lastX, "lastY= " + lastY);
 
         pointLeft += dx;
         pointTop += dy;
-
-        float[] xy = getLocationAtPicture(pointLeft, pointTop, srcRect, picBound);
-        float lineLeft = xy[0], lineTop = xy[1];
-        mLinePath.rQuadTo(lastLineLeft, lastLineTop,
-                (lastLineLeft + lineLeft) / 2,
-                (lastLineTop + lineTop) / 2);
-        lastLineLeft = lineLeft;
-        lastLineTop = lineTop;
         resetBound();
     }
 
-    private float[] getLocationAtPicture(float px, float py, Rect srcRect, Rect dstRect) {
-        float x, y;
-
-        //采用精确计算
-        String srcWidth = MathUtil.subtract(Float.toString(srcRect.right), Float.toString(srcRect.left));
-        String dstWidth = MathUtil.subtract(Float.toString(dstRect.right), Float.toString(dstRect.left));
-        String ratio = MathUtil.divide(dstWidth, srcWidth);
-        String px1 = MathUtil.multiply(Float.toString(px), ratio);
-        String py1 = MathUtil.multiply(Float.toString(py), ratio);
-        x = Float.valueOf(MathUtil.add(px1, Float.toString(srcRect.left)));
-        y = Float.valueOf(MathUtil.add(py1, Float.toString(srcRect.top)));
-
-        return new float[]{x, y};
-    }
 
     public void rotateTo(float angle) {
         this.angle = angle;
@@ -193,42 +166,42 @@ public class Pen {
         return mBound.contain(x, y);
     }
 
-    public void startAt(float x, float y) {
+    public void prepareMove(float x, float y) {
         lastX = x;
         lastY = y;
-        if (isDrawLine)
-            mLinePath.moveTo(pointLeft, pointTop);
     }
-/******************************************************************************************/
 
 
     //绘制部分
-
     /*****************************************************************************/
     void drawPen(Canvas canvas) {
-        Util.P.le("pen:letf= " + pointLeft, "pen:top= " + pointTop);
         canvas.save();
         canvas.rotate(angle, pointLeft, pointTop);
         canvas.drawBitmap(penBm, pointLeft - penWidth / 2, pointTop, mPenPaint);
         canvas.restore();
     }
 
-
-    public void reStart() {
+    /**
+     * 离开钢笔
+     */
+    public void outTouch() {
         lastX = lastY = -1;
     }
 
-    public void reSet(Rect bound) {
+    /**
+     * 在抠图界面，没有返回，以前点击过划线，再次点击时
+     * @param totalBound 总的范围
+     */
+    public void reSet(Rect totalBound) {
         lastX = lastY = -1;
-        pointLeft = bound.width() / 2;
-        pointTop = bound.height() / 2;
-        mLinePath.rewind();
-        mLinePath.moveTo(pointLeft, pointTop);
+        pointLeft = totalBound.width() / 2;
+        pointTop = totalBound.height() / 2;
+        penBm=penBmMove;
+        isDrawLine=false;
+        angle=startAngle;
+        resetBound();
     }
 
-    public void drawLine(Canvas sourceCanvas) {
-        sourceCanvas.drawPath(mLinePath, mlinePaint);
-    }
 
     /*******************************************************************************/
     public boolean isDrawLine() {
@@ -237,17 +210,17 @@ public class Pen {
 
     public long lastTime = -1;
 
-    public void onClick() {
-        Util.P.le("检测pen的双击");
+    public boolean isDoubleClick() {
         long curTime = System.currentTimeMillis();
         //貌似系统定义的双击正是300毫秒 ViewConfiguration.getDoubleTapTimeout()
         if (curTime - lastTime < ViewConfiguration.getDoubleTapTimeout()) {
             lastTime = curTime;
             isDrawLine = !isDrawLine;
             changeApearence();
-            Util.P.le("pen双击成功");
+            return true;
         } else {
             lastTime = curTime;
+            return false;
         }
     }
 
@@ -264,5 +237,4 @@ public class Pen {
         penBmLine.recycle();
         penBmMove.recycle();
     }
-
 }

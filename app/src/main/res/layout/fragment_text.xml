@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff"
     android:orientation="horizontal">
 
     <HorizontalScrollView
@@ -15,10 +14,11 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:paddingBottom="@dimen/padding_function_item_image"
-            android:paddingTop="2dp">
+            android:paddingTop="2dp"
+            android:paddingBottom="@dimen/padding_function_item_image">
+
             <LinearLayout
-                android:id="@+id/main_function_cut"
+                android:id="@+id/add_text_toumingdu"
                 android:layout_width="@dimen/function_width"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -27,23 +27,26 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:paddingBottom="@dimen/padding_function_item_image"
+                    android:src="@mipmap/toumingdu"
                     android:paddingLeft="@dimen/padding_function_item_image"
                     android:paddingRight="@dimen/padding_function_item_image"
                     android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/edit" />
+                    android:paddingBottom="@dimen/padding_function_item_image"
+                    />
 
                 <TextView
+
                     android:layout_width="@dimen/function_width"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="裁剪旋转"
+                    android:text="透明度"
                     android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
+
             <LinearLayout
-                android:id="@+id/main_function_text"
+                android:id="@+id/add_text_style"
                 android:layout_width="@dimen/function_width"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -52,23 +55,25 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:paddingBottom="@dimen/padding_function_item_image"
+                    android:src="@mipmap/bold"
                     android:paddingLeft="@dimen/padding_function_item_image"
                     android:paddingRight="@dimen/padding_function_item_image"
                     android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/function_text" />
+                    android:paddingBottom="@dimen/padding_function_item_image"
+                />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="文字"
+                    android:text="风格"
                     android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
+
             <LinearLayout
-                android:id="@+id/main_function_tietu"
+                android:id="@+id/add_text_color"
                 android:layout_width="@dimen/function_width"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -77,24 +82,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:paddingBottom="@dimen/padding_function_item_image"
-                    android:paddingLeft="@dimen/padding_function_item_image"
+                    android:src="@mipmap/color" android:paddingLeft="@dimen/padding_function_item_image"
                     android:paddingRight="@dimen/padding_function_item_image"
                     android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/tietu" />
+                    android:paddingBottom="@dimen/padding_function_item_image"
+                    />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="贴图"
+                    android:text="颜色"
                     android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/main_function_huitu"
+                android:id="@+id/add_text_typeface"
                 android:layout_width="@dimen/function_width"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -103,23 +108,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:paddingBottom="@dimen/padding_function_item_image"
+                    android:src="@mipmap/typeface"
                     android:paddingLeft="@dimen/padding_function_item_image"
                     android:paddingRight="@dimen/padding_function_item_image"
                     android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/pencil" />
+                    android:paddingBottom="@dimen/padding_function_item_image"
+                    />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="绘图"
+                    android:text="字体"
                     android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
             <LinearLayout
-                android:id="@+id/main_function_mat"
+                android:id="@+id/add_text_special"
                 android:layout_width="@dimen/function_width"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -128,21 +134,50 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:paddingBottom="@dimen/padding_function_item_image"
+                    android:src="@mipmap/special"
                     android:paddingLeft="@dimen/padding_function_item_image"
                     android:paddingRight="@dimen/padding_function_item_image"
                     android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/mat" />
+                    android:paddingBottom="@dimen/padding_function_item_image"
+                    />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="抠图"
+                    android:text="特效"
                     android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/add_text_bubble"
+                android:layout_width="@dimen/function_width"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:src="@mipmap/bubble"
+                    android:paddingLeft="@dimen/padding_function_item_image"
+                    android:paddingRight="@dimen/padding_function_item_image"
+                    android:paddingTop="@dimen/padding_function_item_image"
+                    android:paddingBottom="@dimen/padding_function_item_image"
+                    />
+
+                <TextView
+                    android:layout_width="@dimen/function_width"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="气泡"
+                    android:textColor="@color/text_color1"
+                    android:textSize="@dimen/text_size_main_function" />
+            </LinearLayout>
+
         </LinearLayout>
     </HorizontalScrollView>
 </LinearLayout>
