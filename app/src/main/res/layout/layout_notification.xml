@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
-        android:src="@mipmap/icon1"
+        android:src="@mipmap/icon"
         android:paddingRight="@dimen/padding_main_function"
         />
 

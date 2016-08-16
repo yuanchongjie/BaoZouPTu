@@ -3,24 +3,22 @@ package a.baozouptu.ptu.tietu;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.Build;
 import android.view.MotionEvent;
 import android.view.View;
 
 import a.baozouptu.R;
-import a.baozouptu.ptu.Item;
-import a.baozouptu.ptu.repealRedo.RepealRedoManager;
-import a.baozouptu.ptu.repealRedo.TietuStepData;
-import a.baozouptu.ptu.view.IconBitmapCreator;
-import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.FloatView;
+import a.baozouptu.ptu.Item;
+import a.baozouptu.ptu.repealRedo.RepealRedoManager;
+import a.baozouptu.ptu.repealRedo.StepData;
+import a.baozouptu.ptu.repealRedo.TietuStepData;
+import a.baozouptu.ptu.view.IconBitmapCreator;
 
 /**
  * Created by liuguicen on 2016/6/30.
@@ -113,7 +111,7 @@ public class FloatImageView extends View implements FloatView {
         rimColor = Util.getColor(R.color.float_rim_color);
         itemColor = Util.getColor(R.color.float_item_color);
         Item item = new Item(-1, -1, ITEM_ROTATE);
-        item.bitmap = IconBitmapCreator.getRotateBitmap(mContext, mPadding, itemColor);
+        item.bitmap = IconBitmapCreator.getRotateBitmap( mPadding, itemColor);
         items[7] = item;
     }
 

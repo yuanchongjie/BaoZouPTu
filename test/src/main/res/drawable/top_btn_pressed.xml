@@ -3,7 +3,7 @@
     android:dither="true"
     android:shape="oval"
     android:useLevel="false">
-    <solid android:color="@color/grey" />
+    <solid android:color="#fe0" />
     <size
         android:width="@dimen/top_btn_width"
         android:height="@dimen/top_btn_width" />

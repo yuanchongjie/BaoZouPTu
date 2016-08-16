@@ -1,4 +1,4 @@
-package a.baozouptu.chosePicture;
+package a.baozouptu.base.dataAndLogic;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import a.baozouptu.common.AppConfig;
 
 /**
  * 一定注意，使用这个类时，使用完了关闭数据库
@@ -18,7 +20,7 @@ public class MyDatabase {
 
 
     private MyDatabase(Context context) {
-        dbHelper = new MySQLiteOpenHandler(context);
+        dbHelper = new MySQLiteOpenHandler(context, AppConfig.getIntVersion());
         db = dbHelper.getWritableDatabase();
     }
 
@@ -144,16 +146,48 @@ public class MyDatabase {
         }
     }
 
+    /**
+     * 获取所有的优先分享的ac的title
+     * "create table  IF NOT EXISTS prefer_share(title text primary key,time varchar(50))"
+     * 按时间倒序，即越前面优先级越高
+     */
+    //    有两个返回值，不能直接返回，传入应用获取
+    public void queryAllPreferShare(List<String> titleList) throws IOException {
+        Cursor cursor = db.rawQuery("select title from prefer_share order by time desc ", new String[]{});
+        while (cursor.moveToNext()) {
+            String title = cursor.getString(0);
+            titleList.add(title);
+        }
+    }
+
+
+    /**
+     * "create table  IF NOT EXISTS prefer_share(title text primary key,time varchar(50))"
+     * inert时如果存在就替换，使用replace，不然就会出错，
+     * 这样就不需要update了
+     */
+    public void insertPreferShare(String title, long time) throws IOException {
+        db.execSQL("replace into prefer_share(title,time) values(?,?) ", new Object[]{title, String.valueOf(time)});
+    }
+
+    /**
+     * "create table  IF NOT EXISTS prefer_share(title text primary key,time varchar(50))"
+     *
+     * @param title ac的title
+     */
+    public void deletePreferShare(String title) throws IOException {
+        db.execSQL("delete from prefer_share where title = ?", new Object[]{title});
+    }
+
     public void close() {
         if (db != null) {
             db.close();
             db = null;
-        }if (dbHelper != null) {
+        }
+        if (dbHelper != null) {
             dbHelper.close();
             dbHelper = null;
         }
 
     }
-
-
 }

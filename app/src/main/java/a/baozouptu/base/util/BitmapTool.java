@@ -64,6 +64,10 @@ public class BitmapTool {
      * @return 返回字符串代表不同的状态，成功是是返回"创建成功"四个字
      */
     public static String saveBitmap(Context context, Bitmap bitmap, String path) {
+        return saveBitmap(context, bitmap, path, true);
+    }
+
+    public static String saveBitmap(Context context, Bitmap bitmap, String path, boolean isSendBroad) {
         String suffix = path.substring(path.lastIndexOf("."), path.length());
 
         Bitmap.CompressFormat bmc = null;
@@ -84,13 +88,13 @@ public class BitmapTool {
             fo = new FileOutputStream(path);
             bitmap.compress(bmc, 100, fo);
             fo.flush();
-
-            //发送添加图片的广播
-            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-            Uri uri = Uri.fromFile(file);
-            intent.setData(uri);
-            context.sendBroadcast(intent);
-
+            if (isSendBroad) {
+                //发送添加图片的广播
+                Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                Uri uri = Uri.fromFile(file);
+                intent.setData(uri);
+                context.sendBroadcast(intent);
+            }
         } catch (FileNotFoundException e) {
             Util.P.le("Bitmaptool.savePicture", "存储文件失败");
             e.printStackTrace();
@@ -107,5 +111,9 @@ public class BitmapTool {
                 }
         }
         return "创建成功";
+    }
+
+    public static long getSize(Bitmap sourceBm) {
+            return sourceBm.getRowBytes()*sourceBm.getHeight();
     }
 }

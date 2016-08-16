@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 public class Item {
     public float x;
     public float y;
+    public int mode;
     public String name;
     public Bitmap bitmap;
 

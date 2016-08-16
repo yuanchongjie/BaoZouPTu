@@ -35,17 +35,22 @@
 
 
     <color name="button_color_switch">#5677fc</color>
-    <color name="text_chose_color">#ff5722</color>
+    <color name="text_checked_color">#ff5722</color>
     <color name="text_default_color">#ff111111</color>
+    <color name="text_light_black">#ff666666</color>
+    <color name="text_deep_black">#ff242328</color>
 
+    <color name="back_pic_operation">#998e8e8e</color>
+    <color name="divider_pic_operation">#222222</color>
 
-<!--ptu功能-->
+    <!--ptu功能-->
     <color name="can_repeal_redo">#ffff5722</color>
     <color name="canot_repeal_redo">#80ffffff</color>
     <color name="mat_pen_line1">#ff111111</color>
     <color name="mat_pen_line2">#ff5e5e5e</color>
     <color name="cut_frame">#ffffff</color>
     <color name="black_deep">#333333</color>
+    <color name="light_grey">#aaaaaa</color>
     <drawable name="dialog_background">#80ffffff</drawable>
     <drawable name="hou">#dcdcdc</drawable>
     <drawable name="qian">#039be5</drawable>

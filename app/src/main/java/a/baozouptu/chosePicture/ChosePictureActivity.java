@@ -1,13 +1,5 @@
 package a.baozouptu.chosePicture;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import a.baozouptu.base.dataAndLogic.AsyncImageLoader3;
-import a.baozouptu.base.dataAndLogic.AllDate;
-import a.baozouptu.ptu.PtuActivity;
-import a.baozouptu.base.util.FileTool;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -37,15 +29,22 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import a.baozouptu.R;
+import a.baozouptu.base.dataAndLogic.AllDate;
+import a.baozouptu.base.dataAndLogic.AsyncImageLoader3;
+import a.baozouptu.base.util.FileTool;
 import a.baozouptu.base.util.Util;
+import a.baozouptu.ptu.PtuActivity;
 
 /**
  * 显示所选的最近的或某个文件夹下面的所有图片
  * 并且有选择文件夹，相机，空白图画图的功能
  */
 public class ChosePictureActivity extends AppCompatActivity {
-    private static final String DEBUG_TAG = "ChosePictureActivity";
+    private String TAG="ChosePictureActivity";
     /**
      * 进度条
      */
@@ -86,7 +85,7 @@ public class ChosePictureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_chose_picture);
-        //test();
+        test();
         Handler handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -98,9 +97,9 @@ public class ChosePictureActivity extends AppCompatActivity {
                     } else {
                         picAdpter.notifyDataSetChanged();
                     }
-                    Util.P.le(DEBUG_TAG, "finish update picture");
+                    Util.P.le(TAG, "finish update picture");
                 } else if (msg.obj.equals("change_file")) {
-                    Util.P.le(DEBUG_TAG, "finish update file");
+                    Util.P.le(TAG, "finish update file");
                     fileAdapter.notifyDataSetChanged();
                 }
             }
@@ -114,7 +113,7 @@ public class ChosePictureActivity extends AppCompatActivity {
     }
 
     private void test() {
-        m_ProgressDialog.dismiss();
+        Util.P.le(TAG,"test跳转成功");
         Intent intent1 = new Intent(this, PtuActivity.class);
         intent1.putExtra("picPath", "/storage/sdcard1/中大图.jpg");
         startActivity(intent1);
@@ -127,11 +126,11 @@ public class ChosePictureActivity extends AppCompatActivity {
     private void initPicInfo() {
         usualyPicPathList = usuPicProcess.getUsualyPathFromDB();
         currentPicPathList = usualyPicPathList;
-        Util.P.le(DEBUG_TAG, "获取了上次数据库中的图片");
+        Util.P.le(TAG, "获取了上次数据库中的图片");
         disposeShowPicture();
-        Util.P.le(DEBUG_TAG, "初始化显示图片完成");
+        Util.P.le(TAG, "初始化显示图片完成");
         disposeDrawer();
-        Util.P.le(DEBUG_TAG, "初始化显示Drawer完成");
+        Util.P.le(TAG, "初始化显示Drawer完成");
     }
 
     /**
@@ -216,19 +215,19 @@ public class ChosePictureActivity extends AppCompatActivity {
                 linearLayout.setGravity(Gravity.CENTER);
                 linearLayout.setDividerPadding(10);
                 linearLayout.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
+                linearLayout.setDividerDrawable(Util.getDrawable(R.drawable.divider_picture_opration));
                 linearLayout.setLayoutParams(
                         new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                                 WindowManager.LayoutParams.WRAP_CONTENT));
-
-                TextView textView = new TextView(ChosePictureActivity.this);
-                textView.setTextSize(25);
-                textView.setGravity(Gravity.CENTER);
-                textView.setWidth(view.getWidth() / 2);
-
+                linearLayout.setPadding(Util.dp2Px(2),Util.dp2Px(2),Util.dp2Px(2),Util.dp2Px(2));
+                TextView frequentlyTextView = new TextView(ChosePictureActivity.this);
+                frequentlyTextView.setGravity(Gravity.CENTER);
+                frequentlyTextView.setWidth(view.getWidth() / 2);
+                frequentlyTextView.setGravity(Gravity.CENTER_HORIZONTAL);
                 final String path = currentPicPathList.get(position);
                 if (usualyPicPathList.lastIndexOf(path) >= usuPicProcess.getUsualyStart()) {
-                    textView.setText("取消");
-                    textView.setOnClickListener(new View.OnClickListener() {
+                    frequentlyTextView.setText("取消");
+                    frequentlyTextView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             usuPicProcess.deleteUsualyPath(path, position);
@@ -240,8 +239,8 @@ public class ChosePictureActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-                    textView.setText("常用");
-                    textView.setOnClickListener(new View.OnClickListener() {
+                    frequentlyTextView.setText("常用");
+                    frequentlyTextView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             boolean change = usuPicProcess.addUsualyPath(path);
@@ -254,13 +253,19 @@ public class ChosePictureActivity extends AppCompatActivity {
                     });
 
                 }
-                linearLayout.addView(textView);
+                frequentlyTextView.setTextSize(22);
+                frequentlyTextView.setTextColor(Util.getColor(R.color.text_deep_black));
+
+                linearLayout.addView(frequentlyTextView);
 
                 TextView deleteTextView = new TextView(ChosePictureActivity.this);
-                deleteTextView.setTextSize(25);
+
                 deleteTextView.setGravity(Gravity.CENTER);
-                deleteTextView.setText("删除");
                 deleteTextView.setWidth(view.getWidth() / 2);
+                deleteTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+                deleteTextView.setText("删除");
+                deleteTextView.setTextSize(22);
+                deleteTextView.setTextColor(Util.getColor(R.color.text_deep_black));
 
                 deleteTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -273,13 +278,13 @@ public class ChosePictureActivity extends AppCompatActivity {
 
 
                 int[] popWH = new int[2];
-                Util.getMesureWH(textView, popWH);
+                Util.getMesureWH(linearLayout, popWH);
                 popWindowFile.setContentView(linearLayout);
                 popWindowFile.setWidth(view.getWidth());
                 popWindowFile.setHeight(popWH[1]);
                 popWindowFile.setFocusable(true);
-                popWindowFile.setBackgroundDrawable(getResources().getDrawable(
-                        R.drawable.qian));
+                popWindowFile.setBackgroundDrawable(Util.getDrawable(
+                        R.drawable.background_pic_operation));
                 popWindowFile.showAsDropDown(view, 0, -view.getHeight());
                 return true;
             }
@@ -469,7 +474,7 @@ public class ChosePictureActivity extends AppCompatActivity {
                     },
                     AllDate.screenWidth / 3);
             if (cacheBitmap == null) {
-                viewHolder.ivImage.setImageResource(R.mipmap.icon1);
+                viewHolder.ivImage.setImageResource(R.mipmap.icon);
             } else {
                 viewHolder.ivImage.setImageBitmap(cacheBitmap);
             }

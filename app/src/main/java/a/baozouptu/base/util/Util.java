@@ -2,15 +2,13 @@ package a.baozouptu.base.util;
 
 import android.app.Application;
 import android.content.Context;
-import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Toast;
-
-import a.baozouptu.R;
 
 /**
  * Created by Administrator on 2016/5/19.
@@ -35,6 +33,12 @@ public class Util {
     public static int px2Dp(float px) {
         final float scale = MyApplication.getAppContext().getResources().getDisplayMetrics().density;
         return (int) (px / scale + 0.5f);
+    }
+
+    public static Drawable getDrawable(int id) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            return gloableContext.getResources().getDrawable(id, null);
+        return gloableContext.getResources().getDrawable(id);
     }
 
     /**

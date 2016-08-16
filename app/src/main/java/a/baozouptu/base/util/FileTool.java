@@ -67,13 +67,13 @@ public class FileTool {
                 }
             }
         }
-        Collections.sort(oderedPaths, new Comparator<Pair<Long,String>>() {
-            public int compare(Pair<Long,String> o1, Pair<Long,String> o2) {
+        Collections.sort(oderedPaths, new Comparator<Pair<Long, String>>() {
+            public int compare(Pair<Long, String> o1, Pair<Long, String> o2) {
                 //return (o2.getValue() - o1.getValue());
                 return o1.first.compareTo(o2.first);
             }
         });
-        for (Pair<Long,String> p: oderedPaths)
+        for (Pair<Long, String> p : oderedPaths)
             lstPaths.add(p.second);
     }
 
@@ -111,6 +111,49 @@ public class FileTool {
         return false;
     }
 
+    public static String getApplacationDir(Context context) {
+        return context.getApplicationContext().getFilesDir().getAbsolutePath();
+    }
+
+    public static String createTempPicPath(Context context) {
+        String appPath = getApplacationDir(context);
+        String tempDir = appPath + "/tempPic/text";
+        File file = new File(tempDir);
+        if (!file.exists()) {
+            {
+                if(!file.mkdirs()){
+                    Util.T(context,"保存失败");
+                }
+            }
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        Date curDate = new Date(System.currentTimeMillis());//获取当前时间
+        String time = formatter.format(curDate);
+        String tempPath = tempDir + "/text_step_bm" + time + ".png";
+        return tempPath;
+    }
+
+    /**
+     * 递归删除目录下的所有文件及子目录下所有文件
+     * @param dir 将要删除的文件目录
+     * @return boolean Returns "true" if all deletions were successful.
+     *                 If a deletion fails, the method stops attempting to
+     *                 delete and returns "false".
+     */
+    public static boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            File[] children = dir.listFiles();
+            //递归删除目录中的子目录下
+            for (File file:children) {
+                boolean success = deleteDir(file);
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        // 若是目录，此时为空，可以删除
+        return dir.delete();
+    }
     /**
      * 根据原来的路径创建一个新的路径和名称
      *
@@ -120,14 +163,16 @@ public class FileTool {
     public static String getNewPictureFile(String oldPath) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         Date curDate = new Date(System.currentTimeMillis());//获取当前时间
-        String time=formatter.format(curDate);
+        String time = formatter.format(curDate);
         String prefix = oldPath.substring(0, oldPath.lastIndexOf("."));
         String suffix = oldPath.substring(oldPath.lastIndexOf("."), oldPath.length());
-       
-        return  prefix + "baozou" + time + suffix;
+
+        return prefix + "baozou" + time + suffix;
     }
+
     /**
      * 根据Uri获取图片绝对路径，解决Android4.4以上版本Uri转换
+     *
      * @param context
      * @param imageUri
      * @author yaoxing
@@ -162,7 +207,7 @@ public class FileTool {
                     contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                 }
                 String selection = MediaStore.Images.Media._ID + "=?";
-                String[] selectionArgs = new String[] { split[1] };
+                String[] selectionArgs = new String[]{split[1]};
                 return getDataColumn(context, contentUri, selection, selectionArgs);
             }
         } // MediaStore (and general)
@@ -182,7 +227,7 @@ public class FileTool {
     public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
         Cursor cursor = null;
         String column = MediaStore.Images.Media.DATA;
-        String[] projection = { column };
+        String[] projection = {column};
         try {
             cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
             if (cursor != null && cursor.moveToFirst()) {

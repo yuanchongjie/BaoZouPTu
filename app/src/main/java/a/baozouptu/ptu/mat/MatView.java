@@ -4,10 +4,8 @@ package a.baozouptu.ptu.mat;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.view.MotionEvent;
 
-import a.baozouptu.base.util.MathUtil;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.view.PtuView;
@@ -62,8 +60,9 @@ public class MatView extends PtuView {
                         if (pen.isDoubleClick()) {//检测是否是双击，如果是，设置isDrawLine变量
                             if (pen.isDrawLine()) {//转换到划线状态
                                 CUR_STATUS = PEN_DRAW_LINE;
-                                matPathManager.startDrawLine(
-                                        PtuUtil.getLocationAtPicture(pen.pointLeft, pen.pointTop, srcRect, dstRect));
+                                String[] sxy=PtuUtil.getLocationAtPicture(Float.toString(pen.pointLeft), Float.toString(pen.pointTop),
+                                        srcRect, dstRect);
+                                matPathManager.startDrawLine(new float[]{Float.valueOf(sxy[0]),Float.valueOf(sxy[1])});
                             } else {//转换到move状态
                                 CUR_STATUS = PEN_MOVE;
                                 matPathManager.finishDrawLine();
@@ -72,8 +71,9 @@ public class MatView extends PtuView {
                             //pen的状态由如果是PEN，PEN变回MOVE或者DRAW_LINE
                             if (pen.isDrawLine()) {
                                 CUR_STATUS = PEN_DRAW_LINE;
-                                matPathManager.startDrawLine(
-                                        PtuUtil.getLocationAtPicture(pen.pointLeft, pen.pointTop, srcRect, dstRect));
+                                String[] sxy = PtuUtil.getLocationAtPicture(Float.toString(pen.pointLeft), Float.toString(pen.pointTop),
+                                        srcRect, dstRect);
+                                matPathManager.startDrawLine(new float[]{Float.valueOf(sxy[0]), Float.valueOf(sxy[1])});
                             } else {
                                 CUR_STATUS = PEN_MOVE;
                             }
@@ -96,8 +96,11 @@ public class MatView extends PtuView {
                             } else {
                                 pen.move(x, y, dstRect);
                                 if (CUR_STATUS == PEN_DRAW_LINE)//如果是划线状态，添加移动到路径上
-                                    matPathManager.addLinePoint(
-                                            PtuUtil.getLocationAtPicture(pen.pointLeft, pen.pointTop, srcRect, dstRect));
+                                {
+                                    String[] sxy = PtuUtil.getLocationAtPicture(Float.toString(pen.pointLeft), Float.toString(pen.pointTop),
+                                            srcRect, dstRect);
+                                    matPathManager.startDrawLine(new float[]{Float.valueOf(sxy[0]), Float.valueOf(sxy[1])});
+                                }
                             }
                         } else if (CUR_STATUS != PEN) {
                             //移出了pen,移动太快没检测到,或者移到了手指不能到的地方，

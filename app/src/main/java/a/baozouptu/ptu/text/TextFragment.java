@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import a.baozouptu.R;
 import a.baozouptu.base.dataAndLogic.AllDate;
+import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
@@ -30,12 +31,13 @@ import a.baozouptu.ptu.view.ColorBar;
 import a.baozouptu.ptu.view.ColorLump;
 import a.baozouptu.base.view.HorizontalListView;
 import a.baozouptu.base.view.MySwitchButton;
+import a.baozouptu.ptu.view.PtuView;
 
 /**
  * 添加文字功能的fragment
  * Created by Administrator on 2016/5/1.
  */
-public class AddTextFragment extends Fragment {
+public class TextFragment extends Fragment {
     PtuActivity mAcitivty;
     LinearLayout toumingdu;
     LinearLayout style;
@@ -51,9 +53,8 @@ public class AddTextFragment extends Fragment {
 
     public static void addBigStep(Bitmap bm, StepData sd) {
         TextStepData tsd=(TextStepData)sd;
-        Bitmap textBitmap = RepealRedoManager.getInnerBmFromView(tsd.floatTextView, sd.innerRect);
-        RepealRedoManager.addBm2Bm(bm,textBitmap,tsd.boundRectInPic,tsd.rotateAngle);
-        textBitmap.recycle();
+        RepealRedoManager.addBm2Bm(bm, BitmapTool.getLosslessBitmap(tsd.picPath),
+                tsd.boundRectInPic,tsd.rotateAngle);
     }
 
     @Override
@@ -120,6 +121,18 @@ public class AddTextFragment extends Fragment {
     public void setFloatView(FloatTextView floatView) {
         this.floatTextView = floatView;
         floatTextView.setTypeface(Typeface.DEFAULT);
+    }
+
+    public TextStepData getResultData(PtuView ptuView) {
+        return floatTextView.getResultData(ptuView);
+    }
+
+    public Bitmap getResultBm() {
+        return floatTextView.getResultBm();
+    }
+
+    public void releaseResource() {
+        floatTextView.releaseResource();
     }
 
 
@@ -206,12 +219,13 @@ public class AddTextFragment extends Fragment {
                         if (position == 0) {
                             curTypeface = Typeface.MONOSPACE;
                             floatTextView.setTypeface(curTypeface);
+                            floatTextView.updateEdge();
                         } else if (position == 1) {
                             curTypeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/kaiti.TTF");
-                            floatTextView.setTypeface(curTypeface);
+                            floatTextView.setTypeface(curTypeface);floatTextView.updateEdge();
                         } else if (position == 2) {
                             curTypeface = Typeface.DEFAULT;
-                            floatTextView.setTypeface(curTypeface);
+                            floatTextView.setTypeface(curTypeface);floatTextView.updateEdge();
                         }
                         if (lastFontId != position) {
                             ((TextView) view).setTextColor(AllDate.text_choosed_color);
@@ -235,19 +249,26 @@ public class AddTextFragment extends Fragment {
             switchBold.setOnSlideListener(new MySwitchButton.SlideListener() {
                 @Override
                 public void open() {
-                    if (isItalic)
+                    if (isItalic) {
                         floatTextView.setTypeface(curTypeface, Typeface.BOLD_ITALIC);
-                    else
-                        floatTextView.setTypeface(curTypeface, Typeface.BOLD);
+                        floatTextView.updateEdge();
+                    }
+                    else {
+                        floatTextView.setTypeface(curTypeface, Typeface.BOLD);floatTextView.updateEdge();
+                    }
                     isBold = true;
                 }
 
                 @Override
                 public void close() {
-                    if (isItalic)
+                    if (isItalic) {
                         floatTextView.setTypeface(curTypeface, Typeface.ITALIC);
-                    else
+                        floatTextView.updateEdge();
+                    }
+                    else {
                         floatTextView.setTypeface(curTypeface, Typeface.NORMAL);
+                        floatTextView.updateEdge();
+                    }
                     isBold = false;
                 }
             });
@@ -257,19 +278,25 @@ public class AddTextFragment extends Fragment {
             switchItalic.setOnSlideListener(new MySwitchButton.SlideListener() {
                 @Override
                 public void open() {
-                    if (isBold)
+                    if (isBold){
                         floatTextView.setTypeface(curTypeface, Typeface.BOLD_ITALIC);//斜体，中文有效
-                    else
+                        floatTextView.updateEdge();}
+                    else {
                         floatTextView.setTypeface(curTypeface, Typeface.ITALIC);//斜体，中文有效
+                        floatTextView.updateEdge();
+                    }
                     isItalic = true;
                 }
 
                 @Override
                 public void close() {
-                    if (isBold)
+                    if (isBold) {
                         floatTextView.setTypeface(curTypeface, Typeface.BOLD);
-                    else
+                    }
+                    else {
                         floatTextView.setTypeface(curTypeface, Typeface.NORMAL);
+                        floatTextView.updateEdge();
+                    }
                     isItalic = false;
                 }
             });
@@ -279,12 +306,14 @@ public class AddTextFragment extends Fragment {
                 @Override
                 public void open() {
                     floatTextView.setShadowLayer(5, 5, 5, Color.GRAY);
+                    floatTextView.updateEdge();
                     hasShadow = true;
                 }
 
                 @Override
                 public void close() {
                     floatTextView.setShadowLayer(0, 0, 0, Color.GRAY);
+                    floatTextView.updateEdge();
                     hasShadow = false;
                 }
             });

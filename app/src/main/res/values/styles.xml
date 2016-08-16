@@ -21,4 +21,14 @@
         <item name="android:fitsSystemWindows">true</item>
         <item name="android:clipToPadding">true</item>
     </style>
+    <style name="SaveSetSizeItem">
+        <item name="android:layout_width">@dimen/list_item_width_save_set_middle</item>
+        <item name="android:layout_height">@dimen/list_item_width_save_set_middle</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:layout_marginTop">@dimen/margin_middle</item>
+        <item name="android:layout_marginRight">@dimen/margin_middle</item>
+        <item name="android:layout_marginLeft">@dimen/margin_middle</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">13pt</item>
+    </style>
 </resources>

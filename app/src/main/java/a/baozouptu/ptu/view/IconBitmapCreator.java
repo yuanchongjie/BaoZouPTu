@@ -1,23 +1,17 @@
 package a.baozouptu.ptu.view;
 
-import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
-import android.view.animation.PathInterpolator;
-
-import a.baozouptu.base.util.TempUtil;
 
 /**
- * Created by Administrator on 2016/6/1.
+ *
  */
 public class IconBitmapCreator {
 
@@ -26,9 +20,8 @@ public class IconBitmapCreator {
      *
      * @param color     前景
      * @param backColor 背景色默认透明
-     * @return
      */
-    public static Bitmap getEditBitmap(Context context, int width, int color, int backColor) {
+    public static Bitmap getEditBitmap(int width, int color, int backColor) {
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
@@ -42,10 +35,9 @@ public class IconBitmapCreator {
      * 获取编辑按钮的bitmap对象，背景色默认透明
      *
      * @param color 前景
-     * @return
      */
-    public static Bitmap getEditBitmap(Context context, int width, int color) {
-        return getEditBitmap(context, width, color, 0x00000000);
+    public static Bitmap getEditBitmap( int width, int color) {
+        return getEditBitmap( width, color, 0x00000000);
     }
 
     /**
@@ -54,7 +46,7 @@ public class IconBitmapCreator {
      * @param color     前景
      * @param backColor 背景色默认透明
      */
-    public static Bitmap CreateToBottomCenterBitmap(Context context, int width, int color, int backColor) {
+    public static Bitmap CreateToBottomCenterBitmap( int width, int color, int backColor) {
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
@@ -75,8 +67,8 @@ public class IconBitmapCreator {
      *
      * @param color 前景
      */
-    public static Bitmap CreateToBottomCenterBitmap(Context context, int width, int color) {
-        return CreateToBottomCenterBitmap(context, width, color, 0x00000000);
+    public static Bitmap CreateToBottomCenterBitmap( int width, int color) {
+        return CreateToBottomCenterBitmap( width, color, 0x00000000);
     }
 
     /**
@@ -85,7 +77,7 @@ public class IconBitmapCreator {
      * @param color     前景
      * @param backColor 背景色
      */
-    public static Bitmap getRotateBitmap(Context context, int width, int color, int backColor) {
+    public static Bitmap getRotateBitmap( int width, int color, int backColor) {
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         int gap = width / 8, arcWidth = 5;
@@ -104,7 +96,6 @@ public class IconBitmapCreator {
         paint.setStrokeWidth(1);
         paint.setStyle(Paint.Style.FILL);
         canvas.drawPath(path, paint);
-        TempUtil.showBitmapInDialog(context, bitmap);
         return bitmap;
     }
 
@@ -113,19 +104,14 @@ public class IconBitmapCreator {
      *
      * @param color 前景
      */
-    public static Bitmap getRotateBitmap(Context context, int width, int color) {
-        return getRotateBitmap(context, width, color, 0x00000000);
+    public static Bitmap getRotateBitmap( int width, int color) {
+        return getRotateBitmap( width, color, 0x00000000);
     }
 
     /**
      * 一个叉的形状，取消的icon
-     *
-     * @param context
-     * @param width
-     * @param foregroundColor
-     * @return
      */
-    public static Bitmap createCancelBitmap(Context context, int width, int foregroundColor) {
+    public static Bitmap createCancelBitmap( int width, int foregroundColor) {
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
@@ -142,7 +128,7 @@ public class IconBitmapCreator {
         return bitmap;
     }
 
-    public static Bitmap createSureBitmap(Context context, int width, int foregroundColor) {
+    public static Bitmap createSureBitmap( int width, int foregroundColor) {
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
@@ -158,7 +144,7 @@ public class IconBitmapCreator {
     }
 
 
-    public static Bitmap createRedoBitmap(Context context, int width, int foregroundColor) {
+    public static Bitmap createRedoBitmap( int width, int foregroundColor) {
 
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -188,7 +174,6 @@ public class IconBitmapCreator {
         a3.y += 5;
 
         paint.setColor(foregroundColor);
-        PointF o1 = getCircleCenter(c2, c3, r1), o2 = getCircleCenter(c1, c3, r2);
         canvas.drawOval(rect1, paint);
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
@@ -227,14 +212,9 @@ public class IconBitmapCreator {
 
     /**
      * 制作重做图标的bitmap
-     *
-     * @param context
-     * @param width
-     * @param foregroundColor
-     * @return
      */
-    public static Bitmap createRepealBitmap(Context context, int width, int foregroundColor) {
-        Bitmap tempBitmap = createRedoBitmap(context, width, foregroundColor);
+    public static Bitmap createRepealBitmap( int width, int foregroundColor) {
+        Bitmap tempBitmap = createRedoBitmap( width, foregroundColor);
         Matrix m = new Matrix();
         m.setScale(-1, 1);
         m.postTranslate(tempBitmap.getWidth(), 0); //镜像水平翻转
@@ -242,7 +222,7 @@ public class IconBitmapCreator {
                 , true);
     }
 
-    public static Bitmap createSendBitmap(Context context, int width, int foregroundColor) {
+    public static Bitmap createSendBitmap(int width, int foregroundColor) {
         width = (int) (width * (0.72));
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -276,12 +256,10 @@ public class IconBitmapCreator {
     }
 
     /**
-     * @param context
-     * @param w               图标宽度
-     * @param foregroundColor
+     * @param w 图标宽度
      * @return
      */
-    public static Bitmap createReturnIcon(Context context, int w, int foregroundColor) {
+    public static Bitmap createReturnIcon(int w, int foregroundColor) {
         w = (int) (w * 0.55);
         int h = w;
         w = (int) (w * (140f / 200));
@@ -301,20 +279,20 @@ public class IconBitmapCreator {
         return bitmap;
     }
 
-    public static Bitmap createPen(Context context, int w, int color1,int color2) {
+    public static Bitmap createPen(int w, int color1, int color2) {
         float h = w * 2.5f, bottomH = h * 1f / 6, bottomW = w * 4f / 5;
         int strokeWidth = 6;
-        Bitmap bitmap=Bitmap.createBitmap(w,(int)h, Bitmap.Config.ARGB_8888);
-        Canvas canvas=new Canvas(bitmap);
+        Bitmap bitmap = Bitmap.createBitmap(w, (int) h, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
         Path path = new Path();
-        Paint paint=new Paint();
+        Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setDither(true);
-        float edge=(float)(strokeWidth* Math.sqrt(2));
-        path.moveTo(w / 2, 0+edge);
-        path.lineTo(0+edge, (h - bottomH) / 2);
+        float edge = (float) (strokeWidth * Math.sqrt(2));
+        path.moveTo(w / 2, 0 + edge);
+        path.lineTo(0 + edge, (h - bottomH) / 2);
         path.lineTo(w / 2, h - bottomH);
-        path.lineTo(w-edge, (h - bottomH) / 2);
+        path.lineTo(w - edge, (h - bottomH) / 2);
         path.close();
 
         paint.setStrokeWidth(strokeWidth);
@@ -322,22 +300,47 @@ public class IconBitmapCreator {
         paint.setColor(color1);
         paint.setStrokeJoin(Paint.Join.MITER);
         paint.setStrokeMiter(30);
-        canvas.drawPath(path,paint);
+        canvas.drawPath(path, paint);
 
 
         paint.setStrokeCap(Paint.Cap.ROUND);
-        canvas.drawLine(w/2,0+strokeWidth*2,w/2,(h-bottomH)/2,paint);
+        canvas.drawLine(w / 2, 0 + strokeWidth * 2, w / 2, (h - bottomH) / 2, paint);
         paint.setStrokeCap(Paint.Cap.BUTT);
         path.rewind();
-        path.moveTo((w-bottomW)/2,h-bottomH);
-        path.rLineTo(bottomW,0);
-        path.rLineTo(0,bottomH-strokeWidth/2);
-        path.rLineTo(-bottomW,0);
+        path.moveTo((w - bottomW) / 2, h - bottomH);
+        path.rLineTo(bottomW, 0);
+        path.rLineTo(0, bottomH - strokeWidth / 2);
+        path.rLineTo(-bottomW, 0);
         path.close();
         paint.setColor(color1);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(strokeWidth);
-        canvas.drawPath(path,paint);
+        canvas.drawPath(path, paint);
+        return bitmap;
+    }
+
+    /**
+     * @param mode 1 中间，2左边，3右边
+     */
+    public static Bitmap createJustifyIcon(int width, int foregroundColor, int backgroundColor, int mode) {
+        float h1 = 1.12f * width / 4, h2 = 2f * width / 4, h3 = 2.88f * width / 4;
+        float sw=35f / 400 * width,bw=78f / 400 * width;
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        paint.setDither(true);
+        paint.setColor(foregroundColor);
+        paint.setStrokeWidth(1.5f);
+        canvas.drawLine(sw, h1, width-sw, h1, paint);
+        canvas.drawLine(sw, h3, width-sw, h3, paint);
+        if (mode == 0) {
+            canvas.drawLine(bw, h2, width-bw, h2, paint);
+        } else if (mode == 1) {
+            canvas.drawLine(sw, h2, width-bw*2+sw, h2, paint);
+        } else if (mode == 2) {
+            canvas.drawLine(bw*2-sw, h2, width-sw, h2, paint);
+        }
         return bitmap;
     }
 }

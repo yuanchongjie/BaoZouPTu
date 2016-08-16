@@ -2,7 +2,6 @@ package a.baozouptu.ptu;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
@@ -10,7 +9,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,8 +31,6 @@ import a.baozouptu.base.dataAndLogic.AllDate;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.FileTool;
 import a.baozouptu.base.util.Util;
-import a.baozouptu.ptu.text.AddTextFragment;
-import a.baozouptu.ptu.text.FloatTextView;
 import a.baozouptu.ptu.control.MainFunctionFragment;
 import a.baozouptu.ptu.cut.CutFragment;
 import a.baozouptu.ptu.draw.DrawFragment;
@@ -43,6 +39,9 @@ import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TextStepData;
 import a.baozouptu.ptu.repealRedo.TietuStepData;
+import a.baozouptu.ptu.saveAndShare.SaveSetDialogManager;
+import a.baozouptu.ptu.text.FloatTextView;
+import a.baozouptu.ptu.text.TextFragment;
 import a.baozouptu.ptu.tietu.FloatImageView;
 import a.baozouptu.ptu.tietu.TietuFragment;
 import a.baozouptu.ptu.view.PtuFrameLayout;
@@ -52,18 +51,18 @@ import a.baozouptu.ptu.view.PtuView;
 public class PtuActivity extends AppCompatActivity implements MainFunctionFragment.Listen {
     public static final String TAG = "PtuActivity";
     static int CURRENT_EDIT_MODE = 0;
-    static final int EDIT_NO = 0;
-    static final int EDIT_CUT = 1;
+    public static final int EDIT_NO = 0;
+    public static final int EDIT_CUT = 1;
     /**
      * 包含三个元素
      * sd.floatTextView = floatTextView;
      * sd.innerRect = innerRect;
      * sd.boundRectInPic = boundRectInPic;
      */
-    static final int EDIT_TEXT = 2;
-    static final int EDIT_TIETU = 3;
-    static final int EDIT_DRAW = 4;
-    static final int EDIT_MAT = 5;
+    public static final int EDIT_TEXT = 2;
+    public static final int EDIT_TIETU = 3;
+    public static final int EDIT_DRAW = 4;
+    public static final int EDIT_MAT = 5;
 
     /**
      * 主功能的fragment
@@ -71,7 +70,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     MainFunctionFragment mainFrag;
     FragmentTransaction ft;
     FragmentManager fm;
-    private AddTextFragment textFrag;
+    private TextFragment textFrag;
     private TietuFragment tietuFrag;
     private DrawFragment drawFrag;
     private CutFragment cutFrag;
@@ -123,6 +122,8 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
         setViewContent();
         test();
+        ViewGroup viewGroup = (ViewGroup) findViewById(android.R.id.content);
+        Util.P.le(viewGroup.getClass().getSimpleName());
     }
 
     @TargetApi(19)
@@ -160,6 +161,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
+                    beforeFinish();
                     PtuActivity.this.finish();
                 }
             });
@@ -176,6 +178,13 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 switchFragment(NAME_TEXT);
             }
         }, 500);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                saveSet();
+            }
+        }, 1000);
+
     }
 
     private void initView() {
@@ -212,7 +221,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                         if (CURRENT_EDIT_MODE != EDIT_NO)
                             sure();
                         resultIntent.setAction("finish");
-                        savePtuView();
+                        saveResultBm();
                     }
                 }
         );
@@ -232,6 +241,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        beforeFinish();
                         PtuActivity.this.finish();
                     }
                 }
@@ -239,7 +249,8 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         saveSetBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveSet();
+                if (!Util.DoubleClick.isDoubleClick())
+                    saveSet();
             }
         });
         sureBtn.setOnClickListener(new View.OnClickListener() {
@@ -255,7 +266,24 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     }
 
     private void saveSet() {
-        Dialog dialog=new Dialog(this);
+        SaveSetDialogManager saveSetDialog = new SaveSetDialogManager(this,
+                BitmapTool.getSize(ptuView.getSourceBm()));
+        saveSetDialog.createDialog();
+        saveSetDialog.setClickListener(new SaveSetDialogManager.clickListenerInterface() {
+            @Override
+            public void mSure(float saveRatio) {
+                saveResultBm();
+            }
+
+            @Override
+            public void mCancel() {
+            }
+
+            @Override
+            public String onShareItemClick(float saveRatio) {
+                return picPath;
+            }
+        });
     }
 
     private void setViewContent() {
@@ -263,7 +291,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
-                        totalBound =new Rect(0,0,ptuFrame.getWidth(),ptuFrame.getHeight());
+                        totalBound = new Rect(0, 0, ptuFrame.getWidth(), ptuFrame.getHeight());
                         ptuView.setBitmapAndInit(picPath, ptuFrame.getWidth(), ptuFrame.getHeight());
                         repealRedoManager.setBaseBm(ptuView.getSourceBm()
                                 .copy(Bitmap.Config.ARGB_8888, true));
@@ -274,13 +302,13 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                             switch (action) {
                                 case "text":
                                     if (textFrag == null) {
-                                        textFrag = new AddTextFragment();
+                                        textFrag = new TextFragment();
                                     }
                                     ptuView.initialDraw();
                                     fm.beginTransaction().add(R.id.fragment_function, textFrag)
                                             .addToBackStack("main")
                                             .commit();
-                                    floatTextView = ptuFrame.initAddTextFloat(ptuView.getBound());
+                                    floatTextView = ptuFrame.initAddTextFloat(ptuView.getPicBound());
                                     textFrag.setFloatView(floatTextView);
                             }
                         }
@@ -297,7 +325,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     private void addStep(Bitmap bm, StepData sd) {
         switch (sd.EDIT_MODE) {
             case EDIT_TEXT:
-                AddTextFragment.addBigStep(bm, sd);
+                TextFragment.addBigStep(bm, sd);
                 break;
             case EDIT_TIETU:
                 FloatImageView.addBigStep(bm, sd);
@@ -320,6 +348,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     ptuView.releaseResource();
                     Bitmap newSourceBm = repealRedoManager.getBaseBitmap().
                             copy(Bitmap.Config.ARGB_8888, true);
+                    String newPath = FileTool.getNewPictureFile(picPath);
+                    BitmapTool.saveBitmap(this, newSourceBm, newPath);
+                    picPath = newPath;
                     ptuView.replaceSourceBm(newSourceBm);
 
                     int index = repealRedoManager.getCurrentIndex();
@@ -415,8 +446,8 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             onToSecondFunction();
             switch (function) {
                 case NAME_CUT:
-                    if(cutFrag==null){
-                        cutFrag=new CutFragment(PtuActivity.this);
+                    if (cutFrag == null) {
+                        cutFrag = new CutFragment(PtuActivity.this);
                     }
                     fm.beginTransaction()
                             .setCustomAnimations(R.animator.slide_bottom_in, R.animator.slide_bottom_out,
@@ -425,13 +456,13 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                             .commit();
                     FrameLayout.LayoutParams cutFloatParams =
                             new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    ptuFrame.addView(cutFrag.createCutView(totalBound,ptuView.getSourceBm()), cutFloatParams);
+                    ptuFrame.addView(cutFrag.createCutView(totalBound, ptuView.getSourceBm()), cutFloatParams);
 
                     CURRENT_EDIT_MODE = EDIT_CUT;
                     break;
                 case NAME_TEXT:
                     if (textFrag == null) {
-                        textFrag = new AddTextFragment();
+                        textFrag = new TextFragment();
                     }
                     fm.beginTransaction()
                             .setCustomAnimations(R.animator.slide_bottom_in, R.animator.slide_bottom_out,
@@ -439,9 +470,12 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                             .replace(R.id.fragment_function, textFrag)
                             .commit();
                     CURRENT_EDIT_MODE = EDIT_TEXT;
-                    floatTextView = ptuFrame.initAddTextFloat(ptuView.getBound());
+                    floatTextView = ptuFrame.initAddTextFloat(ptuView.getPicBound());
                     textFrag.setFloatView(floatTextView);
-
+                    floatTextView.
+                            setText("测试宽高是否" +
+                                    "\n准确" +
+                                    "\n真的是准确的");
                /* //让文本框一开始就获得输入法
                 floatTextView.setFocusable(true);
                 floatTextView.requestFocus();
@@ -451,7 +485,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     if (tietuFrag == null) {
                         tietuFrag = new TietuFragment();
                     }
-                    tietuFrag.setFloatImageView(ptuFrame.initAddImageFloat(ptuView.getBound()));
+                    tietuFrag.setFloatImageView(ptuFrame.initAddImageFloat(ptuView.getPicBound()));
                     fm.beginTransaction()
                             .setCustomAnimations(R.animator.slide_bottom_in, R.animator.slide_bottom_out,
                                     R.animator.slide_bottom_in, R.animator.slide_bottom_out)
@@ -477,7 +511,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     //设置布局
                     FrameLayout.LayoutParams floatParams =
                             new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    ptuFrame.addView(matFrag.createMatView(totalBound,ptuView.getSourceBm()), floatParams);
+                    ptuFrame.addView(matFrag.createMatView(totalBound, ptuView.getSourceBm()), floatParams);
                     CURRENT_EDIT_MODE = EDIT_MAT;
                     break;
             }
@@ -496,9 +530,17 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     @Override
     public void onBackPressed() {
+
         if (CURRENT_EDIT_MODE != EDIT_NO) {
             cancel();
-        } else super.onBackPressed();
+        } else {
+            beforeFinish();
+            super.onBackPressed();
+        }
+    }
+
+    private void beforeFinish() {
+        repealRedoManager.clear(this);
     }
 
     /**
@@ -514,36 +556,21 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             ptuView.resetShow();
         }//添加文字
         else if (CURRENT_EDIT_MODE == EDIT_TEXT) {
-            final RectF innerRect = new RectF(), boundRectInPic = new RectF();
-            boolean canGet = floatTextView.prepareResultBitmap(ptuView.getInitRatio(),
-                    innerRect, boundRectInPic);//先获取
-            if (!canGet) {//有些情况下会返回空
+            TextStepData tsd = textFrag.getResultData(ptuView);
+            if (tsd == null) {//有些情况下会返回空
                 Util.T(PtuActivity.this, "操作失败，获取到的图像为空");
-                ptuFrame.removeViewAt(1);
+                cancel();
                 return;
             }
+            Bitmap source = textFrag.getResultBm();
+            ptuView.addBitmap(source,
+                    tsd.boundRectInPic,
+                    tsd.rotateAngle);
 
-            floatTextView.getViewTreeObserver().
-                    addOnGlobalLayoutListener(
-                            new ViewTreeObserver.OnGlobalLayoutListener() {
-                                @Override
-                                public void onGlobalLayout() {
-                                    Bitmap textBitmap = RepealRedoManager.getInnerBmFromView(floatTextView, innerRect);
-                                    ptuView.addBitmap(textBitmap, boundRectInPic, 0);
+            //释放，删除等部分
+            textFrag.releaseResource();
+            afterSure(tsd);
 
-                                    TextStepData tsd = new TextStepData(EDIT_TEXT);
-                                    tsd.floatTextView = floatTextView;
-                                    tsd.innerRect = innerRect;
-                                    tsd.boundRectInPic = boundRectInPic;
-
-                                    //释放，删除等部分
-                                    textBitmap.recycle();
-                                    floatTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                                    ptuFrame.removeViewAt(1);
-
-                                    afterSure(tsd);
-                                }
-                            });
         } //贴图
         else if (CURRENT_EDIT_MODE == EDIT_TIETU) {
 
@@ -584,7 +611,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         if (ptuFrame.getChildCount() > 1) {
             ptuFrame.removeViewAt(1);
         }
-        topRelativeLayout.removeCancle();
+        topRelativeLayout.removeCancel();
         topRelativeLayout.removeSure();
         topRelativeLayout.addReturn();
         topRelativeLayout.addSaveSet();
@@ -592,7 +619,11 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         switchFragment(NAME_MAIN);
     }
 
-    private void savePtuView() {
+    public void saveRsultPic() {
+        saveResultBm();
+    }
+
+    private void saveResultBm() {
         new Handler().postDelayed(new Runnable() {
 
             private String result = null;
@@ -610,6 +641,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 }
                 setResult(0, resultIntent);
                 Util.P.le(TAG, result);
+                beforeFinish();
                 PtuActivity.this.finish();
             }
         }, 600);

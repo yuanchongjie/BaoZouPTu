@@ -27,7 +27,7 @@ public class PtuView extends View implements TSRView {
     String TAG = "PtuView";
     private boolean canDoubleCilick = true;
     private float minRatio;
-    private boolean canDiminish=true;
+    private boolean canDiminish = true;
 
     public void setCanRotate(boolean canRotate) {
         this.canRotate = canRotate;
@@ -99,6 +99,15 @@ public class PtuView extends View implements TSRView {
      * 右上角x坐标，y坐标，以view的右上角为原点，（0,0）
      */
     private int picLeft = 0, picTop = 0;
+
+    public Rect getSrcRect() {
+        return srcRect;
+    }
+
+    public Rect getDstRect() {
+        return dstRect;
+    }
+
     /**
      * 图片的局部，要显示出来的部分
      */
@@ -106,7 +115,7 @@ public class PtuView extends View implements TSRView {
     /**
      * 要绘制的总图在view的canvas上面的位置,
      */
-    protected  Rect dstRect = new Rect(1, 2, 3, 4);
+    protected Rect dstRect = new Rect(1, 2, 3, 4);
 
     Paint picPaint = new Paint();
 
@@ -116,7 +125,7 @@ public class PtuView extends View implements TSRView {
     /**
      * 当前图片的宽和高
      */
-    protected int curPicWidth=10, curPicHeight=10;
+    protected int curPicWidth = 10, curPicHeight = 10;
     protected Canvas sourceCanvas;
 
     public PtuView(Context context) {
@@ -147,6 +156,7 @@ public class PtuView extends View implements TSRView {
         picPaint.setDither(true);
         setBitmapAndInit(bitmap, viewWidth, viewHeigh);
     }
+
     /**
      * 根据提供的缩放比例，将p图的图片缩放到原图*缩放比例大小，并返回
      *
@@ -164,6 +174,10 @@ public class PtuView extends View implements TSRView {
 
     public float getInitRatio() {
         return initRatio;
+    }
+
+    public float getTotalRatio() {
+        return totalRatio;
     }
 
     /**
@@ -186,7 +200,7 @@ public class PtuView extends View implements TSRView {
         this.viewWidth = totalWidth;
         this.viewHeigh = totalHeight;
         totalRatio = Math.min(totalWidth * 1f / srcPicWidth,
-                totalHeight * 1f / srcPicHeight );
+                totalHeight * 1f / srcPicHeight);
         initRatio = totalRatio;
         setCanLessThanScreen(true);
         CURRENT_STATUS = STATUS_INIT;
@@ -197,7 +211,7 @@ public class PtuView extends View implements TSRView {
      */
     public void initialDraw() {
         totalRatio = Math.min(viewWidth * 1f / srcPicWidth,
-                viewHeigh * 1f / srcPicHeight );
+                viewHeigh * 1f / srcPicHeight);
         initRatio = totalRatio;
         curPicWidth = (int) (srcPicWidth * totalRatio);
         curPicHeight = (int) (srcPicHeight * totalRatio);
@@ -251,8 +265,8 @@ public class PtuView extends View implements TSRView {
                         return true;//本次缩放比例不够大
                     if (totalRatio * currentRatio > MAX_RATIO)
                         return true;//总的缩放比例超出了最大范围
-                    if(!canDiminish&&currentRatio*totalRatio<initRatio)//不支持缩小时
-                        currentRatio=initRatio/totalRatio;
+                    if (!canDiminish && currentRatio * totalRatio < initRatio)//不支持缩小时
+                        currentRatio = initRatio / totalRatio;
 
                     CURRENT_STATUS = STATUS_SCALE;
                     totalRatio *= currentRatio;
@@ -270,7 +284,7 @@ public class PtuView extends View implements TSRView {
                     lastX = event.getX(index);
                     lastY = event.getY(index);
                     //当缩小范围超过最小值时
-                    if (canDiminish&&totalRatio < minRatio) {
+                    if (canDiminish && totalRatio < minRatio) {
                         totalRatio = minRatio;
                         CURRENT_STATUS = STATUS_SCALE;
                         scale(viewWidth / 2, viewHeigh / 2, minRatio / totalRatio);
@@ -393,7 +407,7 @@ public class PtuView extends View implements TSRView {
     /**
      * @return 图片在PtuFrameLayout上的相对位置
      */
-    public Rect getBound() {
+    public Rect getPicBound() {
         return dstRect;
     }
 
@@ -490,12 +504,14 @@ public class PtuView extends View implements TSRView {
 
     /**
      * 必须在setBitmapAndInit后面调用
+     *
      * @param canLessThanScreen 是否能小于屏幕
      */
     public void setCanLessThanScreen(boolean canLessThanScreen) {
-        this.canDiminish=canLessThanScreen;
-        if(canLessThanScreen){
-            minRatio = Math.min(viewWidth *1f / 2 / srcPicWidth, viewHeigh *1f / 3 / srcPicHeight);
-        }else minRatio=initRatio;
+        this.canDiminish = canLessThanScreen;
+        if (canLessThanScreen) {
+            minRatio = Math.min(viewWidth * 1f / 2 / srcPicWidth, viewHeigh * 1f / 3 / srcPicHeight);
+        } else minRatio = initRatio;
     }
+
 }

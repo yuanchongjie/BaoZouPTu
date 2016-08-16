@@ -54,10 +54,10 @@ public class AllDate {
     static {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             text_defualt_color = globleContext.getResources().getColor(R.color.text_default_color, null);
-            text_choosed_color = globleContext.getResources().getColor(R.color.text_chose_color, null);
+            text_choosed_color = globleContext.getResources().getColor(R.color.text_checked_color, null);
         } else {
             text_defualt_color = globleContext.getResources().getColor(R.color.text_default_color);
-            text_choosed_color = globleContext.getResources().getColor(R.color.text_chose_color);
+            text_choosed_color = globleContext.getResources().getColor(R.color.text_checked_color);
         }
     }
 

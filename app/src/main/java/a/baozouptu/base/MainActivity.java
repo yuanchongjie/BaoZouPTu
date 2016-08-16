@@ -27,7 +27,7 @@ import a.baozouptu.R;
 import a.baozouptu.chosePicture.ChosePictureActivity;
 import a.baozouptu.ptu.draw.TuyaActivity;
 import a.baozouptu.base.dataAndLogic.AllDate;
-import a.baozouptu.chosePicture.MyDatabase;
+import a.baozouptu.base.dataAndLogic.MyDatabase;
 import a.baozouptu.chosePicture.ProcessUsuallyPicPath;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -78,13 +78,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
         Notification notification = new Notification.Builder(this)
-                .setSmallIcon(R.mipmap.icon1)
+                .setSmallIcon(R.mipmap.icon2)
                 .setContentIntent(pi)
                 .build();
         // 当用户下来通知栏时候看到的就是RemoteViews中自定义的Notification布局
         RemoteViews contentView = new RemoteViews(this.getPackageName(),
                 R.layout.layout_notification);
-        contentView.setImageViewResource(R.id.notify_icon, R.mipmap.icon1);
+        contentView.setImageViewResource(R.id.notify_icon, R.mipmap.icon);
         contentView.setImageViewResource(R.id.notify_text_image, R.mipmap.toast_text);
         contentView.setTextViewText(R.id.notify_text_text, "添加文字");
         notification.contentView = contentView;

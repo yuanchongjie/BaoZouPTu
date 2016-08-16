@@ -24,7 +24,7 @@ import a.baozouptu.R;
 import a.baozouptu.chosePicture.ChosePictureActivity;
 import a.baozouptu.base.dataAndLogic.AllDate;
 import a.baozouptu.base.dataAndLogic.AsyncImageLoader3;
-import a.baozouptu.chosePicture.MyDatabase;
+import a.baozouptu.base.dataAndLogic.MyDatabase;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.repealRedo.StepData;
@@ -182,7 +182,8 @@ class MyViewHolder extends RecyclerView.ViewHolder {
 }
 
 /**
- * Created by Administrator on 2016/6/17.
+ * Created by liuguicen on 2016/6/17.
+ * @description
  */
 class RecyclerAdapter extends RecyclerView.Adapter<MyViewHolder> implements View.OnClickListener {
 
@@ -223,8 +224,7 @@ class RecyclerAdapter extends RecyclerView.Adapter<MyViewHolder> implements View
         imageView.setOnClickListener(this);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         itemView.addView(imageView);
-        MyViewHolder holder = new MyViewHolder(itemView);
-        return holder;
+        return new MyViewHolder(itemView);
     }
 
     @Override

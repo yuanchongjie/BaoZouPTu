@@ -1,4 +1,4 @@
-package a.baozouptu.chosePicture;
+package a.baozouptu.base.dataAndLogic;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,8 +11,8 @@ import a.baozouptu.base.util.Util;
  */
 public class MySQLiteOpenHandler extends SQLiteOpenHelper {
     private static final String name="mysqlite";
-    public MySQLiteOpenHandler(Context context){
-        super(context,name,null,1);
+    public MySQLiteOpenHandler(Context context,int version){
+        super(context,name,null,version);
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -23,6 +23,7 @@ public class MySQLiteOpenHandler extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("create table  IF NOT EXISTS prefer_share(title text primary key,time varchar(50))");
         Util.P.le("执行了更新数据库");
     }
 }
