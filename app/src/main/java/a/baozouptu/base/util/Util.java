@@ -2,7 +2,7 @@ package a.baozouptu.base.util;
 
 import android.app.Application;
 import android.content.Context;
-import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.util.Log;
@@ -10,13 +10,14 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Toast;
 
-import a.baozouptu.R;
+import a.baozouptu.base.dataAndLogic.AllData;
 
 /**
  * Created by Administrator on 2016/5/19.
  */
 public class Util {
     private static MyApplication gloableContext;
+
     public static int dp2Px(Context context, float dp) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
@@ -37,6 +38,12 @@ public class Util {
         return (int) (px / scale + 0.5f);
     }
 
+    public static Drawable getDrawable(int id) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            return gloableContext.getResources().getDrawable(id, null);
+        return gloableContext.getResources().getDrawable(id);
+    }
+
     /**
      * 在mainifest中使用android:name=".MyApplication"，系统将会创建myapplication替代一般的application
      */
@@ -48,7 +55,7 @@ public class Util {
             // TODO Auto-generated method stub
             super.onCreate();
             mcontext = this;
-            gloableContext=this;
+            gloableContext = this;
         }
 
         public static Context getAppContext() {
@@ -85,6 +92,11 @@ public class Util {
 
         public void lgd(String s1, String s2) {
             Log.d(s1, s2);
+        }
+
+        public static void mle(Object s1, Object s2) {
+            Log.e(AllData.TAG +
+                    s1.toString(), s2.toString());
         }
     }
 
@@ -157,7 +169,8 @@ public class Util {
             return context.getResources().getColor(id, null);
         return context.getResources().getColor(id);
     }
-    public static int getColor(@ColorRes int id){
+
+    public static int getColor(@ColorRes int id) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             return gloableContext.getResources().getColor(id, null);
         return gloableContext.getResources().getColor(id);

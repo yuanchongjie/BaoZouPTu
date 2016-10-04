@@ -1,14 +1,19 @@
 package a.baozouptu.base;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -24,43 +29,57 @@ import java.util.ArrayList;
 import java.util.List;
 
 import a.baozouptu.R;
+import a.baozouptu.base.dataAndLogic.AllData;
+import a.baozouptu.base.dataAndLogic.MyDatabase;
+import a.baozouptu.base.util.Util;
 import a.baozouptu.chosePicture.ChosePictureActivity;
-import a.baozouptu.ptu.draw.TuyaActivity;
-import a.baozouptu.base.dataAndLogic.AllDate;
-import a.baozouptu.chosePicture.MyDatabase;
 import a.baozouptu.chosePicture.ProcessUsuallyPicPath;
+import a.baozouptu.ptu.PtuActivity;
+import a.baozouptu.ptu.draw.TuyaActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private static final int MY_PERMISSIONS_STOREGE = 0;
+    public static String TAG = MainActivity.class.getSimpleName();
     private int[] fab = {R.id.fab, R.id.fab1, R.id.fab2, R.id.fab3};
     private FloatingActionButton[] fab_btn = new FloatingActionButton[fab.length];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // testDB1();
-        //  testDB();
 //关闭通知
 //nm.cancel(0);
 
+        boolean isTest = true;
+        if (isTest)
+            test();
+        else {
+            setContentView(R.layout.activity_main);
+            initData();
+            initToolbar();
 
-        test();
-        setContentView(R.layout.activity_main);
+            initview();
+            sendNotify();
+            Util.P.le(TAG, "OnCreate完成");
+        }
+    }
 
-        initToolbar();
-
-        initview();
-        sendNotify();
+    private void initData() {
+        DisplayMetrics metric = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metric);
+        AllData.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
+        AllData.screenHeight=metric.heightPixels;
     }
 
     private void test() {
-
-        DisplayMetrics metric = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metric);
-        AllDate.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
-        Intent intent = new Intent(this, ChosePictureActivity.class);
-        startActivity(intent);
-        sendNotify();
+        //  testDB1();
+        //  testDB();
+        initData();
+      //  if (checkVersion()) {
+            Intent intent = new Intent(this, ChosePictureActivity.class);
+            intent.putExtra("test","test");
+            startActivityForResult(intent, 0);
+            finish();
+      //  }
     }
 
 
@@ -72,27 +91,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // 第二步：定义Notification
         Intent intent = new Intent(this, ChosePictureActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
-        intent.setAction("notify_text");
+        intent.setAction("notify_ptu");
 
         //PendingIntent是待执行的Intent
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
         Notification notification = new Notification.Builder(this)
-                .setSmallIcon(R.mipmap.icon1)
+                .setSmallIcon(R.mipmap.icon)
                 .setContentIntent(pi)
                 .build();
         // 当用户下来通知栏时候看到的就是RemoteViews中自定义的Notification布局
         RemoteViews contentView = new RemoteViews(this.getPackageName(),
                 R.layout.layout_notification);
-        contentView.setImageViewResource(R.id.notify_icon, R.mipmap.icon1);
-        contentView.setImageViewResource(R.id.notify_text_image, R.mipmap.toast_text);
-        contentView.setTextViewText(R.id.notify_text_text, "添加文字");
+        contentView.setImageViewResource(R.id.notify_icon, R.mipmap.icon);
+        contentView.setImageViewResource(R.id.notify_make_image, R.mipmap.notify_make);
+        contentView.setTextViewText(R.id.notify_make_name,
+                getResources().getString(R.string.make_expression));
+
+        contentView.setImageViewResource(R.id.notify_latest_image, R.mipmap.notify_latest);
+        contentView.setTextViewText(R.id.notify_latest_name,
+                getResources().getString(R.string.latest_pic));
+
+
+        Intent latestIntent = new Intent(this, PtuActivity.class);
+        latestIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        latestIntent.setAction("notify_latest");
+        //PendingIntent是待执行的Intent
+        PendingIntent piLatest = PendingIntent.getActivity(this, 0, latestIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+        contentView.setOnClickPendingIntent(R.id.notify_layout_latest, piLatest);
         notification.contentView = contentView;
         notification.flags = Notification.FLAG_NO_CLEAR;
-
         //第三步：启动通知栏，第一个参数是一个通知的唯一标识
         nm.notify(0, notification);
-
+        Util.P.le(TAG, "发送通知完成");
     }
 
     private void testDB1() {
@@ -163,13 +195,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.fab1:
                 Intent intent = new Intent(this, ChosePictureActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, 0);
                 break;
             case R.id.fab2:
                 Snackbar.make(v, "手绘图主要是自己画个简单图保存为表情", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 Intent intent1 = new Intent(this, TuyaActivity.class);
-                startActivity(intent1);
+                startActivityForResult(intent1, 0);
                 break;
             case R.id.fab3:
                 Snackbar.make(v, "自拍相机主要", Snackbar.LENGTH_LONG)
@@ -180,12 +212,61 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data != null) {
-            String action = data.getAction();
-            if (action != null && action.equals("finish")) {
-                finish();
-            }
+        if (data == null) {
+            super.onActivityResult(requestCode, resultCode, data);
+            return;
+        }
+        String action = data.getAction();
+        if (action != null && action.equals("finish")) {
+            setResult(0, new Intent(action));
+            finish();
+            overridePendingTransition(0, R.anim.go_send_exit);
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_PERMISSIONS_STOREGE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent intent = new Intent(this, ChosePictureActivity.class);
+                intent.setAction("test");
+                startActivityForResult(intent, 0);
+                finish();
+            } else {
+                // Permission Denied
+                Toast.makeText(MainActivity.this, "Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    /**
+     * @return 返回是否可以直接使用权限
+     */
+    @TargetApi(Build.VERSION_CODES.M)
+    private boolean checkVersion() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int c = ContextCompat.checkSelfPermission(this, android.Manifest.permission_group.STORAGE);
+            if (c != PackageManager.PERMISSION_GRANTED) {
+               /* if (!shouldShowRequestPermissionRationale(android.Manifest.permission_group.STORAGE)) {
+                    DialogFactory.noTitle(MainActivity.this, "你需要允许此权限",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    requestPermissions(new String[]{Manifest.permission.WRITE_CONTACTS},
+                                            MY_PERMISSIONS_STOREGE);
+                                }
+                            });
+                    return false;
+                } else*/
+                    ActivityCompat.requestPermissions(this, new String[]{
+                            android.Manifest.permission_group.STORAGE}, MY_PERMISSIONS_STOREGE);
+                return false;
+            }
+        }
+        return true;
     }
 }

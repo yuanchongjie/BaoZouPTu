@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -12,7 +13,7 @@ import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.FloatView;
 import a.baozouptu.ptu.text.FloatTextView;
-import a.baozouptu.ptu.tietu.FloatImageView;
+import a.baozouptu.ptu.tietu.TietuFrameLayout;
 
 /**
  * 重绘子视图是一个重要的功能，应该写得简洁有力
@@ -47,9 +48,9 @@ public class PtuFrameLayout extends FrameLayout {
         mContext = context;
     }
 
-    public FloatTextView initAddTextFloat(Rect ptuViewBound) {
+    public FloatTextView initAddTextFloat(Rect picBound) {
         //设置floatText的基本属性
-        floatView = new FloatTextView(mContext, ptuViewBound);
+        floatView = new FloatTextView(mContext, picBound);
 
         //设置布局
         FrameLayout.LayoutParams floatParams =
@@ -153,18 +154,17 @@ public class PtuFrameLayout extends FrameLayout {
             boolean isConsume = false;
 
             float sx = ev.getX(), sy = ev.getY();
-            if (
-                    ( childView instanceof FloatView &&
-                    (new RectF(childView.getLeft(), childView.getTop(),
-                    childView.getLeft() + childView.getWidth(), childView.getTop() + childView.getHeight())
-                    .contains(sx, sy)) )//是浮动图，这判断是否在内部
-                    ||!(childView instanceof FloatView)//不是浮动图
-            )
-             {
+            if (childView instanceof FloatView &&
+                            new RectF(childView.getLeft(), childView.getTop(),
+                                    childView.getLeft() + childView.getWidth(), childView.getTop() + childView.getHeight())
+                                    .contains(sx, sy) ) //是浮动图，这判断是否在内部
+                    {
                 ev.setLocation(sx - childView.getLeft(), sy - childView.getTop());
                 isConsume = childView.dispatchTouchEvent(ev);
                 if (isConsume)//消费了up事件，up置为true
                     hasUp = true;
+            }else if(!(childView instanceof  FloatView)){
+                isConsume=true;
             }
             //没有消费才分发事件，不然就不分发
             if (!isConsume) {
@@ -178,7 +178,7 @@ public class PtuFrameLayout extends FrameLayout {
     }
 
     /**
-     *改变位置，不能在float为空时调用
+     * 改变位置，不能在float为空时调用
      */
     public void changeLocation() {
         FrameLayout.LayoutParams floatParams =
@@ -190,15 +190,11 @@ public class PtuFrameLayout extends FrameLayout {
         updateViewLayout((View) floatView, floatParams);
     }
 
-    public FloatImageView initAddImageFloat(Rect bound) {
-        floatView = new FloatImageView(mContext, bound, getMeasuredWidth(), getMeasuredHeight());
-
-        //设置布局
-        FrameLayout.LayoutParams floatParams =
-                new FrameLayout.LayoutParams(getMeasuredWidth(), getMeasuredHeight());
-        floatParams.setMargins(0, 0, getMeasuredWidth(), getMeasuredHeight());
-        addView((View) floatView, floatParams);
-
-        return (FloatImageView) floatView;
+    public TietuFrameLayout initAddImageFloat(Rect bound) {
+        TietuFrameLayout tietuFrameLayout=new TietuFrameLayout(getContext());
+        FrameLayout.LayoutParams layoutParams=new FrameLayout.LayoutParams(bound.width(),bound.height(), Gravity.CENTER);
+        tietuFrameLayout.setBackgroundColor(0x0000);
+        addView(tietuFrameLayout,layoutParams);
+        return tietuFrameLayout;
     }
 }

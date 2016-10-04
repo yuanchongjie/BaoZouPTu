@@ -1,17 +1,19 @@
 package a.baozouptu.ptu.repealRedo;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import a.baozouptu.base.util.FileTool;
 import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
-import a.baozouptu.ptu.cut.CutView;
 
 /**
  * Created by Administrator on 2016/7/28.
@@ -24,23 +26,13 @@ public class RepealRedoManager {
     private static int maxStep = 5;
     Bitmap baseBitmap;
     boolean hasChangePic;
-    private static RepealRedoManager instanceTotal;
 
-    private RepealRedoManager(int maxStep) {
+    public RepealRedoManager(int maxStep) {
         this.maxStep = maxStep;
         stepList = new LinkedList<>();
         iter = stepList.listIterator();
     }
 
-    /**
-     * @param externalMaxStep 构造器输入负数表示使用默认最大步数，5
-     * @return
-     */
-    public static RepealRedoManager getInstanceTotal(int externalMaxStep) {
-        if (instanceTotal == null)
-            instanceTotal =new  RepealRedoManager(externalMaxStep < 0 ? maxStep : externalMaxStep);
-        return instanceTotal;
-    }
 
     /**
      * 提交操作，返回是否需要超出最大步数，
@@ -102,18 +94,10 @@ public class RepealRedoManager {
     }
 
     public static Canvas addBm2Canvas(Canvas baseCanvas, Bitmap addBitmap, RectF boundRect, float rotateAngle) {
-        int width = (int) (boundRect.right - boundRect.left);
-        int height = (int) (boundRect.bottom - boundRect.top);
-        Bitmap realBm = null;
-        if (addBitmap.getWidth() != width) {
-            realBm = Bitmap.createScaledBitmap(addBitmap, width, height, true);
-        } else {
-            realBm = addBitmap;
-        }
 
         float centerX = (boundRect.left + boundRect.right) / 2, centerY = (boundRect.bottom + boundRect.top) / 2;
         //将realBm到图上
-        BitmapDrawable addDrawable = new BitmapDrawable(Util.MyApplication.getAppContext().getResources(), realBm);
+        BitmapDrawable addDrawable = new BitmapDrawable(Util.MyApplication.getAppContext().getResources(), addBitmap);
         addDrawable.setDither(true);
         addDrawable.setAntiAlias(true);
         addDrawable.setFilterBitmap(true);
@@ -123,8 +107,6 @@ public class RepealRedoManager {
         baseCanvas.save();
         baseCanvas.restore();
 
-        if (realBm != addBitmap)
-            realBm.recycle();
         return baseCanvas;
     }
 
@@ -145,8 +127,10 @@ public class RepealRedoManager {
             innerBitmap[0] = Bitmap.createBitmap(viewBitmap, (int) innerRect.left, (int) innerRect.top,
                     (int) (innerRect.right - innerRect.left), (int) (innerRect.bottom - innerRect.top));//获取floatview内部的内容
             viewBitmap.recycle();
+            viewBitmap=null;
         } catch (OutOfMemoryError e) {
             innerBitmap[0].recycle();
+            innerBitmap[0]=null;
             e.printStackTrace();
         }
         Util.P.le(TAG, "getInnerBmFromView完成");
@@ -178,5 +162,18 @@ public class RepealRedoManager {
         } else {
             return false;
         }
+    }
+
+    public void clear(Context context) {
+        String path=FileTool.createTempPicPath(context);
+        String parentPath = path.substring(0,
+                path.lastIndexOf('/'));
+        FileTool.deleteDir(new File(parentPath));
+        stepList.clear();
+        iter=stepList.listIterator();
+    }
+
+    public void init() {
+        iter=stepList.listIterator();
     }
 }

@@ -53,8 +53,8 @@ public class Pen {
         int c_1 = Color.argb(Color.alpha(c1) / 3, Color.red(c1), Color.green(c1), Color.blue(c1));
         int c2 = Util.getColor(R.color.mat_pen_line2);
         int c_2 = Color.argb(Color.alpha(c2) / 3, Color.red(c2), Color.green(c2), Color.blue(c2));
-        penBmLine = IconBitmapCreator.createPen(mContext, (int) penWidth, c1, c2);
-        penBm = penBmMove = IconBitmapCreator.createPen(mContext, (int) penWidth, c_1, c_2);
+        penBmLine = IconBitmapCreator.createPen((int) penWidth, c1, c2);
+        penBm = penBmMove = IconBitmapCreator.createPen((int) penWidth, c_1, c_2);
         penHeight = penBm.getHeight();
 
         pointLeft = bound.width() / 2;
@@ -234,7 +234,13 @@ public class Pen {
     }
 
     public void releaseResource() {
-        penBmLine.recycle();
-        penBmMove.recycle();
+        if(penBmLine!=null) {
+            penBmLine.recycle();
+            penBmLine = null;
+        }
+        if(penBmMove!=null) {
+            penBmMove.recycle();
+            penBmMove = null;
+        }
     }
 }

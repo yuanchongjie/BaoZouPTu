@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,20 +22,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import a.baozouptu.R;
-import a.baozouptu.chosePicture.ChosePictureActivity;
-import a.baozouptu.base.dataAndLogic.AllDate;
+import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.dataAndLogic.AsyncImageLoader3;
-import a.baozouptu.chosePicture.MyDatabase;
+import a.baozouptu.base.dataAndLogic.MyDatabase;
 import a.baozouptu.base.util.Util;
+import a.baozouptu.chosePicture.ChosePictureActivity;
 import a.baozouptu.ptu.BaseFunction;
+import a.baozouptu.ptu.PtuActivity;
+import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.repealRedo.StepData;
+import a.baozouptu.ptu.repealRedo.TietuStepData;
+import a.baozouptu.ptu.view.PtuView;
 
 /**
  * Created by Administrator on 2016/7/1.
  */
 public class TietuFragment extends Fragment implements BaseFunction {
-    private static String TAG="TietuFragment";
-    private FloatImageView floatImageView;
+    private static String TAG = "TietuFragment";
+    private TietuFrameLayout tietuLayout;
     Context mContext;
     List<String> tietuPaths = new ArrayList<>();
     private RecyclerView recyclerView;
@@ -42,8 +47,10 @@ public class TietuFragment extends Fragment implements BaseFunction {
     private RecyclerAdapter tietuAdapter;
     private LinearLayout more;
 
-    public void setFloatImageView(FloatImageView floatImageView) {
-        this.floatImageView = floatImageView;
+    private PtuView ptuView;
+
+    public void setTietuLayout(TietuFrameLayout tietuLayout) {
+        this.tietuLayout = tietuLayout;
     }
 
     private void loadTietuPath() {
@@ -51,7 +58,7 @@ public class TietuFragment extends Fragment implements BaseFunction {
         MyDatabase mDB = MyDatabase.getInstance(mContext);
         try {
             mDB.queryAllUsedPic(tietuPaths);
-            mDB.queryAllFrequentlyPic(tietuPaths);
+            mDB.queryAllPreferPic(tietuPaths);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -77,14 +84,37 @@ public class TietuFragment extends Fragment implements BaseFunction {
         tietuAdapter = new RecyclerAdapter(mContext, tietuPaths);
         tietuAdapter.setOnItemClickListener(new RecyclerAdapter.OnRecyclerViewItemClickListener() {
             @Override
-            public void onItemClick(View view, String data) {
-                floatImageView.setBitmapAndInit(data);
-                int clickPosition=tietuPaths.indexOf(data);
-                int lastPosition= layoutManager.findLastVisibleItemPosition();
-                if(clickPosition==lastPosition){//将下一个隐藏的item移出来
-                    int[] location = new  int[2] ;
+            public void onItemClick(View view, String data) {/*
+//                处理设置贴图失败的情况，暂不实现
+                boolean flag=false;
+                while(!floatImageView.setBitmapAndInit(data)&&tietuPaths.size()>0)
+                {
+                    flag=true;
+                    int id=tietuPaths.indexOf(data);
+                    tietuPaths.remove(data);
+                    if(tietuPaths.size()==0){
+                        ((ViewGroup)floatImageView.getParent()).removeView(floatImageView);
+                        Toast.makeText(mContext,"贴图加载失败了！",Toast.LENGTH_SHORT).show();
+                        tietuAdapter.notifyDataSetChanged();
+                        return;
+                    }
+                    else{
+                        data=tietuPaths.get(id%tietuPaths.size());
+                    }
+                }
+                if(flag) {
+                    Toast.makeText(mContext,"贴图加载失败了！",Toast.LENGTH_SHORT).show();
+                    tietuAdapter.notifyDataSetChanged();
+                }*/
+
+                addFloatImageView(data);
+
+                int clickPosition = tietuPaths.indexOf(data);
+                int lastPosition = layoutManager.findLastVisibleItemPosition();
+                if (clickPosition == lastPosition) {//将下一个隐藏的item移出来
+                    int[] location = new int[2];
                     view.getLocationInWindow(location); //获取在当前窗口内的绝对坐标
-                    recyclerView.smoothScrollBy(view.getWidth()+location[0]+view.getWidth()-more.getLeft()+10,0);
+                    recyclerView.smoothScrollBy(view.getWidth() + location[0] + view.getWidth() - more.getLeft() + 10, 0);
                 }
             }
         });
@@ -98,9 +128,9 @@ public class TietuFragment extends Fragment implements BaseFunction {
         more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(mContext,ChosePictureActivity.class);
+                Intent intent = new Intent(mContext, ChosePictureActivity.class);
                 intent.setAction("tietu");
-                startActivityForResult(intent,1);
+                startActivityForResult(intent, 1);
             }
         });
         setOnclick();
@@ -110,8 +140,28 @@ public class TietuFragment extends Fragment implements BaseFunction {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Util.P.le(TAG);
-        String path=data.getStringExtra("picPath");
-        floatImageView.setBitmapAndInit(path);
+        String path = data.getStringExtra("pic_path");
+        addFloatImageView(path);
+    }
+
+    /**
+     * 添加一个tietu，
+     *
+     * @param path
+     */
+    private void addFloatImageView(String path) {
+        Bitmap srcBitmap = TietuSizeControler.getSrcBitmap(getActivity(), path);
+        FloatImageView floatImageView = new FloatImageView(mContext);
+        floatImageView.setAdjustViewBounds(true);
+        floatImageView.setImageBitmap(srcBitmap);
+        FrameLayout.LayoutParams params = TietuSizeControler.getFeatParmas(srcBitmap.getWidth(), srcBitmap.getHeight(),
+                ptuView.getPicBound());
+        tietuLayout.addView(floatImageView, params);
+        Util.P.le(TAG, "添加贴图成功");
+    }
+
+    private void removeFloatImageView(FloatImageView view) {
+        tietuLayout.removeView(view);
     }
 
     private void setOnclick() {
@@ -145,28 +195,63 @@ public class TietuFragment extends Fragment implements BaseFunction {
 
     @Override
     public void repeal() {
-
+        if (tietuLayout.getChildCount() > 0)
+            tietuLayout.removeViewAt(tietuLayout.getChildCount() - 1);
     }
 
     @Override
     public void redo() {
-
     }
 
     @Override
     public Bitmap getResultBm(float ratio) {
-        return floatImageView.getSourceBitmap() ;
+        return null;
     }
 
+    /**
+     * 获取结果，因为会有多个贴图，所以返回的 {@link TietuStepData} 里面放的是{@link StepData}的链表
+     *
+     * @return {@link StepData}
+     */
     @Override
     public StepData getResultData(float ratio) {
-        return floatImageView.getResultData(ratio);
+        TietuStepData tsd = new TietuStepData(PtuActivity.EDIT_TIETU);
+        int count = tietuLayout.getChildCount();
+        for (int i = 0; i < count; i++) {
+            FloatImageView fiv = (FloatImageView) tietuLayout.getChildAt(i);
+            StepData sd = new StepData(PtuActivity.EDIT_TIETU);
+//获取每个tietu的范围
+            RectF boundRectInPic = new RectF();
+            String[] temp = PtuUtil.getLocationAtPicture(fiv.getLeft(), fiv.getTop(),
+                    ptuView.getSrcRect(), ptuView.getDstRect());
+            boundRectInPic.left = Float.valueOf(temp[0]);
+            boundRectInPic.top = Float.valueOf(temp[1]);
+
+            temp = PtuUtil.getLocationAtPicture(fiv.getRight(), fiv.getBottom(),
+                    ptuView.getSrcRect(), ptuView.getDstRect());
+            boundRectInPic.right = Float.valueOf(temp[0]);
+            boundRectInPic.bottom = Float.valueOf(temp[1]);
+
+            sd.boundRectInPic = boundRectInPic;
+            sd.rotateAngle = fiv.getRotation();
+            sd.picPath = fiv.getPicPath();
+            tsd.addOneTietu(sd);
+        }
+        return tsd;
+
     }
 
     @Override
     public void releaseResource() {
-        floatImageView.releaseResourse();
+        int count = tietuLayout.getChildCount();
+        for (int i = 0; i < count; i++)
+            tietuLayout.removeViewAt(i);
     }
+
+    public void setPtuView(PtuView ptuView) {
+        this.ptuView = ptuView;
+    }
+
 }
 
 /**
@@ -182,7 +267,9 @@ class MyViewHolder extends RecyclerView.ViewHolder {
 }
 
 /**
- * Created by Administrator on 2016/6/17.
+ * Created by liuguicen on 2016/6/17.
+ *
+ * @description
  */
 class RecyclerAdapter extends RecyclerView.Adapter<MyViewHolder> implements View.OnClickListener {
 
@@ -218,13 +305,12 @@ class RecyclerAdapter extends RecyclerView.Adapter<MyViewHolder> implements View
         itemView.setPadding(5, 0, 5, 0);
 
         ImageView imageView = new ImageView(mContext);
-        imageView.setLayoutParams(new ViewGroup.LayoutParams(AllDate.screenWidth / 5, ViewGroup.LayoutParams.MATCH_PARENT));
+        imageView.setLayoutParams(new ViewGroup.LayoutParams(AllData.screenWidth / 5, ViewGroup.LayoutParams.MATCH_PARENT));
         imageView.setTag("image");
         imageView.setOnClickListener(this);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         itemView.addView(imageView);
-        MyViewHolder holder = new MyViewHolder(itemView);
-        return holder;
+        return new MyViewHolder(itemView);
     }
 
     @Override
@@ -235,12 +321,16 @@ class RecyclerAdapter extends RecyclerView.Adapter<MyViewHolder> implements View
         cachedImage = imageLoader.getBitmap(tietuPaths.get(position));//从缓存中获取
         if (cachedImage != null) {
             holder.iv.setImageBitmap(cachedImage);
-        }else if (cachedImage == null&&!isScroll) {//图片存在，而且处于非滑动状态，从sd卡获取
+        } else if (cachedImage == null && !isScroll) {//图片存在，而且处于非滑动状态，从sd卡获取
             imageLoader.loadBitmap(tietuPaths.get(position), holder.iv,
-                    position, imageCallback, AllDate.screenWidth / 5);
-        }else//获取替代图片
+                    position, imageCallback, AllData.screenWidth / 5);
+        } else//获取替代图片
             holder.iv.setImageResource(R.mipmap.instead_icon);
     }
+
+    public void onBindViewHolder(MyViewHolder holder, int position, List<Long> longs) {
+    }
+
 
     @Override
     public int getItemCount() {

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -20,23 +21,40 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import a.baozouptu.base.dataAndLogic.AllDate;
+import a.baozouptu.base.dataAndLogic.AllData;
+import a.baozouptu.base.dataAndLogic.MyDatabase;
 import a.baozouptu.base.util.FileTool;
 
 
 /**
  * 用来处理常用图片的类，作为activity与底层的接口。包括数据库，ContentProvider，文件等
  * 增删改查等功能
+ * <p>
+ * 数据的顺序，最近常用用图片
+ * <p>最近图片
+ * <p>
+ * <p>喜爱图片图片
+ * <p>
+ * <p>
+ * </p>
  */
 public class ProcessUsuallyPicPath {
+    public static String USED_FLAG = "@%^@#GDa_USED_FLAG";
+    public static String RECENT_FLAG = "@%^@#GDa_RECENT_FLAG";
+    public static String PREFER_FLAG = "@%^@#GDa_PREFER_FLAG";
     private final Handler mHandler;
     Context mContext;
     private final int MAX_USED_NUMBER = 6;
-    private final int MAX_RECENT_NUMBER = 6;
+    private final int MIN_RECENT_NUMBER = 6;
+    private final int MAX_RECENT_NUMBER = 20;
+    /**
+     * 3天的毫秒数
+     */
+    private final long RECENT_DURATION_TIME = 3l * 24l * 3600l * 1000l;
     /**
      * 当前拥有的编辑过的和最近的图片张数
      */
-    private int curUsedNumber = 0, curRecentNumber = 0;
+    private int usedNumber = 0, recentNumber = 0;
     private MyDatabase mDB;
     /**
      * 只获取一次系统时间，以后都以它为基础相加，避免加入太快，毫秒不能记数
@@ -45,24 +63,16 @@ public class ProcessUsuallyPicPath {
     List<String> mUsualyPicPathList = new ArrayList<>();
 
     /**
-     * 最近图片的信息
-     */
-    private List<Long> recentTimesList = new ArrayList<>();
-
-    /**
      * 文件的信息
      */
-    private List<String> filePathList = new ArrayList<>();
-    private List<String> fileInfoList = new ArrayList<>();
-    private List<String> fileRepresentPathList = new ArrayList<>();
+    private List<String> dirPathList = new ArrayList<>();
+    private List<String> dirInfoList = new ArrayList<>();
+    private List<String> dirRepresentPathList = new ArrayList<>();
 
     /**
      * 添加出常用的图片
-     *
-     * @param context
      */
     private List<String> usualyFilesList = new ArrayList<>();
-    private FileTool fileTool = new FileTool();
     private int totalPicNumber = 0;
 
     public ProcessUsuallyPicPath(Context context) {
@@ -75,14 +85,17 @@ public class ProcessUsuallyPicPath {
         mHandler = handler;
     }
 
-    public List<String> getUsualyPathFromDB() {
+    public List<String> getUsuallyPathFromDB() {
         try {
             mDB = MyDatabase.getInstance(mContext);
+            mUsualyPicPathList.add(USED_FLAG);
             mDB.queryAllUsedPic(mUsualyPicPathList);
-            curUsedNumber = mUsualyPicPathList.size();
-            mDB.queryAllFrequentlyPic(mUsualyPicPathList);
+            usedNumber = mUsualyPicPathList.size() - 1;
+            mUsualyPicPathList.add(RECENT_FLAG);
+            mUsualyPicPathList.add(PREFER_FLAG);
+            mDB.queryAllPreferPic(mUsualyPicPathList);
             for (String path : usualyFilesList) {
-                fileTool.getOrderedPicListInFile(path, mUsualyPicPathList);
+                FileTool.getOrderedPicListInFile(path, mUsualyPicPathList);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -94,26 +107,26 @@ public class ProcessUsuallyPicPath {
 
     /**
      * 添加最近编辑过的图片
-     *
-     * @param path
+     * 同时会添加到数据库中
      */
     //注意数据库，内存双添加,以及相关参数改变
     public void addUsedPath(String path) {
         try {
             mDB = MyDatabase.getInstance(mContext);
             //如果存在，需要先删除原来的
-            if (mUsualyPicPathList.indexOf(path) < curUsedNumber) {
+            if (mUsualyPicPathList.indexOf(path) <= usedNumber) {
                 mDB.deleteUsedPic(path);
                 mUsualyPicPathList.remove(path);
+                usedNumber--;
             }
-            if (curUsedNumber + 1 > MAX_USED_NUMBER) {
+            if (usedNumber > MAX_USED_NUMBER) {
                 mDB.deleteOdlestUsedPic();//超过预定数量时，删除一个，再添加
-                mUsualyPicPathList.remove(curUsedNumber - 1);
-                curUsedNumber--;
+                mUsualyPicPathList.remove(usedNumber);
+                usedNumber--;
             }
             mDB.insertUsedPic(path, lastTime++);
-            mUsualyPicPathList.add(0, path);
-            curUsedNumber++;
+            mUsualyPicPathList.add(1, path);
+            usedNumber++;
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -123,36 +136,21 @@ public class ProcessUsuallyPicPath {
 
     /**
      * 添加最近图片
-     *
-     * @param path
      */
-    public void addRecentPath(String path, int index, long time) {
-        if (curRecentNumber + 1 > MAX_RECENT_NUMBER) {
-            mUsualyPicPathList.remove(curUsedNumber + curRecentNumber - 1);
-            recentTimesList.remove(recentTimesList.size() - 1);
-            curRecentNumber--;
-        }
-        mUsualyPicPathList.add(curUsedNumber + index, path);
-        recentTimesList.add(index, time);
-        curRecentNumber++;
+    public void addRecentPath(String path) {
+        mUsualyPicPathList.add(usedNumber + 2 + recentNumber, path);
+        recentNumber++;
     }
 
     /**
      * 添加选定的常用图片
-     *
-     * @param path
      */
-    public boolean addUsualyPath(String path) {
+    public boolean addPreferPath(String path) {
         try {
             mDB = MyDatabase.getInstance(mContext);
-            mDB.insertFrequentlyPic(path, lastTime++);
-            //如果已经设置为常用
-            if (mUsualyPicPathList.indexOf(path) >= getUsualyStart()) return false;
-            else {
-                mUsualyPicPathList.add(curUsedNumber + curRecentNumber, path);
-                return true;
-            }
-
+            mDB.insertPreferPic(path, lastTime++);
+            mUsualyPicPathList.add(getPreferStart(), path);
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -162,11 +160,9 @@ public class ProcessUsuallyPicPath {
     }
 
     /**
-     * 添加选定的常用图片
-     *
-     * @param path
+     * 删除常用图片
      */
-    public void deleteUsualyPath(String path, int index) {
+    public void deletePreferPath(String path, int index) {
         try {
             mDB = MyDatabase.getInstance(mContext);
             mUsualyPicPathList.remove(index);
@@ -185,69 +181,40 @@ public class ProcessUsuallyPicPath {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                // 排序处理得到的图片的map
+                /**
+                 * @param sortPictureList     里面存放pair，第一个是时间，第二个是路径
+                 */
                 List<Pair<Long, String>> sortedPicPathsByTime = new ArrayList<>();
                 Map<String, Integer> picFileNumberMap = new TreeMap<>();
                 Map<String, String> PicFileRepresentMap = new TreeMap<>();
                 Map<String, Long> fileRepresentTime = new HashMap<>();
                 queryPicInfoInSD(sortedPicPathsByTime,
-                        picFileNumberMap, PicFileRepresentMap,fileRepresentTime,
+                        picFileNumberMap, PicFileRepresentMap, fileRepresentTime,
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 queryPicInfoInSD(sortedPicPathsByTime,
-                        picFileNumberMap, PicFileRepresentMap,fileRepresentTime,
+                        picFileNumberMap, PicFileRepresentMap, fileRepresentTime,
                         MediaStore.Images.Media.INTERNAL_CONTENT_URI);
                 long scanTime = System.currentTimeMillis();
                 Collections.sort(sortedPicPathsByTime, new Comparator<Pair<Long, String>>() {
                     @Override
                     public int compare(Pair<Long, String> o1, Pair<Long, String> o2) {
-                        return o1.first.compareTo(o2.first);
+                        return o2.first.compareTo(o1.first);
                     }
                 });
 
                 detectRecentExit();
-                if (-sortedPicPathsByTime.get(0).first < AllDate.lastScanTime &&
+                if (sortedPicPathsByTime.size() == 0) return;
+                if (sortedPicPathsByTime.get(0).first < AllData.lastScanTime &&
                         totalPicNumber == sortedPicPathsByTime.size()) {
-                    AllDate.lastScanTime = scanTime;
+                    AllData.lastScanTime = scanTime;
                     return;
                 }
-                AllDate.lastScanTime = scanTime;
+                AllData.lastScanTime = scanTime;
                 totalPicNumber = sortedPicPathsByTime.size();
 
-                //处理最近图片
-                int index = 0;
-                for (Pair<Long, String> pair : sortedPicPathsByTime) {
-                    if (isInRecent(pair.second)) continue;
-                    long time = -pair.first;
-                    int i = index;
-                    for (; i < recentTimesList.size(); i++) {
-                        if (time > recentTimesList.get(i)) {
-                            addRecentPath(pair.second, i, time);
-                            break;
-                        }
-                    }
-                    //当最近图片总数不足时，直接添加
-                    if (i == recentTimesList.size() && i < MAX_RECENT_NUMBER) {
-                        addRecentPath(pair.second, i, time);
-                    }
-                    index = i + 1;
-                    if (index >= MAX_RECENT_NUMBER) break;
-                }
+                updateRecent(sortedPicPathsByTime);
+                updateFileInfo(picFileNumberMap, PicFileRepresentMap);
 
-                filePathList.clear();
-                fileRepresentPathList.clear();
-                fileInfoList.clear();
-                // 处理文件信息,将要显示的文件信息获取出来
-                filePathList.add("aaaaa");
-                fileRepresentPathList.add(mUsualyPicPathList.get(0));
-                fileInfoList.add("常用图片 (" + mUsualyPicPathList.size() + ")");
-
-                for (Map.Entry<String, Integer> entry : picFileNumberMap.entrySet()) {
-                    String path = entry.getKey();
-                    filePathList.add(path);
-                    fileRepresentPathList.add(PicFileRepresentMap.get(path));
-                    String name = path.substring(path.lastIndexOf("/") + 1, path.length());
-                    fileInfoList.add("" + name + " (" + String.valueOf(entry.getValue()) + ")");
-                }
                 Message msg = new Message();
                 msg.obj = "change_pic";
                 mHandler.sendMessage(msg);
@@ -259,22 +226,64 @@ public class ProcessUsuallyPicPath {
         new Thread(runnable).start();
     }
 
+    private void updateFileInfo(Map<String, Integer> picFileNumberMap, Map<String, String> PicFileRepresentMap) {
+        //处理文件信息
+        dirPathList.clear();
+        dirRepresentPathList.clear();
+        dirInfoList.clear();
+        // 处理文件信息,将要显示的文件信息获取出来
+        dirPathList.add("aaaaa");
+        dirRepresentPathList.add(mUsualyPicPathList.get(0));
+        dirInfoList.add("常用图片 (" + mUsualyPicPathList.size() + ")");
+
+        for (Map.Entry<String, Integer> entry : picFileNumberMap.entrySet()) {
+            String path = entry.getKey();
+            dirPathList.add(path);
+            dirRepresentPathList.add(PicFileRepresentMap.get(path));
+            String name = path.substring(path.lastIndexOf("/") + 1, path.length());
+            dirInfoList.add("" + name + " (" + String.valueOf(entry.getValue()) + ")");
+        }
+    }
+
+    /**
+     * 处理最近图片,原理是删除现有的，再加上需要的，因为数量不多，这样简洁，不易出错
+     *
+     * @param sortedPicPathsByTime 排好序的最近图片
+     */
+    private void updateRecent(List<Pair<Long, String>> sortedPicPathsByTime) {
+        //加入最近图片，至少MIN_RENT_NUMBER，最多MAX_RECENT_NUMBER
+        //正常最近三天
+        clearRecent();
+        long lastTime = System.currentTimeMillis() - RECENT_DURATION_TIME;
+        for (Pair<Long, String> pair : sortedPicPathsByTime) {
+            if (pair.first < lastTime && recentNumber >= MIN_RECENT_NUMBER) break;
+            if (recentNumber > MAX_RECENT_NUMBER) break;
+            addRecentPath(pair.second);
+        }
+    }
+
+    private void clearRecent() {
+        for (int i = usedNumber + 2; i < usedNumber + recentNumber + 2; i++) {
+            mUsualyPicPathList.remove(i);
+        }
+        recentNumber = 0;
+    }
+
     /**
      * 检测最近的图片时已删除
      */
     private void detectRecentExit() {
-        for (int i = curUsedNumber; i < curRecentNumber + curUsedNumber; i++) {
+        for (int i = usedNumber+2; i < recentNumber + usedNumber+2; i++) {
             String path = mUsualyPicPathList.get(i);
             if (!new File(path).exists()) {
                 mUsualyPicPathList.remove(i);
-                curRecentNumber--;
-                recentTimesList.remove(i - curUsedNumber);
+                recentNumber--;
             }
         }
     }
 
     private boolean isInRecent(String path) {
-        for (int i = curUsedNumber; i < curUsedNumber + curRecentNumber; i++) {
+        for (int i = usedNumber+2; i < recentNumber + usedNumber+2; i++) {
             if (mUsualyPicPathList.get(i).equals(path))
                 return true;
         }
@@ -283,6 +292,10 @@ public class ProcessUsuallyPicPath {
 
     /**
      * 启动一个新线程从图片数据库中获取图片信息
+     *
+     * @param sortPictureList  里面存放pair，第一个是时间，第二个是路径
+     * @param fileNumberMap    文件内图片张数,文件路径为key
+     * @param fileRepresentMap 文件的代表图片的路径
      */
     private void queryPicInfoInSD(final List<Pair<Long, String>> sortPictureList,
                                   Map<String, Integer> fileNumberMap,
@@ -304,8 +317,8 @@ public class ProcessUsuallyPicPath {
                         .getColumnIndex(MediaStore.Images.Media.DATA));
                 long modifyTime = cursor.getLong(cursor
                         .getColumnIndex(MediaStore.Images.Media.DATE_MODIFIED)) * 1000;// 最近修改时间
-                if (AllDate.PIC_FILE_SIZE_MIN < size && size < AllDate.PIC_FILE_SIZE_MAX) {// 图片符合条件
-                    sortPictureList.add(new Pair(-modifyTime, path));
+                if (AllData.PIC_FILE_SIZE_MIN < size && size < AllData.PIC_FILE_SIZE_MAX) {// 图片符合条件
+                    sortPictureList.add(new Pair(modifyTime, path));
                     String parentPath = path.substring(0,
                             path.lastIndexOf('/'));
                     if (fileNumberMap.containsKey(parentPath)) {
@@ -326,88 +339,156 @@ public class ProcessUsuallyPicPath {
     }
 
     /**
-     * 更新文件信息，文件名，图片张数
-     * 不会操作数据库
-     * 发送删除通知
+     * 删除图片文件，并更新目录列表信息
+     * <p>更新文件信息，文件是否还存在，图片张数，最新图片，描述信息的字符串
+     * <p>不会操作数据库
+     * <p>注意发送删除通知
      *
-     * @param picPath
+     * @return 是否删除成功
      */
-    public boolean deleteOnePicInfile(String picPath) {
+    public boolean onDeleteOnePicInfile(String picPath) {
         File file = new File(picPath);
-        String path = file.getParent();
-        if (!file.exists()) return true;
+        String dirPath = file.getParent();
         if (file.exists()) {
-            if (file.delete() == false) {
+            if (!file.delete()) {
                 return false;
             }
             Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
             scanIntent.setData(Uri.fromFile(new File(picPath)));
             mContext.sendBroadcast(scanIntent);
-            MediaScannerConnection.scanFile(mContext, new String[]{path}, null, null);
+            MediaScannerConnection.scanFile(mContext, new String[]{dirPath}, null, null);
         }
 
-
-        int id = filePathList.indexOf(path);
+//更新文件目录信息
+        int id = dirPathList.indexOf(dirPath);//图片所在目录的位置id
         if (id != -1) {
-            filePathList.remove(id);
-            if (filePathList.size() == 0) {
-                fileRepresentPathList.remove(id);
-                fileInfoList.remove(id);
-                return true;
-            }
-            filePathList.add(id, path);
             List<String> paths = new ArrayList<>();
-            fileTool.getOrderedPicListInFile(path, paths);
-            if (fileRepresentPathList.get(id).equals(picPath)) {
-                fileRepresentPathList.remove(id);
-                fileRepresentPathList.add(id, paths.get(0));
+            FileTool.getOrderedPicListInFile(dirPath, paths);
+            if (paths.size() == 0)//如果此目录下面已经没有图片
+            {
+                dirPathList.remove(id);
+                dirRepresentPathList.remove(id);
+                dirInfoList.remove(id);
+            } else {//还有图片则更新信息
+                dirRepresentPathList.remove(id);
+                dirRepresentPathList.add(id, paths.get(0));
+                dirInfoList.remove(id);
+                String name = dirPath.substring(dirPath.lastIndexOf("/") + 1, dirPath.length());
+                dirInfoList.add(id, "  " + name + " (" + paths.size() + ")");
             }
-            String name = path.substring(path.lastIndexOf("/") + 1, path.length());
-            fileInfoList.add(id, "  " + name + " (" + paths.size() + ")");
         }
         return true;
     }
 
-    public List<String> getFilePathList() {
-        return filePathList;
+    public List<String> getDirPathList() {
+        return dirPathList;
     }
 
-    public List<String> getFileRepresentPathList() {
-        return fileRepresentPathList;
+    public List<String> getDirRepresentPathList() {
+        return dirRepresentPathList;
     }
 
-    public List<String> getFileInfoList() {
-        return fileInfoList;
+    public List<String> getDirInfoList() {
+        return dirInfoList;
     }
 
-
-    public int getUsualyStart() {
-        return curUsedNumber + curRecentNumber;
+    /**
+     * 获取喜爱图片的开始位置
+     */
+    public int getPreferStart() {
+        return usedNumber + recentNumber + 3;
     }
 
-    public void deletePicture(String path) {
+    public void onDeleteUsuallyPicture(String path) {
+        mDB = MyDatabase.getInstance(mContext);
         try {
-            //如果存在，需要先删除原来的
+            //如果包含在最近使用列表
+
             int id = mUsualyPicPathList.indexOf(path);
-            if (0 <= id && id < curUsedNumber) {
+            if (1 <= id && id <= usedNumber) {
                 mDB.deleteUsedPic(path);
                 mUsualyPicPathList.remove(id);
-                curUsedNumber--;
+                usedNumber--;
             }
+            //如果包含在最近图片列表
             id = mUsualyPicPathList.indexOf(path);
-            if (curUsedNumber <= id && id < curUsedNumber + curRecentNumber) {
+            if (usedNumber + 2 <= id && id < usedNumber + recentNumber + 2) {
                 mUsualyPicPathList.remove(id);
-                recentTimesList.remove(id - curUsedNumber);
-                curRecentNumber--;
+                recentNumber--;
             }
+            //如果包含在常用列表
             if (mUsualyPicPathList.contains(path)) {
                 mDB.deleteFrequentlyPic(path);
                 mUsualyPicPathList.remove(path);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             mDB.close();
         }
+    }
+
+    public void prepareLatestPic() {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                // 排序处理得到的图片的map
+                Map<Long, String> sortedPicPathsByTime = new TreeMap<>();
+                queryPicInfoInSD(sortedPicPathsByTime, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                queryPicInfoInSD(sortedPicPathsByTime, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+
+                Message msg = new Message();
+                msg.obj = "latest_pic";
+                Bundle bundle = new Bundle();
+                List<String> list = new ArrayList<>(sortedPicPathsByTime.values());
+                bundle.putString("pic_path", list.get(list.size() - 1));
+                msg.setData(bundle);
+                if (mHandler == null) {
+                    throw new IllegalArgumentException(this.getClass().getSimpleName() + "更新图片的handler为空");
+                }
+                mHandler.sendMessage(msg);
+            }
+
+            private void queryPicInfoInSD(Map<Long, String> sortPictureList, Uri uri) {
+                if (uri == null) return;//不为空，放入图片
+                String[] projection = {MediaStore.Images.Media.DATE_MODIFIED,
+                        MediaStore.Images.Media.DATA, MediaStore.Images.Media.SIZE};
+
+                Cursor cursor = mContext.getContentResolver().query(uri,
+                        projection, null, null, null);
+                if (cursor != null) {// 从contentProvider之中取出图片
+                    cursor.moveToFirst();
+                    while (cursor.moveToNext()) {
+                        int size = cursor.getInt(cursor
+                                .getColumnIndex(MediaStore.Images.Media.SIZE));
+                        String path = cursor.getString(cursor
+                                .getColumnIndex(MediaStore.Images.Media.DATA));
+                        long modifyTime = cursor.getLong(cursor
+                                .getColumnIndex(MediaStore.Images.Media.DATE_MODIFIED)) * 1000;// 最近修改时间
+                        if (AllData.PIC_FILE_SIZE_MIN < size && size < AllData.PIC_FILE_SIZE_MAX) {// 图片符合条件
+                            sortPictureList.put(modifyTime, path);
+                        }
+                    }
+                    cursor.close();
+                }
+            }
+        };
+        new Thread(runnable).start();
+    }
+
+    public int getUsedNumber() {
+        return usedNumber;
+    }
+
+    public int getRecentNumber() {
+        return recentNumber;
+    }
+
+    public int getPreferNumber() {
+        return usualyFilesList.size() - usedNumber - recentNumber - 3;
+    }
+
+    public boolean isUsuPic(List<String> imagUrls) {
+        return imagUrls == mUsualyPicPathList;
     }
 }

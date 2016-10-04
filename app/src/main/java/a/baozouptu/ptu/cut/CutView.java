@@ -8,8 +8,9 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.view.MotionEvent;
 
+import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.util.GeoUtil;
-import a.baozouptu.ptu.repealRedo.RepealRedoManager;
+import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.view.PtuView;
 import a.baozouptu.ptu.view.TSRView;
 
@@ -48,6 +49,7 @@ public class CutView extends PtuView implements TSRView {
         bmPaint.setDither(true);
 
         super.setBitmapAndInit(sourceBitmap, totalBound.width(), totalBound.height());
+        Util.P.le(AllData.TAG,1);
         initialDraw();
         cutFrameView = new CutFrameView(dstRect);
 
@@ -114,7 +116,8 @@ public class CutView extends PtuView implements TSRView {
     }
 
     private Bitmap getBaseBitmap() {
-        return RepealRedoManager.getInstanceTotal(-1).getBaseBitmap();
+       // return RepealRedoManager.getInstanceTotal(-1).getBaseBitmap();
+        return null;
     }
 
 

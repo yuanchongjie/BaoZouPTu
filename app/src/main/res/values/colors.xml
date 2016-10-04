@@ -8,7 +8,6 @@
     <color name="colorAccent">#FF4081</color>
     <color name="text_color1">#ffff5722</color>
     <color name="float_item_color">#ff5722</color>
-    <color name="ptu_toolbar_background">#88039be5</color>
     <color name="float_rim_color">#80ffffff</color>
     <color name="white">#ffffff</color>
 
@@ -35,18 +34,30 @@
 
 
     <color name="button_color_switch">#5677fc</color>
-    <color name="text_chose_color">#ff5722</color>
+    <color name="text_checked_color">#ff5722</color>
     <color name="text_default_color">#ff111111</color>
+    <color name="text_light_black">#ff666666</color>
+    <color name="text_deep_black">#ff242328</color>
 
+    <color name="back_pic_operation">#998e8e8e</color>
+    <color name="divider_pic_operation">#222222</color>
 
-<!--ptu功能-->
-    <color name="can_repeal_redo">#ffff5722</color>
-    <color name="canot_repeal_redo">#80ffffff</color>
+    <!--ptu功能-->
+    <color name="base_toolbar_background">#ff8a65</color>
+    <color name="can_repeal_redo">#dd2c00</color>
+    <color name="canot_repeal_redo">#a0ffffff</color>
     <color name="mat_pen_line1">#ff111111</color>
     <color name="mat_pen_line2">#ff5e5e5e</color>
     <color name="cut_frame">#ffffff</color>
     <color name="black_deep">#333333</color>
+    <color name="light_grey">#aaaaaa</color>
+
+    <color name="background_pressed">#80aaaaaa</color>
+
+    <color name="cancel_btn">#ffffff</color>
+    <color name="sure_btn">#ffffff</color>
+
     <drawable name="dialog_background">#80ffffff</drawable>
     <drawable name="hou">#dcdcdc</drawable>
-    <drawable name="qian">#039be5</drawable>
+    <drawable name="text_popup_window_background">#fff</drawable>
 </resources>

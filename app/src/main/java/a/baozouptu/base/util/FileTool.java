@@ -22,7 +22,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import a.baozouptu.base.dataAndLogic.AllDate;
+import a.baozouptu.base.dataAndLogic.AllData;
 
 /**
  * 主要用于获取图片文件夹下的所有图片的路径，图片大小支取5k-6000k的见方法注解
@@ -36,15 +36,15 @@ public class FileTool {
      * 遍历目录,得到所有图片的路径，图片大小在5-6000k之间，注意判空
      * 获取到的数据会直接往添加到第二个参数末尾添加
      *
-     * @param path     String 要显示的图片文件夹的路径，
-     * @param lstPaths List《String》括号用不了？？？ , 返回的结构， 文件夹下及子文件夹下所有符合条件的图片的路径,
+     * @param dirPath     String 要显示的图片文件夹的路径，
+     * @param willOrderedPicList List《String》括号用不了？？？ , 返回的结构， 文件夹下及子文件夹下所有符合条件的图片的路径,
      *                 因为要得到子文件夹路径下的图片路径，所以使用传参赋值更好
      */
-    public static void getOrderedPicListInFile(String path, List<String> lstPaths) {
+    public static void getOrderedPicListInFile(String dirPath, List<String> willOrderedPicList) {
         List<Pair<Long, String>> oderedPaths = new ArrayList<>();
 
-        File file = new File(path);
-        if (file == null)
+        File file = new File(dirPath);
+        if (!file.exists()||!file.isDirectory())
             return;
 
         File[] fs = file.listFiles();
@@ -58,7 +58,7 @@ public class FileTool {
             String htx = fName.substring(fName.lastIndexOf(".") + 1,
                     fName.length()).toLowerCase(); // 得到扩展名,用求字串的方法
 
-            for (String s : AllDate.normalPictureFormat) {
+            for (String s : AllData.normalPictureFormat) {
                 if (htx.equals(s)) {
                     if (fileSizeValidity(f.getPath())) {
                         oderedPaths.add(new Pair(-f.lastModified(), f.getPath()));
@@ -67,14 +67,14 @@ public class FileTool {
                 }
             }
         }
-        Collections.sort(oderedPaths, new Comparator<Pair<Long,String>>() {
-            public int compare(Pair<Long,String> o1, Pair<Long,String> o2) {
+        Collections.sort(oderedPaths, new Comparator<Pair<Long, String>>() {
+            public int compare(Pair<Long, String> o1, Pair<Long, String> o2) {
                 //return (o2.getValue() - o1.getValue());
                 return o1.first.compareTo(o2.first);
             }
         });
-        for (Pair<Long,String> p: oderedPaths)
-            lstPaths.add(p.second);
+        for (Pair<Long, String> p : oderedPaths)
+            willOrderedPicList.add(p.second);
     }
 
     /**
@@ -104,13 +104,56 @@ public class FileTool {
                     e.printStackTrace();
                 }
             }
-            if (cur >= AllDate.PIC_FILE_SIZE_MIN && cur <= AllDate.PIC_FILE_SIZE_MAX)
+            if (cur >= AllData.PIC_FILE_SIZE_MIN && cur <= AllData.PIC_FILE_SIZE_MAX)
                 return true;
         }
 
         return false;
     }
 
+    public static String getApplacationDir(Context context) {
+        return context.getApplicationContext().getFilesDir().getAbsolutePath();
+    }
+
+    public static String createTempPicPath(Context context) {
+        String appPath = getApplacationDir(context);
+        String tempDir = appPath + "/tempPic/text";
+        File file = new File(tempDir);
+        if (!file.exists()) {
+            {
+                if(!file.mkdirs()){
+                    Util.T(context,"保存失败");
+                }
+            }
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        Date curDate = new Date(System.currentTimeMillis());//获取当前时间
+        String time = formatter.format(curDate);
+        String tempPath = tempDir + "/text_step_bm" + time + ".png";
+        return tempPath;
+    }
+
+    /**
+     * 递归删除目录下的所有文件及子目录下所有文件
+     * @param dir 将要删除的文件目录
+     * @return boolean Returns "true" if all deletions were successful.
+     *                 If a deletion fails, the method stops attempting to
+     *                 delete and returns "false".
+     */
+    public static boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            File[] children = dir.listFiles();
+            //递归删除目录中的子目录下
+            for (File file:children) {
+                boolean success = deleteDir(file);
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        // 若是目录，此时为空，可以删除
+        return dir.delete();
+    }
     /**
      * 根据原来的路径创建一个新的路径和名称
      *
@@ -120,14 +163,16 @@ public class FileTool {
     public static String getNewPictureFile(String oldPath) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         Date curDate = new Date(System.currentTimeMillis());//获取当前时间
-        String time=formatter.format(curDate);
+        String time = formatter.format(curDate);
         String prefix = oldPath.substring(0, oldPath.lastIndexOf("."));
         String suffix = oldPath.substring(oldPath.lastIndexOf("."), oldPath.length());
-       
-        return  prefix + "baozou" + time + suffix;
+
+        return prefix + "baozou" + time + suffix;
     }
+
     /**
      * 根据Uri获取图片绝对路径，解决Android4.4以上版本Uri转换
+     *
      * @param context
      * @param imageUri
      * @author yaoxing
@@ -162,7 +207,7 @@ public class FileTool {
                     contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                 }
                 String selection = MediaStore.Images.Media._ID + "=?";
-                String[] selectionArgs = new String[] { split[1] };
+                String[] selectionArgs = new String[]{split[1]};
                 return getDataColumn(context, contentUri, selection, selectionArgs);
             }
         } // MediaStore (and general)
@@ -182,7 +227,7 @@ public class FileTool {
     public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
         Cursor cursor = null;
         String column = MediaStore.Images.Media.DATA;
-        String[] projection = { column };
+        String[] projection = {column};
         try {
             cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
             if (cursor != null && cursor.moveToFirst()) {
@@ -228,4 +273,7 @@ public class FileTool {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
     }
 
+    public static String getParentPath(String path) {
+        return path.substring(0,path.lastIndexOf('/'));
+    }
 }

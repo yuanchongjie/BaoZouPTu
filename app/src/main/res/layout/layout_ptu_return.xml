@@ -11,18 +11,17 @@
         android:id="@+id/ptu_return_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"/>
+        android:layout_gravity="center_vertical"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="2dp"
-        android:layout_marginStart="2dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginStart="4dp"
         android:gravity="center"
-        android:textSize="17sp"
-        android:text="返回"
+        android:text="@string/the_return"
+        android:textSize="18sp"
+        android:textColor="@color/white"
         />
 
 </LinearLayout>
