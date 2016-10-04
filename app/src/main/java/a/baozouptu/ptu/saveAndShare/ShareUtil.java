@@ -6,15 +6,19 @@
 package a.baozouptu.ptu.saveAndShare;
 
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import a.baozouptu.base.dataAndLogic.DBUtil;
 
 
 public class ShareUtil {
@@ -22,20 +26,29 @@ public class ShareUtil {
      * @param preferApps 优先旋转的应用Activity的title，越前面，优先级越高
      * @return
      */
-    public static List<ListDrawableItem> getSortedAppData(Context context,List<String> preferApps,List<ResolveInfo> resolveInfos) {
-        List<ListDrawableItem> appInfos=getShowData(context,resolveInfos);
+    public static List<ListDrawableItem> getSortedAppData(Context context, List<String> preferApps, List<ResolveInfo> resolveInfos) {
+        List<ListDrawableItem> appInfos = getShowData(context, resolveInfos);
+        List<String> delTitles = new ArrayList<>();
         int size = preferApps.size();
-        for (int p = size-1; p >= 0; p--) {
+        for (int p = size - 1; p >= 0; p--) {
             CharSequence cs = preferApps.get(p);
-            for (int i = 0; i < appInfos.size(); i++) {
+            int i = 0;
+            for (; i < appInfos.size(); i++) {
                 if (appInfos.get(i).getTitle().equals(cs)) {
-                    resolveInfos.add(0,resolveInfos.remove(i));
-
+                    resolveInfos.add(0, resolveInfos.remove(i));
                     appInfos.add(0, appInfos.remove(i));
                     break;
                 }
             }
+            //如果没找到这个信息,已经不存在这个开放的activity，将其从数据库删除
+            if (i >= appInfos.size()) {
+                delTitles.add(cs.toString());
+            }
         }
+        for (String title : delTitles) {
+            preferApps.remove(title);
+        }
+        DBUtil.deletePreferInfo(context, delTitles);
         return appInfos;
     }
 
@@ -56,30 +69,35 @@ public class ShareUtil {
     /**
      * 通过系统分享内容出去
      *
-     * @param packageName   包名
+     * @param resoveInfo    lxznzi
      * @param imgPathOrText 图片路径或者文字
      * @param type          分享内容的类型
      */
     public static void exeShare(Context context, String chooserTitle,
-                                String packageName, String imgPathOrText, Type type) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        switch (type) {
-            case Image:
-                intent.setType("image/*");
-                File imgPath = new File(imgPathOrText);
-                Uri uri = Uri.fromFile(imgPath);
-                intent.putExtra(Intent.EXTRA_STREAM, uri);
-                break;
-            case Text:
-                intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, imgPathOrText);
-                break;
-        }
-        intent.setPackage(packageName);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                ResolveInfo resoveInfo, String imgPathOrText, Type type) {
         try {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            switch (type) {
+                case Image:
+                    intent.setType("image/*");
+                    File imgPath = new File(imgPathOrText);
+                    Uri uri = Uri.fromFile(imgPath);
+                    intent.putExtra(Intent.EXTRA_STREAM, uri);
+                    break;
+                case Text:
+                    intent.setType("text/plain");
+                    intent.putExtra(Intent.EXTRA_TEXT, imgPathOrText);
+                    break;
+            }
+            intent.addCategory(Intent.CATEGORY_LAUNCHER);
+            //参数是包名，类全限定名，注意直接用类名不行
+            ComponentName cn = new ComponentName(resoveInfo.activityInfo.packageName,
+                    resoveInfo.activityInfo.name);
+            intent.setComponent(cn);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(Intent.createChooser(intent, chooserTitle));
         } catch (ActivityNotFoundException e) {
+            Toast.makeText(context, "分享失败", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -90,8 +108,8 @@ public class ShareUtil {
      * @return
      * @author YOLANDA
      */
-    public  static List<ResolveInfo> getShareTargets(Context context, Type type) {
-        List<ResolveInfo> mApps = new ArrayList<ResolveInfo>();
+    public static List<ResolveInfo> getShareTargets(Context context, Type type) {
+        List<ResolveInfo> mApps;
         Intent intent = new Intent(Intent.ACTION_SEND, null);
         intent.addCategory(Intent.CATEGORY_DEFAULT);
         switch (type) {
@@ -106,6 +124,7 @@ public class ShareUtil {
         mApps = pm.queryIntentActivities(intent, PackageManager.COMPONENT_ENABLED_STATE_DEFAULT);
         return mApps;
     }
+
 
     /**
      * 分享类型

@@ -114,6 +114,8 @@ public class IconBitmapCreator {
     public static Bitmap createCancelBitmap( int width, int foregroundColor) {
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
+        canvas.scale(1.20f,1.20f);//一开始图标的边界padding太大，减小边界
+        canvas.translate(-0.1f*width,-0.1f*width);
 
         //内圆上画图标
         Paint paint = new Paint();
@@ -128,9 +130,37 @@ public class IconBitmapCreator {
         return bitmap;
     }
 
+    public static Bitmap createCancelBitmap(int width, int foregroundColor, int backgroundColor) {
+        Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.scale(1.20f,1.20f);//一开始图标的边界padding太大，减小边界
+        canvas.translate(-0.1f*width,-0.1f*width);
+
+
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setDither(true);
+
+        //画背景
+        paint.setStrokeWidth(0);
+        paint.setColor(backgroundColor);
+        canvas.drawOval(new RectF(0,0,width,width),paint);
+
+        //画前景
+        paint.setStrokeWidth(3f);
+        paint.setColor(foregroundColor);
+        double dx = (2 - Math.sqrt(2)) / 4.0 * width;
+        int x = (int) (dx * 1.7);
+        canvas.drawLine(x, x, width - x, width - x, paint);
+        canvas.drawLine(width - x, x, x, width - x, paint);
+        return bitmap;
+
+    }
     public static Bitmap createSureBitmap( int width, int foregroundColor) {
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
+        canvas.scale(1.20f,1.20f);//一开始图标的边界padding太大，减小边界
+        canvas.translate(-0.1f*width,-0.1f*width);
 
         Paint paint = new Paint();
         paint.setAntiAlias(true);
@@ -138,8 +168,8 @@ public class IconBitmapCreator {
         paint.setStrokeWidth(7.5f);
         paint.setColor(foregroundColor);
         float w = (float) width;
-        canvas.drawLine(w * (35.0f / 200), w * (83.0f / 200), w * (72.0f / 200) + 2, w * (143.0f / 200) + 2, paint);
-        canvas.drawLine(w * (72.0f / 200) - 2, w * (143.0f / 200) + 2, w * (168.0f / 200), w * (69.0f / 200), paint);
+        canvas.drawLine(w * (31.0f / 200), w * (73.0f / 200), w * (72.0f / 200) + 2, w * (143.0f / 200) + 2, paint);
+        canvas.drawLine(w * (72.0f / 200) - 2, w * (143.0f / 200) + 2, w * (172.0f / 200), w * (55.0f / 200), paint);
         return bitmap;
     }
 
@@ -148,7 +178,8 @@ public class IconBitmapCreator {
 
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-
+        canvas.scale(1.25f,1.25f);//一开始图标的边界padding太大，减小边界
+        canvas.translate(-0.125f*width,-0.125f*width);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setDither(true);
@@ -226,7 +257,8 @@ public class IconBitmapCreator {
         width = (int) (width * (0.72));
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-
+        canvas.scale(1.25f,1.25f);
+        canvas.translate(-0.125f*width,-0.125f*width);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setDither(true);
@@ -252,6 +284,7 @@ public class IconBitmapCreator {
         paint1.setStyle(Paint.Style.FILL);
         paint1.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         canvas.drawPath(path, paint1);
+
         return bitmap;
     }
 
@@ -329,6 +362,8 @@ public class IconBitmapCreator {
         paint.setAntiAlias(true);
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
+        canvas.scale(1.25f,1.25f);//一开始图标的边界padding太大，减小边界
+        canvas.translate(-0.125f*width,-0.125f*width);
         paint.setDither(true);
         paint.setColor(foregroundColor);
         paint.setStrokeWidth(1.5f);
@@ -343,4 +378,6 @@ public class IconBitmapCreator {
         }
         return bitmap;
     }
+
+
 }

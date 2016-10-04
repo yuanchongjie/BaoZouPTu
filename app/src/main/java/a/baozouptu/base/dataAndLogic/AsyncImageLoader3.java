@@ -1,14 +1,14 @@
 package a.baozouptu.base.dataAndLogic;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.support.v4.util.LruCache;
 import android.widget.ImageView;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import a.baozouptu.base.util.BitmapTool;
 

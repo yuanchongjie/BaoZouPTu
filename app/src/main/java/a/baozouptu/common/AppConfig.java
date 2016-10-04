@@ -12,12 +12,12 @@ import android.content.SharedPreferences;
 public class AppConfig {
     Context mGloableContext;
     public final static float APPVERSION = 1.0f;
-    public final static int INT_APPVERSION=2;
+    public final static int DATABASE_VERSION =2;
     enum SpType {
         appconfig
     }
-    public static int getIntVersion(){
-        return INT_APPVERSION;
+    public static int getDatabaseVersion(){
+        return DATABASE_VERSION;
     }
 
     public static float getAppversion() {

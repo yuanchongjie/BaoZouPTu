@@ -23,6 +23,7 @@
                 android:orientation="vertical">
 
                 <ImageView
+                    android:id="@+id/main_function_cut_iv"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
@@ -30,14 +31,16 @@
                     android:paddingLeft="@dimen/padding_function_item_image"
                     android:paddingRight="@dimen/padding_function_item_image"
                     android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/edit" />
+                    android:src="@mipmap/edit"
+
+                    />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="裁剪旋转"
+                    android:text="@string/cut"
                     android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
@@ -48,6 +51,7 @@
                 android:orientation="vertical">
 
                 <ImageView
+                    android:id="@+id/main_function_text_iv"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
@@ -55,14 +59,15 @@
                     android:paddingLeft="@dimen/padding_function_item_image"
                     android:paddingRight="@dimen/padding_function_item_image"
                     android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/function_text" />
+                    android:src="@mipmap/text"
+                    />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="文字"
+                    android:text="@string/text"
                     android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
@@ -73,6 +78,7 @@
                 android:orientation="vertical">
 
                 <ImageView
+                    android:id="@+id/main_function_tietu_iv"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
@@ -80,25 +86,27 @@
                     android:paddingLeft="@dimen/padding_function_item_image"
                     android:paddingRight="@dimen/padding_function_item_image"
                     android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/tietu" />
+                    android:src="@mipmap/tietu"
+                    />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="贴图"
+                    android:text="@string/tietu"
                     android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/main_function_huitu"
+                android:id="@+id/main_function_draw"
                 android:layout_width="@dimen/function_width"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
                 <ImageView
+                    android:id="@+id/main_function_draw_iv"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
@@ -106,14 +114,15 @@
                     android:paddingLeft="@dimen/padding_function_item_image"
                     android:paddingRight="@dimen/padding_function_item_image"
                     android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/pencil" />
+                    android:src="@mipmap/draw"
+                    />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="绘图"
+                    android:text="@string/draw"
                     android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>
@@ -124,6 +133,7 @@
                 android:orientation="vertical">
 
                 <ImageView
+                    android:id="@+id/main_function_mat_iv"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
@@ -131,14 +141,15 @@
                     android:paddingLeft="@dimen/padding_function_item_image"
                     android:paddingRight="@dimen/padding_function_item_image"
                     android:paddingTop="@dimen/padding_function_item_image"
-                    android:src="@mipmap/mat" />
+                    android:src="@mipmap/mat"
+                    />
 
                 <TextView
                     android:layout_width="@dimen/function_width"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="抠图"
+                    android:text="@string/mat"
                     android:textColor="@color/text_color1"
                     android:textSize="@dimen/text_size_main_function" />
             </LinearLayout>

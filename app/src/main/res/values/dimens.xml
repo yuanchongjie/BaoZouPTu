@@ -10,7 +10,8 @@
 
     <dimen name="margin_small">3dp</dimen>
     <dimen name="margin_middle">5dp</dimen>
-    <dimen name="margin_big">15dp</dimen>
+    <dimen name="margin_big_xx">15dp</dimen>
+    <dimen name="margin_big_x">12dp</dimen>
     <dimen name="margin_middle_x">8dp</dimen>
     <dimen name="function_width">72dp</dimen>
     <dimen name="text_size_main_function">7pt</dimen>
@@ -30,4 +31,6 @@
     <dimen name="list_item_width_save_set_wide">80dp</dimen>
     <dimen name="list_item_width_save_set_small">44dp</dimen>
     <dimen name="list_item_width_save_set_middle">50dp</dimen>
+    <dimen name="margin_big">10dp</dimen>
+    <dimen name="my_toolbar_height">50dp</dimen>
 </resources>

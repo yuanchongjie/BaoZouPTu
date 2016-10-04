@@ -17,6 +17,15 @@ public class LaunchActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new InstallPolicy().processPolicy();
-        startActivity(new Intent(this, MainActivity.class));
+        test();
+        this.finish();
+    }
+
+    private void test() {
+        Intent intent=new Intent(this, MainActivity.class);
+        intent.putExtra("test","test");
+        startActivity(intent);
+        this.finish();
     }
 }
+

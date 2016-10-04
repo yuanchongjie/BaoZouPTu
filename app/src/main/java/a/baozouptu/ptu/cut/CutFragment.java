@@ -15,7 +15,6 @@ import android.widget.PopupWindow;
 
 import a.baozouptu.R;
 import a.baozouptu.ptu.BaseFunction;
-import a.baozouptu.ptu.cut.CutView;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.repealRedo.StepData;
 
@@ -27,11 +26,6 @@ public class CutFragment extends Fragment implements BaseFunction{
     private LinearLayout rotate;
     private LinearLayout reversal;
     private CutView cutView;
-
-    public CutFragment(Context context) {
-        super();
-        mContext = context;
-    }
 
     @Override
     public void repeal() {

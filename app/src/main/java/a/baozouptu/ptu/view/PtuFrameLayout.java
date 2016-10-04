@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -12,7 +13,7 @@ import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.FloatView;
 import a.baozouptu.ptu.text.FloatTextView;
-import a.baozouptu.ptu.tietu.FloatImageView;
+import a.baozouptu.ptu.tietu.TietuFrameLayout;
 
 /**
  * 重绘子视图是一个重要的功能，应该写得简洁有力
@@ -189,15 +190,11 @@ public class PtuFrameLayout extends FrameLayout {
         updateViewLayout((View) floatView, floatParams);
     }
 
-    public FloatImageView initAddImageFloat(Rect bound) {
-        floatView = new FloatImageView(mContext, bound, getMeasuredWidth(), getMeasuredHeight());
-
-        //设置布局
-        FrameLayout.LayoutParams floatParams =
-                new FrameLayout.LayoutParams(getMeasuredWidth(), getMeasuredHeight());
-        floatParams.setMargins(0, 0, getMeasuredWidth(), getMeasuredHeight());
-        addView((View) floatView, floatParams);
-
-        return (FloatImageView) floatView;
+    public TietuFrameLayout initAddImageFloat(Rect bound) {
+        TietuFrameLayout tietuFrameLayout=new TietuFrameLayout(getContext());
+        FrameLayout.LayoutParams layoutParams=new FrameLayout.LayoutParams(bound.width(),bound.height(), Gravity.CENTER);
+        tietuFrameLayout.setBackgroundColor(0x0000);
+        addView(tietuFrameLayout,layoutParams);
+        return tietuFrameLayout;
     }
 }

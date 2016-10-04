@@ -26,23 +26,13 @@ public class RepealRedoManager {
     private static int maxStep = 5;
     Bitmap baseBitmap;
     boolean hasChangePic;
-    private static RepealRedoManager instanceTotal;
 
-    private RepealRedoManager(int maxStep) {
+    public RepealRedoManager(int maxStep) {
         this.maxStep = maxStep;
         stepList = new LinkedList<>();
         iter = stepList.listIterator();
     }
 
-    /**
-     * @param externalMaxStep 构造器输入负数表示使用默认最大步数，5
-     * @return
-     */
-    public static RepealRedoManager getInstanceTotal(int externalMaxStep) {
-        if (instanceTotal == null)
-            instanceTotal =new  RepealRedoManager(externalMaxStep < 0 ? maxStep : externalMaxStep);
-        return instanceTotal;
-    }
 
     /**
      * 提交操作，返回是否需要超出最大步数，
@@ -137,8 +127,10 @@ public class RepealRedoManager {
             innerBitmap[0] = Bitmap.createBitmap(viewBitmap, (int) innerRect.left, (int) innerRect.top,
                     (int) (innerRect.right - innerRect.left), (int) (innerRect.bottom - innerRect.top));//获取floatview内部的内容
             viewBitmap.recycle();
+            viewBitmap=null;
         } catch (OutOfMemoryError e) {
             innerBitmap[0].recycle();
+            innerBitmap[0]=null;
             e.printStackTrace();
         }
         Util.P.le(TAG, "getInnerBmFromView完成");
@@ -178,5 +170,10 @@ public class RepealRedoManager {
                 path.lastIndexOf('/'));
         FileTool.deleteDir(new File(parentPath));
         stepList.clear();
+        iter=stepList.listIterator();
+    }
+
+    public void init() {
+        iter=stepList.listIterator();
     }
 }

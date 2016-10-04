@@ -17,6 +17,7 @@ import a.baozouptu.ptu.repealRedo.StepData;
 
 /**
  * Created by liuguicen on 2016/7/26.
+ *
  * @description
  */
 public class MatFragment extends Fragment implements BaseFunction {
@@ -26,11 +27,6 @@ public class MatFragment extends Fragment implements BaseFunction {
     private LinearLayout pen;
     private LinearLayout rubber;
     private MatView matView;
-
-    public MatFragment(Context context) {
-        super();
-        mContext = context;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

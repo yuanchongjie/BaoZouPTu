@@ -2,7 +2,6 @@ package a.baozouptu.ptu.saveAndShare;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import a.baozouptu.R;
+import a.baozouptu.base.dataAndLogic.DBUtil;
 import a.baozouptu.base.dataAndLogic.MyDatabase;
 import a.baozouptu.base.util.Util;
 
@@ -38,6 +38,7 @@ public class SaveSetDialogManager {
     List<Integer> sizeIdList = new ArrayList<>();
     private RecyclerView recyclerShare;
     private long sourceSize;
+    private boolean hasInit;
     private final long MAX_SIZE = 40 * 1000 * 1000;
     private int choseSizeId;
     private clickListenerInterface listener;
@@ -54,17 +55,25 @@ public class SaveSetDialogManager {
         String onShareItemClick(float saveRatio);
     }
 
-    public SaveSetDialogManager(Context context, long sourceSize) {
+    public SaveSetDialogManager(Context context) {
         mContext = context;
+        hasInit = false;
+        getShareInfo();
+    }
+
+    public void init(long sourceSize) {
         this.sourceSize = sourceSize;
         sizeList.addAll(Arrays.asList(1d / 5, 1d / 3, 1d / 2, 1d, 2d, 3d));
         choseSizeId = 3;
         canClickList = new ArrayList<>();
         for (int i = 0; i < SIZE_COUNT; i++) canClickList.add(true);
-        getShareInfo();
+        hasInit = true;
     }
 
     public void createDialog() {
+        //判断对话框是否已经存在了
+        if (dialog != null && dialog.isShowing()) return;
+        if (!hasInit) return;
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_save_set, null);
         cancleView = (TextView) view.findViewById(R.id.tv_save_set_cancel);
@@ -105,26 +114,32 @@ public class SaveSetDialogManager {
         sureView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog.dismiss();
                 listenner.mSure(saveRatio);
             }
         });
         cancleView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listenner.mCancel();
                 dialog.dismiss();
+                listenner.mCancel();
             }
         });
         shareRecyclerAdapter.setOnItemClickListener(
                 new ShareRecyclerAdapter.OnRecyclerViewItemClickListener() {
                     @Override
                     public void onItemClick(View view, ListDrawableItem data) {
-                        Util.P.le("Savaset","item受到点击");
+                        Util.P.le("Savaset", "item受到点击");
                         String picPath = listenner.onShareItemClick(saveRatio);
                         int clickPosition = shareActivityInfo.indexOf(data);
-                        ActivityInfo activityInfo = resolveInfos.get(clickPosition).activityInfo;
+                        ResolveInfo resolveInfo = resolveInfos.get(clickPosition);
+
+                        //将优先信息添加到数据库
+                        String title = resolveInfo.loadLabel(mContext.getPackageManager()).toString();
+                        DBUtil.inseartPreferInfo(mContext, title);
                         //如果shareType是Image，那么分享的内容应该为图片在SD卡的路径
-                        ShareUtil.exeShare(mContext, "图片分享", activityInfo.packageName, picPath, ShareUtil.Type.Image);
+                        ShareUtil.exeShare(mContext, "图片分享", resolveInfo, picPath, ShareUtil.Type.Image);
+                        dialog.dismiss();
                     }
                 });
     }
@@ -159,7 +174,7 @@ public class SaveSetDialogManager {
                                     R.drawable.save_set_notchosed));
                             v.setBackground(Util.getDrawable(R.drawable.save_set_chosed));
                             saveRatio = sizeList.get(id).floatValue();
-                            choseSizeId=id;
+                            choseSizeId = id;
                         }
                     }
                 });
@@ -173,4 +188,7 @@ public class SaveSetDialogManager {
     private void setStyle() {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
     }
+
+
 }
+

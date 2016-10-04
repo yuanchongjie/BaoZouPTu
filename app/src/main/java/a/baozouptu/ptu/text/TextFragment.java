@@ -20,7 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import a.baozouptu.R;
-import a.baozouptu.base.dataAndLogic.AllDate;
+import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.PtuActivity;
@@ -183,9 +183,9 @@ public class TextFragment extends Fragment {
 
                     textView.setTextSize(25);
                     if (position == lastFontId) {
-                        textView.setTextColor(AllDate.text_choosed_color);
+                        textView.setTextColor(AllData.text_choosed_color);
                     } else {
-                        textView.setTextColor(AllDate.text_defualt_color);
+                        textView.setTextColor(AllData.text_defualt_color);
                     }
                     textView.setGravity(Gravity.CENTER);
                     textView.setTag(typefaceNames[position]);
@@ -196,8 +196,12 @@ public class TextFragment extends Fragment {
                         textView.setTypeface(Typeface.MONOSPACE);
                         textView.setTextColor(0xffaabbbb);
                     } else if (position == 1) {
-                        Typeface typeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/kaiti.TTF");
-                        textView.setTypeface(typeface);
+                        try {
+                            Typeface typeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/kaiti.TTF");
+                            textView.setTypeface(typeface);
+                        }catch (Exception e){
+                            Toast.makeText(mContext,"获取新字体失败",Toast.LENGTH_SHORT).show();
+                        }
                     } else if (position == 2) {
                         textView.setTypeface(Typeface.DEFAULT);
                     }
@@ -219,18 +223,22 @@ public class TextFragment extends Fragment {
                         if (position == 0) {
                             curTypeface = Typeface.MONOSPACE;
                             floatTextView.setTypeface(curTypeface);
-                            floatTextView.updateEdge();
+                            floatTextView.updateSize();
                         } else if (position == 1) {
-                            curTypeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/kaiti.TTF");
-                            floatTextView.setTypeface(curTypeface);floatTextView.updateEdge();
+                            try {
+                                curTypeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/kaiti.TTF");
+                                floatTextView.setTypeface(curTypeface);floatTextView.updateSize();
+                            }catch (Exception e){
+                                Toast.makeText(mContext,"获取新字体失败",Toast.LENGTH_SHORT).show();
+                            }
                         } else if (position == 2) {
                             curTypeface = Typeface.DEFAULT;
-                            floatTextView.setTypeface(curTypeface);floatTextView.updateEdge();
+                            floatTextView.setTypeface(curTypeface);floatTextView.updateSize();
                         }
                         if (lastFontId != position) {
-                            ((TextView) view).setTextColor(AllDate.text_choosed_color);
+                            ((TextView) view).setTextColor(AllData.text_choosed_color);
                             TextView textView = (TextView) ((HorizontalListView) view.getParent()).findViewWithTag(typefaceNames[lastFontId]);
-                            textView.setTextColor(AllDate.text_defualt_color);
+                            textView.setTextColor(AllData.text_defualt_color);
                             lastFontId = position;
                         }
                     }
@@ -251,10 +259,10 @@ public class TextFragment extends Fragment {
                 public void open() {
                     if (isItalic) {
                         floatTextView.setTypeface(curTypeface, Typeface.BOLD_ITALIC);
-                        floatTextView.updateEdge();
+                        floatTextView.updateSize();
                     }
                     else {
-                        floatTextView.setTypeface(curTypeface, Typeface.BOLD);floatTextView.updateEdge();
+                        floatTextView.setTypeface(curTypeface, Typeface.BOLD);floatTextView.updateSize();
                     }
                     isBold = true;
                 }
@@ -263,11 +271,11 @@ public class TextFragment extends Fragment {
                 public void close() {
                     if (isItalic) {
                         floatTextView.setTypeface(curTypeface, Typeface.ITALIC);
-                        floatTextView.updateEdge();
+                        floatTextView.updateSize();
                     }
                     else {
                         floatTextView.setTypeface(curTypeface, Typeface.NORMAL);
-                        floatTextView.updateEdge();
+                        floatTextView.updateSize();
                     }
                     isBold = false;
                 }
@@ -280,10 +288,10 @@ public class TextFragment extends Fragment {
                 public void open() {
                     if (isBold){
                         floatTextView.setTypeface(curTypeface, Typeface.BOLD_ITALIC);//斜体，中文有效
-                        floatTextView.updateEdge();}
+                        floatTextView.updateSize();}
                     else {
                         floatTextView.setTypeface(curTypeface, Typeface.ITALIC);//斜体，中文有效
-                        floatTextView.updateEdge();
+                        floatTextView.updateSize();
                     }
                     isItalic = true;
                 }
@@ -295,7 +303,7 @@ public class TextFragment extends Fragment {
                     }
                     else {
                         floatTextView.setTypeface(curTypeface, Typeface.NORMAL);
-                        floatTextView.updateEdge();
+                        floatTextView.updateSize();
                     }
                     isItalic = false;
                 }
@@ -306,14 +314,14 @@ public class TextFragment extends Fragment {
                 @Override
                 public void open() {
                     floatTextView.setShadowLayer(5, 5, 5, Color.GRAY);
-                    floatTextView.updateEdge();
+                    floatTextView.updateSize();
                     hasShadow = true;
                 }
 
                 @Override
                 public void close() {
                     floatTextView.setShadowLayer(0, 0, 0, Color.GRAY);
-                    floatTextView.updateEdge();
+                    floatTextView.updateSize();
                     hasShadow = false;
                 }
             });
@@ -435,20 +443,20 @@ public class TextFragment extends Fragment {
          * 设置功能子视图的布局
          * 注意这里popupwindow的高度要加上view所在布局的padding
          *
-         * @param v
-         * @param contentView
          */
         private void setLayout(View v, View contentView) {
-            PopupWindow colorPop = new PopupWindow(contentView,
+            PopupWindow pop = new PopupWindow(contentView,
                     WindowManager.LayoutParams.MATCH_PARENT,
                     v.getHeight() + Util.dp2Px(5), true);
-            colorPop.setTouchable(true);
+            pop.setTouchable(true);
             // 如果不设置PopupWindow的背景，无论是点击外部区域还是Back键都无法dismiss弹框
             // 我觉得这里是API的一个bug
-            colorPop.setBackgroundDrawable(mContext.getResources().getDrawable(
-                    R.drawable.qian));
+            pop.setBackgroundDrawable(mContext.getResources().getDrawable(
+                    R.drawable.text_popup_window_background));
             // 设置好参数之后再show
-            colorPop.showAtLocation(v, Gravity.LEFT | Gravity.BOTTOM, 0, 0);
+            pop.showAtLocation(v, Gravity.LEFT | Gravity.BOTTOM, 0, 0);
+            pop.setInputMethodMode(PopupWindow.INPUT_METHOD_NEEDED);
+            pop.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
     }
 

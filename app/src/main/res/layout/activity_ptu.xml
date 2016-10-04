@@ -1,36 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@drawable/ptu_background">
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar
+<!--    <android.support.v7.widget.Toolbar
         android:id="@+id/ptu_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/ptu_toolbar_background"
+        android:layout_height="70dp"
         android:clipToPadding="true"
         android:fitsSystemWindows="true"
+        android:background="@color/base_toolbar_background"
         app:contentInsetLeft="0dp"
         app:contentInsetStart="0dp"
-        >
+        >-->
         <a.baozouptu.ptu.view.PtuTopRelativeLayout
             android:id="@+id/ptu_toolbar_relative"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="@dimen/my_toolbar_height"
+            android:background="@color/base_toolbar_background">
             <LinearLayout
                 android:id="@+id/ptu_top_center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
                 android:orientation="horizontal"
                 android:background="#0000">
             </LinearLayout>
         </a.baozouptu.ptu.view.PtuTopRelativeLayout>
-    </android.support.v7.widget.Toolbar>
 
     <a.baozouptu.ptu.view.PtuFrameLayout
         android:id="@+id/ptu_frame"

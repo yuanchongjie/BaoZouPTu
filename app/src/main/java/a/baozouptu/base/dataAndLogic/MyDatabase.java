@@ -20,7 +20,7 @@ public class MyDatabase {
 
 
     private MyDatabase(Context context) {
-        dbHelper = new MySQLiteOpenHandler(context, AppConfig.getIntVersion());
+        dbHelper = new MySQLiteOpenHandler(context, AppConfig.getDatabaseVersion());
         db = dbHelper.getWritableDatabase();
     }
 
@@ -105,7 +105,7 @@ public class MyDatabase {
      * inert时如果存在就替换，使用replace，不然就会出错，
      * 这样就不需要update了
      */
-    public void insertFrequentlyPic(String path, long time) throws IOException {
+    public void insertPreferPic(String path, long time) throws IOException {
         db.execSQL("replace into usualypic(path,time) values(?,?) ", new Object[]{path, String.valueOf(time)});
     }
 
@@ -125,7 +125,7 @@ public class MyDatabase {
      * @param time
      */
     public void updateFrequentlyPic(String path, long time) throws IOException {
-        insertFrequentlyPic(path, time);
+        insertPreferPic(path, time);
     }
 
     /**
@@ -135,7 +135,7 @@ public class MyDatabase {
      * @param pathList
      */
     //    有两个返回值，不能直接返回，传入应用获取
-    public void queryAllFrequentlyPic(List<String> pathList) throws IOException {
+    public void queryAllPreferPic(List<String> pathList) throws IOException {
         Cursor cursor = db.rawQuery("select path from usualypic order by time desc ", new String[]{});
         while (cursor.moveToNext()) {
             String path = cursor.getString(0);

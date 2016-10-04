@@ -43,8 +43,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
 
     private ImageButton createBaseToolbarBtn(int width) {
         ImageButton button = new ImageButton(mContext);
-        button.setBackground(Util.getDrawable(R.drawable.ptu_top_btn_background));
-        button.setLayoutParams(new ViewGroup.LayoutParams(width, width));
+        button.setBackground(Util.getDrawable(R.drawable.btn_pressable_background_oval));
         return button;
     }
 
@@ -57,7 +56,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
         cancel = createBaseToolbarBtn(top_btn_width);
         cancel.setImageBitmap(IconBitmapCreator.createCancelBitmap(
                 top_btn_width,
-                Util.getColor( R.color.text_color1)));
+                Util.getColor(R.color.cancel_btn)));
         if (leftParams == null) {
             leftParams = new LayoutParams(top_btn_width, top_btn_width);
             leftParams.setMargins(dividerWidth, 0, 0, 0);
@@ -69,6 +68,9 @@ public class PtuTopRelativeLayout extends RelativeLayout {
     }
 
     public void addCancel() {
+        if (cancel.getParent() != null) {
+            ((ViewGroup) cancel.getParent()).removeView(cancel);
+        }
         addView(cancel, leftParams);
     }
 
@@ -79,11 +81,11 @@ public class PtuTopRelativeLayout extends RelativeLayout {
     public View createReturn(int top_btn_width, int dividerWidth) {
         returnLayout = (LinearLayout) LayoutInflater.from(mContext)
                 .inflate(R.layout.layout_ptu_return, null);
-        returnLayout.setBackground(Util.getDrawable(R.drawable.ptu_top_btn_background));
+        returnLayout.setBackground(Util.getDrawable(R.drawable.btn_pressable_background_rectangle));
         ImageView returnImage = (ImageView) returnLayout.findViewById(R.id.ptu_return_image);
         returnImage.setImageBitmap(IconBitmapCreator.createReturnIcon(
                 top_btn_width,
-                Util.getColor( R.color.text_color1)));
+                Util.getColor(R.color.white)));
 
         return returnLayout;
     }
@@ -91,7 +93,11 @@ public class PtuTopRelativeLayout extends RelativeLayout {
     public void addReturn() {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.setMargins(Util.dp2Px(12), 0, 0, 0);
         params.addRule(RelativeLayout.CENTER_VERTICAL);
+        if (returnLayout.getParent() != null) {
+            ((ViewGroup) returnLayout.getParent()).removeView(returnLayout);
+        }
         addView(returnLayout, params);
     }
 
@@ -102,7 +108,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
     public View createSaveSet(int top_btn_width, int dividerWidth) {
         saveLayout = (LinearLayout) LayoutInflater.from(mContext)
                 .inflate(R.layout.layout_ptu_save_set, null);
-        saveLayout.setBackground(Util.getDrawable(R.drawable.ptu_top_btn_background));
+        saveLayout.setBackground(Util.getDrawable(R.drawable.btn_pressable_background_rectangle));
         return saveLayout;
     }
 
@@ -112,7 +118,10 @@ public class PtuTopRelativeLayout extends RelativeLayout {
         params.addRule(RelativeLayout.CENTER_VERTICAL);
         params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         params.addRule(RelativeLayout.ALIGN_PARENT_END);
-        params.setMargins(0,0,Util.dp2Px(16),0);
+        params.setMargins(0, 0, Util.dp2Px(16), 0);
+        if (saveLayout.getParent() != null) {
+            ((ViewGroup) saveLayout.getParent()).removeView(saveLayout);
+        }
         addView(saveLayout, params);
     }
 
@@ -125,7 +134,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
         sure = createBaseToolbarBtn(top_btn_width);
         sure.setImageBitmap(IconBitmapCreator.createSureBitmap(
                 top_btn_width,
-                Util.getColor( R.color.text_color1)));
+                Util.getColor(R.color.sure_btn)));
         if (rightParams == null) {
             rightParams = new LayoutParams(top_btn_width, top_btn_width);
             rightParams.setMargins(0, 0, dividerWidth, 0);
@@ -135,8 +144,10 @@ public class PtuTopRelativeLayout extends RelativeLayout {
         }
         return sure;
     }
-
     public void addSure() {
+        if (sure.getParent() != null) {
+            ((ViewGroup) sure.getParent()).removeView(sure);
+        }
         addView(sure, rightParams);
     }
 
@@ -172,13 +183,12 @@ public class PtuTopRelativeLayout extends RelativeLayout {
         repealBtn = createBaseToolbarBtn(topBtnWidth);
         canRepealBm = IconBitmapCreator.createRepealBitmap(
                 topBtnWidth,
-                Util.getColor( R.color.can_repeal_redo));
+                Util.getColor(R.color.can_repeal_redo));
         canotRepealBm = IconBitmapCreator.createRepealBitmap(
                 topBtnWidth,
-                Util.getColor( R.color.canot_repeal_redo));
+                Util.getColor(R.color.canot_repeal_redo));
         repealBtn.setImageBitmap(canotRepealBm);
         btns[0] = repealBtn;
-
         linearLayout.addView(repealBtn, new ViewGroup.LayoutParams(topBtnWidth, topBtnWidth));
 
         //设置repeal和redo的button
@@ -186,10 +196,10 @@ public class PtuTopRelativeLayout extends RelativeLayout {
         redoBtn = createBaseToolbarBtn(topBtnWidth);
         canRedoBm = IconBitmapCreator.createRedoBitmap(
                 topBtnWidth,
-                Util.getColor( R.color.can_repeal_redo));
+                Util.getColor(R.color.can_repeal_redo));
         canotRedoBm = IconBitmapCreator.createRedoBitmap(
                 topBtnWidth,
-                Util.getColor( R.color.canot_repeal_redo));
+                Util.getColor(R.color.canot_repeal_redo));
 
         redoBtn.setImageBitmap(canotRedoBm);
         btns[1] = redoBtn;
@@ -201,7 +211,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
         ImageButton goSend = createBaseToolbarBtn(topBtnWidth);
         goSend.setImageBitmap(IconBitmapCreator.createSendBitmap(
                 topBtnWidth,
-                Util.getColor( R.color.text_color1)));
+                Util.getColor(R.color.can_repeal_redo)));
         linearLayout.addView(goSend, new ViewGroup.LayoutParams(topBtnWidth, topBtnWidth));
         btns[2] = goSend;
         return btns;

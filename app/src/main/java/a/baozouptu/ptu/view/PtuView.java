@@ -8,10 +8,12 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
@@ -166,8 +168,10 @@ public class PtuView extends View implements TSRView {
         if (finalRatio != 1.0) {
             Bitmap bitmap = Bitmap.createScaledBitmap(sourceBitmap, (int) (srcPicWidth * finalRatio),
                     (int) (srcPicHeight * finalRatio), true);
-            if (bitmap.equals(sourceBitmap))
+            if (sourceBitmap != null && bitmap.equals(sourceBitmap)) {
                 sourceBitmap.recycle();
+                sourceBitmap = null;
+            }
         }
         return sourceBitmap;
     }
@@ -190,7 +194,10 @@ public class PtuView extends View implements TSRView {
         setBitmapAndInit(BitmapTool.getLosslessBitmap(path), totalWidth, totalHeight);
     }
 
-    public void setBitmapAndInit(Bitmap bitmap, int totalWidth, int totalHeight) {
+    /**
+     * 图片可为空，为空时显示透明的图一张
+     */
+    public void setBitmapAndInit(@Nullable Bitmap bitmap, int totalWidth, int totalHeight) {
         if (bitmap == null)
             sourceBitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
         else sourceBitmap = bitmap;
@@ -389,6 +396,7 @@ public class PtuView extends View implements TSRView {
      * <p/>
      */
     private void getConvertParameter(int curPicWidth, int curPicHeight) {
+        if(sourceBitmap==null)return;
         // 显示在屏幕上绘制的宽度、高度
         int drawWidth = curPicWidth > viewWidth ? viewWidth : curPicWidth;
         int drawHeight = curPicHeight > viewHeigh ? viewHeigh : curPicHeight;
@@ -399,7 +407,14 @@ public class PtuView extends View implements TSRView {
         int x1 = x + (int) (drawWidth / totalRatio), y1 = y + (int) (drawHeight / totalRatio);
         if (x1 > srcPicWidth) x1 = srcPicWidth;
         if (y1 > srcPicHeight) y1 = srcPicHeight;
+
+
         srcRect.set(x, y, x1, y1);
+        //srcRect的边界不能超过bitmap的边界
+        if(srcRect.left<0)srcRect.left=0;
+        if(srcRect.top<0)srcRect.top=0;
+        if(srcRect.right>sourceBitmap.getWidth())srcRect.right=sourceBitmap.getWidth();
+        if(srcRect.bottom>sourceBitmap.getHeight())srcRect.bottom=sourceBitmap.getHeight();
         dstRect.set(leftInView, topInView, leftInView + drawWidth, topInView + drawHeight);
     }
 
@@ -418,11 +433,13 @@ public class PtuView extends View implements TSRView {
     public void onDraw(Canvas canvas) {
         switch (CURRENT_STATUS) {
             case STATUS_INIT:
+                Util.P.le(AllData.TAG,2);
                 initialDraw();
                 break;
             default:
                 break;
         }
+        if(sourceBitmap==null)return;
         if (srcRect.right - srcRect.left > dstRect.right - dstRect.left) {
             float ratio = (dstRect.right - dstRect.left) * 1.0f / (srcRect.right - srcRect.left);
             matrix.reset();
@@ -439,7 +456,10 @@ public class PtuView extends View implements TSRView {
         tempDrawable.setFilterBitmap(true);
         tempDrawable.setBounds(dstRect);
         tempDrawable.draw(canvas);//将底图绘制到View上面到
-        tempBitmap.recycle();
+        if (tempBitmap != null) {
+            tempBitmap.recycle();
+            tempBitmap = null;
+        }
         super.onDraw(canvas);
     }
 
@@ -467,18 +487,21 @@ public class PtuView extends View implements TSRView {
     public void addBitmap(Bitmap addBitmap, RectF boundRect, float rotateAngle) {
         sourceCanvas = RepealRedoManager.addBm2Canvas(sourceCanvas, addBitmap, boundRect, rotateAngle);
         resetShow();
+        Util.P.le(TAG, "将图添加到PtuView成功");
     }
 
     /**
      * 将原始的图片换掉,并且回收原始图片的资源，
+     * <p> 会处理图片大小不同的情况
      * 不显示出来
      */
     public void replaceSourceBm(Bitmap newBm) {
-        sourceBitmap.recycle();
-        sourceBitmap = newBm;
-        srcPicWidth = sourceBitmap.getWidth();
-        srcPicHeight = sourceBitmap.getHeight();
-        sourceCanvas = new Canvas(sourceBitmap);
+        if (sourceBitmap != null) {
+            sourceBitmap.recycle();
+            sourceBitmap = null;
+        }
+        setBitmapAndInit(newBm, viewWidth, viewHeigh);
+        invalidate();
     }
 
     @Override
@@ -491,7 +514,10 @@ public class PtuView extends View implements TSRView {
      * 释放资源，目前只有SourceBitmap一个
      */
     public void releaseResource() {
-        sourceBitmap.recycle();
+     if(sourceBitmap!=null) {
+         sourceBitmap.recycle();
+         sourceBitmap = null;
+     }
     }
 
     public Bitmap getSourceBm() {

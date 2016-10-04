@@ -7,10 +7,10 @@
     <string name="cancel">取消</string>
 
 
-    <string name="app_name">LOL表情</string>
+    <string name="app_name">暴走P图</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">设置</string>
-    <string name="title_activity_main">lol表情</string>
+    <string name="title_activity_main">暴走P图</string>
     <string name="open">zzzz</string>
     <string name="close">zzs</string>
     <string name="pen">钢笔</string>
@@ -24,5 +24,16 @@
     <string name="title_chose_picture">选择图片</string>
     <string name="save_size">大小</string>
     <string name="save_set_dialog_name">保存设置</string>
-
+    <string name="latest_pic">最新图片</string>
+    <string name="make_expression">制作表情</string>
+    <string name="draw">绘图</string>
+    <string name="cut">裁剪旋转</string>
+    <string name="text">文字</string>
+    <string name="tietu">贴图</string>
+    <string name="mat">抠图</string>
+    <string name="the_return">返回</string>
+    <string name="save_set">保存+</string>
+    <string name="latest_use">最近使用</string>
+    <string name="recent_pic">最近图片</string>
+    <string name="prefer_pic">喜爱图片</string>
 </resources>

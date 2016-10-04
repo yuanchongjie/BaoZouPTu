@@ -234,7 +234,13 @@ public class Pen {
     }
 
     public void releaseResource() {
-        penBmLine.recycle();
-        penBmMove.recycle();
+        if(penBmLine!=null) {
+            penBmLine.recycle();
+            penBmLine = null;
+        }
+        if(penBmMove!=null) {
+            penBmMove.recycle();
+            penBmMove = null;
+        }
     }
 }

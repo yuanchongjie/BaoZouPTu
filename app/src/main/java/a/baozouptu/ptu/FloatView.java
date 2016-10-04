@@ -1,6 +1,5 @@
 package a.baozouptu.ptu;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
 /**
@@ -128,7 +127,7 @@ public interface FloatView {
      */
     void drag(float nx, float ny);
 
-    void drawItem(Canvas canvas, Item item);
+    void drawItem(Canvas canvas, MicroButtonData item);
 
     void setDownState();
 

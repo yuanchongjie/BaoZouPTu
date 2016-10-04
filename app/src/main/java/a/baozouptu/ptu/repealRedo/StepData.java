@@ -11,8 +11,6 @@ public class StepData {
      */
     public int EDIT_MODE;
 
-    public int locationX;
-    public int locationY;
     /**
      * rect代表view有效区域在底图上的位置的rect，相对于原始图片的左上角上下左右边的距离
      */

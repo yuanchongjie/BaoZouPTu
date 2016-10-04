@@ -11,9 +11,7 @@
         android:id="@+id/ptu_return_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="12dp"
-        android:layout_marginStart="12dp"/>
+        android:layout_gravity="center_vertical"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,8 +19,9 @@
         android:layout_marginLeft="4dp"
         android:layout_marginStart="4dp"
         android:gravity="center"
+        android:text="@string/the_return"
         android:textSize="18sp"
-        android:text="返回"
+        android:textColor="@color/white"
         />
 
 </LinearLayout>

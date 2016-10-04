@@ -22,7 +22,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import a.baozouptu.base.dataAndLogic.AllDate;
+import a.baozouptu.base.dataAndLogic.AllData;
 
 /**
  * 主要用于获取图片文件夹下的所有图片的路径，图片大小支取5k-6000k的见方法注解
@@ -36,15 +36,15 @@ public class FileTool {
      * 遍历目录,得到所有图片的路径，图片大小在5-6000k之间，注意判空
      * 获取到的数据会直接往添加到第二个参数末尾添加
      *
-     * @param path     String 要显示的图片文件夹的路径，
-     * @param lstPaths List《String》括号用不了？？？ , 返回的结构， 文件夹下及子文件夹下所有符合条件的图片的路径,
+     * @param dirPath     String 要显示的图片文件夹的路径，
+     * @param willOrderedPicList List《String》括号用不了？？？ , 返回的结构， 文件夹下及子文件夹下所有符合条件的图片的路径,
      *                 因为要得到子文件夹路径下的图片路径，所以使用传参赋值更好
      */
-    public static void getOrderedPicListInFile(String path, List<String> lstPaths) {
+    public static void getOrderedPicListInFile(String dirPath, List<String> willOrderedPicList) {
         List<Pair<Long, String>> oderedPaths = new ArrayList<>();
 
-        File file = new File(path);
-        if (file == null)
+        File file = new File(dirPath);
+        if (!file.exists()||!file.isDirectory())
             return;
 
         File[] fs = file.listFiles();
@@ -58,7 +58,7 @@ public class FileTool {
             String htx = fName.substring(fName.lastIndexOf(".") + 1,
                     fName.length()).toLowerCase(); // 得到扩展名,用求字串的方法
 
-            for (String s : AllDate.normalPictureFormat) {
+            for (String s : AllData.normalPictureFormat) {
                 if (htx.equals(s)) {
                     if (fileSizeValidity(f.getPath())) {
                         oderedPaths.add(new Pair(-f.lastModified(), f.getPath()));
@@ -74,7 +74,7 @@ public class FileTool {
             }
         });
         for (Pair<Long, String> p : oderedPaths)
-            lstPaths.add(p.second);
+            willOrderedPicList.add(p.second);
     }
 
     /**
@@ -104,7 +104,7 @@ public class FileTool {
                     e.printStackTrace();
                 }
             }
-            if (cur >= AllDate.PIC_FILE_SIZE_MIN && cur <= AllDate.PIC_FILE_SIZE_MAX)
+            if (cur >= AllData.PIC_FILE_SIZE_MIN && cur <= AllData.PIC_FILE_SIZE_MAX)
                 return true;
         }
 
@@ -273,4 +273,7 @@ public class FileTool {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
     }
 
+    public static String getParentPath(String path) {
+        return path.substring(0,path.lastIndexOf('/'));
+    }
 }
