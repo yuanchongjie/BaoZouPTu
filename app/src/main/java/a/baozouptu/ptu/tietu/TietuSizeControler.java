@@ -5,9 +5,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.widget.FrameLayout;
 
 import a.baozouptu.base.dataAndLogic.AllData;
+import a.baozouptu.base.util.Util;
 
 /**
  * Created by liuguicen on 2016/9/29.
@@ -24,6 +26,8 @@ import a.baozouptu.base.dataAndLogic.AllData;
  * <p/>
  */
 public class TietuSizeControler {
+    private static final String TAG = "TietuSizeControler";
+
     /**
      * 获取合适大小的Bitmap，Bitmap占用的内存不能超过剩余内存，如果超过，则返回空
      * @return 如果Bitmap用的内存超过剩余的值，会返回空
@@ -56,39 +60,44 @@ public class TietuSizeControler {
 
     /**
      * 获取tietu的FloatImageView的布局参数，大小为min(合适的值,图片的大小）；
+     * 合适的大小：
+     * <p>（1）图片不能适中，不能太大，也不能太小。
+     * <p> （2）对于底图很小的情况，其实不必考虑，照样保持正常大小即可
+     * <p> 解析图片时，解析的就是一个适中的图，如果图片本身是特别小的，
+     * 设置好view的大小，自动缩放即可
+     *
      * 位置为图片范围内的一个随机值
      * @param srcWidth 原图的大小
      * @param srcHeight 原图的大小
      * @param picBound 显示的范围
      * @return 布局参数
      */
-    public static  FrameLayout.LayoutParams getFeatParmas(int srcWidth,int srcHeight,Rect picBound) {
+    public static  FrameLayout.LayoutParams getFeatParams(int srcWidth, int srcHeight, Rect picBound) {
         //宽和高
-
         int exceptWidth=picBound.width()/2;//1/2图片宽
-        if(exceptWidth>AllData.screenWidth/3)
-            exceptWidth=AllData.screenWidth/3;//不能大于屏幕的1/3宽
+        if(exceptWidth>AllData.screenWidth*2/5)
+            exceptWidth=AllData.screenWidth*2/5;//不能大于屏幕的1/3宽
         else if(exceptWidth<AllData.screenWidth/6)//太小
-            exceptWidth=picBound.height()*3/4;
+            exceptWidth=AllData.screenWidth/6;
 
         int exceptHeight=picBound.height()/2;//1/2图片高
-        if(exceptHeight>AllData.screenHeight/5)
-            exceptHeight=AllData.screenHeight/5;//不能大于屏幕的1/6高
-        else if(exceptHeight<AllData.screenHeight/10)//太小
-            exceptHeight=picBound.height()*3/4;
+        if(exceptHeight>AllData.screenHeight*2/7)
+            exceptHeight=AllData.screenHeight*2/7;//不能大于屏幕的1/5高
+        else if(exceptHeight<AllData.screenHeight/7)//太小
+            exceptHeight=AllData.screenHeight/7;
 
-        float ratio=Math.min(srcHeight*1f/exceptHeight,srcWidth*1f/exceptWidth);//保持长宽比，取小的一个
-        exceptWidth=(int)(srcWidth*ratio);
-        exceptHeight=(int)(srcHeight*ratio);
+        float ratio=Math.min(exceptHeight*1f/srcHeight,exceptWidth*1f/srcWidth);//保持长宽比，取小的一个
+        exceptWidth=(int)(srcWidth*ratio)+FloatImageView.pad*2;
+        exceptHeight=(int)(srcHeight*ratio)+FloatImageView.pad*2;
         FrameLayout.LayoutParams parmas=new FrameLayout.LayoutParams(exceptWidth,exceptHeight);
 
         //位置，随机数，需要图片范围内
         int mleft=(int)(Math.random()*(picBound.width()-exceptWidth));
         int mtop=(int)(Math.random()*(picBound.height()-exceptHeight));
-        parmas.setMargins(picBound.left+mleft,picBound.top+mtop,
-                0,0);
-
+        parmas.leftMargin=picBound.left+mleft;
+        parmas.topMargin=picBound.top+mtop;
+        Util.P.le(TAG,"长宽比原始"+srcHeight*1f/srcWidth);
+        Util.P.le(TAG,"长宽比计算"+exceptHeight/exceptWidth);
         return parmas;
     }
-
 }

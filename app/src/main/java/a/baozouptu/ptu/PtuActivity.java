@@ -539,7 +539,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                         tietuFrag = new TietuFragment();
                         tietuFrag.setPtuView(ptuView);
                     }
-                    tietuFrag.setTietuLayout(ptuFrame.initAddImageFloat(ptuView.getPicBound()));
+                    tietuFrag.setTietuLayout(ptuFrame.initAddImageFloat(totalBound));
                     fm.beginTransaction()
                             .setCustomAnimations(R.animator.slide_bottom_in, R.animator.slide_bottom_out,
                                     R.animator.slide_bottom_in, R.animator.slide_bottom_out)

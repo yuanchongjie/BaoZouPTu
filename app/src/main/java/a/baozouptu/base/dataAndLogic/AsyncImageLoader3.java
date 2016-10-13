@@ -23,25 +23,25 @@ public class AsyncImageLoader3 {
      * 使用LRU算法，用key-value形式查找对象；
      */
     public static LruCache<String, Bitmap> imageCache;
-    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    LinkedBlockingQueue<Runnable> lque = new LinkedBlockingQueue<Runnable>();
+    private final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+    LinkedBlockingQueue<Runnable> lque;
     /**
-     * 线程池，固定五个线程来执行任务，规定最大线程数量的线程池
+     * 线程池，固定相应个线程来执行任务，规定最大线程数量的线程池
+     * 核心线程5秒不响应会自动销毁的
      */
-    private ExecutorService executorService = new ThreadPoolExecutor(5, 5,
-            0L, TimeUnit.MILLISECONDS,
-            lque);
+    private ThreadPoolExecutor executorService;
 
     private final Handler handler = new Handler();
     private static AsyncImageLoader3 asyncImageLoader3;
 
-    public static AsyncImageLoader3 getInstatnce() {
+    public static AsyncImageLoader3 getInstance() {
         if (asyncImageLoader3 == null)
             asyncImageLoader3 = new AsyncImageLoader3();
         return asyncImageLoader3;
     }
 
     private AsyncImageLoader3() {
+        lque= new LinkedBlockingQueue<Runnable>();
         int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         imageCache = new LruCache<String, Bitmap>(maxMemory / 6) {
             @Override
@@ -49,6 +49,10 @@ public class AsyncImageLoader3 {
                 return value.getRowBytes() * value.getHeight() / 1024;
             }
         };
+        executorService = new ThreadPoolExecutor(CPU_COUNT*2+1, CPU_COUNT*2+1,
+                5L, TimeUnit.SECONDS,
+                lque);
+        executorService.allowCoreThreadTimeOut(true);
     }
 
     /**
@@ -136,5 +140,16 @@ public class AsyncImageLoader3 {
      */
     public void evitAll(){
         imageCache.evictAll();
+    }
+
+    public void stop(){
+        executorService.shutdown();
+    }
+    public void reStart(){
+        if(executorService.isShutdown()){
+            executorService=new ThreadPoolExecutor(CPU_COUNT*2+1, 0,
+                    0L, TimeUnit.MILLISECONDS,
+                    lque);
+        }
     }
 }

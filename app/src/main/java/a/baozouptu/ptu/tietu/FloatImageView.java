@@ -8,9 +8,14 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.nfc.Tag;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.widget.ImageView;
 
+import a.baozouptu.R;
+import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.MicroButtonData;
@@ -22,8 +27,11 @@ import a.baozouptu.ptu.view.IconBitmapCreator;
  * @description
  */
 public class FloatImageView extends ImageView {
-    private static int pad = Util.dp2Px(10);
-    private static Bitmap bitmap = IconBitmapCreator.createCancelBitmap(pad, Color.WHITE, Color.BLUE);
+    private static final String TAG = "FloatImageView";
+    public static int pad = Util.dp2Px(10);
+    private static Bitmap bitmap = IconBitmapCreator.createCancelBitmap(pad * 2, Color.WHITE, Util.getColor(R.color.mat_pen_line2));
+    public static final int minWidth = 9;
+    public static final int minHeight = 16;
     MicroButtonData[] items;
     Paint itemPaint;
 
@@ -47,6 +55,7 @@ public class FloatImageView extends ImageView {
 
     private void init() {
         //item方面
+        setPadding(pad, pad, pad, pad);
         initItem();
         initRim();
     }
@@ -64,18 +73,21 @@ public class FloatImageView extends ImageView {
         showRim = true;
         rim = new Path();
         rimPaint = new Paint();
-        rimPaint.setDither(true);
-        rimPaint.setColor(0x8aaa);
-        rimPaint.setStyle(Paint.Style.STROKE);
         rimPaint.setAntiAlias(true);
+        rimPaint.setDither(true);
+        rimPaint.setStrokeWidth(7f);
+        rimPaint.setColor(0xa0ffffff);
+        rimPaint.setStyle(Paint.Style.STROKE);
     }
 
     /**
-     * 设置边框显示或隐藏
+     * 设置边框显示或隐藏,判断与当前状态是否相同，不相同才重绘，高效一些
      */
     public void setShowRim(boolean isShow) {
-        showRim = isShow;
-        invalidate();
+        if (showRim != isShow) {
+            showRim = isShow;
+            invalidate();
+        }
     }
 
     /**
@@ -96,35 +108,51 @@ public class FloatImageView extends ImageView {
     public boolean isOnCancel(float x, float y) {
         if (!showRim) return false;//边框没显示出来，返回false
         RectF itemBound = new RectF();
-//        item方面的
+//        item方面的,取消item
         int r = getPaddingTop();
+        itemBound.left = getWidth() - r * 2;
         itemBound.top = 0;
+        itemBound.right = getWidth();
         itemBound.bottom = r * 2;
-        itemBound.left = getRight() - r * 2;
-        itemBound.right = getRight();
         if (itemBound.contains(x, y))
             return true;
         return false;
     }
 
     @Override
+    public void layout(int l, int t, int r, int b) {
+        super.layout(l, t, r, b);
+        Log.e(TAG, "layout: " + " " + l + " " + t + " " + r + " " + b);
+        Util.P.le(TAG, "实际的宽高" + (r - l) + "　" + (b - t));
+    }
+
+    /**
+     * 返回false,父布局的onTouchEvent一定会被调用
+     */
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return false;
+    }
+
+    @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
+        Util.P.le(TAG, "onDraw方法被调用");
         if (showRim) {
             //画边框
             int r = getPaddingTop();
             rim.moveTo(r, r);
             rim.lineTo(getWidth() - r, r);
-            rim.lineTo(r, getHeight() - r);
             rim.lineTo(getWidth() - r, getHeight() - r);
+            rim.lineTo(r, getHeight() - r);
             rim.close();
             canvas.drawPath(rim, rimPaint);
 
-            //画item
+            //画item的icon
+            //取消item
             int itop = 0;
             int ileft = getWidth() - r * 2;
-            canvas.drawBitmap(items[2].bitmap, itop, ileft, itemPaint);
+            canvas.drawBitmap(items[2].bitmap, ileft, itop, itemPaint);
         }
     }
 
@@ -133,8 +161,8 @@ public class FloatImageView extends ImageView {
         return BitmapTool.getLosslessBitmap(picPath);
     }
 
-    public void setSourceBitmap(Activity activity,String path) {
-        setImageBitmap(TietuSizeControler.getSrcBitmap(activity,path));
+    public void setSourceBitmap(Activity activity, String path) {
+        setImageBitmap(TietuSizeControler.getSrcBitmap(activity, path));
     }
 
     public void releaseResourse() {

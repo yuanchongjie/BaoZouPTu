@@ -47,12 +47,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //关闭通知
-//nm.cancel(0);
+//nm.stop(0);
 
         boolean isTest = true;
-        if (isTest)
+        if (isTest) {
             test();
-        else {
+            sendNotify();
+        } else {
             setContentView(R.layout.activity_main);
             initData();
             initToolbar();
@@ -67,19 +68,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         DisplayMetrics metric = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metric);
         AllData.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
-        AllData.screenHeight=metric.heightPixels;
+        AllData.screenHeight = metric.heightPixels;
     }
 
     private void test() {
         //  testDB1();
         //  testDB();
         initData();
-      //  if (checkVersion()) {
-            Intent intent = new Intent(this, ChosePictureActivity.class);
-            intent.putExtra("test","test");
-            startActivityForResult(intent, 0);
-            finish();
-      //  }
+        //  if (checkVersion()) {
+        Intent intent = new Intent(this, ChosePictureActivity.class);
+        intent.putExtra("test", "test");
+        startActivityForResult(intent, 0);
+        finish();
+        //  }
     }
 
 
@@ -262,8 +263,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             });
                     return false;
                 } else*/
-                    ActivityCompat.requestPermissions(this, new String[]{
-                            android.Manifest.permission_group.STORAGE}, MY_PERMISSIONS_STOREGE);
+                ActivityCompat.requestPermissions(this, new String[]{
+                        android.Manifest.permission_group.STORAGE}, MY_PERMISSIONS_STOREGE);
                 return false;
             }
         }
