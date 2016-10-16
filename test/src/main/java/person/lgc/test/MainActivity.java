@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.util.Collections;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -13,7 +15,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final ImageView imageView=(ImageView) findViewById(R.id.show_pic_file);
-        imageView.setRotation(90);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

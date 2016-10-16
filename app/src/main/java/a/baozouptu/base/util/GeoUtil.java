@@ -116,6 +116,18 @@ public class GeoUtil {
             x3=t.x3;y3=t.y3;
             x4=t.x4;y4=t.y4;
         }
+        /**
+         * 举行旋转一定的角度形成的非水平矩形
+         * @param angle 旋转的角度
+         */
+        public static UnLevelRect getUnLeveRectByRotate(RectF r,float angle){
+            PointF co=new PointF((r.left+r.right)/2,(r.top+r.bottom)/2);
+            PointF p0=getCooderAfterRotate(new PointF(r.left,r.top),co,angle);
+            PointF p1=getCooderAfterRotate(new PointF(r.right,r.top),co,angle);
+            PointF p2=getCooderAfterRotate(new PointF(r.left,r.bottom),co,angle);
+            PointF p3=getCooderAfterRotate(new PointF(r.right,r.bottom),co,angle);
+            return new UnLevelRect(p0,p1,p2,p3);
+        }
 
         public void set(PointF p1, PointF p2, PointF p3, PointF p4) {
             set(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y);

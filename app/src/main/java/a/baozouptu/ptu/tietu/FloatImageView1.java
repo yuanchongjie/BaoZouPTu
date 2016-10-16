@@ -283,7 +283,9 @@ public class FloatImageView1 extends View implements FloatView {
         invalidate();
     }
 
-
+    /**
+     * 获取线段向量的角度
+     */
     private float getAngle(float x, float y, float x1, float y1) {
         float dx = x1 - x, dy = y1 - y;
         double angle = Math.atan2(dy, dx);

@@ -183,9 +183,9 @@ public class TextFragment extends Fragment {
 
                     textView.setTextSize(25);
                     if (position == lastFontId) {
-                        textView.setTextColor(AllData.text_choosed_color);
+                        textView.setTextColor(Util.getColor(R.color.text_checked_color));
                     } else {
-                        textView.setTextColor(AllData.text_defualt_color);
+                        textView.setTextColor(Util.getColor(R.color.text_default_color));
                     }
                     textView.setGravity(Gravity.CENTER);
                     textView.setTag(typefaceNames[position]);

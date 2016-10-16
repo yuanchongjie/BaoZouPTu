@@ -433,7 +433,7 @@ public class PtuView extends View implements TSRView {
     public void onDraw(Canvas canvas) {
         switch (CURRENT_STATUS) {
             case STATUS_INIT:
-                Util.P.le(AllData.TAG,2);
+                Util.P.le(TAG,2);
                 initialDraw();
                 break;
             default:

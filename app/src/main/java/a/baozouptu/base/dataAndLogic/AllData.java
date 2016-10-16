@@ -1,11 +1,5 @@
 package a.baozouptu.base.dataAndLogic;
 
-import android.content.Context;
-import android.os.Build;
-
-import a.baozouptu.R;
-import a.baozouptu.base.util.Util;
-
 /**
  * 保存应用所需的一些常用通用的数据项
  *
@@ -31,35 +25,9 @@ public class AllData {
      */
     public final static int PIC_FILE_SIZE_MAX = 100000*1000;
 
-    public static int CURRENT_EDIT_MODE = 0;
-    public static final int EDIT_NO = 0;
-    public static final int EDIT_CUT = 1;
-    /**
-     * 包含三个元素
-     * sd.floatTextView = floatTextView;
-     * sd.innerRect = innerRect;
-     * sd.boundRectInPic = boundRectInPic;
-     */
-    public static final int EDIT_TEXT = 2;
-    public static final int EDIT_TIETU = 3;
-    public static final int EDIT_DRAW = 4;
-    public static final int EDTI_MAT = 5;
-
     public static int text_defualt_color;
     public static int text_choosed_color;
-    private static Context globleContext = Util.MyApplication.getAppContext();
     public static long lastScanTime = 0;
-    public static AsyncImageLoader3 imageLoader3 = AsyncImageLoader3.getInstatnce();
+    public static AsyncImageLoader3 imageLoader3 = AsyncImageLoader3.getInstance();
     public static final String TAG="LOL";
-
-    static {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            text_defualt_color = globleContext.getResources().getColor(R.color.text_default_color, null);
-            text_choosed_color = globleContext.getResources().getColor(R.color.text_checked_color, null);
-        } else {
-            text_defualt_color = globleContext.getResources().getColor(R.color.text_default_color);
-            text_choosed_color = globleContext.getResources().getColor(R.color.text_checked_color);
-        }
-    }
-
 }

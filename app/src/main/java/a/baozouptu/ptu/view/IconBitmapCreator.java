@@ -133,9 +133,6 @@ public class IconBitmapCreator {
     public static Bitmap createCancelBitmap(int width, int foregroundColor, int backgroundColor) {
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        canvas.scale(1.20f,1.20f);//一开始图标的边界padding太大，减小边界
-        canvas.translate(-0.1f*width,-0.1f*width);
-
 
         Paint paint = new Paint();
         paint.setAntiAlias(true);
@@ -144,15 +141,15 @@ public class IconBitmapCreator {
         //画背景
         paint.setStrokeWidth(0);
         paint.setColor(backgroundColor);
-        canvas.drawOval(new RectF(0,0,width,width),paint);
+        canvas.drawCircle(width/2,width/2,width/2,paint);
 
         //画前景
+
         paint.setStrokeWidth(3f);
         paint.setColor(foregroundColor);
-        double dx = (2 - Math.sqrt(2)) / 4.0 * width;
-        int x = (int) (dx * 1.7);
-        canvas.drawLine(x, x, width - x, width - x, paint);
-        canvas.drawLine(width - x, x, x, width - x, paint);
+        int dx = width*2/7;
+        canvas.drawLine(dx, dx, width - dx, width - dx, paint);
+        canvas.drawLine(width - dx, dx, dx, width - dx, paint);
         return bitmap;
 
     }

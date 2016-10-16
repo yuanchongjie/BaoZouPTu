@@ -30,6 +30,7 @@ import a.baozouptu.chosePicture.ChosePictureActivity;
 import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.ptu.PtuUtil;
+import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TietuStepData;
 import a.baozouptu.ptu.view.PtuView;
@@ -48,9 +49,17 @@ public class TietuFragment extends Fragment implements BaseFunction {
     private LinearLayout more;
 
     private PtuView ptuView;
+    private RepealRedoManager<StepData> mRpealRedoList;
 
     public void setTietuLayout(TietuFrameLayout tietuLayout) {
         this.tietuLayout = tietuLayout;
+        tietuLayout.setOnTietuRemoveListener(
+                new TietuFrameLayout.TietuChangeListener() {
+                    @Override
+                    public void onTietuRemove(FloatImageView view) {
+                        removeFloatImageView(view);
+                    }
+                });
     }
 
     private void loadTietuPath() {
@@ -71,7 +80,7 @@ public class TietuFragment extends Fragment implements BaseFunction {
     public void onCreate(Bundle savedInstanceState) {
         mContext = getActivity();
         loadTietuPath();
-
+        mRpealRedoList=new RepealRedoManager<>(20);
         super.onCreate(savedInstanceState);
     }
 
@@ -154,10 +163,10 @@ public class TietuFragment extends Fragment implements BaseFunction {
         FloatImageView floatImageView = new FloatImageView(mContext);
         floatImageView.setAdjustViewBounds(true);
         floatImageView.setImageBitmap(srcBitmap);
-        FrameLayout.LayoutParams params = TietuSizeControler.getFeatParmas(srcBitmap.getWidth(), srcBitmap.getHeight(),
+        FrameLayout.LayoutParams params = TietuSizeControler.getFeatParams(srcBitmap.getWidth(), srcBitmap.getHeight(),
                 ptuView.getPicBound());
         tietuLayout.addView(floatImageView, params);
-        Util.P.le(TAG, "添加贴图成功");
+        Util.P.le(TAG, "添加贴图成功 "+"长宽比 "+params.width*1f/params.height);
     }
 
     private void removeFloatImageView(FloatImageView view) {
@@ -167,7 +176,7 @@ public class TietuFragment extends Fragment implements BaseFunction {
     private void setOnclick() {
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            AsyncImageLoader3 imageLoader = AsyncImageLoader3.getInstatnce();
+            AsyncImageLoader3 imageLoader = AsyncImageLoader3.getInstance();
 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -276,7 +285,7 @@ class RecyclerAdapter extends RecyclerView.Adapter<MyViewHolder> implements View
     private boolean isScroll = false;
 
     private final List<String> tietuPaths;
-    AsyncImageLoader3 imageLoader = AsyncImageLoader3.getInstatnce();
+    AsyncImageLoader3 imageLoader = AsyncImageLoader3.getInstance();
     AsyncImageLoader3.ImageCallback imageCallback = new AsyncImageLoader3.ImageCallback() {
         @Override
         public void imageLoaded(Bitmap imageDrawable, ImageView image, int position, String imageUrl) {

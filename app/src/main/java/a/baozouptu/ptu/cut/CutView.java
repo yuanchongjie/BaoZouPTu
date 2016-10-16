@@ -21,6 +21,7 @@ import a.baozouptu.ptu.view.TSRView;
  */
 public class CutView extends PtuView implements TSRView {
     private final Context mContext;
+    private final String TAG="CutView";
     private Paint clearPaint;
     private Paint bmPaint;
     private Rect totalBound;
@@ -49,7 +50,7 @@ public class CutView extends PtuView implements TSRView {
         bmPaint.setDither(true);
 
         super.setBitmapAndInit(sourceBitmap, totalBound.width(), totalBound.height());
-        Util.P.le(AllData.TAG,1);
+        Util.P.le(TAG,1);
         initialDraw();
         cutFrameView = new CutFrameView(dstRect);
 
