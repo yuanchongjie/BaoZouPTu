@@ -7,11 +7,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import java.util.ArrayList;
-
 import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
+import a.baozouptu.ptu.repealRedo.RepealRedoManager;
+import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.view.PtuView;
 
 /**
@@ -62,24 +62,11 @@ public class TietuFrameLayout extends FrameLayout {
 
     @Override
     public void removeView(View view) {
-        if (chosedView.equals(view))
+        if (chosedView != null && chosedView.equals(view))
             chosedView = null;
         super.removeView(view);
     }
-   /* */
 
-    /**
-     * 改变位置，不能在float为空时调用
-     *//*
-    public void changeLocation() {
-        FrameLayout.LayoutParams floatParams =
-                new FrameLayout.LayoutParams((int) chosedView.getWidth(),
-                        (int) chosedView.getHeight());
-        floatParams.setMargins((int) floatView.getfLeft(), (int) floatView.getfTop(),
-                (int) (floatView.getfLeft() + floatView.getmWidth()),
-                (int) (floatView.getfTop() + floatView.getmHeight()));
-        updateViewLayout((View) floatView, floatParams);
-    }*/
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX(), y = event.getY();
@@ -104,7 +91,7 @@ public class TietuFrameLayout extends FrameLayout {
                 //旋转
                 lastAngle = getAngle(x0, y0, x1, y1);
                 //移动
-                lastX = (+x1) / 2;
+                lastX = (x0 + x1) / 2;
                 lastY = (y0 + y1) / 2;
             case MotionEvent.ACTION_MOVE:
                 Util.DoubleClick.cancel();
@@ -122,7 +109,8 @@ public class TietuFrameLayout extends FrameLayout {
                     //旋转
                     float curAngle = getAngle(x0, y0,
                             x1, y1);
-                    chosedView.setRotation(chosedView.getRotation() + curAngle - lastAngle);
+                    if (chosedView != null)
+                        chosedView.setRotation(chosedView.getRotation() + curAngle - lastAngle);
                     lastAngle = curAngle;
                     //移动
                     float nx = (x0 + x1) / 2, ny = (y0 + y1) / 2;
@@ -136,8 +124,8 @@ public class TietuFrameLayout extends FrameLayout {
                 int index = event.getActionIndex();
 
                 if (event.getPointerCount() == 2) {
-                    lastX = event.getX(index);
-                    lastY = event.getY(index);
+                    lastX = event.getX(index == 0 ? 1 : 0);
+                    lastY = event.getY(index == 0 ? 1 : 0);
                 } else if (event.getPointerCount() == 3) {
                     int i0, i1;
                     if (index == 0) {
@@ -173,34 +161,20 @@ public class TietuFrameLayout extends FrameLayout {
         return true;
     }
 
-    private void scale(FloatImageView chosedView, float currentRatio) {
-        currentRatio = adjustSize(chosedView, currentRatio);
-        TietuFrameLayout.LayoutParams parmas = (TietuFrameLayout.LayoutParams) chosedView.getLayoutParams();
-        //=当前位置-当前距离 chosedView.getWidth()/2 缩放后多出来的currentRatio-1距离
-        parmas.leftMargin = (int) (chosedView.getLeft() - chosedView.getWidth() / 2 * (currentRatio - 1));
-        parmas.topMargin = (int) (chosedView.getTop() - chosedView.getHeight() / 2 * (currentRatio - 1));
-        parmas.width = (int) (chosedView.getWidth() * currentRatio);
-        parmas.height = (int) (chosedView.getHeight() * currentRatio);
-        updateViewLayout(chosedView, parmas);
-    }
-
-    private float adjustSize(FloatImageView chosedView, float currentRatio) {
-        currentRatio = Math.max(currentRatio, FloatImageView.minWidth * 1f / chosedView.getWidth());//大于最小宽
-        currentRatio = Math.min(currentRatio, AllData.screenWidth * 1.2f / chosedView.getWidth());//小于最大宽
-        currentRatio = Math.max(currentRatio, FloatImageView.minHeight * 1f / chosedView.getHeight());//大于最小高
-        currentRatio = Math.min(currentRatio, AllData.screenHeight * 1.2f / chosedView.getHeight());
-        return currentRatio;
-    }
-
     /**
      * 移动某个TietuView
      *
-     * @param view 被移动的View
-     * @param x    移动距离
+     * @param x 移动距离
      */
-    private void moveTietu(FloatImageView view, float x, float y) {
+    private void moveTietu(FloatImageView chosedView, float x, float y) {
+        if (chosedView == null || !chosedView.showRim) return;//边框没显示出来，不移动
+
         TietuFrameLayout.LayoutParams parmas = (TietuFrameLayout.LayoutParams) chosedView.getLayoutParams();
+        parmas.leftMargin += x;
+        parmas.topMargin += y;
         adjustBound(parmas, chosedView);
+
+//只会移动状态不会变化
         updateViewLayout(chosedView, parmas);
     }
 
@@ -220,6 +194,27 @@ public class TietuFrameLayout extends FrameLayout {
         }
     }
 
+    private void scale(FloatImageView chosedView, float currentRatio) {
+        if (chosedView == null || !chosedView.showRim) return;//边框没显示出来，不缩放
+        currentRatio = adjustSize(chosedView, currentRatio);
+        TietuFrameLayout.LayoutParams parmas = (TietuFrameLayout.LayoutParams) chosedView.getLayoutParams();
+        //=当前位置-当前距离 chosedView.getWidth()/2 缩放后多出来的currentRatio-1距离
+        parmas.leftMargin = (int) (chosedView.getLeft() - chosedView.getWidth() / 2 * (currentRatio - 1));
+        parmas.topMargin = (int) (chosedView.getTop() - chosedView.getHeight() / 2 * (currentRatio - 1));
+        parmas.width = (int) (chosedView.getWidth() * currentRatio);
+        parmas.height = (int) (parmas.width * chosedView.getHWRatio());
+        updateViewLayout(chosedView, parmas);
+        Util.P.le(TAG, "长宽比 " + parmas.width * 1f / parmas.height);
+    }
+
+    private float adjustSize(FloatImageView chosedView, float currentRatio) {
+        currentRatio = Math.max(currentRatio, FloatImageView.minWidth * 1f / chosedView.getWidth());//大于最小宽
+        currentRatio = Math.min(currentRatio, AllData.screenWidth * 1.2f / chosedView.getWidth());//小于最大宽
+        currentRatio = Math.max(currentRatio, FloatImageView.minHeight * 1f / chosedView.getHeight());//大于最小高
+        currentRatio = Math.min(currentRatio, AllData.screenHeight * 1.2f / chosedView.getHeight());
+        return currentRatio;
+    }
+
     public void removeFloatView(FloatImageView chosedView) {
         if (tietuChangeListener != null)
             tietuChangeListener.onTietuRemove(chosedView);
@@ -227,14 +222,16 @@ public class TietuFrameLayout extends FrameLayout {
     }
 
     /**
-    View被选中的时候，会先判断是否与选中相同，相同者不变化
+     * View被选中的时候，会先判断是否与选中相同，相同者不变化
+     * 否则显示边框
      */
     void onChosedView(FloatImageView childView) {
         if (childView.equals(chosedView))
             chosedView.setShowRim(true);
         else {
-            chosedView.setShowRim(false);//处理原来选中的View
-            chosedView=childView;
+            if (chosedView != null)
+                chosedView.setShowRim(false);//处理原来选中的View
+            chosedView = childView;
 //        首先将View更新到最前面
             LayoutParams layoutParams = (FrameLayout.LayoutParams) childView.getLayoutParams();
             super.removeView(childView);
@@ -251,5 +248,4 @@ public class TietuFrameLayout extends FrameLayout {
         double angle = Math.atan2(dy, dx);
         return (float) Math.toDegrees(angle);
     }
-
 }

@@ -129,7 +129,6 @@ public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public void myBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         //如果是分组标题
-        Util.P.le("我调用","position =  "+position+"isscrpll= "+isScrollWidthoutTouch);
         ItemHolder itemHolder = null;
         if (usuallyProcessor.isUsuPic(imagUrls)) {
             int headerValue = getHeaderValue(position);

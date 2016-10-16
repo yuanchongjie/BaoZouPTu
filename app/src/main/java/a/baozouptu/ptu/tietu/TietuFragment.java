@@ -30,6 +30,7 @@ import a.baozouptu.chosePicture.ChosePictureActivity;
 import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.ptu.PtuUtil;
+import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TietuStepData;
 import a.baozouptu.ptu.view.PtuView;
@@ -48,6 +49,7 @@ public class TietuFragment extends Fragment implements BaseFunction {
     private LinearLayout more;
 
     private PtuView ptuView;
+    private RepealRedoManager<StepData> mRpealRedoList;
 
     public void setTietuLayout(TietuFrameLayout tietuLayout) {
         this.tietuLayout = tietuLayout;
@@ -78,7 +80,7 @@ public class TietuFragment extends Fragment implements BaseFunction {
     public void onCreate(Bundle savedInstanceState) {
         mContext = getActivity();
         loadTietuPath();
-
+        mRpealRedoList=new RepealRedoManager<>(20);
         super.onCreate(savedInstanceState);
     }
 
@@ -163,9 +165,8 @@ public class TietuFragment extends Fragment implements BaseFunction {
         floatImageView.setImageBitmap(srcBitmap);
         FrameLayout.LayoutParams params = TietuSizeControler.getFeatParams(srcBitmap.getWidth(), srcBitmap.getHeight(),
                 ptuView.getPicBound());
-
         tietuLayout.addView(floatImageView, params);
-        Util.P.le(TAG, "添加贴图成功");
+        Util.P.le(TAG, "添加贴图成功 "+"长宽比 "+params.width*1f/params.height);
     }
 
     private void removeFloatImageView(FloatImageView view) {

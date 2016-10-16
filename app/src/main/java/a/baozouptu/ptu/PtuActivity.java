@@ -12,6 +12,7 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +26,7 @@ import android.widget.ImageButton;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import java.io.File;
+import java.util.Iterator;
 
 import a.baozouptu.R;
 import a.baozouptu.base.dataAndLogic.AllData;
@@ -45,6 +47,7 @@ import a.baozouptu.ptu.text.FloatTextView;
 import a.baozouptu.ptu.text.TextFragment;
 import a.baozouptu.ptu.tietu.FloatImageView1;
 import a.baozouptu.ptu.tietu.TietuFragment;
+import a.baozouptu.ptu.tietu.TietuSizeControler;
 import a.baozouptu.ptu.view.PtuFrameLayout;
 import a.baozouptu.ptu.view.PtuTopRelativeLayout;
 import a.baozouptu.ptu.view.PtuView;
@@ -88,7 +91,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     private String picPath = null;
     private FloatTextView floatTextView;
     private final int MAX_STEP = 10;
-    private RepealRedoManager repealRedoManager;
+    private RepealRedoManager<StepData> repealRedoManager;
 
     private PtuTopRelativeLayout topRelativeLayout;
     private ImageButton cancelBtn;
@@ -107,19 +110,24 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Util.P.le("进入P图Activity");
+        Util.P.le(TAG,"进入P图Activity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ptu);
-
+        Util.P.le(TAG,"进入P图Activity");
         setTitle("");
         initView();
+        Util.P.le(TAG,"完成initView");
         initToolbar();
+        Util.P.le(TAG,"完成initToolbar");
         //如果加载数据不成功，（图片加载失败）返回，
         if (!initData()) return;
+        Util.P.le(TAG,"完成initData");
         initFragment();
-
+        Util.P.le(TAG,"完成initFragment");
         setViewContent();
+        Util.P.le(TAG,"完成setViewContent");
         test();
+        Util.P.le(TAG,"完成test");
     }
 
     @TargetApi(19)
@@ -135,7 +143,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     /**
      * 如果加载数据不成功，（图片加载失败）返回false，
-     *
      * @return 是否成功加载图片到PtuView
      */
     private boolean initData() {
@@ -366,6 +373,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                                 .copy(Bitmap.Config.ARGB_8888, true));
                         ptuFrame.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                         switchFragment(EDIT_MAIN);
+                        Util.P.le(TAG,"初始化加载PtuView完成");
                     }
                 }
         );
@@ -565,11 +573,12 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     //设置布局
                     FrameLayout.LayoutParams floatParams =
                             new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    ptuFrame.addView(matFrag.createMatView(totalBound, ptuView.getSourceBm()), floatParams);
+                    ptuFrame.addView(matFrag.createMatView(PtuActivity.this,totalBound, ptuView.getSourceBm()), floatParams);
                     CURRENT_EDIT_MODE = EDIT_MAT;
                     break;
             }
         }
+        Util.P.le(TAG,"switchFragment完成");
     }
 
     /**
@@ -638,12 +647,12 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
             TietuStepData ttsd = (TietuStepData) tietuFrag.getResultData(1);
             ttsd.EDIT_MODE = EDIT_TIETU;
-            Bitmap source = tietuFrag.getResultBm(1);
-            if(source==null)return;
-            ptuView.addBitmap(source,
-                    ttsd.boundRectInPic,
-                    ttsd.rotateAngle);
-
+            Iterator<StepData> iterator=ttsd.iterator();
+            while(iterator.hasNext()){
+                StepData sd=iterator.next();
+                ptuView.addBitmap(TietuSizeControler.getSrcBitmap(PtuActivity.this,sd.picPath),
+                sd.boundRectInPic,sd.rotateAngle);
+            }
             //释放，删除等部分
             ptuFrame.removeViewAt(1);
             tietuFrag.releaseResource();

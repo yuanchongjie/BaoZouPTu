@@ -8,14 +8,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
-import android.nfc.Tag;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
 import a.baozouptu.R;
-import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.MicroButtonData;
@@ -34,7 +31,6 @@ public class FloatImageView extends ImageView {
     public static final int minHeight = 16;
     MicroButtonData[] items;
     Paint itemPaint;
-
     /**
      * 是否显示边框
      */
@@ -42,6 +38,7 @@ public class FloatImageView extends ImageView {
     private Path rim;
     private Paint rimPaint;
     private String picPath;
+    private Bitmap mBitmap;
 
     public FloatImageView(Context context) {
         super(context);
@@ -80,6 +77,12 @@ public class FloatImageView extends ImageView {
         rimPaint.setStyle(Paint.Style.STROKE);
     }
 
+    @Override
+    public void setImageBitmap(Bitmap bm) {
+        mBitmap=bm;
+        super.setImageBitmap(bm);
+    }
+
     /**
      * 设置边框显示或隐藏,判断与当前状态是否相同，不相同才重绘，高效一些
      */
@@ -109,7 +112,7 @@ public class FloatImageView extends ImageView {
         if (!showRim) return false;//边框没显示出来，返回false
         RectF itemBound = new RectF();
 //        item方面的,取消item
-        int r = getPaddingTop();
+        int r = (int)(getPaddingTop()*1.5);
         itemBound.left = getWidth() - r * 2;
         itemBound.top = 0;
         itemBound.right = getWidth();
@@ -118,14 +121,6 @@ public class FloatImageView extends ImageView {
             return true;
         return false;
     }
-
-    @Override
-    public void layout(int l, int t, int r, int b) {
-        super.layout(l, t, r, b);
-        Log.e(TAG, "layout: " + " " + l + " " + t + " " + r + " " + b);
-        Util.P.le(TAG, "实际的宽高" + (r - l) + "　" + (b - t));
-    }
-
     /**
      * 返回false,父布局的onTouchEvent一定会被调用
      */
@@ -141,6 +136,7 @@ public class FloatImageView extends ImageView {
         if (showRim) {
             //画边框
             int r = getPaddingTop();
+            rim.reset();
             rim.moveTo(r, r);
             rim.lineTo(getWidth() - r, r);
             rim.lineTo(getWidth() - r, getHeight() - r);
@@ -169,7 +165,16 @@ public class FloatImageView extends ImageView {
 
     }
 
+
     public String getPicPath() {
         return picPath;
+    }
+
+    /**
+     *
+     * @return 获取高除以宽的比
+     */
+    public float getHWRatio(){
+        return mBitmap.getHeight()*1f/mBitmap.getWidth();
     }
 }

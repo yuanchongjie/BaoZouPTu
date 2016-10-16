@@ -519,7 +519,7 @@ public class ChosePictureActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        AsyncImageLoader3.getInstance().stop();
+      //  AsyncImageLoader3.getInstance().stop();
         super.onStop();
     }
     @Override

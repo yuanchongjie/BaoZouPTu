@@ -18,10 +18,10 @@ import a.baozouptu.base.util.Util;
 /**
  * Created by Administrator on 2016/7/28.
  */
-public class RepealRedoManager {
+public class RepealRedoManager<T> {
     private static final String TAG = "RepealRedoManager";
-    LinkedList<StepData> stepList;
-    private ListIterator<StepData> iter;
+    LinkedList<T> stepList;
+    private ListIterator<T> iter;
     //撤销重做的最大步数
     private static int maxStep = 5;
     Bitmap baseBitmap;
@@ -42,7 +42,7 @@ public class RepealRedoManager {
      * @param sd
      * @return
      */
-    public StepData commit(StepData sd) {
+    public T commit(T sd) {
         while (iter.hasNext()) {
             iter.next();
             iter.remove();
@@ -53,7 +53,7 @@ public class RepealRedoManager {
             while (iter.hasPrevious()) {
                 iter.previous();
             }
-            StepData resd = iter.next();
+            T resd = iter.next();
             iter.remove();
             while (iter.hasNext()) {
                 iter.next();
@@ -75,7 +75,7 @@ public class RepealRedoManager {
         return iter.hasNext();
     }
 
-    public StepData redo() {
+    public T redo() {
         if (iter.hasNext()) {
             return iter.next();
         }
@@ -137,7 +137,7 @@ public class RepealRedoManager {
         return innerBitmap[0];
     }
 
-    public StepData getStepdata(int i) {
+    public T getStepdata(int i) {
         return stepList.get(i);
     }
 

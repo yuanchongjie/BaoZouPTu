@@ -31,7 +31,7 @@ class TouchEventProcessor {
         float x = event.getX(), y = event.getY();
         if (Util.DoubleClick.isDoubleClick())//判断发生点击事件
         {
-            if (chosedView.isOnCancel(x - chosedView.getLeft(), x - chosedView.getTop()))//如果点击到了取消
+            if (chosedView != null && chosedView.isOnCancel(x - chosedView.getLeft(), y - chosedView.getTop()))//如果点击到了取消
             {
                 layout.removeFloatView(chosedView);
                 return true;
@@ -45,13 +45,14 @@ class TouchEventProcessor {
                     rect.top = child.getTop();
                     rect.bottom = child.getBottom();
                     if (rect.contains((int) x, (int) y)) {
-                        layout.onChosedView((FloatImageView)child);
+                        layout.onChosedView((FloatImageView) child);
                         return true;
                     }
                 }
             }
 //            点击没有发生在tietu图片上面
-            chosedView.setShowRim(false);
+            if (chosedView != null)
+                chosedView.setShowRim(false);
         }
         return true;
     }

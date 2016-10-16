@@ -96,8 +96,6 @@ public class TietuSizeControler {
         int mtop=(int)(Math.random()*(picBound.height()-exceptHeight));
         parmas.leftMargin=picBound.left+mleft;
         parmas.topMargin=picBound.top+mtop;
-        Util.P.le(TAG,"长宽比原始"+srcHeight*1f/srcWidth);
-        Util.P.le(TAG,"长宽比计算"+exceptHeight/exceptWidth);
         return parmas;
     }
 }

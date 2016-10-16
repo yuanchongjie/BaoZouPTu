@@ -51,7 +51,7 @@ public class AsyncImageLoader3 {
         };
         executorService = new ThreadPoolExecutor(CPU_COUNT*2+1, CPU_COUNT*2+1,
                 5L, TimeUnit.SECONDS,
-                lque);
+                lque);//核心线程=cup数量*2+1，5秒为运行后关闭之
         executorService.allowCoreThreadTimeOut(true);
     }
 
