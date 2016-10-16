@@ -124,10 +124,10 @@ public class MainFunctionFragment extends Fragment {
             li.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(id!=1&&id!=2){
+                   /* if(id!=1&&id!=2){
                         Toast.makeText(mcontext,"暂未实现此功能,敬请期待！",Toast.LENGTH_SHORT).show();
                         return;
-                    }
+                    }*/
                     imageList.get(id).setImageDrawable(chosenDrawableList.get(id));
                     chosedId = id;
                     listen.switchFragment(functionConstantList.get(id));

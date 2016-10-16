@@ -25,7 +25,7 @@ public class MyFileListAdapter extends BaseAdapter {
     List<String> picFileInfoList;
 
     List<String> representPicturePathList;
-    AsyncImageLoader3 asyLoader3 = AsyncImageLoader3.getInstatnce();
+    AsyncImageLoader3 asyLoader3 = AsyncImageLoader3.getInstance();
 
     private LayoutInflater  layoutInflater;
 

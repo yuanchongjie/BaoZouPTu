@@ -229,7 +229,7 @@ public class ChosePictureActivity extends AppCompatActivity {
         });
 
         pictureGridview.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            AsyncImageLoader3 imageLoader = AsyncImageLoader3.getInstatnce();
+            AsyncImageLoader3 imageLoader = AsyncImageLoader3.getInstance();
             int lastScrollState = RecyclerView.SCROLL_STATE_IDLE;
 
             @Override
@@ -518,9 +518,14 @@ public class ChosePictureActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        AsyncImageLoader3.getInstatnce().evitAll();
-        super.onPause();
+    protected void onStop() {
+      //  AsyncImageLoader3.getInstance().stop();
+        super.onStop();
+    }
+    @Override
+    protected void onRestart() {
+        AsyncImageLoader3.getInstance().reStart();
+        super.onRestart();
     }
 
     @Override

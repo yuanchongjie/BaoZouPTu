@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import a.baozouptu.R;
+import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.repealRedo.StepData;
 
@@ -21,6 +22,7 @@ import a.baozouptu.ptu.repealRedo.StepData;
  * @description
  */
 public class MatFragment extends Fragment implements BaseFunction {
+    private static final String TAG = "MatFragment";
     private Context mContext;
     private LinearLayout shape;
     private LinearLayout smear;
@@ -44,6 +46,7 @@ public class MatFragment extends Fragment implements BaseFunction {
         shape = (LinearLayout) view.findViewById(R.id.mat_shape);
         rubber = (LinearLayout) view.findViewById(R.id.mat_rubber);
         setClick();
+        Util.P.le(TAG,"创建MatView完成");
         return view;
     }
 
@@ -99,8 +102,8 @@ public class MatFragment extends Fragment implements BaseFunction {
         matView.releaseResource();
     }
 
-    public MatView createMatView(Rect bound, Bitmap bitmap) {
-        matView = new MatView(mContext, bound);
+    public MatView createMatView(Context context,Rect bound, Bitmap bitmap) {
+        matView = new MatView(context, bound);
         matView.setBitmapAndInit(bitmap, bound.width(), bound.height());
         matView.canDoubleClick(false);
         matView.setCanLessThanScreen(false);

@@ -163,8 +163,9 @@ public class PtuFrameLayout extends FrameLayout {
                 isConsume = childView.dispatchTouchEvent(ev);
                 if (isConsume)//消费了up事件，up置为true
                     hasUp = true;
-            }else if(!(childView instanceof  FloatView)){
-                isConsume=true;
+            }else if(!(childView instanceof  FloatView)){//如果不是浮动图
+                ev.setLocation(sx - childView.getLeft(), sy - childView.getTop());
+                isConsume=childView.dispatchTouchEvent(ev);
             }
             //没有消费才分发事件，不然就不分发
             if (!isConsume) {
