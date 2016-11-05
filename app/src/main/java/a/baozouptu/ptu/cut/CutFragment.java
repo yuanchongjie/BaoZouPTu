@@ -33,7 +33,7 @@ public class CutFragment extends Fragment implements BaseFunction{
     }
 
     @Override
-    public void redo() {
+    public void redo(StepData sd) {
 
     }
 
@@ -95,8 +95,8 @@ public class CutFragment extends Fragment implements BaseFunction{
     public void setRealRedoManager(RepealRedoManager realRedoManager){
     }
 
-    public View createCutView(Rect totalBound, Bitmap sourceBm) {
-        cutView = new CutView(mContext,sourceBm, totalBound);
+    public View createCutView(Context context,Rect totalBound,Rect picBound, Bitmap sourceBm) {
+        cutView = new CutView(context,sourceBm, totalBound);
         return cutView;
     }
 }

@@ -10,6 +10,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -433,7 +434,7 @@ public class PtuView extends View implements TSRView {
     public void onDraw(Canvas canvas) {
         switch (CURRENT_STATUS) {
             case STATUS_INIT:
-                Util.P.le(TAG,2);
+
                 initialDraw();
                 break;
             default:
@@ -461,6 +462,7 @@ public class PtuView extends View implements TSRView {
             tempBitmap = null;
         }
         super.onDraw(canvas);
+        Log.e(TAG,"绘制完成");
     }
 
     /**
@@ -485,7 +487,7 @@ public class PtuView extends View implements TSRView {
      * @param rotateAngle 浮动视图旋转的角度
      */
     public void addBitmap(Bitmap addBitmap, RectF boundRect, float rotateAngle) {
-        sourceCanvas = RepealRedoManager.addBm2Canvas(sourceCanvas, addBitmap, boundRect, rotateAngle);
+        RepealRedoManager.addBm2Canvas(sourceCanvas, addBitmap, boundRect, rotateAngle);
         resetShow();
         Util.P.le(TAG, "将图添加到PtuView成功");
     }

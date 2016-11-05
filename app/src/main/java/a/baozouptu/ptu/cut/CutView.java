@@ -2,13 +2,14 @@ package a.baozouptu.ptu.cut;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.MotionEvent;
 
-import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.view.PtuView;
@@ -37,10 +38,10 @@ public class CutView extends PtuView implements TSRView {
 
     private boolean intercept = false;
 
-    private final CutFrameView cutFrameView;
+    private final CutFrame cutFrame;
 
     public CutView(Context context, Bitmap sourceBitmap, Rect totalBound) {
-        super(context);
+        super(context,sourceBitmap, totalBound.width(), totalBound.height());
         mContext = context;
         this.totalBound = new Rect(totalBound);
         clearPaint = new Paint();
@@ -48,15 +49,13 @@ public class CutView extends PtuView implements TSRView {
         bmPaint = new Paint();
         bmPaint.setAntiAlias(true);
         bmPaint.setDither(true);
-
-        super.setBitmapAndInit(sourceBitmap, totalBound.width(), totalBound.height());
-        Util.P.le(TAG,1);
         initialDraw();
-        cutFrameView = new CutFrameView(dstRect);
+        cutFrame = new CutFrame(dstRect);//dstRect在父视图中
 
         sourceDx = sourceDy = 0;
         sourceRatio = 1;
         sourceLastAngle = sourceTotalAngle = 0;
+        Log.e(TAG,"初始化完成");
     }
 
     @Override
@@ -64,12 +63,12 @@ public class CutView extends PtuView implements TSRView {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 float x = event.getX(), y = event.getY();
-                if (cutFrameView.isInCornerLump(x, y)) {
+                if (cutFrame.isInCornerLump(x, y)) {
                     intercept = true;
-                } else if (cutFrameView.isInEdgeLine(x, y)) {
+                } else if (cutFrame.isInEdgeLine(x, y)) {
                     intercept = true;
 
-                } else if (cutFrameView.isInCenterLump(x, y)) {
+                } else if (cutFrame.isInCenterLump(x, y)) {
                     intercept = true;
 
                 } else {
@@ -129,5 +128,12 @@ public class CutView extends PtuView implements TSRView {
     }
 
     public void reset() {
+    }
+
+    @Override
+    public void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        cutFrame.draw(canvas);
+        Log.e(TAG,"绘制完成");
     }
 }

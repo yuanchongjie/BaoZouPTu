@@ -19,7 +19,7 @@ public interface BaseFunction {
      * 重做
      */
 
-    void redo();
+    void redo(StepData sd);
 
     /**
      * 获取操作之后最终的bitmap

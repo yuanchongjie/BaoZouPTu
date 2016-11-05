@@ -43,14 +43,10 @@ public class MainFunctionFragment extends Fragment {
     private List<Drawable> drawableList;
     private List<Drawable> chosenDrawableList;
     private int tietuPosition = 2;
+    private final String TAG = "MainFunctionFragment";
 
     public interface Listen {
         void switchFragment(int function);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
     }
 
     @Override

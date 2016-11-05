@@ -17,7 +17,8 @@ import a.baozouptu.base.util.Util;
  *
  * @description 裁剪的框，支持缩放和拖动，在中间格子显示宽和高
  */
-public class CutFrameView {
+public class CutFrame {
+    private final String TAG="CutFrame";
     /**
      * 位置和宽高
      */
@@ -55,7 +56,7 @@ public class CutFrameView {
     /**
      * @param picBound 图片在屏幕，PtuFrame中的矩形，初始化时根据图片范围定位置大小
      */
-    CutFrameView(Rect picBound) {
+    CutFrame(Rect picBound) {
         mLeft = picBound.left;
         mTop = picBound.top;
         mWidth = picBound.width();
@@ -275,6 +276,7 @@ public class CutFrameView {
         float textY = mHeight / 2 - fm.descent + (fm.bottom - fm.top) / 2;
         canvas.drawText(show,(mWidth-textWidth)/2,textY,textPaint);
 
+        Util.P.le(TAG,"draw完成");
     }
 
 

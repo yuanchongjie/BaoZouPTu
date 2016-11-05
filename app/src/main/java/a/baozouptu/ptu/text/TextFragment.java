@@ -49,18 +49,15 @@ public class TextFragment extends Fragment {
     private FunctionPopWindowBuilder textPopupBuilder;
     private FloatTextView floatTextView;
     private Typeface curTypeface = Typeface.MONOSPACE;
+    private String TAG = "TextFragment";
 
 
     public static void addBigStep(Bitmap bm, StepData sd) {
-        TextStepData tsd=(TextStepData)sd;
+        TextStepData tsd = (TextStepData) sd;
         RepealRedoManager.addBm2Bm(bm, BitmapTool.getLosslessBitmap(tsd.picPath),
-                tsd.boundRectInPic,tsd.rotateAngle);
+                tsd.boundRectInPic, tsd.rotateAngle);
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -71,7 +68,6 @@ public class TextFragment extends Fragment {
         setClick();
         return view;
     }
-
 
     /**
      * 获取addTextFragment上的view组件
@@ -134,7 +130,6 @@ public class TextFragment extends Fragment {
     public void releaseResource() {
         floatTextView.releaseResource();
     }
-
 
     /**
      * 创建添加文字模块功能区的功能操作视图
@@ -199,8 +194,8 @@ public class TextFragment extends Fragment {
                         try {
                             Typeface typeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/kaiti.TTF");
                             textView.setTypeface(typeface);
-                        }catch (Exception e){
-                            Toast.makeText(mContext,"获取新字体失败",Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            Toast.makeText(mContext, "获取新字体失败", Toast.LENGTH_SHORT).show();
                         }
                     } else if (position == 2) {
                         textView.setTypeface(Typeface.DEFAULT);
@@ -227,13 +222,15 @@ public class TextFragment extends Fragment {
                         } else if (position == 1) {
                             try {
                                 curTypeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/kaiti.TTF");
-                                floatTextView.setTypeface(curTypeface);floatTextView.updateSize();
-                            }catch (Exception e){
-                                Toast.makeText(mContext,"获取新字体失败",Toast.LENGTH_SHORT).show();
+                                floatTextView.setTypeface(curTypeface);
+                                floatTextView.updateSize();
+                            } catch (Exception e) {
+                                Toast.makeText(mContext, "获取新字体失败", Toast.LENGTH_SHORT).show();
                             }
                         } else if (position == 2) {
                             curTypeface = Typeface.DEFAULT;
-                            floatTextView.setTypeface(curTypeface);floatTextView.updateSize();
+                            floatTextView.setTypeface(curTypeface);
+                            floatTextView.updateSize();
                         }
                         if (lastFontId != position) {
                             ((TextView) view).setTextColor(AllData.text_choosed_color);
@@ -260,9 +257,9 @@ public class TextFragment extends Fragment {
                     if (isItalic) {
                         floatTextView.setTypeface(curTypeface, Typeface.BOLD_ITALIC);
                         floatTextView.updateSize();
-                    }
-                    else {
-                        floatTextView.setTypeface(curTypeface, Typeface.BOLD);floatTextView.updateSize();
+                    } else {
+                        floatTextView.setTypeface(curTypeface, Typeface.BOLD);
+                        floatTextView.updateSize();
                     }
                     isBold = true;
                 }
@@ -272,8 +269,7 @@ public class TextFragment extends Fragment {
                     if (isItalic) {
                         floatTextView.setTypeface(curTypeface, Typeface.ITALIC);
                         floatTextView.updateSize();
-                    }
-                    else {
+                    } else {
                         floatTextView.setTypeface(curTypeface, Typeface.NORMAL);
                         floatTextView.updateSize();
                     }
@@ -286,10 +282,10 @@ public class TextFragment extends Fragment {
             switchItalic.setOnSlideListener(new MySwitchButton.SlideListener() {
                 @Override
                 public void open() {
-                    if (isBold){
+                    if (isBold) {
                         floatTextView.setTypeface(curTypeface, Typeface.BOLD_ITALIC);//斜体，中文有效
-                        floatTextView.updateSize();}
-                    else {
+                        floatTextView.updateSize();
+                    } else {
                         floatTextView.setTypeface(curTypeface, Typeface.ITALIC);//斜体，中文有效
                         floatTextView.updateSize();
                     }
@@ -300,8 +296,7 @@ public class TextFragment extends Fragment {
                 public void close() {
                     if (isBold) {
                         floatTextView.setTypeface(curTypeface, Typeface.BOLD);
-                    }
-                    else {
+                    } else {
                         floatTextView.setTypeface(curTypeface, Typeface.NORMAL);
                         floatTextView.updateSize();
                     }
@@ -442,7 +437,6 @@ public class TextFragment extends Fragment {
         /**
          * 设置功能子视图的布局
          * 注意这里popupwindow的高度要加上view所在布局的padding
-         *
          */
         private void setLayout(View v, View contentView) {
             PopupWindow pop = new PopupWindow(contentView,
