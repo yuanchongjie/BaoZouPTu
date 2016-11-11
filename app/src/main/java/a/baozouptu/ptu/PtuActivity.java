@@ -81,7 +81,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     private DrawFragment drawFrag;
     private CutFragment cutFrag;
     private MatFragment matFrag;
-    private PtuView ptuView;
+    public PtuView ptuView;
     private PtuFrameLayout ptuFrame;
     /**
      * 子功能获取的bitmap的参数,0为获取图片相对原图片的左边距，1为获取图片相对原图片的上边距，
@@ -221,7 +221,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                switchFragment(EDIT_TIETU);
+                switchFragment(EDIT_CUT);
             }
         }, 500);
        /* new Handler().postDelayed(new Runnable() {
@@ -528,8 +528,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                             .commit();
                     FrameLayout.LayoutParams cutFloatParams =
                             new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                    cutFloatParams.setMargins(0,0,0,0);
                     ptuFrame.addView(
-                            cutFrag.createCutView(this,totalBound,ptuView.getPicBound(), ptuView.getSourceBm())
+                            cutFrag.createCutView(this,totalBound,ptuView.getPicBound())
                            , cutFloatParams);
 
                     CURRENT_EDIT_MODE = EDIT_CUT;

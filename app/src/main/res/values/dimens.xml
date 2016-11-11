@@ -25,8 +25,8 @@
     <dimen name="pading_3dp">3dp</dimen>
     <dimen name="top_btn_width">40dp</dimen>
     <dimen name="padding_top_btn">15dp</dimen>
-    <dimen name="cut_frame_lump_width">10dp</dimen>
 
+    <dimen name="cut_frame_lump_width">17dp</dimen>
     <!--保存设置对话框-->
     <dimen name="list_item_width_save_set_wide">80dp</dimen>
     <dimen name="list_item_width_save_set_small">44dp</dimen>

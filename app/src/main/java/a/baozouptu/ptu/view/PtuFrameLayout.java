@@ -12,6 +12,8 @@ import android.widget.FrameLayout;
 import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.FloatView;
+import a.baozouptu.ptu.cut.CutFragment;
+import a.baozouptu.ptu.cut.CutFrameView;
 import a.baozouptu.ptu.text.FloatTextView;
 import a.baozouptu.ptu.tietu.TietuFrameLayout;
 
@@ -163,7 +165,14 @@ public class PtuFrameLayout extends FrameLayout {
                 isConsume = childView.dispatchTouchEvent(ev);
                 if (isConsume)//消费了up事件，up置为true
                     hasUp = true;
-            }else if(!(childView instanceof  FloatView)){//如果不是浮动图
+            }else if(childView instanceof CutFrameView){
+                ev.setLocation(sx - childView.getLeft(), sy - childView.getTop());
+                isConsume=childView.dispatchTouchEvent(ev);
+                if(!isConsume){
+                    isConsume=getChildAt(0).dispatchTouchEvent(ev);
+                }
+            }
+            else if(!(childView instanceof  FloatView)){//如果不是浮动图
                 ev.setLocation(sx - childView.getLeft(), sy - childView.getTop());
                 isConsume=childView.dispatchTouchEvent(ev);
             }

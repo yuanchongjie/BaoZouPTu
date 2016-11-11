@@ -51,7 +51,7 @@
     <color name="cut_frame">#ffffff</color>
     <color name="black_deep">#333333</color>
     <color name="light_grey">#aaaaaa</color>
-
+    <color name="half_transparent_black">#68000000</color>
     <color name="background_pressed">#80aaaaaa</color>
 
     <color name="cancel_btn">#ffffff</color>

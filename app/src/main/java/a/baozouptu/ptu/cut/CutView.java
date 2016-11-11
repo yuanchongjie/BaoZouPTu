@@ -1,3 +1,4 @@
+/*
 package a.baozouptu.ptu.cut;
 
 import android.content.Context;
@@ -15,11 +16,13 @@ import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.view.PtuView;
 import a.baozouptu.ptu.view.TSRView;
 
+*/
 /**
  * Created by liuguicen on 2016/8/5.
  *
  * @description
- */
+ *//*
+
 public class CutView extends PtuView implements TSRView {
     private final Context mContext;
     private final String TAG="CutView";
@@ -38,7 +41,7 @@ public class CutView extends PtuView implements TSRView {
 
     private boolean intercept = false;
 
-    private final CutFrame cutFrame;
+ //   private final CutFrame cutFrame;
 
     public CutView(Context context, Bitmap sourceBitmap, Rect totalBound) {
         super(context,sourceBitmap, totalBound.width(), totalBound.height());
@@ -50,7 +53,7 @@ public class CutView extends PtuView implements TSRView {
         bmPaint.setAntiAlias(true);
         bmPaint.setDither(true);
         initialDraw();
-        cutFrame = new CutFrame(dstRect);//dstRect在父视图中
+//        cutFrame = new CutFrame(dstRect);//dstRect在父视图中
 
         sourceDx = sourceDy = 0;
         sourceRatio = 1;
@@ -100,9 +103,11 @@ public class CutView extends PtuView implements TSRView {
     }
 
 
-    /**
+    */
+/**
      * 旋转没有关系,旋转的时候将旋转的图放到source的框中，
-     */
+     *//*
+
     @Override
     public void rotate(float angle) {
         sourceTotalAngle += angle;
@@ -137,3 +142,4 @@ public class CutView extends PtuView implements TSRView {
         Log.e(TAG,"绘制完成");
     }
 }
+*/

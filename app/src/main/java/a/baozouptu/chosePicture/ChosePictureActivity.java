@@ -88,7 +88,7 @@ public class ChosePictureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_chose_picture);
-       // test();
+        test();
         Handler handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {

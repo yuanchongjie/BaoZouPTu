@@ -526,7 +526,7 @@ public class PtuView extends View implements TSRView {
         return sourceBitmap;
     }
 
-    public void canDoubleClick(boolean b) {
+    public void setCanDoubleClick(boolean b) {
         canDoubleCilick = b;
     }
 
