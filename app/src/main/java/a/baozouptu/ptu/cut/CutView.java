@@ -60,7 +60,6 @@ public class CutView extends PtuView implements TSRView {
         sourceLastAngle = sourceTotalAngle = 0;
         Log.e(TAG,"初始化完成");
     }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getActionMasked()) {
