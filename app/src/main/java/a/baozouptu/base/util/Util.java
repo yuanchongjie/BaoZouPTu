@@ -143,8 +143,8 @@ public class Util {
     }
 
     public static void getMesureWH(View v, int[] WH) {
-        int width = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-        int height = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        int width = View.MeasureSpec.makeMeasureSpec((1<<30)-1, View.MeasureSpec.AT_MOST);
+        int height = View.MeasureSpec.makeMeasureSpec((1<<30)-1, View.MeasureSpec.AT_MOST);
         v.measure(width, height);
         WH[0] = v.getMeasuredWidth();
         WH[1] = v.getMeasuredHeight();

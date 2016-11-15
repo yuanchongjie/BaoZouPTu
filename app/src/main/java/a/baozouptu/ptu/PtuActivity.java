@@ -37,6 +37,7 @@ import a.baozouptu.ptu.control.MainFunctionFragment;
 import a.baozouptu.ptu.cut.CutFragment;
 import a.baozouptu.ptu.draw.DrawFragment;
 import a.baozouptu.ptu.mat.MatFragment;
+import a.baozouptu.ptu.repealRedo.CutStepData;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TextStepData;
@@ -109,7 +110,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Util.P.le(TAG,"ononCreate()_1");
         Util.P.le(TAG, "进入P图Activity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ptu);
@@ -128,7 +128,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         Util.P.le(TAG, "完成setViewContent");
         test();
         Util.P.le(TAG, "完成test");
-        Util.P.le(TAG,"ononCreate()_2");
+        Util.P.le(TAG, "ononCreate()_2");
     }
 
     @TargetApi(19)
@@ -322,7 +322,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     //另外开启，加载一些其他的数据，不阻塞UI线程
     @Override
     protected void onStart() {
-        Util.P.le(TAG,"onStart_1");
+        Util.P.le(TAG, "onStart_1");
         if (saveSetmanager == null)
             new Thread(new Runnable() {
                 @Override
@@ -331,7 +331,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 }
             }).start();
         super.onStart();
-        Util.P.le(TAG,"onStart_2");
+        Util.P.le(TAG, "onStart_2");
     }
 
     private void saveSet() {
@@ -372,7 +372,8 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     @Override
                     public void onGlobalLayout() {
                         totalBound.set(0, 0, ptuFrame.getWidth(), ptuFrame.getHeight());
-                        ptuView.setBitmapAndInit(picPath, ptuFrame.getWidth(), ptuFrame.getHeight());
+                        ptuView.setTotalBound(totalBound);
+                        ptuView.setBitmapAndInit(picPath, totalBound);
                         repealRedoManager.setBaseBm(ptuView.getSourceBm()
                                 .copy(Bitmap.Config.ARGB_8888, true));
                         ptuFrame.getViewTreeObserver().removeOnGlobalLayoutListener(this);
@@ -449,6 +450,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             progressDialog.show();
             switch (sd.EDIT_MODE) {
                 case EDIT_MAIN:
+                case EDIT_CUT:
+                    cutFrag.redo(sd);
+                    break;
                 case EDIT_TEXT:
                     Bitmap sourceBm = ptuView.getSourceBm();
                     addStep(sourceBm, repealRedoManager.redo());
@@ -464,6 +468,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 case EDIT_MAT:
                     matFrag.redo(sd);
                     break;
+
             }
             progressDialog.dismiss();
             checkRepealRedo();
@@ -512,7 +517,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     .setCustomAnimations(R.animator.slide_bottom_in, R.animator.slide_bottom_out,
                             R.animator.slide_bottom_in, R.animator.slide_bottom_out)
                     .replace(R.id.fragment_function, mainFrag)
-                    .addToBackStack(null)
                     .commit();
         } else {
             onToSecondFunction();
@@ -520,6 +524,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 case EDIT_CUT:
                     if (cutFrag == null) {
                         cutFrag = new CutFragment();
+                        cutFrag.setPtuView(ptuView);
                     }
                     fm.beginTransaction()
                             .setCustomAnimations(R.animator.slide_bottom_in, R.animator.slide_bottom_out,
@@ -528,10 +533,10 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                             .commit();
                     FrameLayout.LayoutParams cutFloatParams =
                             new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    cutFloatParams.setMargins(0,0,0,0);
+                    cutFloatParams.setMargins(0, 0, 0, 0);
                     ptuFrame.addView(
-                            cutFrag.createCutView(this,totalBound,ptuView.getPicBound())
-                           , cutFloatParams);
+                            cutFrag.createCutView(this, totalBound, ptuView.getSourceBm())
+                            , cutFloatParams);
 
                     CURRENT_EDIT_MODE = EDIT_CUT;
                     break;
@@ -632,8 +637,12 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
         if (CURRENT_EDIT_MODE == EDIT_CUT) {
             Bitmap newSourceBm = cutFrag.getResultBm(1);
+            StepData csd=cutFrag.getResultData(1);
+            cutFrag.releaseResource();
+            ptuFrame.removeViewAt(1);
             ptuView.replaceSourceBm(newSourceBm);
-            ptuView.resetShow();
+            switchFragment(EDIT_MAIN);
+            afterSure(csd);
         }//添加文字
         else if (CURRENT_EDIT_MODE == EDIT_TEXT) {
             TextStepData tsd = textFrag.getResultData(ptuView);
@@ -694,6 +703,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         if (ptuFrame.getChildCount() > 1) {
             ptuFrame.removeViewAt(1);
         }
+        if (ptuView.getVisibility() == View.INVISIBLE) {
+            ptuView.setVisibility(View.VISIBLE);
+        }
         topRelativeLayout.removeCancel();
         topRelativeLayout.removeSure();
         topRelativeLayout.addReturn();
@@ -727,7 +739,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     }
 
 
-
     @Override
     protected void onStop() {
         if (endType == "share")
@@ -735,4 +746,10 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         super.onStop();
     }
 
+    @Override
+    protected void onDestroy() {
+        if(ptuView!=null)
+            ptuView.releaseResource();
+        super.onDestroy();
+    }
 }

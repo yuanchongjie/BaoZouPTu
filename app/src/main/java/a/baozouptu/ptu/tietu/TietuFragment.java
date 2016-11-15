@@ -220,7 +220,7 @@ public class TietuFragment extends Fragment implements BaseFunction {
         while (iterator.hasNext()) {
             StepData sd = iterator.next();
             Bitmap souceBitmap= TietuSizeControler.getBitmapInSize(mContext, sd.picPath,
-                    (int)sd.boundRectInPic.width(),(int)sd.boundRectInPic.height());
+                    Math.round(sd.boundRectInPic.width()),Math.round(sd.boundRectInPic.height()));
             ptuView.addBitmap(souceBitmap,
                     sd.boundRectInPic, sd.rotateAngle);
         }

@@ -199,10 +199,10 @@ public class TietuFrameLayout extends FrameLayout {
         currentRatio = adjustSize(chosedView, currentRatio);
         TietuFrameLayout.LayoutParams parmas = (TietuFrameLayout.LayoutParams) chosedView.getLayoutParams();
         //=当前位置-当前距离 chosedView.getWidth()/2 缩放后多出来的currentRatio-1距离
-        parmas.leftMargin = (int) (chosedView.getLeft() - chosedView.getWidth() / 2 * (currentRatio - 1));
-        parmas.topMargin = (int) (chosedView.getTop() - chosedView.getHeight() / 2 * (currentRatio - 1));
-        parmas.width = (int) (chosedView.getWidth() * currentRatio);
-        parmas.height = (int) (parmas.width * chosedView.getHWRatio());
+        parmas.leftMargin = Math.round (chosedView.getLeft() - chosedView.getWidth() / 2 * (currentRatio - 1));
+        parmas.topMargin = Math.round (chosedView.getTop() - chosedView.getHeight() / 2 * (currentRatio - 1));
+        parmas.width = Math.round (chosedView.getWidth() * currentRatio);
+        parmas.height = Math.round (parmas.width * chosedView.getHWRatio());
         updateViewLayout(chosedView, parmas);
         Util.P.le(TAG, "长宽比 " + parmas.width * 1f / parmas.height);
     }

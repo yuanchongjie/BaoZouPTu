@@ -103,8 +103,8 @@ public class MatFragment extends Fragment implements BaseFunction {
     }
 
     public MatView createMatView(Context context,Rect bound, Bitmap bitmap) {
-        matView = new MatView(context, bound);
-        matView.setBitmapAndInit(bitmap, bound.width(), bound.height());
+        matView = new MatView(context, bitmap, bound);
+        matView.setBitmapAndInit(bitmap, bound);
         matView.setCanDoubleClick(false);
         matView.setCanLessThanScreen(false);
         return matView;

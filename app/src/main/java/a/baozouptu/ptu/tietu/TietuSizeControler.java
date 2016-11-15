@@ -108,13 +108,13 @@ public class TietuSizeControler {
             exceptHeight=AllData.screenHeight/7;
 
         float ratio=Math.min(exceptHeight*1f/srcHeight,exceptWidth*1f/srcWidth);//保持长宽比，取小的一个
-        exceptWidth=(int)(srcWidth*ratio)+FloatImageView.pad*2;
-        exceptHeight=(int)(srcHeight*ratio)+FloatImageView.pad*2;
+        exceptWidth=Math.round(srcWidth*ratio)+FloatImageView.pad*2;
+        exceptHeight=Math.round(srcHeight*ratio)+FloatImageView.pad*2;
         FrameLayout.LayoutParams parmas=new FrameLayout.LayoutParams(exceptWidth,exceptHeight);
 
         //位置，随机数，需要图片范围内
-        int mleft=(int)(Math.random()*(picBound.width()-exceptWidth));
-        int mtop=(int)(Math.random()*(picBound.height()-exceptHeight));
+        int mleft=(int)Math.round(Math.random()*(picBound.width()-exceptWidth));
+        int mtop=(int)Math.round(Math.random()*(picBound.height()-exceptHeight));
         parmas.leftMargin=picBound.left+mleft;
         parmas.topMargin=picBound.top+mtop;
         return parmas;

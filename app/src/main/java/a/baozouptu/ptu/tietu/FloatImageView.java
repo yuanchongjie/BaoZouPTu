@@ -105,7 +105,7 @@ public class FloatImageView extends ImageView {
         if (!showRim) return false;//边框没显示出来，返回false
         RectF itemBound = new RectF();
 //        item方面的,取消item
-        int r = (int)(getPaddingTop()*1.5);
+        int r = Math.round(getPaddingTop()*1.5f);
         itemBound.left = getWidth() - r * 2;
         itemBound.top = 0;
         itemBound.right = getWidth();

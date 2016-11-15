@@ -53,15 +53,15 @@ public class Pen {
         int c_1 = Color.argb(Color.alpha(c1) / 3, Color.red(c1), Color.green(c1), Color.blue(c1));
         int c2 = Util.getColor(R.color.mat_pen_line2);
         int c_2 = Color.argb(Color.alpha(c2) / 3, Color.red(c2), Color.green(c2), Color.blue(c2));
-        penBmLine = IconBitmapCreator.createPen((int) penWidth, c1, c2);
-        penBm = penBmMove = IconBitmapCreator.createPen((int) penWidth, c_1, c_2);
+        penBmLine = IconBitmapCreator.createPen(Math.round(penWidth), c1, c2);
+        penBm = penBmMove = IconBitmapCreator.createPen(Math.round(penWidth), c_1, c_2);
         penHeight = penBm.getHeight();
 
         pointLeft = bound.width() / 2;
         pointTop = bound.height() / 2;
         totalBound = bound;
 
-        angle=startAngle=-30;
+        angle = startAngle = -30;
         this.mBound = new GeoUtil.UnLevelRect();
         resetBound();
     }
@@ -72,6 +72,7 @@ public class Pen {
 
     /**
      * 移动，会先检测边界(图片边界和总的边界）
+     *
      * @param picBound 图片的范围
      */
     public void move(float nx, float ny, Rect picBound) {
@@ -173,6 +174,7 @@ public class Pen {
 
 
     //绘制部分
+
     /*****************************************************************************/
     void drawPen(Canvas canvas) {
         canvas.save();
@@ -190,15 +192,16 @@ public class Pen {
 
     /**
      * 在抠图界面，没有返回，以前点击过划线，再次点击时
+     *
      * @param totalBound 总的范围
      */
     public void reSet(Rect totalBound) {
         lastX = lastY = -1;
         pointLeft = totalBound.width() / 2;
         pointTop = totalBound.height() / 2;
-        penBm=penBmMove;
-        isDrawLine=false;
-        angle=startAngle;
+        penBm = penBmMove;
+        isDrawLine = false;
+        angle = startAngle;
         resetBound();
     }
 
@@ -234,11 +237,11 @@ public class Pen {
     }
 
     public void releaseResource() {
-        if(penBmLine!=null) {
+        if (penBmLine != null) {
             penBmLine.recycle();
             penBmLine = null;
         }
-        if(penBmMove!=null) {
+        if (penBmMove != null) {
             penBmMove.recycle();
             penBmMove = null;
         }

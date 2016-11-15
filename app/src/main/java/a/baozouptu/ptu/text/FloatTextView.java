@@ -77,7 +77,7 @@ public class FloatTextView extends EditText implements FloatView {
     private int lastSelectionId;
     private Rect picBound;
     private String mText = "";
-    private int mBackGroundColor = 0xffffffff;
+    private int mBackGroundColor = 0x00000000;
     private Bitmap[] justifyBm;
     private Bitmap resultBm;
 
@@ -400,7 +400,7 @@ public class FloatTextView extends EditText implements FloatView {
      */
     private int sp2px(float spValue) {
         final float fontScale = mContext.getResources().getDisplayMetrics().scaledDensity;
-        return (int) (spValue * fontScale + 0.5f);
+        return Math.round(spValue * fontScale + 0.5f);
     }
 
     /**
@@ -428,8 +428,8 @@ public class FloatTextView extends EditText implements FloatView {
 
         String realRatio = MU.di(Double.toString(1), Float.toString(ptuView.getTotalRatio()));
         Bitmap textViewBm = generateProximateScaleBm(realRatio);
-        resultBm = Bitmap.createBitmap(textViewBm, (int) rimLeft, (int) rimTop,
-                (int) (rimRight - rimLeft), (int) (rimBottom - rimTop));
+        resultBm = Bitmap.createBitmap(textViewBm, Math.round(rimLeft), Math.round(rimTop),
+                Math.round(rimRight - rimLeft), Math.round(rimBottom - rimTop));
         textViewBm.recycle();
         textViewBm = null;
         String path = FileTool.createTempPicPath(mContext);
@@ -501,11 +501,11 @@ public class FloatTextView extends EditText implements FloatView {
         fLeft = centerX - mWidth / 2;
         fTop = centerY - mHeight / 2;
         ((PtuFrameLayout) getParent()).changeLocation();
-        Bitmap bitmap = Bitmap.createBitmap((int) mWidth, (int) mHeight, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(Math.round(mWidth), Math.round(mHeight), Bitmap.Config.ARGB_8888);
         SHOW_SATUS = STATUS_TOUMING;
         requestLayout();
-        setHeight((int) mHeight);
-        setWidth((int) mHeight);
+        setHeight(Math.round(mHeight));
+        setWidth(Math.round(mHeight));
         ((PtuFrameLayout) getParent()).measure(((PtuFrameLayout) getParent()).getWidth(),
                 ((PtuFrameLayout) getParent()).getHeight());
         ((PtuFrameLayout) getParent()).layout(0, 0, ((PtuFrameLayout) getParent()).getWidth(),
