@@ -64,7 +64,6 @@ public class CutView extends PtuView implements TSRView {
 
 
     }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (frame.onTouchEvent(event)) return true;//是否交给Frame处理
