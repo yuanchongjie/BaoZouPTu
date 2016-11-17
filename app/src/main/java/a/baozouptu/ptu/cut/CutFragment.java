@@ -50,13 +50,16 @@ public class CutFragment extends Fragment implements BaseFunction {
     private Drawable[] drawableList;
     private Drawable[] chosenDrawableList;
 
+    private int chosenId = -1;
+
     private static final String[] RATIO_NAMES = new String[]{
             "1:1", "3:2", "2:3", "4:3", "3:4", "16:9", "9:16", "自定义", "自由"
     };
     private static final float[] RATIOS = new float[]{
             1, 3f / 2, 2f / 3, 4f / 3, 3f / 4, 16f / 9, 9f / 16, 1, 1
     };
-    private int chosenId = -1;
+
+    private SizeRatioDialog sizeRatioDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -170,6 +173,7 @@ public class CutFragment extends Fragment implements BaseFunction {
                 custom.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        userDefinedSize();
                         custom.setTextColor(Util.getColor(R.color.text_checked_color));
                         popWindow.dismiss();
                     }
@@ -295,8 +299,26 @@ public class CutFragment extends Fragment implements BaseFunction {
     }
 
     private void userDefinedRatio() {
+        sizeRatioDialog=new SizeRatioDialog(mContext,1);
+        sizeRatioDialog.createDialog();
+        sizeRatioDialog.setActionListener(new SizeRatioDialog.ActionListener() {
+            @Override
+            public void onSure(float w, float h) {
+                cutView.setFixedRatio(h/w);
+            }
+        });
     }
 
+    private void userDefinedSize(){
+        sizeRatioDialog=new SizeRatioDialog(mContext,0);
+        sizeRatioDialog.createDialog();
+        sizeRatioDialog.setActionListener(new SizeRatioDialog.ActionListener() {
+            @Override
+            public void onSure(float w, float h) {
+                cutView.setFixedSize((int)(w+0.5f),(int)(h+0.5f));
+            }
+        });
+    }
 
     private void onClickRotate() {
         cutView.rotate(90);

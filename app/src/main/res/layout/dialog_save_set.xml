@@ -13,7 +13,7 @@
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="@string/save_set_dialog_name"
-        android:textSize="9pt" />
+        android:textSize="10pt" />
 
     <TextView
         android:layout_width="match_parent"

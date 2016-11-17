@@ -638,6 +638,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         if (CURRENT_EDIT_MODE == EDIT_CUT) {
             Bitmap newSourceBm = cutFrag.getResultBm(1);
             StepData csd=cutFrag.getResultData(1);
+            String picPath=FileTool.createTempPicPath(this);
+            BitmapTool.saveBitmap(this,newSourceBm,picPath);
+            csd.picPath=picPath;
             cutFrag.releaseResource();
             ptuFrame.removeViewAt(1);
             ptuView.replaceSourceBm(newSourceBm);
