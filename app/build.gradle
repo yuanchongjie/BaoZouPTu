@@ -2,32 +2,32 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
     /*兼容Android6.0系统所需，如果这句话报错，可在dependencies标签下使用compile 'cn.bmob.android:http-legacy:1.0'*/
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "a.baozouptu"
         minSdkVersion 16
-        targetSdkVersion 21
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }
-    signingConfigs {
-        release  {
-            storeFile file("androidApk-key1.jks")
-            storePassword "111111"
-            keyAlias "111111"
-            keyPassword "111111"
-        }
-    }
+//    signingConfigs {
+//        release  {
+//            storeFile file("androidApk-key1.jks")
+//            storePassword "111111"
+//            keyAlias "111111"
+//            keyPassword "111111"
+//        }
+//    }
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
         }
     }
 }
