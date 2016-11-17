@@ -124,8 +124,8 @@ public class RepealRedoManager<T> {
             Bitmap viewBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),
                     Bitmap.Config.ARGB_8888);
             view.draw(new Canvas(viewBitmap));
-            innerBitmap[0] = Bitmap.createBitmap(viewBitmap, (int) innerRect.left, (int) innerRect.top,
-                    (int) (innerRect.right - innerRect.left), (int) (innerRect.bottom - innerRect.top));//获取floatview内部的内容
+            innerBitmap[0] = Bitmap.createBitmap(viewBitmap, Math.round( innerRect.left), Math.round( innerRect.top),
+                    Math.round(innerRect.right - innerRect.left), Math.round (innerRect.bottom - innerRect.top));//获取floatview内部的内容
             viewBitmap.recycle();
             viewBitmap=null;
         } catch (OutOfMemoryError e) {

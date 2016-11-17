@@ -203,7 +203,12 @@ public class ProcessUsuallyPicPath {
                 });
 
                 detectRecentExit();
-                if (sortedPicPathsByTime.size() == 0) return;
+                if (sortedPicPathsByTime.size() == 0) {
+                    Message msg = new Message();
+                    msg.obj = "change_no";
+                    mHandler.sendMessage(msg);
+                    return;
+                }
                 if (sortedPicPathsByTime.get(0).first < AllData.lastScanTime &&
                         totalPicNumber == sortedPicPathsByTime.size()) {
                     AllData.lastScanTime = scanTime;
@@ -273,7 +278,7 @@ public class ProcessUsuallyPicPath {
      * 检测最近的图片时已删除
      */
     private void detectRecentExit() {
-        for (int i = usedNumber+2; i < recentNumber + usedNumber+2; i++) {
+        for (int i = usedNumber + 2; i < recentNumber + usedNumber + 2; i++) {
             String path = mUsualyPicPathList.get(i);
             if (!new File(path).exists()) {
                 mUsualyPicPathList.remove(i);
@@ -283,7 +288,7 @@ public class ProcessUsuallyPicPath {
     }
 
     private boolean isInRecent(String path) {
-        for (int i = usedNumber+2; i < recentNumber + usedNumber+2; i++) {
+        for (int i = usedNumber + 2; i < recentNumber + usedNumber + 2; i++) {
             if (mUsualyPicPathList.get(i).equals(path))
                 return true;
         }

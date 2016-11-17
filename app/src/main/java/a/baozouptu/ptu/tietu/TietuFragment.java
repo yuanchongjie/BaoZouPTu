@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.RectF;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,6 +20,7 @@ import android.widget.LinearLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import a.baozouptu.R;
@@ -76,6 +78,7 @@ public class TietuFragment extends Fragment implements BaseFunction {
 
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         mContext = getActivity();
@@ -93,22 +96,23 @@ public class TietuFragment extends Fragment implements BaseFunction {
         tietuAdapter = new RecyclerAdapter(mContext, tietuPaths);
         tietuAdapter.setOnItemClickListener(new RecyclerAdapter.OnRecyclerViewItemClickListener() {
             @Override
-            public void onItemClick(View view, String data) {/*
+            public void onItemClick(View view, String data) {
+                /*
 //                处理设置贴图失败的情况，暂不实现
                 boolean flag=false;
-                while(!floatImageView.setBitmapAndInit(data)&&tietuPaths.size()>0)
+                while(!floatImageView.setBitmapAndInit(data)&&tietuPaths.fixed_size()>0)
                 {
                     flag=true;
                     int id=tietuPaths.indexOf(data);
                     tietuPaths.remove(data);
-                    if(tietuPaths.size()==0){
+                    if(tietuPaths.fixed_size()==0){
                         ((ViewGroup)floatImageView.getParent()).removeView(floatImageView);
                         Toast.makeText(mContext,"贴图加载失败了！",Toast.LENGTH_SHORT).show();
                         tietuAdapter.notifyDataSetChanged();
                         return;
                     }
                     else{
-                        data=tietuPaths.get(id%tietuPaths.size());
+                        data=tietuPaths.get(id%tietuPaths.fixed_size());
                     }
                 }
                 if(flag) {
@@ -146,6 +150,7 @@ public class TietuFragment extends Fragment implements BaseFunction {
         return view;
     }
 
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Util.P.le(TAG);
@@ -162,7 +167,7 @@ public class TietuFragment extends Fragment implements BaseFunction {
         Bitmap srcBitmap = TietuSizeControler.getSrcBitmap(getActivity(), path);
         FloatImageView floatImageView = new FloatImageView(mContext);
         floatImageView.setAdjustViewBounds(true);
-        floatImageView.setImageBitmap(srcBitmap);
+        floatImageView.setImageBitmapAndPath(srcBitmap,path);
         FrameLayout.LayoutParams params = TietuSizeControler.getFeatParams(srcBitmap.getWidth(), srcBitmap.getHeight(),
                 ptuView.getPicBound());
         tietuLayout.addView(floatImageView, params);
@@ -209,7 +214,16 @@ public class TietuFragment extends Fragment implements BaseFunction {
     }
 
     @Override
-    public void redo() {
+    public void redo(StepData psd) {
+        TietuStepData ttsd=(TietuStepData)psd;
+        Iterator<StepData> iterator = ttsd.iterator();
+        while (iterator.hasNext()) {
+            StepData sd = iterator.next();
+            Bitmap souceBitmap= TietuSizeControler.getBitmapInSize(mContext, sd.picPath,
+                    Math.round(sd.boundRectInPic.width()),Math.round(sd.boundRectInPic.height()));
+            ptuView.addBitmap(souceBitmap,
+                    sd.boundRectInPic, sd.rotateAngle);
+        }
     }
 
     @Override
@@ -253,8 +267,10 @@ public class TietuFragment extends Fragment implements BaseFunction {
     @Override
     public void releaseResource() {
         int count = tietuLayout.getChildCount();
-        for (int i = 0; i < count; i++)
+        for (int i = count-1; i >= 0; i--) {
+            ((FloatImageView)tietuLayout.getChildAt(i)).releaseResourse();
             tietuLayout.removeViewAt(i);
+        }
     }
 
     public void setPtuView(PtuView ptuView) {

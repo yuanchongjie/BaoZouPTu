@@ -18,7 +18,7 @@ public class TietuStepData extends  StepData implements Iterable {
     }
 
     @Override
-    public Iterator iterator() {
+    public Iterator<StepData> iterator() {
         return tietuList.iterator();
     }
 }

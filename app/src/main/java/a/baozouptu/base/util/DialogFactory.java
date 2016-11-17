@@ -15,9 +15,9 @@ import a.baozouptu.R;
 public class DialogFactory {
     /**
      * 没有标题，只有确定有效
-     * @param context
-     * @param msg
-     * @param sure
+     * @param context 上下文
+     * @param msg 消息
+     * @param sure 确定函数
      */
     public static void noTitle(Context context, String msg, AlertDialog.OnClickListener sure){
         AlertDialog.Builder builder=new AlertDialog.Builder(context);

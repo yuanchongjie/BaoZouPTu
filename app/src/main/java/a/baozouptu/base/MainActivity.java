@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         boolean isTest = true;
         if (isTest) {
+         //   new NetWorkTest().test();
             test();
             sendNotify();
         } else {
@@ -93,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = new Intent(this, ChosePictureActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
         intent.setAction("notify_ptu");
-
         //PendingIntent是待执行的Intent
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);

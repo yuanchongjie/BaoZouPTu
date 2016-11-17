@@ -1,6 +1,7 @@
 package a.baozouptu.ptu.tietu;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
@@ -27,6 +28,26 @@ import a.baozouptu.base.util.Util;
  */
 public class TietuSizeControler {
     private static final String TAG = "TietuSizeControler";
+    /**
+     * 获取合适大小的Bitmap，Bitmap占用的内存不能超过剩余内存，如果超过，则返回空
+     * @return 如果Bitmap用的内存超过剩余的值，会返回空
+     */
+    public static Bitmap getBitmapInSize(Context context, String path, int nwidth, int nheight) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path,options);
+
+        options.inJustDecodeBounds = false;
+        options.inDither = true;
+        options.inPreferQualityOverSpeed = true;
+        options.inSampleSize =  Math.min(options.outWidth / nwidth, options.outHeight  / nheight);
+        long totalSize=options.outWidth/options.inSampleSize*(options.outHeight/options.inSampleSize)*4;
+        long realFreeMemory=Runtime.getRuntime().maxMemory()-Runtime.getRuntime().totalMemory();//使用freeMemaory不对
+        if(totalSize>realFreeMemory){
+            return null;//内存超出了剩余内存
+        }
+        return BitmapFactory.decodeFile(path, options);
+    }
 
     /**
      * 获取合适大小的Bitmap，Bitmap占用的内存不能超过剩余内存，如果超过，则返回空
@@ -87,13 +108,13 @@ public class TietuSizeControler {
             exceptHeight=AllData.screenHeight/7;
 
         float ratio=Math.min(exceptHeight*1f/srcHeight,exceptWidth*1f/srcWidth);//保持长宽比，取小的一个
-        exceptWidth=(int)(srcWidth*ratio)+FloatImageView.pad*2;
-        exceptHeight=(int)(srcHeight*ratio)+FloatImageView.pad*2;
+        exceptWidth=Math.round(srcWidth*ratio)+FloatImageView.pad*2;
+        exceptHeight=Math.round(srcHeight*ratio)+FloatImageView.pad*2;
         FrameLayout.LayoutParams parmas=new FrameLayout.LayoutParams(exceptWidth,exceptHeight);
 
         //位置，随机数，需要图片范围内
-        int mleft=(int)(Math.random()*(picBound.width()-exceptWidth));
-        int mtop=(int)(Math.random()*(picBound.height()-exceptHeight));
+        int mleft=(int)Math.round(Math.random()*(picBound.width()-exceptWidth));
+        int mtop=(int)Math.round(Math.random()*(picBound.height()-exceptHeight));
         parmas.leftMargin=picBound.left+mleft;
         parmas.topMargin=picBound.top+mtop;
         return parmas;

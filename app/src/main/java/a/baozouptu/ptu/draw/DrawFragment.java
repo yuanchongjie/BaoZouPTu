@@ -16,7 +16,7 @@ public class DrawFragment extends Fragment implements DrawBaseFunction {
     }
 
     @Override
-    public void redo() {
+    public void redo(StepData sd) {
 
     }
 

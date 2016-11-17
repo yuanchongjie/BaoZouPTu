@@ -17,6 +17,7 @@ public class LaunchActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new InstallPolicy().processPolicy();
+//        Bmob.initialize(this,"3000c4af659e92854854c5b10f0824a2");
         test();
         this.finish();
     }

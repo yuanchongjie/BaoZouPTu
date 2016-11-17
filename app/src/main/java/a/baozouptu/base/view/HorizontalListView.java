@@ -236,7 +236,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
     private EdgeEffectCompat mEdgeGlowRight;
 
     /**
-     * The height measure spec for this view, used to help size children views
+     * The height measure spec for this view, used to help fixed_size children views
      */
     private int mHeightMeasureSpec;
 
@@ -529,7 +529,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
     }
 
     /**
-     * Adds a child to this viewgroup and measures it so it renders the correct size
+     * Adds a child to this viewgroup and measures it so it renders the correct fixed_size
      */
     private void addAndMeasureChild(final View child, int viewPos) {
         LayoutParams params = getLayoutParams(child);
@@ -784,7 +784,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
         // Loop removing the leftmost child, until that child is on the screen
         while (child != null && child.getRight() + dx <= 0) {
             // The child is being completely removed so remove its width from the display offset and its divider if it has one.
-            // To remove add the size of the child and its divider (if it has one) to the offset.
+            // To remove add the fixed_size of the child and its divider (if it has one) to the offset.
             // You need to add since its being removed from the left side, i.e. shifting the offset to the right.
             mDisplayOffset += isLastItemInAdapter(mLeftViewAdapterIndex) ? child.getMeasuredWidth() : mDividerWidth + child.getMeasuredWidth();
 
@@ -870,7 +870,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
                 // Layout the child
                 child.layout(left, top, right, bottom);
 
-                // Increment our offset by added child's size and divider width
+                // Increment our offset by added child's fixed_size and divider width
                 leftOffset += child.getMeasuredWidth() + mDividerWidth;
             }
         }
