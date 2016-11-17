@@ -12,6 +12,8 @@ import android.widget.FrameLayout;
 import a.baozouptu.base.util.GeoUtil;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.FloatView;
+import a.baozouptu.ptu.cut.CutFrame;
+import a.baozouptu.ptu.cut.CutView;
 import a.baozouptu.ptu.text.FloatTextView;
 import a.baozouptu.ptu.tietu.TietuFrameLayout;
 
@@ -54,11 +56,11 @@ public class PtuFrameLayout extends FrameLayout {
 
         //设置布局
         FrameLayout.LayoutParams floatParams =
-                new FrameLayout.LayoutParams((int) floatView.getmWidth(), (int) floatView.getmHeight());
+                new FrameLayout.LayoutParams(Math.round(floatView.getmWidth()), Math.round(floatView.getmHeight()));
 
-        floatParams.setMargins((int) floatView.getfLeft(), (int) floatView.getfTop(),
-                (int) (floatView.getfLeft() + floatView.getmWidth()),
-                (int) (floatView.getfTop() + floatView.getmHeight()));
+        floatParams.setMargins(Math.round(floatView.getfLeft()), Math.round(floatView.getfTop()),
+                Math.round(floatView.getfLeft() + floatView.getmWidth()),
+                Math.round(floatView.getfTop() + floatView.getmHeight()));
         addView((View) floatView, floatParams);
         return (FloatTextView) floatView;
     }
@@ -155,17 +157,17 @@ public class PtuFrameLayout extends FrameLayout {
 
             float sx = ev.getX(), sy = ev.getY();
             if (childView instanceof FloatView &&
-                            new RectF(childView.getLeft(), childView.getTop(),
-                                    childView.getLeft() + childView.getWidth(), childView.getTop() + childView.getHeight())
-                                    .contains(sx, sy) ) //是浮动图，这判断是否在内部
-                    {
+                    new RectF(childView.getLeft(), childView.getTop(),
+                            childView.getLeft() + childView.getWidth(), childView.getTop() + childView.getHeight())
+                            .contains(sx, sy)) //是浮动图，这判断是否在内部
+            {
                 ev.setLocation(sx - childView.getLeft(), sy - childView.getTop());
                 isConsume = childView.dispatchTouchEvent(ev);
                 if (isConsume)//消费了up事件，up置为true
                     hasUp = true;
-            }else if(!(childView instanceof  FloatView)){//如果不是浮动图
+            } else if (!(childView instanceof FloatView)) {//如果不是浮动图
                 ev.setLocation(sx - childView.getLeft(), sy - childView.getTop());
-                isConsume=childView.dispatchTouchEvent(ev);
+                isConsume = childView.dispatchTouchEvent(ev);
             }
             //没有消费才分发事件，不然就不分发
             if (!isConsume) {
@@ -183,19 +185,19 @@ public class PtuFrameLayout extends FrameLayout {
      */
     public void changeLocation() {
         FrameLayout.LayoutParams floatParams =
-                new FrameLayout.LayoutParams((int) floatView.getmWidth(),
-                        (int) floatView.getmHeight());
-        floatParams.setMargins((int) floatView.getfLeft(), (int) floatView.getfTop(),
-                (int) (floatView.getfLeft() + floatView.getmWidth()),
-                (int) (floatView.getfTop() + floatView.getmHeight()));
+                new FrameLayout.LayoutParams(Math.round(floatView.getmWidth()),
+                        Math.round(floatView.getmHeight()));
+        floatParams.setMargins(Math.round(floatView.getfLeft()), Math.round(floatView.getfTop()),
+                Math.round(floatView.getfLeft() + floatView.getmWidth()),
+                Math.round(floatView.getfTop() + floatView.getmHeight()));
         updateViewLayout((View) floatView, floatParams);
     }
 
     public TietuFrameLayout initAddImageFloat(Rect bound) {
-        TietuFrameLayout tietuFrameLayout=new TietuFrameLayout(getContext());
-        FrameLayout.LayoutParams layoutParams=new FrameLayout.LayoutParams(bound.width(),bound.height(), Gravity.CENTER);
+        TietuFrameLayout tietuFrameLayout = new TietuFrameLayout(getContext());
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(bound.width(), bound.height(), Gravity.CENTER);
         tietuFrameLayout.setBackgroundColor(0x0000);
-        addView(tietuFrameLayout,layoutParams);
+        addView(tietuFrameLayout, layoutParams);
         return tietuFrameLayout;
     }
 }

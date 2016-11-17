@@ -1,7 +1,9 @@
 package a.baozouptu.ptu.view;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +31,6 @@ public class PtuTopRelativeLayout extends RelativeLayout {
     private LayoutParams leftParams;
     private LinearLayout returnLayout;
     private LinearLayout saveLayout;
-    private LayoutParams saveParams;
 
     public PtuTopRelativeLayout(Context context) {
         super(context);
@@ -41,7 +42,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
         mContext = context;
     }
 
-    private ImageButton createBaseToolbarBtn(int width) {
+    private ImageButton createBaseToolbarBtn() {
         ImageButton button = new ImageButton(mContext);
         button.setBackground(Util.getDrawable(R.drawable.btn_pressable_background_oval));
         return button;
@@ -50,10 +51,9 @@ public class PtuTopRelativeLayout extends RelativeLayout {
     /**
      * @param top_btn_width 宽度
      * @param dividerWidth  左边距
-     * @return
      */
     public ImageButton createCancel(int top_btn_width, int dividerWidth) {
-        cancel = createBaseToolbarBtn(top_btn_width);
+        cancel = createBaseToolbarBtn();
         cancel.setImageBitmap(IconBitmapCreator.createCancelBitmap(
                 top_btn_width,
                 Util.getColor(R.color.cancel_btn)));
@@ -62,7 +62,8 @@ public class PtuTopRelativeLayout extends RelativeLayout {
             leftParams.setMargins(dividerWidth, 0, 0, 0);
             leftParams.addRule(RelativeLayout.CENTER_VERTICAL);
             leftParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-            leftParams.addRule(RelativeLayout.ALIGN_PARENT_START);
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN)
+                leftParams.addRule(RelativeLayout.ALIGN_PARENT_START);
         }
         return cancel;
     }
@@ -78,7 +79,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
         removeView(cancel);
     }
 
-    public View createReturn(int top_btn_width, int dividerWidth) {
+    public View createReturn(int top_btn_width) {
         returnLayout = (LinearLayout) LayoutInflater.from(mContext)
                 .inflate(R.layout.layout_ptu_return, null);
         returnLayout.setBackground(Util.getDrawable(R.drawable.btn_pressable_background_rectangle));
@@ -105,7 +106,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
         removeView(returnLayout);
     }
 
-    public View createSaveSet(int top_btn_width, int dividerWidth) {
+    public View createSaveSet() {
         saveLayout = (LinearLayout) LayoutInflater.from(mContext)
                 .inflate(R.layout.layout_ptu_save_set, null);
         saveLayout.setBackground(Util.getDrawable(R.drawable.btn_pressable_background_rectangle));
@@ -117,7 +118,8 @@ public class PtuTopRelativeLayout extends RelativeLayout {
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.CENTER_VERTICAL);
         params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        params.addRule(RelativeLayout.ALIGN_PARENT_END);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN)
+            params.addRule(RelativeLayout.ALIGN_PARENT_END);
         params.setMargins(0, 0, Util.dp2Px(16), 0);
         if (saveLayout.getParent() != null) {
             ((ViewGroup) saveLayout.getParent()).removeView(saveLayout);
@@ -131,7 +133,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
 
     public ImageButton createSure(int top_btn_width, int dividerWidth) {
 //        添加最右边的按钮
-        sure = createBaseToolbarBtn(top_btn_width);
+        sure = createBaseToolbarBtn();
         sure.setImageBitmap(IconBitmapCreator.createSureBitmap(
                 top_btn_width,
                 Util.getColor(R.color.sure_btn)));
@@ -140,10 +142,12 @@ public class PtuTopRelativeLayout extends RelativeLayout {
             rightParams.setMargins(0, 0, dividerWidth, 0);
             rightParams.addRule(RelativeLayout.CENTER_VERTICAL);
             rightParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            rightParams.addRule(RelativeLayout.ALIGN_END);
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN)
+                rightParams.addRule(RelativeLayout.ALIGN_END);
         }
         return sure;
     }
+
     public void addSure() {
         if (sure.getParent() != null) {
             ((ViewGroup) sure.getParent()).removeView(sure);
@@ -180,7 +184,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
     public ImageButton[] createCenterView(int topBtnWidth, int dividerWidth) {
         ImageButton[] btns = new ImageButton[3];
         LinearLayout linearLayout = (LinearLayout) findViewById(R.id.ptu_top_center);
-        repealBtn = createBaseToolbarBtn(topBtnWidth);
+        repealBtn = createBaseToolbarBtn();
         canRepealBm = IconBitmapCreator.createRepealBitmap(
                 topBtnWidth,
                 Util.getColor(R.color.can_repeal_redo));
@@ -193,7 +197,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
 
         //设置repeal和redo的button
         addDivider(linearLayout, dividerWidth);
-        redoBtn = createBaseToolbarBtn(topBtnWidth);
+        redoBtn = createBaseToolbarBtn();
         canRedoBm = IconBitmapCreator.createRedoBitmap(
                 topBtnWidth,
                 Util.getColor(R.color.can_repeal_redo));
@@ -208,7 +212,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
 
         //去发送按钮
         addDivider(linearLayout, dividerWidth);
-        ImageButton goSend = createBaseToolbarBtn(topBtnWidth);
+        ImageButton goSend = createBaseToolbarBtn();
         goSend.setImageBitmap(IconBitmapCreator.createSendBitmap(
                 topBtnWidth,
                 Util.getColor(R.color.can_repeal_redo)));

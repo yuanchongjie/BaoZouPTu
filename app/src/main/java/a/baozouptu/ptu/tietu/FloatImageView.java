@@ -1,6 +1,5 @@
 package a.baozouptu.ptu.tietu;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -26,7 +25,7 @@ import a.baozouptu.ptu.view.IconBitmapCreator;
 public class FloatImageView extends ImageView {
     private static final String TAG = "FloatImageView";
     public static int pad = Util.dp2Px(10);
-    private static Bitmap bitmap = IconBitmapCreator.createCancelBitmap(pad * 2, Color.WHITE, Util.getColor(R.color.mat_pen_line2));
+    private static Bitmap iconBitmap = IconBitmapCreator.createCancelBitmap(pad * 2, Color.WHITE, Util.getColor(R.color.mat_pen_line2));
     public static final int minWidth = 9;
     public static final int minHeight = 16;
     MicroButtonData[] items;
@@ -38,7 +37,7 @@ public class FloatImageView extends ImageView {
     private Path rim;
     private Paint rimPaint;
     private String picPath;
-    private Bitmap mBitmap;
+    private Bitmap srcBitmap;
 
     public FloatImageView(Context context) {
         super(context);
@@ -60,7 +59,7 @@ public class FloatImageView extends ImageView {
     private void initItem() {
         items = new MicroButtonData[8];
         items[2] = new MicroButtonData(-1, -1, " ");
-        items[2].bitmap = FloatImageView.bitmap;
+        items[2].bitmap = FloatImageView.iconBitmap;
         itemPaint = new Paint();
         itemPaint.setAntiAlias(true);
         itemPaint.setDither(true);
@@ -75,12 +74,6 @@ public class FloatImageView extends ImageView {
         rimPaint.setStrokeWidth(7f);
         rimPaint.setColor(0xa0ffffff);
         rimPaint.setStyle(Paint.Style.STROKE);
-    }
-
-    @Override
-    public void setImageBitmap(Bitmap bm) {
-        mBitmap=bm;
-        super.setImageBitmap(bm);
     }
 
     /**
@@ -112,7 +105,7 @@ public class FloatImageView extends ImageView {
         if (!showRim) return false;//边框没显示出来，返回false
         RectF itemBound = new RectF();
 //        item方面的,取消item
-        int r = (int)(getPaddingTop()*1.5);
+        int r = Math.round(getPaddingTop()*1.5f);
         itemBound.left = getWidth() - r * 2;
         itemBound.top = 0;
         itemBound.right = getWidth();
@@ -152,17 +145,9 @@ public class FloatImageView extends ImageView {
         }
     }
 
-    public Bitmap getSourceBitmap() {
-
-        return BitmapTool.getLosslessBitmap(picPath);
-    }
-
-    public void setSourceBitmap(Activity activity, String path) {
-        setImageBitmap(TietuSizeControler.getSrcBitmap(activity, path));
-    }
-
     public void releaseResourse() {
-
+        if(srcBitmap!=null)   srcBitmap.recycle();
+        srcBitmap =null;
     }
 
 
@@ -175,6 +160,12 @@ public class FloatImageView extends ImageView {
      * @return 获取高除以宽的比
      */
     public float getHWRatio(){
-        return mBitmap.getHeight()*1f/mBitmap.getWidth();
+        return srcBitmap.getHeight()*1f/srcBitmap.getWidth();
+    }
+
+    public void setImageBitmapAndPath(Bitmap srcBitmap, String path) {
+        this.srcBitmap =srcBitmap;
+        picPath=path;
+        setImageBitmap(srcBitmap);
     }
 }

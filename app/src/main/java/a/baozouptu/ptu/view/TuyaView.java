@@ -241,7 +241,7 @@ public class TuyaView extends View{
     }
     //选择画笔大小
     public void selectPaintSize(int which) {
-        //int size = Integer.parseInt(this.getResources().getStringArray(R.array.paintsize)[which]);
+        //int fixed_size = Integer.parseInt(this.getResources().getStringArray(R.array.paintsize)[which]);
         currentSize = which;
         setPaintStyle();
     }

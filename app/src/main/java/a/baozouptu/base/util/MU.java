@@ -3,9 +3,8 @@ package a.baozouptu.base.util;
 import java.math.BigDecimal;
 
 /**
- * Created by liuguicen on 2016/8/4.
+ * 高精度运算
  *
- * @description
  */
 public class MU {
     //默认除法运算精度

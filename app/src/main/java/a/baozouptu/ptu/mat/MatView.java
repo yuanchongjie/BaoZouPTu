@@ -2,6 +2,7 @@ package a.baozouptu.ptu.mat;
 
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.view.MotionEvent;
@@ -34,14 +35,14 @@ public class MatView extends PtuView {
 
     /**
      * 必须在
-     *
+     *@param  sourceBitmap 显示的图片
      * @param totalBound 整个PtuFragment的bound
      */
-    public MatView(Context context, Rect totalBound) {
-        super(context);
+    public MatView(Context context, Bitmap sourceBitmap,Rect totalBound) {
+        super(context,sourceBitmap,totalBound);
 
         mContext = context;
-        this.totalBound = new Rect(totalBound);
+        this.totalBound = totalBound;
         CUR_STATUS = PEN;
         pen = new Pen(context, totalBound);
         matPathManager = new MatPathManager();

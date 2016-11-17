@@ -1,27 +1,47 @@
 package person.lgc.test;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
+import android.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.Toast;
-
-import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
+    boolean isIn = false;
+    boolean isShow=true;
+    Fragment fragment;
+    FragmentManager fm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final ImageView imageView=(ImageView) findViewById(R.id.show_pic_file);
-        imageView.setOnClickListener(new View.OnClickListener() {
+
+        fragment = new MyFragment();
+        fm = getFragmentManager();
+        findViewById(R.id.show_pic_file).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this,"x= "+imageView.getX()+" Y= "+imageView.getY(),Toast.LENGTH_LONG).show();
-                imageView.setRotation((imageView.getRotation()+15)%180);
+                if (!isIn) {
+                    fm.beginTransaction().add(R.id.fragment, fragment).commit();
+                    isIn=true;
+                } else {
+                    isIn=false;
+                    fm.beginTransaction().remove(fragment).commit();
+                }
+            }
+        });
+        findViewById(R.id.hide).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isIn&&isShow){
+                    fm.beginTransaction().hide(fragment).commit();
+                    isShow=false;
+                }else if(isIn) {
+                    fm.beginTransaction().show(fragment).commit();
+                    isShow=true;
+                }
             }
         });
     }
-
 }

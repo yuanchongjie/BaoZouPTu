@@ -4,6 +4,7 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.provider.Telephony;
 
 /**
  * 几何操作的工具
@@ -18,8 +19,8 @@ public class GeoUtil {
     /**
      * 利用matrix进行缩放
      *
-     * @param scalingX      被缩放的x
-     * @param scalingY      被缩放的y
+     * @param scalingX     被缩放的x
+     * @param scalingY     被缩放的y
      * @param scaleCenterX 缩放中心x
      * @param scaleCenterY 缩放中心y
      * @param scale        缩放倍数
@@ -39,8 +40,8 @@ public class GeoUtil {
     /**
      * 利用matrix进行缩放
      *
-     * @param scalingX      被缩放的x
-     * @param scalingY      被缩放的y
+     * @param scalingX     被缩放的x
+     * @param scalingY     被缩放的y
      * @param scaleCenterX 缩放中心x
      * @param scaleCenterY 缩放中心y
      * @param scale        缩放倍数
@@ -58,9 +59,23 @@ public class GeoUtil {
     }
 
     public static Rect rectF2Rect(RectF rf) {
-        return new Rect((int) rf.left, (int) rf.top, (int) rf.right, (int) rf.bottom);
+        return new Rect(Math.round(rf.left), Math.round(rf.top), Math.round(rf.right), Math.round(rf.bottom));
     }
 
+    /**
+     * 高精度计算缩放后的坐标
+     * @param xy    存放缩放后的坐标
+     * @param cx    缩放中心的x坐标
+     * @param cy    缩放中心的y坐标
+     * @param bx    被缩放点的x坐标
+     * @param by    被缩放点的x坐标
+     * @param ratio 缩放比例
+     */
+    public static void getScaledCoord(float[] xy, float cx, float cy, float bx, float by, float ratio) {
+        //中心的坐标
+        xy[0] = Float.valueOf(MU.su(cx, MU.mu(MU.su(cx, String.valueOf(bx)), ratio)));
+        xy[1] = Float.valueOf(MU.su(cy, MU.mu(MU.su(cy, String.valueOf(by)), ratio)));
+    }
     /**
      * 非水平的矩形,可以为斜的的那种矩形，注意构造时必须按顺时针或逆时针放入四个点
      * Created by Administrator on 2016/5/31.
@@ -111,40 +126,50 @@ public class GeoUtil {
         }
 
         public UnLevelRect(UnLevelRect t) {
-            x1=t.x1;y1=t.y1;
-            x2=t.x2;y2=t.y2;
-            x3=t.x3;y3=t.y3;
-            x4=t.x4;y4=t.y4;
+            x1 = t.x1;
+            y1 = t.y1;
+            x2 = t.x2;
+            y2 = t.y2;
+            x3 = t.x3;
+            y3 = t.y3;
+            x4 = t.x4;
+            y4 = t.y4;
         }
+
         /**
          * 举行旋转一定的角度形成的非水平矩形
+         *
          * @param angle 旋转的角度
          */
-        public static UnLevelRect getUnLeveRectByRotate(RectF r,float angle){
-            PointF co=new PointF((r.left+r.right)/2,(r.top+r.bottom)/2);
-            PointF p0=getCooderAfterRotate(new PointF(r.left,r.top),co,angle);
-            PointF p1=getCooderAfterRotate(new PointF(r.right,r.top),co,angle);
-            PointF p2=getCooderAfterRotate(new PointF(r.left,r.bottom),co,angle);
-            PointF p3=getCooderAfterRotate(new PointF(r.right,r.bottom),co,angle);
-            return new UnLevelRect(p0,p1,p2,p3);
+        public static UnLevelRect getUnLeveRectByRotate(RectF r, float angle) {
+            PointF co = new PointF((r.left + r.right) / 2, (r.top + r.bottom) / 2);
+            PointF p0 = getCooderAfterRotate(new PointF(r.left, r.top), co, angle);
+            PointF p1 = getCooderAfterRotate(new PointF(r.right, r.top), co, angle);
+            PointF p2 = getCooderAfterRotate(new PointF(r.left, r.bottom), co, angle);
+            PointF p3 = getCooderAfterRotate(new PointF(r.right, r.bottom), co, angle);
+            return new UnLevelRect(p0, p1, p2, p3);
         }
 
         public void set(PointF p1, PointF p2, PointF p3, PointF p4) {
             set(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y);
         }
 
-        public float getLeft(){
-            return Math.min(Math.min(x1,x2),Math.min(x3,x4));
+        public float getLeft() {
+            return Math.min(Math.min(x1, x2), Math.min(x3, x4));
         }
-        public float getRight(){
-            return Math.max(Math.max(x1,x2),Math.max(x3,x4));
+
+        public float getRight() {
+            return Math.max(Math.max(x1, x2), Math.max(x3, x4));
         }
-        public float getTop(){
-            return Math.min(Math.min(y1,y2),Math.min(y3,y4));
+
+        public float getTop() {
+            return Math.min(Math.min(y1, y2), Math.min(y3, y4));
         }
-        public float getButtom(){
-            return Math.max(Math.max(y1,y2),Math.max(y3,y4));
+
+        public float getButtom() {
+            return Math.max(Math.max(y1, y2), Math.max(y3, y4));
         }
+
         public void set(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
             this.x1 = x1;
             this.y2 = y2;

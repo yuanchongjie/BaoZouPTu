@@ -6,7 +6,7 @@
             android:shape="oval"
             android:useLevel="false">
             <solid android:color="@color/colorPrimary" />
-           <!-- <size
+           <!-- <fixed_size
                 android:width="@dimen/list_item_width_save_set"
                 android:height="@dimen/list_item_width_save_set" />-->
         </shape>

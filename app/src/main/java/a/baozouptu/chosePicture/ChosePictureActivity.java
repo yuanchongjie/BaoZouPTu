@@ -92,10 +92,10 @@ public class ChosePictureActivity extends AppCompatActivity {
         Handler handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
+                m_ProgressDialog.dismiss();// 表示此处开始就解除这个进度条Dialog，应该是在相对起始线程的另一个中使用
                 if (msg.obj.equals("change_pic")) {
                     if (isFirst) {
                         pictureGridview.setAdapter(picAdpter);
-                        m_ProgressDialog.dismiss();// 表示此处开始就解除这个进度条Dialog，应该是在相对起始线程的另一个中使用
                         isFirst = false;
                     } else {
                         picAdpter.notifyDataSetChanged();
@@ -200,9 +200,8 @@ public class ChosePictureActivity extends AppCompatActivity {
                 Intent sourceIntent = getIntent();
                 if (sourceIntent != null) {
                     String s = sourceIntent.getAction();
-                    if (s != null && s.equals("tietu")) {//是来自选择贴图，不是选择的贴图
+                    if (s != null && s.equals("tietu")) {//选择贴图,不是一般的选择图片
                         Intent intent1 = new Intent();
-                        Util.P.le(TAG, currentPicPathList.get(position));
                         intent1.putExtra("pic_path", currentPicPathList.get(position));
                         setResult(3, intent1);
                         ChosePictureActivity.this.finish();
@@ -451,6 +450,7 @@ public class ChosePictureActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         usuPicProcessor.getAllPicInfoAndRecent();
+        picAdpter.notifyDataSetChanged();
         super.onResume();
     }
 
@@ -470,7 +470,7 @@ public class ChosePictureActivity extends AppCompatActivity {
                         usuPicProcessor.addRecentPath(new_path);
                         picAdpter.notifyDataSetChanged();
                     }
-                } else {//不是常用的图片，是文件中的图片，则更新文件
+                } else {//不是常用的图片，是文件夹中的图片，则更新文件
                     String new_path = data.getStringExtra("new_path");
                     if (new_path != null) {
                         currentPicPathList.add(0, new_path);
@@ -524,7 +524,7 @@ public class ChosePictureActivity extends AppCompatActivity {
     }
     @Override
     protected void onRestart() {
-        AsyncImageLoader3.getInstance().reStart();
+        //AsyncImageLoader3.getInstance().reStart();
         super.onRestart();
     }
 
