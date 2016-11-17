@@ -208,7 +208,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                beforeFinish();
                 PtuActivity.this.finish();
             }
         });
@@ -284,7 +283,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        beforeFinish();
                         PtuActivity.this.finish();
                     }
                 }
@@ -608,20 +606,13 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     @Override
     public void onBackPressed() {
-
         if (CURRENT_EDIT_MODE != EDIT_MAIN) {
             cancel();
         } else {
-            beforeFinish();
             super.onBackPressed();
         }
     }
 
-    private void beforeFinish() {
-//        if (mProgressDialog!=null&&mProgressDialog.isShowing()) mProgressDialog.dismiss();
-        if (repealRedoManager != null)
-            repealRedoManager.clear(this);
-    }
 
     /**
      * 会完成点击sure之后的所有工作
@@ -734,7 +725,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         Intent resultIntent = new Intent(mAction);
         resultIntent.putExtras(bundle);
         setResult(0, resultIntent);
-        beforeFinish();
         finish();
         if (isGoSend) {
             overridePendingTransition(0, R.anim.go_send_exit);
@@ -753,6 +743,8 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     protected void onDestroy() {
         if(ptuView!=null)
             ptuView.releaseResource();
+        if (repealRedoManager != null)
+            repealRedoManager.clear(this);
         super.onDestroy();
     }
 }

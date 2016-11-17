@@ -130,7 +130,6 @@ public class BitmapTool {
             return bitmap.getAllocationByteCount();
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1)  //API 12
-
         {
             return bitmap.getByteCount();
         }
