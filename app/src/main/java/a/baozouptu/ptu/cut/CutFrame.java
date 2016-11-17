@@ -2,7 +2,6 @@ package a.baozouptu.ptu.cut;
 
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
@@ -26,14 +25,10 @@ public class CutFrame {
     /**
      * 最小剪切框的宽度
      */
-    static final float MIN_WIDTH = Util.dp2Px(75);
+    private static final float MIN_AREA = Util.dp2Px(3600);
     private final static int EXTENSE_LENGTH = Util.dp2Px(4);
 
     private final Rect totalBound;
-    /**
-     * 位置和宽高
-     */
-    private float mLeft, mTop, mWidth, mHeight;
     /**
      * frame的位置和宽高
      */
@@ -49,8 +44,7 @@ public class CutFrame {
     private final Paint textPaint;
     private RectF rect;
     private final Paint mLumpPaint;
-    private final Paint noChosedPaint;
-    private int color;
+    private final Paint noChoosedPaint;
     private float lastX = -1, lastY = -1;
     private MOVESTATE CUR_STATA;
     private CutView cutView;
@@ -58,14 +52,6 @@ public class CutFrame {
     float lastCenterX, lastCenterY;
     private int fixedWidth, fixedHeight;
     private float fixedRatio;
-
-    boolean isFixedSize() {
-        return fixedWidth>0;
-    }
-
-    int getFixedWidth() {
-        return fixedWidth;
-    }
 
 
     private enum MOVESTATE {
@@ -85,12 +71,11 @@ public class CutFrame {
         this.cutView = cutView;
         this.totalBound = totalBound;
         CUR_STATA = MOVESTATE.NONE;
-        color = Util.getColor(R.color.cut_frame);
-        color = Color.WHITE;
-        frameLeft = mLeft = cutView.getDstRect().left;
-        frameTop = mTop = cutView.getDstRect().top;
-        frameWidth = mWidth = cutView.getDstRect().width() / 2;
-        frameHeight = mHeight = cutView.getDstRect().height() / 2;
+        int color = Util.getColor(R.color.cut_frame);
+        frameLeft=cutView.getDstRect().left;
+        frameTop=cutView.getDstRect().top;
+        frameWidth=cutView.getDstRect().width();
+        frameHeight=cutView.getDstRect().height();
 
         mLinePaint = new Paint();
         mLinePaint.setAntiAlias(true);
@@ -103,8 +88,8 @@ public class CutFrame {
         mLumpPaint.setDither(true);
         mLumpPaint.setColor(color);
 
-        noChosedPaint = new Paint();
-        noChosedPaint.setColor(Util.getColor(R.color.half_transparent_black));
+        noChoosedPaint = new Paint();
+        noChoosedPaint.setColor(Util.getColor(R.color.half_transparent_black));
 
         textPaint = new Paint();//显示尺寸的文字
         textPaint.setTextSize(20);
@@ -127,11 +112,23 @@ public class CutFrame {
      * 初始化CutFrame,开始或重置时调用
      */
     void reInit() {
+        fixedRatio = -1;
+        fixedHeight = -1;
+        fixedWidth = -1;
         frameLeft = cutView.getDstRect().left;
         frameTop = cutView.getDstRect().top;
         frameWidth = cutView.getDstRect().width();
         frameHeight = cutView.getDstRect().height();
     }
+
+    boolean isFixedSize() {
+        return fixedWidth > 0;
+    }
+
+    int getFixedWidth() {
+        return fixedWidth;
+    }
+
 
     /**
      * 只会处理移动的情况，其它情况它不处理
@@ -146,10 +143,7 @@ public class CutFrame {
 
                 //中间位置
                 rect.set(frameWidth / 3, frameHeight / 3, frameWidth * 2 / 3, frameHeight * 2 / 3);
-                rect.left -= EXTENSE_LENGTH;
-                rect.right += EXTENSE_LENGTH;
-                rect.top -= EXTENSE_LENGTH;
-                rect.bottom += EXTENSE_LENGTH;
+                rect.inset(-EXTENSE_LENGTH, -EXTENSE_LENGTH);
                 if (rect.contains(frameX, frameY)) {
                     CUR_STATA = MOVESTATE.CENTER;
                     onTouch = true;
@@ -160,10 +154,7 @@ public class CutFrame {
                 // 左上角
                 rect.set(-cornerWidth, -cornerWidth,
                         cornerWidth, 0 + cornerWidth);
-                rect.left -= EXTENSE_LENGTH;
-                rect.right += EXTENSE_LENGTH;
-                rect.top -= EXTENSE_LENGTH;
-                rect.bottom += EXTENSE_LENGTH;
+                rect.inset(-EXTENSE_LENGTH, -EXTENSE_LENGTH);
                 if (rect.contains(frameX, frameY)) {
                     CUR_STATA = MOVESTATE.LEFT_TOP;
                     onTouch = true;
@@ -172,10 +163,7 @@ public class CutFrame {
                 //右上
                 rect.set(frameWidth - cornerWidth, -cornerWidth,
                         frameWidth + cornerWidth, 0 + cornerWidth);
-                rect.left -= EXTENSE_LENGTH;
-                rect.right += EXTENSE_LENGTH;
-                rect.top -= EXTENSE_LENGTH;
-                rect.bottom += EXTENSE_LENGTH;
+                rect.inset(-EXTENSE_LENGTH, -EXTENSE_LENGTH);
                 if (rect.contains(frameX, frameY)) {
                     CUR_STATA = MOVESTATE.RIGHT_TOP;
                     onTouch = true;
@@ -184,10 +172,7 @@ public class CutFrame {
                 //左下
                 rect.set(-cornerWidth, frameHeight - cornerWidth,
                         cornerWidth, frameHeight + cornerWidth);
-                rect.left -= EXTENSE_LENGTH;
-                rect.right += EXTENSE_LENGTH;
-                rect.top -= EXTENSE_LENGTH;
-                rect.bottom += EXTENSE_LENGTH;
+                rect.inset(-EXTENSE_LENGTH, -EXTENSE_LENGTH);
                 if (rect.contains(frameX, frameY)) {
                     CUR_STATA = MOVESTATE.LEFT_BOTTOM;
                     onTouch = true;
@@ -196,10 +181,7 @@ public class CutFrame {
                 //右下
                 rect.set(frameWidth - cornerWidth, frameHeight - cornerWidth,
                         frameWidth + cornerWidth, frameHeight + cornerWidth);
-                rect.left -= EXTENSE_LENGTH;
-                rect.right += EXTENSE_LENGTH;
-                rect.top -= EXTENSE_LENGTH;
-                rect.bottom += EXTENSE_LENGTH;
+                rect.inset(-EXTENSE_LENGTH, -EXTENSE_LENGTH);
                 if (rect.contains(frameX, frameY)) {
                     CUR_STATA = MOVESTATE.RIGHT_BOTTOM;
                     onTouch = true;
@@ -207,59 +189,41 @@ public class CutFrame {
                 }
 
                 //四边
-                //四条边上,
-                if (fixedRatio > 0) {//固定尺寸和比例不用点击边框，详见setFixedRatio方法
+                //四条边上
+                rect.set(-edgeWidth, -edgeWidth * 3 / 4, edgeWidth, edgeWidth * 3 / 4);
+                //上
+                rect.offset(frameWidth / 2, 0);
+                rect.inset(-EXTENSE_LENGTH, -EXTENSE_LENGTH);
+                if (rect.contains(frameX, frameY)) {
+                    CUR_STATA = MOVESTATE.TOP;
+                    onTouch = true;
+                    break;
+                }
+                //下
+                rect.offset(0, frameHeight);
+                //不扩大，前面以扩大
+                if (rect.contains(frameX, frameY)) {
+                    CUR_STATA = MOVESTATE.BOTTOM;
+                    onTouch = true;
+                    break;
+                }
 
-                    rect.left = -edgeWidth;
-                    rect.right = edgeWidth;
-                    rect.top = -edgeWidth * 3 / 4;
-                    rect.bottom = edgeWidth * 3 / 4;
-                    //上
-                    rect.offset(frameWidth / 2, 0);
-                    rect.left -= EXTENSE_LENGTH;
-                    rect.right += EXTENSE_LENGTH;
-                    rect.top -= EXTENSE_LENGTH;
-                    rect.bottom += EXTENSE_LENGTH;
-                    if (rect.contains(frameX, frameY)) {
-                        CUR_STATA = MOVESTATE.TOP;
-                        onTouch = true;
-                        break;
-                    }
-                    //下
-                    rect.offset(0, frameHeight);
-                    //不扩大，前面以扩大
-                    if (rect.contains(frameX, frameY)) {
-                        CUR_STATA = MOVESTATE.BOTTOM;
-                        onTouch = true;
-                        break;
-                    }
-
-                    rect.left = -edgeWidth * 3 / 4;
-                    rect.right = edgeWidth * 3 / 4;
-                    rect.top = -edgeWidth;
-                    rect.bottom = edgeWidth + 0;
-                    //右边
-                    rect.offset(frameWidth, frameHeight / 2);
-                    rect.left -= EXTENSE_LENGTH;
-                    rect.right += EXTENSE_LENGTH;
-                    rect.top -= EXTENSE_LENGTH;
-                    rect.bottom += EXTENSE_LENGTH;
-                    if (rect.contains(frameX, frameY)) {
-                        CUR_STATA = MOVESTATE.RIGHT;
-                        onTouch = true;
-                        break;
-                    }
-                    //左边
-                    rect.offset(-frameWidth, 0);
-                    rect.left -= EXTENSE_LENGTH;
-                    rect.right += EXTENSE_LENGTH;
-                    rect.top -= EXTENSE_LENGTH;
-                    rect.bottom += EXTENSE_LENGTH;
-                    if (rect.contains(frameX, frameY)) {
-                        CUR_STATA = MOVESTATE.LEFT;
-                        onTouch = true;
-                        break;
-                    }
+                //右边
+                rect.set(-edgeWidth * 3 / 4, -edgeWidth, edgeWidth * 3 / 4, edgeWidth + 0);
+                rect.offset(frameWidth, frameHeight / 2);
+                rect.inset(-EXTENSE_LENGTH, -EXTENSE_LENGTH);
+                if (rect.contains(frameX, frameY)) {
+                    CUR_STATA = MOVESTATE.RIGHT;
+                    onTouch = true;
+                    break;
+                }
+                //左边
+                rect.offset(-frameWidth, 0);
+                rect.inset(-EXTENSE_LENGTH, -EXTENSE_LENGTH);
+                if (rect.contains(frameX, frameY)) {
+                    CUR_STATA = MOVESTATE.LEFT;
+                    onTouch = true;
+                    break;
                 }
                 onTouch = false;
                 break;
@@ -272,100 +236,65 @@ public class CutFrame {
                     move(dx, dy);
                 } else {
                     if (fixedRatio > 0) {//固定缩放比的情况，取移动的短边进行变化
-                        if (dx < dy) {
-                            dy = dx * fixedRatio;
-                        } else {
-                            dx = dy / fixedRatio;
-                        }
+                        float[] dxy = calculateOffsetInFixedRatio(dx, dy);
+                        dx = dxy[0];
+                        dy = dxy[1];
                     }
                     switch (CUR_STATA) {
                         //四个角
                         case LEFT_TOP:
-                            if (frameWidth - dx >= MIN_WIDTH) {
-                                frameLeft += dx;
-                                frameWidth -= dx;//左边加多少，宽度减多少
-                                adjustEdge(frameLeft, frameTop, frameWidth, frameHeight);
-                                cutView.invalidate();
-                            }
-                            if (frameHeight - dy >= MIN_WIDTH) {
-                                frameTop += dy;
-                                frameHeight -= dy;//上边加多少，高度减多少
-                                adjustEdge(frameLeft, frameTop, frameWidth, frameHeight);
-                                cutView.invalidate();
-                            }
+                            if ((frameWidth - dx) * (frameHeight - dy) >= MIN_AREA) {
+                                addLeft(dx);
+                                addTop(dy);
+                            } //否则不管，多次移动中的小距离移动填补差值
                             break;
                         case RIGHT_TOP:
-                            if (frameWidth + dx >= MIN_WIDTH) {
-                                frameWidth += dx;//右边增加，及宽度增加
-                                adjustEdge(frameLeft, frameTop, frameWidth, frameHeight);
-                                cutView.invalidate();
-                            }
-                            if (frameHeight - dy >= MIN_WIDTH) {
-                                frameTop += dy;
-                                frameHeight -= dy;//上边加多少，高度减多少
-                                adjustEdge(frameLeft, frameTop, frameWidth, frameHeight);
-                                cutView.invalidate();
-                            }
+                            if ((frameWidth + dx) * (frameHeight - dy) >= MIN_AREA) {
+                                addRight(dx);
+                                addTop(dy);
+                            } //否则不管，多次移动中的小距离移动填补差值
+
                             break;
                         case LEFT_BOTTOM:
-                            if (frameWidth - dx >= MIN_WIDTH) {
-                                frameLeft += dx;
-                                frameWidth -= dx;//左边加多少，宽度减多少
-                                adjustEdge(frameLeft, frameTop, frameWidth, frameHeight);
-                                cutView.invalidate();
-                            }
-                            if (frameHeight + dy >= MIN_WIDTH) {
-                                frameHeight += dy;
-                                adjustEdge(frameLeft, frameTop, frameWidth, frameHeight);
-                                cutView.invalidate();
-                            }
+                            if ((frameWidth - dx) * (frameHeight + dy) >= MIN_AREA) {
+                                addLeft(dx);
+                                addBottom(dy);
+                            } //否则不管，多次移动中的小距离移动填补差值
+
                             break;
                         case RIGHT_BOTTOM:
-                            if (frameWidth + dx >= MIN_WIDTH) {
-                                frameWidth += dx;//右边增加，及宽度增加
-                                adjustEdge(frameLeft, frameTop, frameWidth, frameHeight);
-                                cutView.invalidate();
-                            }
-                            if (frameHeight + dy >= MIN_WIDTH) {
-                                frameHeight += dy;
-                                adjustEdge(frameLeft, frameTop, frameWidth, frameHeight);
-                                cutView.invalidate();
-                            }
+                            if ((frameWidth + dx) * (frameHeight + dy) >= MIN_AREA) {
+                                addRight(dx);
+                                addBottom(dy);
+                            } //否则不管，多次移动中的小距离移动填补差值
                             break;
 
                         //四条边
                         case LEFT:
-                            if (frameWidth - dx >= MIN_WIDTH) {
-                                frameLeft += dx;
-                                frameWidth -= dx;//左边加多少，宽度减多少
-                                adjustEdge(frameLeft, frameTop, frameWidth, frameHeight);
-                                cutView.invalidate();
+                            if ((frameWidth - dx) * frameHeight >= MIN_AREA) {
+                                addLeft(dx);
                             }
                             break;
                         case RIGHT:
-                            if (frameWidth + dx >= MIN_WIDTH) {
-                                frameWidth += dx;//右边增加，及宽度增加
-                                adjustEdge(frameLeft, frameTop, frameWidth, frameHeight);
-                                cutView.invalidate();
+                            if ((frameWidth + dx) * frameHeight >= MIN_AREA) {
+                                addRight(dx);
                             }
                             break;
                         case TOP:
-                            if (frameHeight - dy >= MIN_WIDTH) {
-                                frameTop += dy;
-                                frameHeight -= dy;//上边加多少，高度减多少
-                                adjustEdge(frameLeft, frameTop, frameWidth, frameHeight);
-                                cutView.invalidate();
+                            if ((frameHeight - dy) * frameWidth >= MIN_AREA) {
+                                addTop(dy);
                             }
                             break;
                         case BOTTOM:
-                            if (frameHeight + dy >= MIN_WIDTH) {
-                                frameHeight += dy;
-                                adjustEdge(frameLeft, frameTop, frameWidth, frameHeight);
-                                cutView.invalidate();
+                            if ((frameHeight + dy) * frameWidth >= MIN_AREA) {
+                                addBottom(dy);
                             }
                             break;
                     }
                 }
+                Util.P.le(TAG, frameWidth * frameHeight);
+                adjustEdge(frameLeft, frameTop, frameWidth, frameHeight);
+                cutView.invalidate();
                 lastX = x;
                 lastY = y;
                 break;
@@ -374,7 +303,7 @@ public class CutFrame {
                 //为CutView适配做准备
                 lastCenterX = frameX + frameWidth / 2;
                 lastCenterY = frameY + frameHeight / 2;
-                autoScalePic(CUR_STATA);
+                autoScalePic();
                 CUR_STATA = MOVESTATE.NONE;
                 onTouch = false;
                 break;
@@ -382,24 +311,9 @@ public class CutFrame {
         return onTouch;
     }
 
-    void move(float dx, float dy) {
-        //判断边界
-        if (frameLeft + dx < cutView.getDstRect().left) frameLeft = cutView.getDstRect().left;
-        else if (frameLeft + dx + frameWidth > cutView.getDstRect().right)
-            frameLeft = cutView.getDstRect().right - frameWidth;
-        else frameLeft += dx;
-
-        if (frameTop + dy < cutView.getDstRect().top) frameTop = cutView.getDstRect().top;
-        else if (frameTop + dy + frameHeight > cutView.getDstRect().bottom)
-            frameTop = cutView.getDstRect().bottom - frameHeight;
-        else
-            frameTop += dy;
-        adjustEdge(frameLeft, frameTop, frameWidth, frameHeight);
-        cutView.invalidate();
-    }
-
-    private void autoScalePic(MOVESTATE CUR_STATE) {
-        float ratio = 1;
+    private void autoScalePic() {
+        if (CUR_STATA == MOVESTATE.CENTER) return;//如果是中间移动，这不需要自动缩放
+        float ratio;
         //小于1/3或者大于2/3，自动缩放
         if (frameWidth < totalBound.width() * 1f / 3 && frameHeight < totalBound.height() * 1f / 3) {
             ratio = Math.min(totalBound.width() * 1f / 2 / frameWidth,
@@ -412,6 +326,7 @@ public class CutFrame {
         float centerX = frameLeft + frameWidth / 2;
         float centerY = frameTop + frameHeight / 2;
         ratio = adjustRatio(ratio);
+        if (Math.abs(ratio - 1) < 0.01) return;
         String[] pxy = cutView.getLocationAtPicture(centerX, centerY);
         cutView.scale(centerX, centerY, ratio);
         scale(centerX, centerY, ratio);
@@ -435,17 +350,73 @@ public class CutFrame {
      */
     private float adjustRatio(float ratio) {
         ratio = cutView.getUsableScaleSize(ratio);
-        if (ratio * frameWidth <= MIN_WIDTH) {
-            ratio = MIN_WIDTH / frameWidth;
+        if (frameWidth * ratio * frameHeight * ratio <= MIN_AREA) {
+            ratio = (float) Math.sqrt(MIN_AREA / (frameWidth * frameHeight));
         }
-        if (ratio * frameHeight <= MIN_WIDTH) {
-            ratio = MIN_WIDTH / frameHeight;
+        if (frameWidth * ratio > cutView.getDstRect().width()) {
+            ratio = cutView.getDstRect().width() / frameWidth;
+        }
+        if (frameHeight * ratio > cutView.getDstRect().height()) {
+            ratio = cutView.getDstRect().height() / frameHeight;
         }
         return ratio;
     }
 
     /**
-     * 适配并设置好位置和长宽
+     * 在固定比例的情况下重新计算位移值
+     */
+    private float[] calculateOffsetInFixedRatio(float dx, float dy) {
+        if (CUR_STATA == MOVESTATE.RIGHT || CUR_STATA == MOVESTATE.LEFT
+                || CUR_STATA == MOVESTATE.BOTTOM || CUR_STATA == MOVESTATE.TOP) {//如果点在四条边上，变化是不一样的，放在下面
+        } else { //计算正负
+            double angle = -Math.atan2(dy, dx) * 180 / Math.PI;
+            //计算大小
+            if (Math.abs(dx) < Math.abs(dy)) {
+                dx = Math.abs(dx);
+                dy = dx * fixedRatio;
+            } else {
+                dy = Math.abs(dy);
+                dx = dy / fixedRatio;
+            }
+            //确定符号
+            if (CUR_STATA == MOVESTATE.LEFT_TOP || CUR_STATA == MOVESTATE.RIGHT_BOTTOM) {
+                if (angle > 45 || angle < -135) {//箱右上方移动
+                    dx *= -1;
+                    dy *= -1;
+                }
+            } else if (CUR_STATA == MOVESTATE.RIGHT_TOP || CUR_STATA == MOVESTATE.LEFT_BOTTOM) {
+                {
+                    if (angle > -45 && angle < 135) {
+                        dy *= -1;
+                    } else {
+                        dx *= -1;
+                    }
+                }
+            }
+        }
+        return new float[]{dx, dy};
+    }
+
+    void move(float dx, float dy) {
+        //判断边界
+        if (frameLeft + dx < cutView.getDstRect().left) frameLeft = cutView.getDstRect().left;
+        else if (frameLeft + dx + frameWidth > cutView.getDstRect().right)
+            frameLeft = cutView.getDstRect().right - frameWidth;
+        else frameLeft += dx;
+
+        if (frameTop + dy < cutView.getDstRect().top) frameTop = cutView.getDstRect().top;
+        else if (frameTop + dy + frameHeight > cutView.getDstRect().bottom)
+            frameTop = cutView.getDstRect().bottom - frameHeight;
+        else
+            frameTop += dy;
+        adjustEdge(frameLeft, frameTop, frameWidth, frameHeight);
+        cutView.invalidate();
+    }
+
+    /**
+     * 适配并设置好位置和长宽,
+     * <p> 保证不超过外边界，
+     * <p>保证固定长宽比时的长宽比
      */
     private void adjustEdge(float nframeLeft, float nframeTop, float nframeWidth, float nframeHeight) {
         RectF inRect = new RectF(nframeLeft, nframeTop, nframeLeft + nframeWidth, nframeTop + nframeHeight);
@@ -485,10 +456,10 @@ public class CutFrame {
         Log.e(TAG, "draw开始 ");
 
         //暗色未选中背景
-        canvas.drawRect(0, 0, canvas.getWidth(), frameTop, noChosedPaint);//上下
-        canvas.drawRect(0, frameTop + frameHeight, canvas.getWidth(), canvas.getHeight(), noChosedPaint);
-        canvas.drawRect(0, frameTop, frameLeft, frameTop + frameHeight, noChosedPaint);//左右
-        canvas.drawRect(frameLeft + frameWidth, frameTop, canvas.getWidth(), frameTop + frameHeight, noChosedPaint);
+        canvas.drawRect(0, 0, canvas.getWidth(), frameTop, noChoosedPaint);//上下
+        canvas.drawRect(0, frameTop + frameHeight, canvas.getWidth(), canvas.getHeight(), noChoosedPaint);
+        canvas.drawRect(0, frameTop, frameLeft, frameTop + frameHeight, noChoosedPaint);//左右
+        canvas.drawRect(frameLeft + frameWidth, frameTop, canvas.getWidth(), frameTop + frameHeight, noChoosedPaint);
 
         canvas.translate(frameLeft, frameTop);
         drawFrame(canvas);
@@ -557,19 +528,49 @@ public class CutFrame {
                 Math.round(frameWidth / cutView.getTotalRatio()),
                 Math.round(frameHeight / cutView.getTotalRatio()));
         float textWidth = textPaint.measureText(show);
-        Util.P.le(TAG, "文字宽度： " + textWidth);
         Paint.FontMetrics fm = textPaint.getFontMetrics();
         float textY = frameHeight / 2 - fm.descent + (fm.bottom - fm.top) / 2;
         canvas.drawText(show, (frameWidth - textWidth) / 2, textY, textPaint);
 
-        Util.P.le(TAG, "drawFrame完成");
     }
+
+
+    /**
+     * 增加左边，建议编译器内联的方法使用此函数
+     * <p>左边加多少，宽度减多少
+     */
+    private void addLeft(float dx) {
+        frameLeft += dx;
+        frameWidth -= dx;
+    }
+
+    /**
+     * 上边加多少，高度减多少
+     */
+    private void addTop(float dy) {
+        frameTop += dy;
+        frameHeight -= dy;
+    }
+
+    /**
+     * 右边加多少，宽度加多少
+     */
+    private void addRight(float dx) {
+        frameWidth += dx;
+    }
+
+    /**
+     * 下边加多少，高度加多少
+     */
+    private void addBottom(float dy) {
+        frameHeight += dy;//上边加多少，高度减多少
+    }
+
 
     /********************************************************************************/
     /**
      * 固定比例，让裁剪框满足最大的塞入到显示出的图片之中
      */
-
     void setFixedRatio(float fixedRatio) {
         Rect dstRect = cutView.getDstRect();
         this.fixedRatio = fixedRatio;
@@ -577,12 +578,12 @@ public class CutFrame {
 
         if (fixedRatio > dstRatio) {//高宽比图片显示部分高，水平居中
             frameHeight = dstRect.height();
-            frameWidth = (int) (frameHeight * fixedRatio + 0.5f);
+            frameWidth = (int) (frameHeight / fixedRatio + 0.5f);
             frameTop = dstRect.top;
             frameLeft = dstRect.left + (dstRect.width() - frameWidth) / 2;
         } else {//否则垂直居中
             frameWidth = dstRect.width();
-            frameHeight = (int) (frameWidth / fixedRatio + 0.5f);
+            frameHeight = (int) (frameWidth * fixedRatio + 0.5f);
             frameLeft = dstRect.left;
             frameTop = dstRect.top + (dstRect.height() - frameHeight) / 2;
         }
@@ -592,17 +593,16 @@ public class CutFrame {
         this.fixedRatio = -1;
     }
 
-
     /**
      * 固定尺寸,用户操作上相当于固定比例，最后获取图片时缩放即可
      */
-    public void setFixedSize(int width, int height, Rect picBound) {
+    void setFixedSize(int width, int height) {
         fixedWidth = width;
         fixedHeight = height;
         setFixedRatio(height * 1f / width);//用户操作上相当于固定比例，
     }
 
-    public void cancelFixedSzie() {
+    void cancelFixedSize() {
         fixedWidth = fixedHeight = -1;
         cancelFixedRatio();
     }
@@ -624,5 +624,38 @@ public class CutFrame {
         if (mTop < dstRect.top) mTop = dstRect.top;
         }
          */
+
+
+        /**
+         * 经验：此函数调试很久，功能是移动不能超过一定限度，如果超过，就移动到当前位置到限度的差值，
+         * 实际上移动会产生很多次，而且这里对精确度要求不高，如果超过限度，不移动即可，效果相同的，
+         * 多次移动差不不同，小长度的会填补差值
+         * 保证长和宽增加后面积是最小面积，长宽增加值的 比例保持dy/dx原来的比例，
+         * 解一元2次方程组
+         * @return 最后的增加距离
+         */
+       /* private float[] addDisInMinArea(float dx, float dy) {
+        float a = dy / dx;
+        float b = frameWidth * a + frameHeight;
+        float c = frameWidth * frameHeight - MIN_AREA;
+        float dert=b*b-4*a*c;
+        float[] wh =new float[]{0,0};
+        if(dert<=0||Math.abs(a-0)<0.1)return wh;
+
+        wh[0] = (-b + (float) Math.sqrt(b * b - 4 * a * c)) / 2 / a;
+        wh[1] = wh[0] * a;
+        Util.P.le("调整后的差值"+wh[0]+" "+wh[1]);
+        float whRatio = (frameHeight + wh[1]) / (frameWidth + wh[0]) / (frameHeight / frameWidth);
+        if (frameWidth + wh[0] < 0 ||
+                Math.abs(whRatio - 1) > 1) {//有两个结果，结果为负不能取，宽高比变化太大不能取
+            Util.P.le("缩放比例结果的差值1"+ Math.abs(whRatio - 1));
+            wh[0] = (-b - (float) Math.sqrt(b * b - 4 * a * c)) / 2 / a;
+            wh[1] = wh[0] * a;
+        }
+        whRatio = (frameHeight + wh[1]) / (frameWidth + wh[0]) / (frameHeight / frameWidth);
+        Util.P.le("缩放比例结果的差值2"+ Math.abs(whRatio - 1));
+        if( Math.abs(whRatio - 1) > 1||Math.abs(wh[0]-0)<0.1||Math.abs(wh[1]-0)<0.1)wh[0]=wh[1]=0;
+            return new float[]{0,0};
+        }*/
     }
 }

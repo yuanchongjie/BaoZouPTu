@@ -150,7 +150,7 @@ public class MainFunctionFragment extends Fragment {
     /**
      *
      *
-     *///暂未使用，根据fragment的添加方式有所改变
+     */
     public void eraseChosenColor() {
         if (chosedId != -1) {
             imageList.get(chosedId).setImageDrawable(drawableList.get(chosedId));

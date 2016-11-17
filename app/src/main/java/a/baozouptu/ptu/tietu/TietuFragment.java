@@ -100,19 +100,19 @@ public class TietuFragment extends Fragment implements BaseFunction {
                 /*
 //                处理设置贴图失败的情况，暂不实现
                 boolean flag=false;
-                while(!floatImageView.setBitmapAndInit(data)&&tietuPaths.size()>0)
+                while(!floatImageView.setBitmapAndInit(data)&&tietuPaths.fixed_size()>0)
                 {
                     flag=true;
                     int id=tietuPaths.indexOf(data);
                     tietuPaths.remove(data);
-                    if(tietuPaths.size()==0){
+                    if(tietuPaths.fixed_size()==0){
                         ((ViewGroup)floatImageView.getParent()).removeView(floatImageView);
                         Toast.makeText(mContext,"贴图加载失败了！",Toast.LENGTH_SHORT).show();
                         tietuAdapter.notifyDataSetChanged();
                         return;
                     }
                     else{
-                        data=tietuPaths.get(id%tietuPaths.size());
+                        data=tietuPaths.get(id%tietuPaths.fixed_size());
                     }
                 }
                 if(flag) {

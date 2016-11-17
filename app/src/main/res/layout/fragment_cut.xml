@@ -7,7 +7,7 @@
     android:paddingBottom="@dimen/padding_function_item_image"
     android:paddingTop="2dp">
     <LinearLayout
-        android:id="@+id/cut_reset"
+        android:id="@+id/cut_fixed_size"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="match_parent"
@@ -22,7 +22,7 @@
             android:paddingLeft="@dimen/padding_function_item_image"
             android:paddingRight="@dimen/padding_function_item_image"
             android:paddingTop="@dimen/padding_function_item_image"
-            android:src="@mipmap/reset" />
+            android:src="@mipmap/fixed_size" />
 
         <TextView
             android:layout_width="@dimen/function_width"
@@ -30,13 +30,13 @@
             android:layout_weight="1"
             android:layout_gravity="center"
             android:gravity="center"
-            android:text="@string/cut_reset"
+            android:text="@string/cut_fixed_size"
             android:textColor="@color/text_color1"
             android:textSize="@dimen/text_size_main_function" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/cut_scale"
+        android:id="@+id/cut_fixed_ratio"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="match_parent"

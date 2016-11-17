@@ -61,6 +61,8 @@ public class CutView extends PtuView implements TSRView {
         sourceRatio = 1;
         sourceLastAngle = sourceTotalAngle = 0;
         Log.e(TAG, "初始化完成");
+
+
     }
 
     @Override
@@ -263,6 +265,17 @@ public class CutView extends PtuView implements TSRView {
         invalidate();
     }
 
+    public void setFixedRatio(float fixedRatio) {
+        frame.cancelFixedSize();//先取消其他的状态
+        frame.setFixedRatio(fixedRatio);
+        invalidate();
+    }
+
+    public void setFixedSize(int width, int height) {
+        frame.cancelFixedRatio();//先取消其他的状态
+        frame.setFixedSize(width,height);
+    }
+
     {
         /**
          * 以CutFrame为边界，不能超出它的边界
@@ -346,4 +359,5 @@ public class CutView extends PtuView implements TSRView {
          }
          */
     }
+
 }

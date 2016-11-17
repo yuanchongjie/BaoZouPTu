@@ -37,7 +37,6 @@ public class PtuUtil {
         py = MU.su(py, Float.toString(dstRect.top));
         String x, y;
 
-        //采用精确计算
         String srcWidth = MU.su(Float.toString(srcRect.right), Float.toString(srcRect.left));
         String dstWidth = MU.su(Float.toString(dstRect.right), Float.toString(dstRect.left));
         String ratio = MU.di(srcWidth, dstWidth);

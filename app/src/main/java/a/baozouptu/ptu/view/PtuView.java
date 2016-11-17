@@ -137,9 +137,9 @@ public class PtuView extends View implements TSRView {
     }
 
     private void init() {
-        picPaint=new Paint();
+        picPaint = new Paint();
         picPaint.setDither(true);
-        canDiminish=true;
+        canDiminish = true;
     }
 
     /**
@@ -285,7 +285,7 @@ public class PtuView extends View implements TSRView {
         int tx = picLeft;
         picLeft += curX - lastX;
         lastX = curX;
-        if (Math.abs(picLeft) + totalBound.width() > curPicWidth)//如果x超出界限，x方向就不移动了
+        if (picLeft > 0 || Math.abs(picLeft) + totalBound.width() > curPicWidth)//如果x超出界限，x方向就不移动了
             picLeft = tx;
 
         int ty = picTop;
@@ -439,6 +439,7 @@ public class PtuView extends View implements TSRView {
         setBitmapAndInit(newBm, totalBound);
         invalidate();
     }
+
     /**
      * 获取变换后的参数
      * 获取当前的宽高，
