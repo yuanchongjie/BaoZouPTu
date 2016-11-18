@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:baselineAligned="true"
+    android:paddingBottom="@dimen/padding_function_item_image"
+    android:paddingTop="2dp">
+
+    <LinearLayout
+        android:id="@+id/draw_style"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:layout_gravity="center"
+            android:paddingBottom="@dimen/padding_function_item_image"
+            android:paddingLeft="@dimen/padding_function_item_image"
+            android:paddingRight="@dimen/padding_function_item_image"
+            android:paddingTop="@dimen/padding_function_item_image"
+            android:src="@mipmap/reset" />
+
+        <TextView
+            android:layout_width="@dimen/function_width"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="画笔样式"
+            android:textColor="@color/text_color1"
+            android:textSize="@dimen/text_size_main_function" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/draw_color"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:layout_gravity="center"
+            android:paddingBottom="@dimen/padding_function_item_image"
+            android:paddingLeft="@dimen/padding_function_item_image"
+            android:paddingRight="@dimen/padding_function_item_image"
+            android:paddingTop="@dimen/padding_function_item_image"
+            android:src="@mipmap/scale" />
+
+        <TextView
+            android:layout_width="@dimen/function_width"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="画笔颜色"
+            android:textColor="@color/text_color1"
+            android:textSize="@dimen/text_size_main_function" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/draw_size"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:layout_gravity="center"
+            android:paddingBottom="@dimen/padding_function_item_image"
+            android:paddingLeft="@dimen/padding_function_item_image"
+            android:paddingRight="@dimen/padding_function_item_image"
+            android:paddingTop="@dimen/padding_function_item_image"
+            android:src="@mipmap/rotate" />
+
+        <TextView
+            android:layout_width="@dimen/function_width"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="画笔尺寸"
+            android:textColor="@color/text_color1"
+            android:textSize="@dimen/text_size_main_function" />
+    </LinearLayout>
+
+</LinearLayout>

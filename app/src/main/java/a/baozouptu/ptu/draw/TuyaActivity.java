@@ -12,7 +12,6 @@ import android.widget.FrameLayout;
 import android.widget.SeekBar;
 
 import a.baozouptu.R;
-import a.baozouptu.ptu.view.TuyaView;
 
 /**
  * Created by yonglong on 2016/7/2.
@@ -25,7 +24,7 @@ public class TuyaActivity extends AppCompatActivity implements View.OnClickListe
     private Button btn_redo;
     private Button btn_save;
     private Button btn_recover;
-    private TuyaView tuyaView;//自定义涂鸦板
+    private DrawView drawView;//自定义涂鸦板
     private Button btn_paintcolor;
     private Button btn_paintsize;
     private Button btn_paintstyle;
@@ -56,10 +55,10 @@ public class TuyaActivity extends AppCompatActivity implements View.OnClickListe
         Display defaultDisplay = getWindowManager().getDefaultDisplay();
         int screenWidth = defaultDisplay.getWidth();
         int screenHeight = defaultDisplay.getHeight();
-        tuyaView = new TuyaView(this,screenWidth,screenHeight);
-        frameLayout.addView(tuyaView);
-        tuyaView.requestFocus();
-        tuyaView.selectPaintSize(sb_size.getProgress());
+//        drawView = new DrawView(this,screenWidth,screenHeight);
+        frameLayout.addView(drawView);
+        drawView.requestFocus();
+        drawView.selectPaintSize(sb_size.getProgress());
     }
     private void initListener() {
         btn_undo.setOnClickListener(this);
@@ -74,12 +73,12 @@ public class TuyaActivity extends AppCompatActivity implements View.OnClickListe
     class MySeekChangeListener implements SeekBar.OnSeekBarChangeListener {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            tuyaView.selectPaintSize(seekBar.getProgress());
+            drawView.selectPaintSize(seekBar.getProgress());
             //Toast.makeText(MainActivity.this,"当前画笔尺寸为"+seekBar.getProgress(),Toast.LENGTH_SHORT ).show();
         }
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
-            tuyaView.selectPaintSize(seekBar.getProgress());
+            drawView.selectPaintSize(seekBar.getProgress());
             //Toast.makeText(MainActivity.this,"当前画笔尺寸为"+seekBar.getProgress(),Toast.LENGTH_SHORT ).show();
         }
         @Override
@@ -89,16 +88,16 @@ public class TuyaActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_last://撤销
-                tuyaView.undo();
+                drawView.undo();
                 break;
             case R.id.btn_redo://重做
-                tuyaView.redo();
+                drawView.redo();
                 break;
             case R.id.btn_recover://恢
-                tuyaView.recover();
+                drawView.recover();
                 break;
             case R.id.btn_savesd://保存
-                tuyaView.saveToSDCard();
+                drawView.saveToSDCard();
                 break;
             case R.id.btn_paintcolor:
                 sb_size.setVisibility(View.GONE);
@@ -123,7 +122,7 @@ public class TuyaActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 select_paint_color_index = which;
-                tuyaView.selectPaintColor(which);
+                drawView.selectPaintColor(which);
                 dialog.dismiss();
             }
         });
@@ -165,7 +164,7 @@ public class TuyaActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 select_paint_style_index = which;
-                tuyaView.selectPaintStyle(which);
+                drawView.selectPaintStyle(which);
                 dialog.dismiss();
             }
         });
