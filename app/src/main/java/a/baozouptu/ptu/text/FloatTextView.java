@@ -433,7 +433,7 @@ public class FloatTextView extends EditText implements FloatView {
         textViewBm.recycle();
         textViewBm = null;
         String path = FileTool.createTempPicPath(mContext);
-        BitmapTool.saveBitmap(mContext, resultBm, path);
+        BitmapTool.saveBitmap(mContext, resultBm, path,false);
         TextStepData tsd = new TextStepData(PtuActivity.EDIT_TEXT);
         tsd.picPath = path;
         tsd.boundRectInPic = boundRectInPic;

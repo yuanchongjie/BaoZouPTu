@@ -103,6 +103,8 @@ public class BitmapTool {
                 intent.setData(uri);
                 context.sendBroadcast(intent);
             }
+        } catch (SecurityException se) {
+            return "创建文件失败";
         } catch (FileNotFoundException e) {
             Util.P.le("Bitmaptool.savePicture", "存储文件失败");
             e.printStackTrace();
@@ -118,7 +120,7 @@ public class BitmapTool {
                     e.printStackTrace();
                 }
         }
-        return "创建成功";
+        return "success";
     }
 
     /**

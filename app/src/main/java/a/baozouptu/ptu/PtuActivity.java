@@ -21,6 +21,7 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
@@ -37,7 +38,6 @@ import a.baozouptu.ptu.control.MainFunctionFragment;
 import a.baozouptu.ptu.cut.CutFragment;
 import a.baozouptu.ptu.draw.DrawFragment;
 import a.baozouptu.ptu.mat.MatFragment;
-import a.baozouptu.ptu.repealRedo.CutStepData;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TextStepData;
@@ -346,6 +346,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             @Override
             public void mSure(float saveRatio) {
                 String newPath = saveResultBm(saveRatio);
+                if (newPath == null) return;
                 Bundle bundle = new Bundle();
                 bundle.putString("new_path", newPath);
                 setReturnResultAndFinish("common", bundle, false);
@@ -362,7 +363,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             }
         });
     }
-
 
     private void setViewContent() {
         ptuFrame.getViewTreeObserver().addOnGlobalLayoutListener(
@@ -382,11 +382,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         );
     }
 
-
     /*************************************************************
      * repealRedo部分
      *************************************************/
-
     private void addStep(Bitmap bm, StepData sd) {
         switch (sd.EDIT_MODE) {
             case EDIT_TEXT:
@@ -413,17 +411,17 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     ptuView.releaseResource();
                     Bitmap newSourceBm = repealRedoManager.getBaseBitmap().
                             copy(Bitmap.Config.ARGB_8888, true);
-                    String newPath = FileTool.getNewPictureFile(picPath);
-                    BitmapTool.saveBitmap(this, newSourceBm, newPath);
+                    String newPath = FileTool.createTempPicPath(this);
+                    BitmapTool.saveBitmap(this, newSourceBm, newPath, false);
                     picPath = newPath;
                     ptuView.replaceSourceBm(newSourceBm);
-                    Util.P.le(TAG, "重做的替换基图成功");
+                    Util.P.le(TAG, "撤销的替换基图成功");
                     int index = repealRedoManager.getCurrentIndex();
                     for (int i = 0; i <= index; i++) {
                         StepData sd = repealRedoManager.getStepdata(i);
                         addStep(newSourceBm, sd);
                     }
-                    Util.P.le(TAG, "重做的多步添加图片完成");
+                    Util.P.le(TAG, "撤销的多步添加图片完成");
                     ptuView.resetShow();
                 }
                 break;
@@ -479,7 +477,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         topRelativeLayout.setRepealBtnColor(repealRedoManager.canRepeal());
     }
 
-
     public void setRedoBtnColor(boolean canRedo) {
         topRelativeLayout.setRedoBtnColor(canRedo);
     }
@@ -493,11 +490,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     /**************************************************************************************************************/
 
-    //
-    //观察Fragment的生命周期，
-    // （1）是否Activity创建，不管有没有添加，都会执行
-    //(2)执行不同的FragmentTransetion事务其反应如何
-    //
     private void initFragment() {
         mainFrag = new MainFunctionFragment();
         fm = getFragmentManager();
@@ -613,7 +605,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         }
     }
 
-
     /**
      * 会完成点击sure之后的所有工作
      * 回到主功能界面时,如果是从子功能回来，
@@ -628,10 +619,10 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
         if (CURRENT_EDIT_MODE == EDIT_CUT) {
             Bitmap newSourceBm = cutFrag.getResultBm(1);
-            StepData csd=cutFrag.getResultData(1);
-            String picPath=FileTool.createTempPicPath(this);
-            BitmapTool.saveBitmap(this,newSourceBm,picPath);
-            csd.picPath=picPath;
+            StepData csd = cutFrag.getResultData(1);
+            String picPath = FileTool.createTempPicPath(this);
+            BitmapTool.saveBitmap(this, newSourceBm, picPath, false);
+            csd.picPath = picPath;
             cutFrag.releaseResource();
             ptuFrame.removeViewAt(1);
             ptuView.replaceSourceBm(newSourceBm);
@@ -715,9 +706,15 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     private String saveResultBm(final float saveRatio) {
         String result = null;
         Bitmap bitmap = ptuView.getFinalPicture(saveRatio);
-        String newPath = FileTool.getNewPictureFile(picPath);
+        String newPath = FileTool.getNewPictureFileDefult(picPath);
+        if (newPath == null) {
+            Toast.makeText(this, "创建SD卡文件失败", Toast.LENGTH_LONG).show();
+            return null;
+        }
         result = BitmapTool.saveBitmap(PtuActivity.this, bitmap, newPath);
-        Util.P.le(TAG, "保存图片结果:" + result);
+        if (!result.equals("success")) {
+            Toast.makeText(this, result, Toast.LENGTH_LONG).show();
+        }
         return newPath;
     }
 
@@ -741,7 +738,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     @Override
     protected void onDestroy() {
-        if(ptuView!=null)
+        if (ptuView != null)
             ptuView.releaseResource();
         if (repealRedoManager != null)
             repealRedoManager.clear(this);
