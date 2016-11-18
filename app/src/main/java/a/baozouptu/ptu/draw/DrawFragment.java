@@ -44,20 +44,11 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
     private int lastColor = 0xff000000;
 
     @Override
-    public void smallRepeal() {
-        drawView.undo();
-        Log.e(TAG,
-                "repealPrepare");
-    }
-
-    @Override
-    public void smallRedo() {
-
-    }
-
-    @Override
     public void repeal() {
 
+        drawView.undo();
+        Log.e(TAG,
+                "repeal");
     }
 
     @Override
@@ -82,12 +73,11 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
     }
 
     @Override
-    public void addBigStep(StepData sd) {
+    public void releaseResource() {
 
     }
 
-    @Override
-    public void releaseResource() {
+    public static void addBigStep(Bitmap bm, StepData sd) {
 
     }
 
@@ -275,7 +265,6 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
             View contentView = LayoutInflater.from(mContext).inflate(R.layout.popwindow_toumindu, null);
             SeekBar seekBar = (SeekBar) contentView.findViewById(R.id.seekbar_toumingdu);
             seekBar.setMax(100);
-            seekBar.setProgress(drawView.currentSize);
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {

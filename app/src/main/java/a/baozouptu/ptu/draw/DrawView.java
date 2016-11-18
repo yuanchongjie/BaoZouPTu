@@ -3,22 +3,15 @@ package a.baozouptu.ptu.draw;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.EmbossMaskFilter;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.RadialGradient;
 import android.graphics.Rect;
-import android.graphics.Shader;
-import android.graphics.SweepGradient;
-import android.graphics.drawable.ShapeDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
@@ -33,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-
-import a.baozouptu.R;
 
 /**
  * 涂鸦View
@@ -57,8 +48,8 @@ public class DrawView extends View {
     private DrawPath dp;
     private int screenWidth, screenHeight;
     private int currentColor = Color.RED;
-    public int currentSize = 15;
-    private int currentStyle = 0;
+    private int currentSize = 5;
+    private int currentStyle = 1;
     private int[] paintColor;//颜色集合
 
     private class DrawPath {
@@ -119,41 +110,24 @@ public class DrawView extends View {
         mPaint.setStrokeCap(Paint.Cap.ROUND);// 形状
         mPaint.setAntiAlias(true);//设置是否使用抗锯齿功能，会消耗较大资源，绘制图形速度会变慢。
         mPaint.setDither(true); //设定是否使用图像抖动处理，会使绘制出来的图片颜色更加平滑和饱满，图像更加清晰
-        //初始
-        mPaint.setStrokeWidth(currentSize);
-        mPaint.setColor(currentColor);
+
 
         // 设置光源的方向
-        float[] direction = new float[]{1.5f, 1.5f, 1.5f};
+        float[] direction = new float[]{ 1.5f, 1.5f, 1.5f };
         //设置环境光亮度
         float light = 0.6f;
         // 选择要应用的反射等级
         float specular = 6;
         // 向mask应用一定级别的模糊
         float mask_blur = 4.2f;
-        //浮雕
-        EmbossMaskFilter emboss = new EmbossMaskFilter(direction, light, specular, mask_blur);
+        EmbossMaskFilter emboss=new EmbossMaskFilter(direction,light,specular,mask_blur);
+
         //模糊
         BlurMaskFilter blur = new BlurMaskFilter(8, BlurMaskFilter.Blur.NORMAL);
 
- /*
-             * LinearGradient shader = new LinearGradient(0, 0, endX, endY, new
-             * int[]{startColor, midleColor, endColor},new float[]{0 , 0.5f,
-             * 1.0f}, TileMode.MIRROR);
-             * 参数一为渐变起初点坐标x位置，参数二为y轴位置，参数三和四分辨对应渐变终点
-             * 其中参数new int[]{startColor, midleColor,endColor}是参与渐变效果的颜色集合，
-             * 其中参数new float[]{0 , 0.5f, 1.0f}是定义每个颜色处于的渐变相对位置， 这个参数可以为null，如果为null表示所有的颜色按顺序均匀的分布
-             */
-        Shader mShader = new LinearGradient(0, 0, 100, 100,
-                new int[]{Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW},
 
-                null, Shader.TileMode.REPEAT);
-        // Shader.TileMode三种模式
-        // REPEAT:沿着渐变方向循环重复
-        // CLAMP:如果在预先定义的范围外画的话，就重复边界的颜色
-        // MIRROR:与REPEAT一样都是循环重复，但这个会对称重复
 
-        switch (currentStyle) {
+        switch (currentStyle){
             case 0:
                 //初始
                 mPaint.setStrokeWidth(currentSize);
@@ -167,20 +141,21 @@ public class DrawView extends View {
                 mPaint.setStrokeWidth(50);
                 break;
             case 2:
-                // 应用mask
-                mPaint.setMaskFilter(emboss);
+                mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
                 break;
             case 3:
+                mPaint.setStyle(Paint.Style.FILL);
+                break;
+            case 4:
+                mPaint.setStrokeCap(Paint.Cap.BUTT);
+                break;
+            case 5:
                 // 应用mask
                 mPaint.setMaskFilter(blur);
                 break;
-            case 4:
-                mPaint.setShader(mShader);
-                break;
-            case 5:
-                mPaint.setShader(mShader);
-                break;
             case 6:
+                // 应用mask
+                mPaint.setMaskFilter(emboss);
                 break;
         }
     }
