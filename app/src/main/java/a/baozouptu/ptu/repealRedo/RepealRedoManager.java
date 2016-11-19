@@ -3,8 +3,11 @@ package a.baozouptu.ptu.repealRedo;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ClipDrawable;
 import android.view.View;
 
 import java.io.File;
@@ -94,7 +97,7 @@ public class RepealRedoManager<T> {
     }
 
     public static Canvas addBm2Canvas(Canvas baseCanvas, Bitmap addBitmap, RectF boundRect, float rotateAngle) {
-
+        baseCanvas.save();
         float centerX = (boundRect.left + boundRect.right) / 2, centerY = (boundRect.bottom + boundRect.top) / 2;
         //将realBm到图上
         BitmapDrawable addDrawable = new BitmapDrawable(Util.MyApplication.getAppContext().getResources(), addBitmap);
@@ -104,9 +107,7 @@ public class RepealRedoManager<T> {
         baseCanvas.rotate(rotateAngle, centerX, centerY);//旋转
         addDrawable.setBounds(GeoUtil.rectF2Rect(boundRect));
         addDrawable.draw(baseCanvas);
-        baseCanvas.save();
         baseCanvas.restore();
-
         return baseCanvas;
     }
 

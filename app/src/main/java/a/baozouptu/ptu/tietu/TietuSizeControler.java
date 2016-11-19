@@ -53,16 +53,13 @@ public class TietuSizeControler {
      * 获取合适大小的Bitmap，Bitmap占用的内存不能超过剩余内存，如果超过，则返回空
      * @return 如果Bitmap用的内存超过剩余的值，会返回空
      */
-    public static Bitmap getSrcBitmap(Activity activity, String path) {
+    public static Bitmap getSrcBitmap(String path) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(path,options);
 
-        DisplayMetrics metric = new DisplayMetrics();
-        activity.getWindowManager().getDefaultDisplay().getMetrics(metric);
-
         int totalWidth = AllData.screenWidth;
-        int totalHeight = metric.heightPixels;
+        int totalHeight = AllData.screenHeight;
 
         int srcWidth = Math.min(options.outWidth,totalWidth);
         int srcHeight = Math.min(options.outHeight,totalHeight);

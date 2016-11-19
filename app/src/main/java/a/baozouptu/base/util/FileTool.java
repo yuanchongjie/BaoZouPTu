@@ -32,19 +32,21 @@ import a.baozouptu.base.dataAndLogic.AllData;
  */
 public class FileTool {
 
+    private String suffix;
+
     /**
      * 遍历目录,得到所有图片的路径，图片大小在5-6000k之间，注意判空
      * 获取到的数据会直接往添加到第二个参数末尾添加
      *
-     * @param dirPath     String 要显示的图片文件夹的路径，
+     * @param dirPath            String 要显示的图片文件夹的路径，
      * @param willOrderedPicList List《String》括号用不了？？？ , 返回的结构， 文件夹下及子文件夹下所有符合条件的图片的路径,
-     *                 因为要得到子文件夹路径下的图片路径，所以使用传参赋值更好
+     *                           因为要得到子文件夹路径下的图片路径，所以使用传参赋值更好
      */
     public static void getOrderedPicListInFile(String dirPath, List<String> willOrderedPicList) {
         List<Pair<Long, String>> oderedPaths = new ArrayList<>();
 
         File file = new File(dirPath);
-        if (!file.exists()||!file.isDirectory())
+        if (!file.exists() || !file.isDirectory())
             return;
 
         File[] fs = file.listFiles();
@@ -121,8 +123,8 @@ public class FileTool {
         File file = new File(tempDir);
         if (!file.exists()) {
             {
-                if(!file.mkdirs()){
-                    Util.T(context,"保存失败");
+                if (!file.mkdirs()) {
+                    Util.T(context, "保存失败");
                 }
             }
         }
@@ -135,16 +137,17 @@ public class FileTool {
 
     /**
      * 递归删除目录下的所有文件及子目录下所有文件
+     *
      * @param dir 将要删除的文件目录
      * @return boolean Returns "true" if all deletions were successful.
-     *                 If a deletion fails, the method stops attempting to
-     *                 delete and returns "false".
+     * If a deletion fails, the method stops attempting to
+     * delete and returns "false".
      */
     public static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             File[] children = dir.listFiles();
             //递归删除目录中的子目录下
-            for (File file:children) {
+            for (File file : children) {
                 boolean success = deleteDir(file);
                 if (!success) {
                     return false;
@@ -154,20 +157,30 @@ public class FileTool {
         // 若是目录，此时为空，可以删除
         return dir.delete();
     }
+
     /**
      * 根据原来的路径创建一个新的路径和名称
      *
      * @param oldPath 以前的路径
      * @return
      */
-    public static String getNewPictureFile(String oldPath) {
+    public static String getNewPictureFileDefult(String oldPath) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         Date curDate = new Date(System.currentTimeMillis());//获取当前时间
         String time = formatter.format(curDate);
-        String prefix = oldPath.substring(0, oldPath.lastIndexOf("."));
-        String suffix = oldPath.substring(oldPath.lastIndexOf("."), oldPath.length());
-
-        return prefix + "baozou" + time + suffix;
+        String res = null;
+        String prefix = Environment.getExternalStorageDirectory().getAbsolutePath() + "/暴走P图-图片/";
+        try {
+            File dir = new File(prefix);
+            if (!dir.exists())
+                dir.mkdirs();
+            res = oldPath.substring(oldPath.lastIndexOf("."), oldPath.length());
+            res=prefix + "baozou" + time + res;
+        } catch (SecurityException se) {
+            res=null;
+        } finally {
+            return res;
+        }
     }
 
     /**
@@ -245,7 +258,7 @@ public class FileTool {
      * @param uri The Uri to check.
      * @return Whether the Uri authority is ExternalStorageProvider.
      */
-    public static boolean isExternalStorageDocument(Uri uri) {
+    private static boolean isExternalStorageDocument(Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
 
@@ -253,7 +266,7 @@ public class FileTool {
      * @param uri The Uri to check.
      * @return Whether the Uri authority is DownloadsProvider.
      */
-    public static boolean isDownloadsDocument(Uri uri) {
+    private static boolean isDownloadsDocument(Uri uri) {
         return "com.android.providers.downloads.documents".equals(uri.getAuthority());
     }
 
@@ -261,7 +274,7 @@ public class FileTool {
      * @param uri The Uri to check.
      * @return Whether the Uri authority is MediaProvider.
      */
-    public static boolean isMediaDocument(Uri uri) {
+    private static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 
@@ -269,11 +282,11 @@ public class FileTool {
      * @param uri The Uri to check.
      * @return Whether the Uri authority is Google Photos.
      */
-    public static boolean isGooglePhotosUri(Uri uri) {
+    private static boolean isGooglePhotosUri(Uri uri) {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
     }
 
     public static String getParentPath(String path) {
-        return path.substring(0,path.lastIndexOf('/'));
+        return path.substring(0, path.lastIndexOf('/'));
     }
 }

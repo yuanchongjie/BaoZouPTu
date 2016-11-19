@@ -22,10 +22,11 @@
     <string name="cut_reversal">翻转</string>
     <string name="cut_fixed_size">尺寸</string>
     <string name="title_chose_picture">选择图片</string>
-    <string name="save_size">大小</string>
+    <string name="save_size">图片大小</string>
     <string name="save_set_dialog_name">保存设置</string>
     <string name="latest_pic">最新图片</string>
     <string name="make_expression">制作表情</string>
+
     <string name="draw">绘图</string>
     <string name="cut">裁剪旋转</string>
     <string name="text">文字</string>
@@ -36,4 +37,6 @@
     <string name="latest_use">最近使用</string>
     <string name="recent_pic">最近图片</string>
     <string name="prefer_pic">喜爱图片</string>
+
+
 </resources>

@@ -137,8 +137,15 @@ public class ProcessUsuallyPicPath {
     /**
      * 添加最近图片
      */
-    public void addRecentPath(String path) {
+    void addRecentPath(String path) {
         mUsualyPicPathList.add(usedNumber + 2 + recentNumber, path);
+        recentNumber++;
+    }
+    /**
+     * 添加最近图片，最前面
+     */
+    public void addRecentPathFirst(String path) {
+        mUsualyPicPathList.add(usedNumber + 2, path);
         recentNumber++;
     }
 
@@ -212,6 +219,9 @@ public class ProcessUsuallyPicPath {
                 if (sortedPicPathsByTime.get(0).first < AllData.lastScanTime &&
                         totalPicNumber == sortedPicPathsByTime.size()) {
                     AllData.lastScanTime = scanTime;
+                    Message msg = new Message();
+                    msg.obj = "change_no";
+                    mHandler.sendMessage(msg);
                     return;
                 }
                 AllData.lastScanTime = scanTime;
@@ -495,5 +505,11 @@ public class ProcessUsuallyPicPath {
 
     public boolean isUsuPic(List<String> imagUrls) {
         return imagUrls == mUsualyPicPathList;
+    }
+
+    public boolean hasRecentPic(String picPath) {
+        int id=mUsualyPicPathList.indexOf(picPath);
+        if( usedNumber + 2<=id&&id<recentNumber + usedNumber + 2)return true;
+        return false;
     }
 }

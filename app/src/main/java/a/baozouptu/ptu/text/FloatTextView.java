@@ -15,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
@@ -65,7 +66,7 @@ public class FloatTextView extends EditText implements FloatView {
      * floatView的宽和高，包括padding，保证加上mleft，mtop之后不会超出原图片的边界
      */
     public float mWidth, mHeight;
-    private static int SHOW_SATUS = STATUS_INPUT;
+    private static int SHOW_SATUS;
     private int rimColor;
     private int itemColor;
     private int downShowState;
@@ -184,6 +185,7 @@ public class FloatTextView extends EditText implements FloatView {
         //获取了实际的宽高之后才能获取初始位置
         fLeft = (picBound.left + picBound.right) / 2 - mWidth / 2;
         fTop = picBound.bottom - mHeight;
+        SHOW_SATUS = STATUS_ITEM;
         setRim();
         initItems();
         addTextChangedListener(new TextWatcher() {
@@ -433,7 +435,7 @@ public class FloatTextView extends EditText implements FloatView {
         textViewBm.recycle();
         textViewBm = null;
         String path = FileTool.createTempPicPath(mContext);
-        BitmapTool.saveBitmap(mContext, resultBm, path);
+        BitmapTool.saveBitmap(mContext, resultBm, path, false);
         TextStepData tsd = new TextStepData(PtuActivity.EDIT_TEXT);
         tsd.picPath = path;
         tsd.boundRectInPic = boundRectInPic;
@@ -645,8 +647,12 @@ public class FloatTextView extends EditText implements FloatView {
     public void changeShowState(int state) {
         if (SHOW_SATUS != state) {
             if (SHOW_SATUS == STATUS_INPUT && state != STATUS_INPUT) {//如果当前是输入状态，改变到非输入状态，这需要取消输入法
-                //    InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-                // imm.hideSoftInputFromWindow(this.getApplicationWindowToken(), 0);
+                InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(this.getApplicationWindowToken(), 0);
+                setCursorVisible(false);
+            }
+            if (state == STATUS_INPUT) {
+                setCursorVisible(true);
             }
             //不需要重绘的情况
             if (SHOW_SATUS == STATUS_ITEM && state == STATUS_INPUT

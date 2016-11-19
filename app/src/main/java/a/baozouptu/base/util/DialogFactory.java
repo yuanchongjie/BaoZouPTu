@@ -28,4 +28,5 @@ public class DialogFactory {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.show();
     }
+
 }

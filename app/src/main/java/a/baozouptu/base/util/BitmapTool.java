@@ -78,13 +78,17 @@ public class BitmapTool {
     public static String saveBitmap(Context context, Bitmap bitmap, String path, boolean isSendBroad) {
         String suffix = path.substring(path.lastIndexOf("."), path.length());
 
-        Bitmap.CompressFormat bmc = null;
+        Bitmap.CompressFormat bmc;
         if (suffix.equals(".jpg") || suffix.equals(".jpeg"))
             bmc = Bitmap.CompressFormat.JPEG;
         else if (suffix.equals(".png"))
             bmc = Bitmap.CompressFormat.PNG;
         else if (suffix.equals(".webp"))
             bmc = Bitmap.CompressFormat.WEBP;
+        else {
+            bmc= Bitmap.CompressFormat.JPEG;
+            path=path.substring(0,path.indexOf('.')+1)+"jpeg";
+        }
 
         FileOutputStream fo = null;
         try {
@@ -103,6 +107,8 @@ public class BitmapTool {
                 intent.setData(uri);
                 context.sendBroadcast(intent);
             }
+        } catch (SecurityException se) {
+            return "创建文件失败";
         } catch (FileNotFoundException e) {
             Util.P.le("Bitmaptool.savePicture", "存储文件失败");
             e.printStackTrace();
@@ -118,7 +124,7 @@ public class BitmapTool {
                     e.printStackTrace();
                 }
         }
-        return "创建成功";
+        return "success";
     }
 
     /**
@@ -130,7 +136,6 @@ public class BitmapTool {
             return bitmap.getAllocationByteCount();
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1)  //API 12
-
         {
             return bitmap.getByteCount();
         }

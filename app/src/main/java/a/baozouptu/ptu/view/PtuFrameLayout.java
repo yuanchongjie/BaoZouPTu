@@ -23,7 +23,6 @@ import a.baozouptu.ptu.tietu.TietuFrameLayout;
  */
 public class PtuFrameLayout extends FrameLayout {
     private static final String TAG = "PtuFrameLayout";
-    private String DEBUG_TAG = "PtuFrameLayout";
     private static int CURRENT_STATUS = 0;
     private static final int STATUS_INIT = 0;
     private static final int STATUS_MOVE_FLOAT = 1;
@@ -67,7 +66,7 @@ public class PtuFrameLayout extends FrameLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Util.P.le(DEBUG_TAG, "onTouchEvent");
+        Util.P.le(TAG, "onTouchEvent");
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 if (hasUp) {
@@ -200,4 +199,5 @@ public class PtuFrameLayout extends FrameLayout {
         addView(tietuFrameLayout, layoutParams);
         return tietuFrameLayout;
     }
+
 }

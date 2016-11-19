@@ -64,7 +64,6 @@ public class CutView extends PtuView implements TSRView {
 
 
     }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (frame.onTouchEvent(event)) return true;//是否交给Frame处理
@@ -165,9 +164,6 @@ public class CutView extends PtuView implements TSRView {
         }
     }
 
-    /**
-     *
-     */
     private float getAngle(float x, float y, float x1, float y1) {
         float dx = x1 - x, dy = y1 - y;
         double angle = Math.atan2(dy, dx);
@@ -182,9 +178,8 @@ public class CutView extends PtuView implements TSRView {
 
     /**
      * 自动缩放时控制比例，不能太大或太小
-     *
-     * @param ratio
-     * @return
+     * @param ratio 期望的比例
+     * @return 实际能缩放的比例
      */
     public float getUsableScaleSize(float ratio) {
         if (totalRatio * ratio <= initRatio) //最小
@@ -195,16 +190,16 @@ public class CutView extends PtuView implements TSRView {
     }
 
     public String[] getLocationAtPicture(float centerX, float centerY) {
-        return PtuUtil.getLocationAtPicture(centerX, centerY,
+        return PtuUtil.getLocationAtPicture(String.valueOf(centerX), String.valueOf(centerY),
                 srcRect, dstRect);
     }
 
     public Bitmap getResultBm() {
         //原图
         if (srcRect.width() == sourceBitmap.getWidth() && srcRect.height() == sourceBitmap.getHeight() &&
-                frame.frameWidth >= dstRect.width() - 1 && frame.frameHeight >= dstRect.height() - 1) {
-            Util.P.le(TAG, "获取了原图");
-            return sourceBitmap;
+                frame.frameWidth >= dstRect.width() - 1 && frame.frameHeight >= dstRect.height() - 1
+                &&!frame.isFixedSize()) {
+            return sourceBitmap.copy(sourceBitmap.getConfig(),true);
         } else {
             int left = Math.round((frame.frameLeft - picLeft) / totalRatio);
             int top = Math.round((frame.frameTop - picTop) / totalRatio);
@@ -214,6 +209,10 @@ public class CutView extends PtuView implements TSRView {
             if(frame.isFixedSize()){
                 matrix.postScale(frame.getFixedWidth()*1f/rw,frame.getFixedWidth()*1f/rw);
             }
+            if(left<0)left=0;
+            else if(top<0)top=0;
+            if(left+rw>sourceBitmap.getWidth())rw=sourceBitmap.getWidth()-left;
+            if(top+rh>sourceBitmap.getHeight())rh=sourceBitmap.getHeight()-top;
             return Bitmap.createBitmap(sourceBitmap, left, top, rw, rh,matrix,true);
         }
     }

@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-<SeekBar
-    android:id="@+id/seekbar_toumingdu"
-    android:thumb="@drawable/seekbar_thumb_bigoval"
-    android:progressDrawable="@drawable/seekbar_progress"
-    android:paddingLeft="15dp"
-    android:paddingRight="15dp"
-    android:thumbOffset="15dp"
-    android:maxHeight="5dp"
-    android:layout_gravity="center_vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-   />
+
+    <SeekBar
+        android:id="@+id/seekbar_toumingdu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:maxHeight="2dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:progressDrawable="@drawable/seekbar_progress"
+        android:thumb="@drawable/seekbar_thumb_bigoval"
+         />
 </LinearLayout>

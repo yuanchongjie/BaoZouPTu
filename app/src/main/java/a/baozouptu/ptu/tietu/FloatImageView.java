@@ -15,6 +15,7 @@ import a.baozouptu.R;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.MicroButtonData;
+import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.view.IconBitmapCreator;
 
 /**
@@ -105,7 +106,7 @@ public class FloatImageView extends ImageView {
         if (!showRim) return false;//边框没显示出来，返回false
         RectF itemBound = new RectF();
 //        item方面的,取消item
-        int r = Math.round(getPaddingTop()*1.5f);
+        int r = Math.round(getPaddingTop() * 1.5f);
         itemBound.left = getWidth() - r * 2;
         itemBound.top = 0;
         itemBound.right = getWidth();
@@ -114,6 +115,7 @@ public class FloatImageView extends ImageView {
             return true;
         return false;
     }
+
     /**
      * 返回false,父布局的onTouchEvent一定会被调用
      */
@@ -128,14 +130,14 @@ public class FloatImageView extends ImageView {
         Util.P.le(TAG, "onDraw方法被调用");
         if (showRim) {
             //画边框
-            int r = getPaddingTop();
-            rim.reset();
+            int r = pad;
+            /*rim.reset();
             rim.moveTo(r, r);
             rim.lineTo(getWidth() - r, r);
             rim.lineTo(getWidth() - r, getHeight() - r);
             rim.lineTo(r, getHeight() - r);
             rim.close();
-            canvas.drawPath(rim, rimPaint);
+            canvas.drawPath(rim, rimPaint);*/
 
             //画item的icon
             //取消item
@@ -146,8 +148,8 @@ public class FloatImageView extends ImageView {
     }
 
     public void releaseResourse() {
-        if(srcBitmap!=null)   srcBitmap.recycle();
-        srcBitmap =null;
+        if (srcBitmap != null) srcBitmap.recycle();
+        srcBitmap = null;
     }
 
 
@@ -156,16 +158,16 @@ public class FloatImageView extends ImageView {
     }
 
     /**
-     *
      * @return 获取高除以宽的比
      */
-    public float getHWRatio(){
-        return srcBitmap.getHeight()*1f/srcBitmap.getWidth();
+    public float getHWRatio() {
+        return srcBitmap.getHeight() * 1f / srcBitmap.getWidth();
     }
 
     public void setImageBitmapAndPath(Bitmap srcBitmap, String path) {
-        this.srcBitmap =srcBitmap;
-        picPath=path;
+        this.srcBitmap = srcBitmap;
+        picPath = path;
         setImageBitmap(srcBitmap);
     }
+
 }

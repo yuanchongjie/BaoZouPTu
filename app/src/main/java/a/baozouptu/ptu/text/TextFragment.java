@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
@@ -23,6 +24,9 @@ import a.baozouptu.R;
 import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.Util;
+import a.baozouptu.base.view.FirstUseDialog;
+import a.baozouptu.base.view.RubberView;
+import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.repealRedo.StepData;
@@ -31,28 +35,30 @@ import a.baozouptu.ptu.view.ColorBar;
 import a.baozouptu.ptu.view.ColorLump;
 import a.baozouptu.base.view.HorizontalListView;
 import a.baozouptu.base.view.MySwitchButton;
+import a.baozouptu.ptu.view.PtuFrameLayout;
 import a.baozouptu.ptu.view.PtuView;
 
 /**
  * 添加文字功能的fragment
  * Created by Administrator on 2016/5/1.
  */
-public class TextFragment extends Fragment {
+public class TextFragment extends Fragment implements BaseFunction {
     PtuActivity mAcitivty;
     LinearLayout toumingdu;
     LinearLayout style;
     LinearLayout color;
     LinearLayout typeface;
-    LinearLayout special;
-    LinearLayout bouble;
+    LinearLayout rubber;
+    //LinearLayout bouble;
     private int lastColor = 0xff000000;
     private FunctionPopWindowBuilder textPopupBuilder;
     private FloatTextView floatTextView;
     private Typeface curTypeface = Typeface.MONOSPACE;
     private String TAG = "TextFragment";
+    private RubberView rubberView;
 
 
-    public static void addBigStep(Bitmap bm, StepData sd) {
+    public  void addBigStep(Bitmap bm, StepData sd) {
         TextStepData tsd = (TextStepData) sd;
         RepealRedoManager.addBm2Bm(bm, BitmapTool.getLosslessBitmap(tsd.picPath),
                 tsd.boundRectInPic, tsd.rotateAngle);
@@ -79,8 +85,8 @@ public class TextFragment extends Fragment {
         style = (LinearLayout) view.findViewById(R.id.add_text_style);
         color = (LinearLayout) view.findViewById(R.id.add_text_color);
         typeface = (LinearLayout) view.findViewById(R.id.add_text_typeface);
-        special = (LinearLayout) view.findViewById(R.id.add_text_special);
-        bouble = (LinearLayout) view.findViewById(R.id.add_text_bubble);
+        rubber = (LinearLayout) view.findViewById(R.id.text_rubber);
+        //bouble = (LinearLayout) view.findViewById(R.id.add_text_bubble);
     }
 
     /**
@@ -112,6 +118,40 @@ public class TextFragment extends Fragment {
                 textPopupBuilder.setStylePopWindow(v);
             }
         });
+        rubber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!AllData.appConfig.hasReadTextRubber()) {
+                    final FirstUseDialog firstUseDialog = new FirstUseDialog(getActivity());
+                    firstUseDialog.createDialog(null,"滑动即可擦除", new FirstUseDialog.ActionListener() {
+                        @Override
+                        public void onSure() {
+                            AllData.appConfig.writeConfig_TextRubber(true);
+                        }
+                    });
+                }
+                switchRubber();
+            }
+        });
+    }
+
+    private void switchRubber() {
+        PtuFrameLayout ptuFrame = ((PtuActivity) getActivity()).getPtuFrame();
+        if (ptuFrame.indexOfChild(floatTextView) == -1) {
+            ptuFrame.removeViewAt(ptuFrame.getChildCount()-1);
+            addErasureInPic();
+            ptuFrame.addView(floatTextView);
+            return;
+        }
+        ptuFrame.removeView(floatTextView);
+        PtuView ptuview=((PtuActivity) getActivity()).ptuView;
+        FrameLayout.LayoutParams params=new  FrameLayout.LayoutParams(ptuview.getDstRect().width(),ptuview.getDstRect().height());
+        params.setMargins(ptuview.getDstRect().left,ptuview.getDstRect().top,0,0);
+        rubberView = new RubberView(getActivity(),ptuview);
+        ptuFrame.addView(rubberView,params);
+    }
+
+    private void addErasureInPic() {
     }
 
     public void setFloatView(FloatTextView floatView) {
@@ -460,4 +500,25 @@ public class TextFragment extends Fragment {
         textPopupBuilder = null;
         super.onDestroy();
     }
+
+    @Override
+    public void repeal() {
+
+    }
+
+    @Override
+    public void redo(StepData sd) {
+
+    }
+
+    @Override
+    public Bitmap getResultBm(float ratio) {
+        return null;
+    }
+
+    @Override
+    public StepData getResultData(float ratio) {
+        return null;
+    }
+
 }

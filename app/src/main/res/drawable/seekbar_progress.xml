@@ -14,7 +14,7 @@
     <item android:id="@android:id/progress">
         <clip>
             <shape>
-               <solid android:color="#03a9f4"/>
+               <solid android:color="@color/amber"/>
             </shape>
         </clip>
     </item>

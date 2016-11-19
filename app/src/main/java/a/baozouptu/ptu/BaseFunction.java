@@ -31,10 +31,16 @@ public interface BaseFunction {
 
     /**
      * 提供撤销重做所需的数据
+     *
      * @param ratio
-     * @return  stepDate的子类
+     * @return stepDate的子类
      */
     StepData getResultData(float ratio);
+
+    /**
+     * 做一大步功能
+     */
+    void addBigStep(Bitmap bm, StepData sd);
 
     void releaseResource();
 }

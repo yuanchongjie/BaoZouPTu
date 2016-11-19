@@ -62,6 +62,11 @@ public class ChosePictureActivity extends AppCompatActivity {
     private List<String> currentPicPathList = new ArrayList<>();
 
     /**
+     * 新P的图片，不好添加，用这个显示添加
+     */
+    String editedPicPath;
+
+    /**
      * 文件列表的几个相关list
      */
     private List<String> dirInfoList;
@@ -104,6 +109,15 @@ public class ChosePictureActivity extends AppCompatActivity {
                 } else if (msg.obj.equals("change_file")) {
                     Util.P.le(TAG, "finish update file");
                     fileAdapter.notifyDataSetChanged();
+                }else {
+                    if (editedPicPath != null) {
+                        if (!usuPicProcessor.hasRecentPic(editedPicPath)) {
+                            usuPicProcessor.addRecentPathFirst(editedPicPath);
+                            picAdpter.notifyDataSetChanged();
+                            Util.P.le("已更新图片");
+                        }
+                        editedPicPath = null;
+                    }
                 }
             }
         };
@@ -148,7 +162,7 @@ public class ChosePictureActivity extends AppCompatActivity {
         DisplayMetrics metric = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metric);
         AllData.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
-        AllData.screenHeight=metric.heightPixels;
+        AllData.screenHeight = metric.heightPixels;
     }
 
     private void initView() {
@@ -398,7 +412,7 @@ public class ChosePictureActivity extends AppCompatActivity {
                         if (usualyPicPathList.contains(path)) {//包含才常用列表里面，删除常用列表中的信息
                             usuPicProcessor.onDeleteUsuallyPicture(path);
                         }
-                            currentPicPathList.remove(path);
+                        currentPicPathList.remove(path);
                         picAdpter.notifyDataSetChanged();
                         fileAdapter.notifyDataSetChanged();
                     }
@@ -450,7 +464,6 @@ public class ChosePictureActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         usuPicProcessor.getAllPicInfoAndRecent();
-        picAdpter.notifyDataSetChanged();
         super.onResume();
     }
 
@@ -465,11 +478,7 @@ public class ChosePictureActivity extends AppCompatActivity {
                 overridePendingTransition(0, R.anim.go_send_exit);
             } else {
                 if (usuPicProcessor.isUsuPic(currentPicPathList)) {
-                    String new_path = data.getStringExtra("new_path");
-                    if (new_path != null) {
-                        usuPicProcessor.addRecentPath(new_path);
-                        picAdpter.notifyDataSetChanged();
-                    }
+                    editedPicPath = data.getStringExtra("new_path");
                 } else {//不是常用的图片，是文件夹中的图片，则更新文件
                     String new_path = data.getStringExtra("new_path");
                     if (new_path != null) {
@@ -519,9 +528,10 @@ public class ChosePictureActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-      //  AsyncImageLoader3.getInstance().stop();
+        //  AsyncImageLoader3.getInstance().stop();
         super.onStop();
     }
+
     @Override
     protected void onRestart() {
         //AsyncImageLoader3.getInstance().reStart();

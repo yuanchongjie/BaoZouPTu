@@ -1,11 +1,16 @@
 package a.baozouptu.common;
 
 import android.content.Context;
+import android.os.Environment;
 
 import java.io.IOException;
 
+import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.dataAndLogic.MyDatabase;
+import a.baozouptu.base.util.FileTool;
 import a.baozouptu.base.util.Util;
+
+import static a.baozouptu.base.dataAndLogic.AllData.appConfig;
 
 /**
  * Created by liuguicen on 2016/8/13.
@@ -13,7 +18,6 @@ import a.baozouptu.base.util.Util;
  * @description
  */
 public class InstallPolicy {
-    AppConfig appConfig;
     Context mGloableContext;
     private MyDatabase myDatabase;
 
@@ -24,6 +28,7 @@ public class InstallPolicy {
 
     public void processPolicy() {
         if (appConfig.isNewInstall()) {//新安装安
+            createAppFile();
             MyDatabase myDatabase = null;
             try {//添加分享的优先选项
                 String[] shareTitls = new String[]{"添加到微信收藏", "陌陌", "保存到QQ收藏", "发送给朋友", "发送给好友"};
@@ -37,6 +42,13 @@ public class InstallPolicy {
                 myDatabase.close();
             }
        }
+    }
+
+    /**
+     * 创建App的文件
+     */
+    private void createAppFile() {
+
     }
 
 }
