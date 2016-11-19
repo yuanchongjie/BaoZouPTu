@@ -45,7 +45,6 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
 
     @Override
     public void repeal() {
-
         drawView.undo();
         Log.e(TAG,
                 "repeal");

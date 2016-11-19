@@ -32,7 +32,6 @@ import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.FileTool;
 import a.baozouptu.base.util.Util;
-import a.baozouptu.base.view.FirstUseDialog;
 import a.baozouptu.chosePicture.ProcessUsuallyPicPath;
 import a.baozouptu.ptu.control.MainFunctionFragment;
 import a.baozouptu.ptu.cut.CutFragment;
@@ -249,13 +248,17 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         repealBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bigRepeal();
+                if (CURRENT_EDIT_MODE == EDIT_MAIN)
+                    bigRepeal();
+                else smallRepeal();
             }
         });
         redoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bigRedo();
+                if (CURRENT_EDIT_MODE == EDIT_MAIN)
+                    bigRedo();
+                else smallRedo();
             }
         });
         goSendBtn.setOnClickListener(
@@ -263,7 +266,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     @Override
                     public void onClick(View v) {
                         if (!AllData.appConfig.hasReadGoSend()) {
-                            AlertDialog.Builder builder=new AlertDialog.Builder(PtuActivity.this);
+                            AlertDialog.Builder builder = new AlertDialog.Builder(PtuActivity.this);
                             builder.setTitle("快捷发送");
                             builder.setMessage("页面将会关闭，" +
                                     "点击通讯软件的发送图片即可快捷发送");
@@ -274,8 +277,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                                 }
                             });
                             builder.create().show();
-                        }
-                        else goSend();
+                        } else goSend();
 
                     }
                 }
@@ -413,28 +415,11 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     }
 
-    private void bigRepeal() {
-        Util.P.le(TAG, "开始执行撤销");
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.show();
+
+    private void smallRepeal() {
         switch (CURRENT_EDIT_MODE) {
             //主界面的重做
             case EDIT_MAIN:
-                if (repealRedoManager.canRepeal()) {
-                    repealRedoManager.repeal();
-                    ptuView.releaseResource();
-                    Bitmap newSourceBm = repealRedoManager.getBaseBitmap().
-                            copy(Bitmap.Config.ARGB_8888, true);
-                    ptuView.replaceSourceBm(newSourceBm);
-                    Util.P.le(TAG, "撤销的替换基图成功");
-                    int index = repealRedoManager.getCurrentIndex();
-                    for (int i = 0; i <= index; i++) {
-                        StepData sd = repealRedoManager.getStepdata(i);
-                        addStep(newSourceBm, sd);
-                    }
-                    Util.P.le(TAG, "撤销的多步添加图片完成");
-                    ptuView.resetShow();
-                }
                 break;
             case EDIT_DRAW:
                 drawFrag.repeal();
@@ -446,6 +431,47 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 matFrag.repeal();
                 break;
         }
+    }
+
+    private void smallRedo() {
+        switch (CURRENT_EDIT_MODE) {
+            //主界面的重做
+            case EDIT_MAIN:
+                break;
+            case EDIT_DRAW:
+                drawFrag.redo(null);
+                break;
+            case EDIT_TIETU:
+                tietuFrag.redo(null);
+                break;
+            case EDIT_MAT:
+                matFrag.redo(null);
+                break;
+        }
+
+    }
+
+    private void bigRepeal() {
+        Util.P.le(TAG, "开始执行撤销");
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+
+        if (repealRedoManager.canRepeal()) {
+            repealRedoManager.repeal();
+            ptuView.releaseResource();
+            Bitmap newSourceBm = repealRedoManager.getBaseBitmap().
+                    copy(Bitmap.Config.ARGB_8888, true);
+            ptuView.replaceSourceBm(newSourceBm);
+            Util.P.le(TAG, "撤销的替换基图成功");
+            int index = repealRedoManager.getCurrentIndex();
+            for (int i = 0; i <= index; i++) {
+                StepData sd = repealRedoManager.getStepdata(i);
+                addStep(newSourceBm, sd);
+            }
+            Util.P.le(TAG, "撤销的多步添加图片完成");
+            ptuView.resetShow();
+        }
+
         progressDialog.dismiss();
         checkRepealRedo();
     }
@@ -582,9 +608,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                             .commit();
                     FrameLayout.LayoutParams drawFloatParams =
                             new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    drawFloatParams.setMargins(0,0,0,0);
+                    drawFloatParams.setMargins(0, 0, 0, 0);
                     ptuFrame.addView(
-                            drawFrag.createDrawView(this,totalBound,ptuView.getPicBound())
+                            drawFrag.createDrawView(this, totalBound, ptuView.getPicBound())
                             , drawFloatParams);
 
                     CURRENT_EDIT_MODE = EDIT_DRAW;
@@ -675,7 +701,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         else if (CURRENT_EDIT_MODE == EDIT_TIETU) {
             TietuStepData ttsd = (TietuStepData) tietuFrag.getResultData(1);
             ttsd.EDIT_MODE = EDIT_TIETU;
-            tietuFrag.addBigStep(null,ttsd);
+            tietuFrag.addBigStep(null, ttsd);
             //释放，删除等部分
             tietuFrag.releaseResource();
             ptuFrame.removeViewAt(1);

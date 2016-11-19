@@ -217,13 +217,16 @@ public class TietuFragment extends Fragment implements BaseFunction {
         Iterator<StepData> iterator = ttsd.iterator();
         while (iterator.hasNext()) {
             StepData sd = iterator.next();
-            Bitmap souceBitmap= TietuSizeControler.getBitmapInSize(mContext, sd.picPath,
+            Bitmap sourceBitmap= TietuSizeControler.getBitmapInSize(mContext, sd.picPath,
                     Math.round(sd.boundRectInPic.width()),Math.round(sd.boundRectInPic.height()));
-            ptuView.addBitmap(souceBitmap,
+            ptuView.addBitmap(sourceBitmap,
                     sd.boundRectInPic, sd.rotateAngle);
         }
     }
 
+    public void smallRedo(){
+
+    }
     @Override
     public Bitmap getResultBm(float ratio) {
         return null;
