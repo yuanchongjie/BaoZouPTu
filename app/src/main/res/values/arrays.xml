@@ -12,10 +12,9 @@
     <string-array name="paintstyle" >
         <item>画笔</item>
         <item>橡皮</item>
-        <item>样式1</item>
-        <item>样式2</item>
-        <item>样式3</item>
-        <item>样式4</item>
-        <item>样式5</item>
+        <item>浮雕</item>
+        <item>模糊</item>
+        <item>彩虹</item>
+        <item>马赛克</item>
     </string-array>
 </resources>
