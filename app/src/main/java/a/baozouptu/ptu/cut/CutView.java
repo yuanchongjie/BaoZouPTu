@@ -190,7 +190,7 @@ public class CutView extends PtuView implements TSRView {
     }
 
     public String[] getLocationAtPicture(float centerX, float centerY) {
-        return PtuUtil.getLocationAtPicture(centerX, centerY,
+        return PtuUtil.getLocationAtPicture(String.valueOf(centerX), String.valueOf(centerY),
                 srcRect, dstRect);
     }
 

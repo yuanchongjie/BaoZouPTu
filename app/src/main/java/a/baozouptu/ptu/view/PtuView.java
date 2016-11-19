@@ -108,6 +108,7 @@ public class PtuView extends View implements TSRView {
      * 当前图片的宽和高
      */
     protected int curPicWidth = 10, curPicHeight = 10;
+
     protected Canvas sourceCanvas;
 
     public PtuView(Context context) {
@@ -416,6 +417,9 @@ public class PtuView extends View implements TSRView {
      * 会显示出来
      */
     public void replaceSourceBm(Bitmap newBm) {
+        if(newBm==sourceBitmap){
+            return;
+        }
         if (sourceBitmap != null) {
             sourceBitmap.recycle();
             sourceBitmap = null;

@@ -45,13 +45,14 @@ public class TietuFragment extends Fragment implements BaseFunction {
     private TietuFrameLayout tietuLayout;
     Context mContext;
     List<String> tietuPaths = new ArrayList<>();
+
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private RecyclerAdapter tietuAdapter;
+
     private LinearLayout more;
 
     private PtuView ptuView;
-    private RepealRedoManager<StepData> mRpealRedoList;
 
     public void setTietuLayout(TietuFrameLayout tietuLayout) {
         this.tietuLayout = tietuLayout;
@@ -83,7 +84,6 @@ public class TietuFragment extends Fragment implements BaseFunction {
     public void onCreate(Bundle savedInstanceState) {
         mContext = getActivity();
         loadTietuPath();
-        mRpealRedoList=new RepealRedoManager<>(20);
         super.onCreate(savedInstanceState);
     }
 
@@ -160,18 +160,16 @@ public class TietuFragment extends Fragment implements BaseFunction {
 
     /**
      * 添加一个tietu，
-     *
      * @param path
      */
     private void addFloatImageView(String path) {
-        Bitmap srcBitmap = TietuSizeControler.getSrcBitmap(getActivity(), path);
+        Bitmap srcBitmap = TietuSizeControler.getSrcBitmap(path);
         FloatImageView floatImageView = new FloatImageView(mContext);
         floatImageView.setAdjustViewBounds(true);
         floatImageView.setImageBitmapAndPath(srcBitmap,path);
         FrameLayout.LayoutParams params = TietuSizeControler.getFeatParams(srcBitmap.getWidth(), srcBitmap.getHeight(),
                 ptuView.getPicBound());
         tietuLayout.addView(floatImageView, params);
-        Util.P.le(TAG, "添加贴图成功 "+"长宽比 "+params.width*1f/params.height);
     }
 
     private void removeFloatImageView(FloatImageView view) {
@@ -245,15 +243,15 @@ public class TietuFragment extends Fragment implements BaseFunction {
             StepData sd = new StepData(PtuActivity.EDIT_TIETU);
 //获取每个tietu的范围
             RectF boundRectInPic = new RectF();
-            String[] temp = PtuUtil.getLocationAtPicture(fiv.getLeft(), fiv.getTop(),
+            float[] temp = PtuUtil.getLocationAtPicture(fiv.getLeft()+FloatImageView.pad, fiv.getTop()+FloatImageView.pad,
                     ptuView.getSrcRect(), ptuView.getDstRect());
-            boundRectInPic.left = Float.valueOf(temp[0]);
-            boundRectInPic.top = Float.valueOf(temp[1]);
+            boundRectInPic.left = temp[0];
+            boundRectInPic.top = temp[1];
 
-            temp = PtuUtil.getLocationAtPicture(fiv.getRight(), fiv.getBottom(),
+            temp = PtuUtil.getLocationAtPicture(fiv.getRight()-FloatImageView.pad, fiv.getBottom()-FloatImageView.pad,
                     ptuView.getSrcRect(), ptuView.getDstRect());
-            boundRectInPic.right = Float.valueOf(temp[0]);
-            boundRectInPic.bottom = Float.valueOf(temp[1]);
+            boundRectInPic.right = temp[0];
+            boundRectInPic.bottom = temp[1];
 
             sd.boundRectInPic = boundRectInPic;
             sd.rotateAngle = fiv.getRotation();
@@ -277,6 +275,16 @@ public class TietuFragment extends Fragment implements BaseFunction {
         this.ptuView = ptuView;
     }
 
+    public void addBigStep(@Nullable Bitmap bm, StepData psd) {
+        TietuStepData ttsd=(TietuStepData)psd;
+        Iterator<StepData> iterator = ttsd.iterator();
+        while (iterator.hasNext()) {
+            StepData sd = iterator.next();
+            ptuView.addBitmap(TietuSizeControler.getSrcBitmap(sd.picPath),
+                    sd.boundRectInPic, sd.rotateAngle);
+        }
+
+    }
 }
 
 /**

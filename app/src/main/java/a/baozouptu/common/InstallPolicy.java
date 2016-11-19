@@ -5,9 +5,12 @@ import android.os.Environment;
 
 import java.io.IOException;
 
+import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.dataAndLogic.MyDatabase;
 import a.baozouptu.base.util.FileTool;
 import a.baozouptu.base.util.Util;
+
+import static a.baozouptu.base.dataAndLogic.AllData.appConfig;
 
 /**
  * Created by liuguicen on 2016/8/13.
@@ -15,7 +18,6 @@ import a.baozouptu.base.util.Util;
  * @description
  */
 public class InstallPolicy {
-    AppConfig appConfig;
     Context mGloableContext;
     private MyDatabase myDatabase;
 

@@ -146,6 +146,11 @@ public class CutFragment extends Fragment implements BaseFunction {
     }
 
     @Override
+    public void addBigStep(Bitmap bm, StepData sd) {
+
+    }
+
+    @Override
     public void releaseResource() {
         cutView.releaseResource();
     }

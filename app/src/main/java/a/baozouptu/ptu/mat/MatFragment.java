@@ -98,6 +98,11 @@ public class MatFragment extends Fragment implements BaseFunction {
     }
 
     @Override
+    public void addBigStep(Bitmap bm, StepData sd) {
+
+    }
+
+    @Override
     public void releaseResource() {
         matView.releaseResource();
     }

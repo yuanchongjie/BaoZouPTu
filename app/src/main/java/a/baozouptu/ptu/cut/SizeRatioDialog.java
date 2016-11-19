@@ -136,14 +136,14 @@ class SizeRatioDialog {
             public void onClick(View v) {
                 if (getAndSetParams())
                     actionListener.onSure(w, h);
-                dialog.hide();
+                dialog.dismiss();
             }
         });
         cancelBn = (Button) view.findViewById(R.id.cut_sr_cancle);
         cancelBn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.hide();
+                dialog.dismiss();
             }
         });
 

@@ -26,13 +26,13 @@ import android.widget.Toast;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import java.io.File;
-import java.util.Iterator;
 
 import a.baozouptu.R;
 import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.FileTool;
 import a.baozouptu.base.util.Util;
+import a.baozouptu.base.view.FirstUseDialog;
 import a.baozouptu.chosePicture.ProcessUsuallyPicPath;
 import a.baozouptu.ptu.control.MainFunctionFragment;
 import a.baozouptu.ptu.cut.CutFragment;
@@ -45,9 +45,7 @@ import a.baozouptu.ptu.repealRedo.TietuStepData;
 import a.baozouptu.ptu.saveAndShare.SaveSetDialogManager;
 import a.baozouptu.ptu.text.FloatTextView;
 import a.baozouptu.ptu.text.TextFragment;
-import a.baozouptu.ptu.tietu.FloatImageView1;
 import a.baozouptu.ptu.tietu.TietuFragment;
-import a.baozouptu.ptu.tietu.TietuSizeControler;
 import a.baozouptu.ptu.view.PtuFrameLayout;
 import a.baozouptu.ptu.view.PtuTopRelativeLayout;
 import a.baozouptu.ptu.view.PtuView;
@@ -83,6 +81,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     private CutFragment cutFrag;
     private MatFragment matFrag;
     public PtuView ptuView;
+
     private PtuFrameLayout ptuFrame;
     /**
      * 子功能获取的bitmap的参数,0为获取图片相对原图片的左边距，1为获取图片相对原图片的上边距，
@@ -220,7 +219,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                switchFragment(EDIT_CUT);
+                switchFragment(EDIT_TEXT);
             }
         }, 500);
        /* new Handler().postDelayed(new Runnable() {
@@ -263,7 +262,21 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        goSend();
+                        if (!AllData.appConfig.hasReadGoSend()) {
+                            AlertDialog.Builder builder=new AlertDialog.Builder(PtuActivity.this);
+                            builder.setTitle("快捷发送");
+                            builder.setMessage("页面将会关闭，" +
+                                    "点击通讯软件的发送图片即可快捷发送");
+                            builder.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    AllData.appConfig.wiriteConfig_GoSend(true);
+                                }
+                            });
+                            builder.create().show();
+                        }
+                        else goSend();
+
                     }
                 }
         );
@@ -388,32 +401,30 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     private void addStep(Bitmap bm, StepData sd) {
         switch (sd.EDIT_MODE) {
             case EDIT_TEXT:
-                TextFragment.addBigStep(bm, sd);
+                textFrag.addBigStep(bm, sd);
                 break;
             case EDIT_TIETU:
-                FloatImageView1.addBigStep(bm, sd);
+                tietuFrag.addBigStep(bm, sd);
                 break;
             case EDIT_DRAW:
-                DrawFragment.addBigStep(bm, sd);
+                drawFrag.addBigStep(bm, sd);
                 break;
         }
 
     }
 
     private void bigRepeal() {
-        Util.P.le(TAG, "执行开始撤销");
+        Util.P.le(TAG, "开始执行撤销");
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         switch (CURRENT_EDIT_MODE) {
+            //主界面的重做
             case EDIT_MAIN:
                 if (repealRedoManager.canRepeal()) {
                     repealRedoManager.repeal();
                     ptuView.releaseResource();
                     Bitmap newSourceBm = repealRedoManager.getBaseBitmap().
                             copy(Bitmap.Config.ARGB_8888, true);
-                    String newPath = FileTool.createTempPicPath(this);
-                    BitmapTool.saveBitmap(this, newSourceBm, newPath, false);
-                    picPath = newPath;
                     ptuView.replaceSourceBm(newSourceBm);
                     Util.P.le(TAG, "撤销的替换基图成功");
                     int index = repealRedoManager.getCurrentIndex();
@@ -650,12 +661,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         else if (CURRENT_EDIT_MODE == EDIT_TIETU) {
             TietuStepData ttsd = (TietuStepData) tietuFrag.getResultData(1);
             ttsd.EDIT_MODE = EDIT_TIETU;
-            Iterator<StepData> iterator = ttsd.iterator();
-            while (iterator.hasNext()) {
-                StepData sd = iterator.next();
-                ptuView.addBitmap(TietuSizeControler.getSrcBitmap(PtuActivity.this, sd.picPath),
-                        sd.boundRectInPic, sd.rotateAngle);
-            }
+            tietuFrag.addBigStep(null,ttsd);
             //释放，删除等部分
             tietuFrag.releaseResource();
             ptuFrame.removeViewAt(1);
@@ -728,7 +734,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         }
     }
 
-
     @Override
     protected void onStop() {
         if (endType == "share")
@@ -743,5 +748,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         if (repealRedoManager != null)
             repealRedoManager.clear(this);
         super.onDestroy();
+    }
+
+    public PtuFrameLayout getPtuFrame() {
+        return ptuFrame;
     }
 }

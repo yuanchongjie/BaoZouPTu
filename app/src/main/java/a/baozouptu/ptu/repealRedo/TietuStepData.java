@@ -7,7 +7,7 @@ import java.util.Iterator;
  * Created by Administrator on 2016/7/27.
  */
 public class TietuStepData extends  StepData implements Iterable {
-    ArrayList<StepData> tietuList = new ArrayList<>();
+    private ArrayList<StepData> tietuList = new ArrayList<>();
 
     public TietuStepData(int mode) {
         super(mode);

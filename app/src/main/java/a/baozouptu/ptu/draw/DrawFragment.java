@@ -36,11 +36,12 @@ public class DrawFragment extends Fragment implements DrawBaseFunction {
     }
 
     @Override
-    public void releaseResource() {
+    public void addBigStep(Bitmap bm, StepData sd) {
 
     }
 
-    public static void addBigStep(Bitmap bm, StepData sd) {
+    @Override
+    public void releaseResource() {
 
     }
 }

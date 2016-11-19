@@ -1,5 +1,7 @@
 package a.baozouptu.base.dataAndLogic;
 
+import a.baozouptu.common.AppConfig;
+
 /**
  * 保存应用所需的一些常用通用的数据项
  *
@@ -30,4 +32,5 @@ public class AllData {
     public static long lastScanTime = 0;
     public static AsyncImageLoader3 imageLoader3 = AsyncImageLoader3.getInstance();
     public static final String TAG="LOL";
+    public static AppConfig appConfig;
 }
