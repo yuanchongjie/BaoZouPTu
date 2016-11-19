@@ -265,6 +265,7 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
             View contentView = LayoutInflater.from(mContext).inflate(R.layout.popwindow_toumindu, null);
             SeekBar seekBar = (SeekBar) contentView.findViewById(R.id.seekbar_toumingdu);
             seekBar.setMax(100);
+            seekBar.setProgress(drawView.currentSize);
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
