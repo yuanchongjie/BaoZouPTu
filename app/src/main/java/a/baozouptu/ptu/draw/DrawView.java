@@ -1,14 +1,17 @@
-package a.baozouptu.ptu.view;
+package a.baozouptu.ptu.draw;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.EmbossMaskFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
@@ -28,7 +31,7 @@ import java.util.List;
  * 涂鸦View
  * Created by yonglong on 2016/7/2.
  */
-public class TuyaView extends View{
+public class DrawView extends View {
     private Context context;
     private Bitmap mBitmap;
     private Canvas mCanvas;
@@ -48,20 +51,25 @@ public class TuyaView extends View{
     private int currentSize = 5;
     private int currentStyle = 1;
     private int[] paintColor;//颜色集合
+
     private class DrawPath {
         public Path path;// 路径
         public Paint paint;// 画笔
     }
 
-    public TuyaView(Context context,int w,int h) {
+    /**
+     * @param context
+     * @param picBound
+     */
+    public DrawView(Context context, Rect picBound) {
         super(context);
         this.context = context;
-        screenWidth = w;
-        screenHeight = h;
+        screenWidth = picBound.width();
+        screenHeight = picBound.height();
         paintColor = new int[]{
                 Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.BLACK, Color.GRAY, Color.CYAN
         };
-        setLayerType(LAYER_TYPE_SOFTWARE,null);//设置默认样式，去除dis-in的黑色方框以及clear模式的黑线效果
+        setLayerType(LAYER_TYPE_SOFTWARE, null);//设置默认样式，去除dis-in的黑色方框以及clear模式的黑线效果
         initCanvas();
         savePath = new ArrayList<>();
         deletePath = new ArrayList<>();
@@ -71,29 +79,87 @@ public class TuyaView extends View{
         setPaintStyle();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         //画布大小
+//        Bitmap.createBitmap(sourceBitmap, rect.left, rect.top,
+//                rect.right - rect.left, rect.bottom - rect.top, matrix, true);
         mBitmap = Bitmap.createBitmap(screenWidth, screenHeight, Bitmap.Config.ARGB_8888);
         mBitmap.eraseColor(Color.argb(0, 0, 0, 0));
         mCanvas = new Canvas(mBitmap);  //所有mCanvas画的东西都被保存在了mBitmap中
         mCanvas.drawColor(Color.TRANSPARENT);
     }
+
+    /**
+     * Paint类样式说明
+     * setMaskFilter(MaskFilter maskfilter); 设置MaskFilter，可以用不同的MaskFilter实现滤镜的效果，如滤化，立体等
+     */
+    /*
+      MaskFilter类可以为Paint分配边缘效果。
+     对MaskFilter的扩展可以对一个Paint边缘的alpha通道应用转换。Android包含了下面几种MaskFilter：
+     BlurMaskFilter   指定了一个模糊的样式和半径来处理Paint的边缘。
+     EmbossMaskFilter  指定了光源的方向和环境光强度来添加浮雕效果。
+     要应用一个MaskFilter，可以使用setMaskFilter方法，并传递给它一个MaskFilter对象。下面的例子是对一个已经存在的Paint应用一个EmbossMaskFilter：
+
+
+*/
+
     //初始化画笔样式
     private void setPaintStyle() {
         mPaint = new Paint();
+
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);// 设置外边缘
         mPaint.setStrokeCap(Paint.Cap.ROUND);// 形状
-        mPaint.setAntiAlias(true);
-        mPaint.setDither(true);
-        if (currentStyle == 1) {
-            mPaint.setStrokeWidth(currentSize);
-            mPaint.setColor(currentColor);
-        } else {//橡皮擦
-            mPaint.setAlpha(0);
-            mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-            mPaint.setColor(Color.TRANSPARENT);
-            mPaint.setStrokeWidth(50);
+        mPaint.setAntiAlias(true);//设置是否使用抗锯齿功能，会消耗较大资源，绘制图形速度会变慢。
+        mPaint.setDither(true); //设定是否使用图像抖动处理，会使绘制出来的图片颜色更加平滑和饱满，图像更加清晰
+
+
+        // 设置光源的方向
+        float[] direction = new float[]{ 1.5f, 1.5f, 1.5f };
+        //设置环境光亮度
+        float light = 0.6f;
+        // 选择要应用的反射等级
+        float specular = 6;
+        // 向mask应用一定级别的模糊
+        float mask_blur = 4.2f;
+        EmbossMaskFilter emboss=new EmbossMaskFilter(direction,light,specular,mask_blur);
+
+        //模糊
+        BlurMaskFilter blur = new BlurMaskFilter(8, BlurMaskFilter.Blur.NORMAL);
+
+
+
+        switch (currentStyle){
+            case 0:
+                //初始
+                mPaint.setStrokeWidth(currentSize);
+                mPaint.setColor(currentColor);
+                break;
+            case 1:
+                //橡皮擦
+                mPaint.setAlpha(0);
+                mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+                mPaint.setColor(Color.TRANSPARENT);
+                mPaint.setStrokeWidth(50);
+                break;
+            case 2:
+                mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+                break;
+            case 3:
+                mPaint.setStyle(Paint.Style.FILL);
+                break;
+            case 4:
+                mPaint.setStrokeCap(Paint.Cap.BUTT);
+                break;
+            case 5:
+                // 应用mask
+                mPaint.setMaskFilter(blur);
+                break;
+            case 6:
+                // 应用mask
+                mPaint.setMaskFilter(emboss);
+                break;
         }
     }
+
     @Override
     public void onDraw(Canvas canvas) {
         //canvas.drawColor(0xFFAAAAAA);
@@ -104,11 +170,13 @@ public class TuyaView extends View{
             canvas.drawPath(mPath, mPaint);
         }
     }
+
     private void touch_start(float x, float y) {
         mPath.moveTo(x, y);
         mX = x;
         mY = y;
     }
+
     private void touch_move(float x, float y) {
         float dx = Math.abs(x - mX);
         float dy = Math.abs(mY - y);
@@ -120,6 +188,7 @@ public class TuyaView extends View{
             mY = y;
         }
     }
+
     private void touch_up() {
         mPath.lineTo(mX, mY);
         mCanvas.drawPath(mPath, mPaint);
@@ -127,6 +196,7 @@ public class TuyaView extends View{
         savePath.add(dp);
         mPath = null;// 重新置空
     }
+
     /**
      * 撤销
      * 撤销的核心思想就是将画布清空，
@@ -141,6 +211,7 @@ public class TuyaView extends View{
             redrawOnBitmap();
         }
     }
+
     /**
      * 重做
      */
@@ -150,6 +221,7 @@ public class TuyaView extends View{
             redrawOnBitmap();
         }
     }
+
     private void redrawOnBitmap() {
         /*mBitmap = Bitmap.createBitmap(screenWidth, screenHeight,
                 Bitmap.Config.RGB_565);
@@ -162,6 +234,7 @@ public class TuyaView extends View{
         }
         invalidate();// 刷新
     }
+
     /**
      * 恢复，恢复的核心就是将删除的那条路径重新添加到savapath中重新绘画即可
      */
@@ -177,6 +250,7 @@ public class TuyaView extends View{
             invalidate();
         }
     }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
@@ -192,6 +266,10 @@ public class TuyaView extends View{
                 touch_start(x, y);
                 invalidate();
                 break;
+            case MotionEvent.ACTION_CANCEL:
+                touch_up();
+                invalidate();
+                break;
             case MotionEvent.ACTION_MOVE:
                 touch_move(x, y);
                 invalidate();
@@ -203,6 +281,7 @@ public class TuyaView extends View{
         }
         return true;
     }
+
     //保存到sd卡
     public void saveToSDCard() {
         //获得系统当前时间，并以该时间作为文件名
@@ -221,33 +300,29 @@ public class TuyaView extends View{
 
 
         //发送Sd卡的就绪广播,要不然在手机图库中不存在
-        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.parse("file://" + Environment.getExternalStorageDirectory()));
+        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + Environment.getExternalStorageDirectory()));
         context.sendBroadcast(intent);
-        Toast.makeText(context,"图片已保存",Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "图片已保存", Toast.LENGTH_SHORT).show();
         Log.e("TAG", "图片已保存");
     }
+
     //以下为样式修改内容
     //设置画笔样式
     public void selectPaintStyle(int which) {
-        if (which == 0) {
-            currentStyle = 1;
-            setPaintStyle();
-        }
-        //当选择的是橡皮擦时，设置颜色为白色
-        if (which == 1) {
-            currentStyle = 2;
-            setPaintStyle();
-        }
+        currentStyle = which;
+        setPaintStyle();
     }
+
     //选择画笔大小
     public void selectPaintSize(int which) {
         //int fixed_size = Integer.parseInt(this.getResources().getStringArray(R.array.paintsize)[which]);
         currentSize = which;
         setPaintStyle();
     }
+
     //设置画笔颜色
     public void selectPaintColor(int which) {
-        currentColor = paintColor[which];
+        currentColor = which;
         setPaintStyle();
     }
 }

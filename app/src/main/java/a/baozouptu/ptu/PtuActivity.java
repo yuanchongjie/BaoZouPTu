@@ -572,8 +572,22 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     CURRENT_EDIT_MODE = EDIT_TIETU;
                     break;
                 case EDIT_DRAW:
+                    if (drawFrag == null) {
+                        drawFrag = new DrawFragment();
+                    }
+                    fm.beginTransaction()
+                            .setCustomAnimations(R.animator.slide_bottom_in, R.animator.slide_bottom_out,
+                                    R.animator.slide_bottom_in, R.animator.slide_bottom_out)
+                            .replace(R.id.fragment_function, drawFrag)
+                            .commit();
+                    FrameLayout.LayoutParams drawFloatParams =
+                            new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                    drawFloatParams.setMargins(0,0,0,0);
+                    ptuFrame.addView(
+                            drawFrag.createDrawView(this,totalBound,ptuView.getPicBound())
+                            , drawFloatParams);
 
-                    CURRENT_EDIT_MODE = EDIT_TIETU;
+                    CURRENT_EDIT_MODE = EDIT_DRAW;
                     break;
                 case EDIT_MAT:
                     if (matFrag == null) {

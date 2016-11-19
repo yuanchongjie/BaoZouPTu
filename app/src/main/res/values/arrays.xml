@@ -12,5 +12,10 @@
     <string-array name="paintstyle" >
         <item>画笔</item>
         <item>橡皮</item>
+        <item>样式1</item>
+        <item>样式2</item>
+        <item>样式3</item>
+        <item>样式4</item>
+        <item>样式5</item>
     </string-array>
 </resources>
