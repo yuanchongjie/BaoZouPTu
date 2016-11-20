@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +22,6 @@ import java.util.List;
 
 import a.baozouptu.R;
 import a.baozouptu.base.util.Util;
-import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.ptu.PtuUtil;
 
 /**
@@ -32,7 +30,7 @@ import a.baozouptu.ptu.PtuUtil;
 @TargetApi(Build.VERSION_CODES.M)
 public class MainFunctionFragment extends Fragment {
     int chosedId = 0;
-    Context mcontext;
+    Context mContext;
 
     private View view;
     private Listen listen;
@@ -52,37 +50,37 @@ public class MainFunctionFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mcontext = getActivity();
-        listen = (Listen) mcontext;
+        mContext = getActivity();
+        listen = (Listen) mContext;
         layoutIdList = new ArrayList<>(Arrays.asList(
                 R.id.main_function_cut,
                 R.id.main_function_text,
                 R.id.main_function_tietu,
-                R.id.main_function_draw,
-                R.id.main_function_mat
+                R.id.main_function_draw
+               // R.id.main_function_mat
         ));
         imageIdList = new ArrayList<>(Arrays.asList(
                 R.id.main_function_cut_iv,
                 R.id.main_function_text_iv,
                 R.id.main_function_tietu_iv,
-                R.id.main_function_draw_iv,
-                R.id.main_function_mat_iv
+                R.id.main_function_draw_iv
+               // R.id.main_function_mat_iv
         ));
 
         functionConstantList = new ArrayList<>(Arrays.asList(
                 PtuUtil.EDIT_CUT,
                 PtuUtil.EDIT_TEXT,
                 PtuUtil.EDIT_TIETU,
-                PtuUtil.EDIT_DRAW,
-                PtuUtil.EDIT_MAT
+                PtuUtil.EDIT_DRAW
+                //PtuUtil.EDIT_MAT
         ));
 
         drawableList = new ArrayList<>(Arrays.asList(
                 Util.getDrawable(R.mipmap.edit).mutate(),
                 Util.getDrawable(R.mipmap.text).mutate(),
                 Util.getDrawable(R.mipmap.tietu).mutate(),
-                Util.getDrawable(R.mipmap.draw).mutate(),
-                Util.getDrawable(R.mipmap.mat).mutate()
+                Util.getDrawable(R.mipmap.draw).mutate()
+                //Util.getDrawable(R.mipmap.mat).mutate()
         ));
 
         chosenDrawableList = new ArrayList<>(Arrays.asList(
@@ -93,9 +91,9 @@ public class MainFunctionFragment extends Fragment {
                 getStateDrawable(Util.getDrawable(R.mipmap.tietu).mutate(),
                         getStateList(), PorterDuff.Mode.MULTIPLY),
                 getStateDrawable(Util.getDrawable(R.mipmap.draw).mutate(),
-                        getStateList(), PorterDuff.Mode.SRC_IN),
-                getStateDrawable(Util.getDrawable(R.mipmap.mat).mutate(),
                         getStateList(), PorterDuff.Mode.SRC_IN)
+              /*  getStateDrawable(Util.getDrawable(R.mipmap.mat).mutate(),
+                        getStateList(), PorterDuff.Mode.SRC_IN)*/
 
         ));
         super.onCreate(savedInstanceState);
@@ -122,7 +120,7 @@ public class MainFunctionFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                    /* if(id!=1&&id!=2){
-                        Toast.makeText(mcontext,"暂未实现此功能,敬请期待！",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext,"暂未实现此功能,敬请期待！",Toast.LENGTH_SHORT).show();
                         return;
                     }*/
                     imageList.get(id).setImageDrawable(chosenDrawableList.get(id));
