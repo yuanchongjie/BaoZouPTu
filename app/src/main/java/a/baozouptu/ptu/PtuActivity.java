@@ -49,6 +49,7 @@ import a.baozouptu.ptu.tietu.TietuFragment;
 import a.baozouptu.ptu.view.PtuFrameLayout;
 import a.baozouptu.ptu.view.PtuTopRelativeLayout;
 import a.baozouptu.ptu.view.PtuView;
+
 import static a.baozouptu.ptu.PtuUtil.EDIT_MAIN;
 import static a.baozouptu.ptu.PtuUtil.EDIT_CUT;
 import static a.baozouptu.ptu.PtuUtil.EDIT_TEXT;
@@ -310,12 +311,15 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     private void showFailDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(PtuActivity.this);
-        builder.setTitle("图片加载失败");
+        builder.setTitle("图片加载失败，图片不存在，或已失效已失效");
         builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                PtuActivity.this.finish();
+                Intent resultIntent = new Intent();
+                resultIntent.setAction("load_failed");
+                resultIntent.putExtra("failed_path", picPath);
+                setResult(0, resultIntent);
             }
         });
         builder.create().show();
@@ -524,7 +528,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             StepData csd = cutFrag.getResultData(1);
             cutFrag.releaseResource();
             ptuView.replaceSourceBm(newSourceBm);
-            asynchronousSaveStepBm(newSourceBm,csd);
+            asynchronousSaveStepBm(newSourceBm, csd);
             switchFragment(EDIT_MAIN);
             afterSure(csd);
         }
@@ -536,7 +540,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 return;
             }
             Bitmap source = textFrag.getResultBm();
-            textFrag.addBigStep(source,tsd);
+            textFrag.addBigStep(source, tsd);
             asynchronousSaveStepBm(source, tsd);
             //释放，删除等部分
             textFrag.releaseResource();
@@ -715,6 +719,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
      * 异步保存
      * <p>注意保存之后图片加会释放，
      * <p>释放之后不能加其他操作了
+     *
      * @param bm 图片
      * @param sd 数据
      */
@@ -791,6 +796,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             super.onBackPressed();
         }
     }
+
     @Override
     protected void onDestroy() {
         if (ptuView != null)

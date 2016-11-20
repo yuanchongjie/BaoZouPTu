@@ -109,7 +109,7 @@ public class ChosePictureActivity extends AppCompatActivity {
                 } else if (msg.obj.equals("change_file")) {
                     Util.P.le(TAG, "finish update file");
                     fileAdapter.notifyDataSetChanged();
-                }else {
+                } else {
                     if (editedPicPath != null) {
                         if (!usuPicProcessor.hasRecentPic(editedPicPath)) {
                             usuPicProcessor.addRecentPathFirst(editedPicPath);
@@ -476,6 +476,10 @@ public class ChosePictureActivity extends AppCompatActivity {
                 setResult(0, new Intent(action));
                 finish();
                 overridePendingTransition(0, R.anim.go_send_exit);
+            } else if (action != null && action.equals("load_failed")) {
+                String failedPath = data.getStringExtra("failed_path");
+                currentPicPathList.remove(failedPath);
+                picAdpter.notifyDataSetChanged();
             } else {
                 if (usuPicProcessor.isUsuPic(currentPicPathList)) {
                     editedPicPath = data.getStringExtra("new_path");
