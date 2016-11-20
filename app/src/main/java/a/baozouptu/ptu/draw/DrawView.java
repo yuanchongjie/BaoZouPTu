@@ -3,8 +3,6 @@ package a.baozouptu.ptu.draw;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,11 +12,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.RadialGradient;
 import android.graphics.Rect;
 import android.graphics.Shader;
-import android.graphics.SweepGradient;
-import android.graphics.drawable.ShapeDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
@@ -33,8 +28,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-
-import a.baozouptu.R;
 
 /**
  * 涂鸦View
