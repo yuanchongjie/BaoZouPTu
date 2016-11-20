@@ -11,8 +11,9 @@ import android.view.View;
 
 import java.util.ArrayList;
 
-import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.PtuUtil;
+import a.baozouptu.ptu.RepealRedoListener;
+import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.view.PtuView;
 
 /**
@@ -29,10 +30,12 @@ public class RubberView extends View {
     private Path path;
     private Path picPath;
 
+    private RepealRedoListener repealRedoListener;
     private ArrayList<Pair<Path,Paint>> pathPaintList;
 
     int color;
     int width;
+    private final RepealRedoManager<Pair<Path, Paint>> repealRedoManager;
 
 
     public RubberView(Context context, PtuView ptuView){
@@ -48,6 +51,7 @@ public class RubberView extends View {
         paint.setColor(color);
         paint.setStrokeWidth(width);
         paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeCap(Paint.Cap.ROUND);
 
         picPaint=new Paint();
         picPaint.setDither(true);
@@ -55,14 +59,18 @@ public class RubberView extends View {
         picPaint.setColor(color);
         picPaint.setStrokeWidth(width*ptuView.getSrcRect().height()/ptuView.getDstRect().width());
         picPaint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeCap(Paint.Cap.ROUND);
 
         pathPaintList =new ArrayList<>();
+        repealRedoManager = new RepealRedoManager<>(100);
+        path=new Path();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x=event.getX(),y=event.getY();
-        float[] pxy=PtuUtil.getLocationAtPicture(x,y,ptuView.getSrcRect(),ptuView.getDstRect());
+        float[] pxy=PtuUtil.getLocationAtPicture(x+getLeft(),y+getTop(),
+                ptuView.getSrcRect(),ptuView.getDstRect());
         float[] plxy=new float[2];
         switch (event.getActionMasked()){
             case MotionEvent.ACTION_DOWN:
@@ -76,13 +84,19 @@ public class RubberView extends View {
                 break;
             case MotionEvent.ACTION_MOVE:
                 path.quadTo(lastX,lastY,x,y);
+                picPath.quadTo(plxy[0],plxy[1],pxy[0],pxy[1]);
                 lastX=x;
                 lastY=y;
                 plxy[0]=lastX;
                 plxy[1]=lastY;
-                picPath.quadTo(plxy[0],plxy[1],pxy[0],pxy[1]);
                 break;
             case MotionEvent.ACTION_UP:
+                path.quadTo(lastX,lastY,x,y);
+                picPath.quadTo(plxy[0],plxy[1],pxy[0],pxy[1]);
+
+                repealRedoManager.commit(new Pair<>(path, paint));
+                repealRedoListener.canRedo(true);
+                repealRedoListener.canRepeal(repealRedoManager.canRepeal());
                 pathPaintList.add(new Pair<>(picPath, picPaint));
                 break;
         }
@@ -90,10 +104,38 @@ public class RubberView extends View {
         return true;
     }
 
+
     @Override
     protected void onDraw(Canvas canvas) {
+        int index = repealRedoManager.getCurrentIndex();
+        for (int i = 0; i <= index; i++) {
+            Pair<Path,Paint> sd = repealRedoManager.getStepdata(i);
+            canvas.drawPath(sd.first,sd.second);
+        }
         canvas.drawPath(path,paint);
         super.onDraw(canvas);
+    }
+
+    public void smallRedo(){
+        if(repealRedoManager.canRedo()) {
+            repealRedoManager.redo();
+            repealRedoListener.canRedo(repealRedoManager.canRedo());
+            repealRedoListener.canRepeal(repealRedoManager.canRepeal());
+            invalidate();
+        }
+    }
+
+    public void smallRepeal(){
+        if(repealRedoManager.canRepeal()) {
+            repealRedoManager.repealPrepare();
+            repealRedoListener.canRedo(repealRedoManager.canRedo());
+            repealRedoListener.canRepeal(repealRedoManager.canRepeal());
+           invalidate();
+        }
+    }
+
+    public ArrayList<Pair<Path,Paint>> getResultdata(){
+        return pathPaintList;
     }
 
     void setColor(int color) {
@@ -102,5 +144,9 @@ public class RubberView extends View {
 
     void setWidth(int width) {
         this.width = width;
+    }
+
+    public void setRepealRedoListener(RepealRedoListener repealRedoListener) {
+        this.repealRedoListener = repealRedoListener;
     }
 }

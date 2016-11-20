@@ -44,10 +44,20 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
     private int lastColor = 0xff000000;
 
     @Override
-    public void repeal() {
+    public void smallRepeal() {
         drawView.undo();
         Log.e(TAG,
-                "repeal");
+                "repealPrepare");
+    }
+
+    @Override
+    public void smallRedo() {
+
+    }
+
+    @Override
+    public void repeal() {
+
     }
 
     @Override
@@ -72,7 +82,7 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
     }
 
     @Override
-    public void addBigStep(Bitmap bm, StepData sd) {
+    public void addBigStep(StepData sd) {
 
     }
 

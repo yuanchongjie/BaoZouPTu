@@ -2,10 +2,14 @@ package a.baozouptu.ptu.text;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +24,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import a.baozouptu.R;
 import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.util.BitmapTool;
@@ -28,6 +34,7 @@ import a.baozouptu.base.view.FirstUseDialog;
 import a.baozouptu.base.view.RubberView;
 import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.PtuActivity;
+import a.baozouptu.ptu.RepealRedoListener;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TextStepData;
@@ -56,14 +63,22 @@ public class TextFragment extends Fragment implements BaseFunction {
     private Typeface curTypeface = Typeface.MONOSPACE;
     private String TAG = "TextFragment";
     private RubberView rubberView;
+    RepealRedoListener repealRedoListener;
+    PtuView ptuView;
 
-
-    public  void addBigStep(Bitmap bm, StepData sd) {
+    public void addBigStep(StepData sd) {
         TextStepData tsd = (TextStepData) sd;
-        RepealRedoManager.addBm2Bm(bm, BitmapTool.getLosslessBitmap(tsd.picPath),
-                tsd.boundRectInPic, tsd.rotateAngle);
+        //擦除的东西添加上去
+        Canvas canvas = new Canvas(ptuView.getSourceBm());
+        ArrayList<Pair<Path, Paint>> pathPaintList = tsd.getRubberData();
+        for (Pair<Path, Paint> pair : pathPaintList) {
+            canvas.drawPath(pair.first, pair.second);
+        }
+        if (sd.picPath != null) {
+            Bitmap bm = BitmapTool.getLosslessBitmap(sd.picPath);
+            ptuView.addBitmap(bm, tsd.boundRectInPic, 0);
+        }
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -123,7 +138,7 @@ public class TextFragment extends Fragment implements BaseFunction {
             public void onClick(View v) {
                 if (!AllData.appConfig.hasReadTextRubber()) {
                     final FirstUseDialog firstUseDialog = new FirstUseDialog(getActivity());
-                    firstUseDialog.createDialog(null,"滑动即可擦除", new FirstUseDialog.ActionListener() {
+                    firstUseDialog.createDialog(null, "滑动即可擦除", new FirstUseDialog.ActionListener() {
                         @Override
                         public void onSure() {
                             AllData.appConfig.writeConfig_TextRubber(true);
@@ -138,17 +153,18 @@ public class TextFragment extends Fragment implements BaseFunction {
     private void switchRubber() {
         PtuFrameLayout ptuFrame = ((PtuActivity) getActivity()).getPtuFrame();
         if (ptuFrame.indexOfChild(floatTextView) == -1) {
-            ptuFrame.removeViewAt(ptuFrame.getChildCount()-1);
+            ptuFrame.removeViewAt(ptuFrame.getChildCount() - 1);
             addErasureInPic();
             ptuFrame.addView(floatTextView);
             return;
         }
         ptuFrame.removeView(floatTextView);
-        PtuView ptuview=((PtuActivity) getActivity()).ptuView;
-        FrameLayout.LayoutParams params=new  FrameLayout.LayoutParams(ptuview.getDstRect().width(),ptuview.getDstRect().height());
-        params.setMargins(ptuview.getDstRect().left,ptuview.getDstRect().top,0,0);
-        rubberView = new RubberView(getActivity(),ptuview);
-        ptuFrame.addView(rubberView,params);
+        PtuView ptuview = ((PtuActivity) getActivity()).ptuView;
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ptuview.getDstRect().width(), ptuview.getDstRect().height());
+        params.setMargins(ptuview.getDstRect().left, ptuview.getDstRect().top, 0, 0);
+        rubberView = new RubberView(getActivity(), ptuview);
+        rubberView.setRepealRedoListener(repealRedoListener);
+        ptuFrame.addView(rubberView, params);
     }
 
     private void addErasureInPic() {
@@ -159,16 +175,20 @@ public class TextFragment extends Fragment implements BaseFunction {
         floatTextView.setTypeface(Typeface.DEFAULT);
     }
 
-    public TextStepData getResultData(PtuView ptuView) {
-        return floatTextView.getResultData(ptuView);
-    }
-
     public Bitmap getResultBm() {
         return floatTextView.getResultBm();
     }
 
     public void releaseResource() {
         floatTextView.releaseResource();
+    }
+
+    public void setRepealRedoListener(RepealRedoListener repealRedoListener) {
+        this.repealRedoListener = repealRedoListener;
+    }
+
+    public void setPtuView(PtuView ptuView) {
+        this.ptuView = ptuView;
     }
 
     /**
@@ -502,6 +522,16 @@ public class TextFragment extends Fragment implements BaseFunction {
     }
 
     @Override
+    public void smallRepeal() {
+        rubberView.smallRepeal();
+    }
+
+    @Override
+    public void smallRedo() {
+        rubberView.smallRedo();
+    }
+
+    @Override
     public void repeal() {
 
     }
@@ -518,7 +548,20 @@ public class TextFragment extends Fragment implements BaseFunction {
 
     @Override
     public StepData getResultData(float ratio) {
-        return null;
+        TextStepData tsd = floatTextView.getResultData(ptuView);
+        if (rubberView != null) {
+            if (tsd == null)
+                tsd = new TextStepData(PtuActivity.EDIT_TEXT);
+            tsd.addRubberDate(rubberView.getResultdata());
+        }
+        return tsd;
     }
 
+    public boolean onBackPressed() {
+        if (((PtuActivity) getActivity()).getPtuFrame().indexOfChild(floatTextView) == -1) {
+            switchRubber();
+            return false;
+        }
+        return true;
+    }
 }

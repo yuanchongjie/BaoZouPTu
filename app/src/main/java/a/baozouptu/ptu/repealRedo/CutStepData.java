@@ -5,5 +5,4 @@ package a.baozouptu.ptu.repealRedo;
  */
 
 public class CutStepData extends  StepData{
-
 }

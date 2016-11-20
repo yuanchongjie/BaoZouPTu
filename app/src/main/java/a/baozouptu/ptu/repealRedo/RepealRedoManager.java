@@ -23,12 +23,12 @@ import a.baozouptu.base.util.Util;
  */
 public class RepealRedoManager<T> {
     private static final String TAG = "RepealRedoManager";
-    LinkedList<T> stepList;
-    private ListIterator<T> iter;
     //撤销重做的最大步数
-    private static int maxStep = 5;
-    Bitmap baseBitmap;
-    boolean hasChangePic;
+    private int maxStep = 5;
+    private LinkedList<T> stepList;
+    private ListIterator<T> iter;
+    private Bitmap baseBitmap;
+    private boolean hasChangePic;
 
     public RepealRedoManager(int maxStep) {
         this.maxStep = maxStep;
@@ -41,9 +41,6 @@ public class RepealRedoManager<T> {
      * 提交操作，返回是否需要超出最大步数，
      * <p>超出则删除最列表开始的stepData，
      * <p>然后需要将BaseBitmap前进一步，
-     *
-     * @param sd
-     * @return
      */
     public T commit(T sd) {
         while (iter.hasNext()) {
@@ -65,11 +62,6 @@ public class RepealRedoManager<T> {
         }
         return null;
     }
-
-    public Bitmap getBaseBitmap() {
-        return baseBitmap;
-    }
-
     public int getCurrentIndex() {
         return iter.previousIndex();
     }
@@ -78,6 +70,9 @@ public class RepealRedoManager<T> {
         return iter.hasNext();
     }
 
+    /**
+     * 返回redo数据结果，并且当前指针前进一步
+     */
     public T redo() {
         if (iter.hasNext()) {
             return iter.next();
@@ -89,6 +84,35 @@ public class RepealRedoManager<T> {
         return iter.hasPrevious();
     }
 
+
+
+    public T getStepdata(int i) {
+        return stepList.get(i);
+    }
+
+    /**
+     * 当前指针向前一步
+     */
+    public void repealPrepare() {
+        iter.previous();
+    }
+
+    public void clear(Context context) {
+        String path = FileTool.createTempPicPath(context);
+        String parentPath = path.substring(0,
+                path.lastIndexOf('/'));
+        FileTool.deleteDir(new File(parentPath));
+        stepList.clear();
+        iter = stepList.listIterator();
+    }
+
+    public void init() {
+        iter = stepList.listIterator();
+    }
+
+    public Bitmap getBaseBitmap() {
+        return baseBitmap;
+    }
 
     public static Bitmap addBm2Bm(Bitmap baseBitmap, Bitmap addBitmap, RectF boundRect, float rotateAngle) {
         Canvas c = new Canvas(baseBitmap);
@@ -125,29 +149,20 @@ public class RepealRedoManager<T> {
             Bitmap viewBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),
                     Bitmap.Config.ARGB_8888);
             view.draw(new Canvas(viewBitmap));
-            innerBitmap[0] = Bitmap.createBitmap(viewBitmap, Math.round( innerRect.left), Math.round( innerRect.top),
-                    Math.round(innerRect.right - innerRect.left), Math.round (innerRect.bottom - innerRect.top));//获取floatview内部的内容
+            innerBitmap[0] = Bitmap.createBitmap(viewBitmap, Math.round(innerRect.left), Math.round(innerRect.top),
+                    Math.round(innerRect.right - innerRect.left), Math.round(innerRect.bottom - innerRect.top));//获取floatview内部的内容
             viewBitmap.recycle();
-            viewBitmap=null;
+            viewBitmap = null;
         } catch (OutOfMemoryError e) {
             innerBitmap[0].recycle();
-            innerBitmap[0]=null;
+            innerBitmap[0] = null;
             e.printStackTrace();
         }
         Util.P.le(TAG, "getInnerBmFromView完成");
         return innerBitmap[0];
     }
-
-    public T getStepdata(int i) {
-        return stepList.get(i);
-    }
-
     public void setBaseBm(Bitmap baseBitmap) {
         this.baseBitmap = baseBitmap;
-    }
-
-    public void repeal() {
-        iter.previous();
     }
 
     /**
@@ -163,18 +178,5 @@ public class RepealRedoManager<T> {
         } else {
             return false;
         }
-    }
-
-    public void clear(Context context) {
-        String path=FileTool.createTempPicPath(context);
-        String parentPath = path.substring(0,
-                path.lastIndexOf('/'));
-        FileTool.deleteDir(new File(parentPath));
-        stepList.clear();
-        iter=stepList.listIterator();
-    }
-
-    public void init() {
-        iter=stepList.listIterator();
     }
 }

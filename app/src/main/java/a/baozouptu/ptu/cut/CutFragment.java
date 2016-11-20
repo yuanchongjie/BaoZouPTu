@@ -126,10 +126,6 @@ public class CutFragment extends Fragment implements BaseFunction {
     }
 
     @Override
-    public void repeal() {
-    }
-
-    @Override
     public void redo(StepData sd) {
         ptuView.replaceSourceBm(BitmapTool.getLosslessBitmap(sd.picPath));
     }
@@ -146,7 +142,7 @@ public class CutFragment extends Fragment implements BaseFunction {
     }
 
     @Override
-    public void addBigStep(Bitmap bm, StepData sd) {
+    public void addBigStep(StepData sd) {
 
     }
 
@@ -379,5 +375,19 @@ public class CutFragment extends Fragment implements BaseFunction {
         }
         chosenId = i;
         ((ImageView) group.getChildAt(0)).setImageDrawable(chosenDrawableList[chosenId]);
+    }
+
+    @Override
+    public void smallRepeal() {
+    }
+
+    @Override
+    public void smallRedo() {
+
+    }
+
+    @Override
+    public void repeal() {
+
     }
 }

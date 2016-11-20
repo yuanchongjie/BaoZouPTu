@@ -206,9 +206,14 @@ public class TietuFragment extends Fragment implements BaseFunction {
     }
 
     @Override
-    public void repeal() {
+    public void smallRepeal() {
         if (tietuLayout.getChildCount() > 0)
             tietuLayout.removeViewAt(tietuLayout.getChildCount() - 1);
+    }
+
+    @Override
+    public void repeal() {
+
     }
 
     @Override
@@ -278,7 +283,7 @@ public class TietuFragment extends Fragment implements BaseFunction {
         this.ptuView = ptuView;
     }
 
-    public void addBigStep(@Nullable Bitmap bm, StepData psd) {
+    public void addBigStep(StepData psd) {
         TietuStepData ttsd=(TietuStepData)psd;
         Iterator<StepData> iterator = ttsd.iterator();
         while (iterator.hasNext()) {

@@ -78,6 +78,16 @@ public class MatFragment extends Fragment implements BaseFunction {
     }
 
     @Override
+    public void smallRepeal() {
+
+    }
+
+    @Override
+    public void smallRedo() {
+
+    }
+
+    @Override
     public void repeal() {
 
     }
@@ -98,7 +108,7 @@ public class MatFragment extends Fragment implements BaseFunction {
     }
 
     @Override
-    public void addBigStep(Bitmap bm, StepData sd) {
+    public void addBigStep(StepData sd) {
 
     }
 

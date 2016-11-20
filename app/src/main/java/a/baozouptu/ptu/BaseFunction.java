@@ -1,6 +1,7 @@
 package a.baozouptu.ptu;
 
 import android.graphics.Bitmap;
+import android.support.annotation.Nullable;
 
 import a.baozouptu.ptu.repealRedo.StepData;
 
@@ -12,7 +13,6 @@ public interface BaseFunction {
     /**
      * 撤销
      */
-
     void repeal();
 
     /**
@@ -20,6 +20,17 @@ public interface BaseFunction {
      */
 
     void redo(StepData sd);
+
+    /**
+     * 子功能撤销
+     */
+    void smallRepeal();
+
+
+    /**
+     * 子功能重做
+     */
+    void smallRedo();
 
     /**
      * 获取操作之后最终的bitmap
@@ -40,7 +51,7 @@ public interface BaseFunction {
     /**
      * 做一大步功能
      */
-    void addBigStep(Bitmap bm, StepData sd);
+    void addBigStep(StepData sd);
 
     void releaseResource();
 }
