@@ -23,7 +23,7 @@
             android:paddingLeft="@dimen/padding_function_item_image"
             android:paddingRight="@dimen/padding_function_item_image"
             android:paddingTop="@dimen/padding_function_item_image"
-            android:src="@mipmap/fixed_size" />
+            android:src="@mipmap/reset" />
 
         <TextView
             android:layout_width="@dimen/function_width"
