@@ -57,7 +57,6 @@ public class FloatTextView extends EditText implements FloatView {
     private Context mContext;
     public int mPadding = Util.dp2Px(24);
 
-
     public float currentRatio;
     private float mTextSize = 30;
     private String mHint = "点击输入文字";
@@ -93,7 +92,6 @@ public class FloatTextView extends EditText implements FloatView {
     public int getPadding() {
         return mPadding;
     }
-
 
     ArrayList<MicroButtonData> items = new ArrayList<>(8);
     /**
@@ -423,6 +421,7 @@ public class FloatTextView extends EditText implements FloatView {
      */
     public TextStepData getResultData(PtuView ptuView) {
         if (mText.trim().equals("")) return null;
+        setCursorVisible(false);
         //文本在view中的位置
          /*代表view有效区域在底图上的位置的rect，相对于原始图片的左上角上下左右边的距离*/
         RectF boundRectInPic = new RectF();
@@ -436,7 +435,7 @@ public class FloatTextView extends EditText implements FloatView {
         textViewBm = null;
         String path = FileTool.createTempPicPath(mContext);
         BitmapTool.saveBitmap(mContext, resultBm, path, false);
-        TextStepData tsd = new TextStepData(PtuActivity.EDIT_TEXT);
+        TextStepData tsd = new TextStepData(PtuUtil.EDIT_TEXT);
         tsd.picPath = path;
         tsd.boundRectInPic = boundRectInPic;
         tsd.rotateAngle = 0;
@@ -773,9 +772,5 @@ public class FloatTextView extends EditText implements FloatView {
     }
 
     public void releaseResource() {
-        if (resultBm != null) {
-            resultBm.recycle();
-            resultBm = null;
-        }
     }
 }

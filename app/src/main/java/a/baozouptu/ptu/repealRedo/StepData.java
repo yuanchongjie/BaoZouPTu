@@ -17,8 +17,6 @@ public class StepData {
     public RectF boundRectInPic = new RectF();
     public float rotateAngle;
     public String picPath;
-    public StepData() {
-    }
 
     public StepData(int editMode) {
         this.EDIT_MODE = editMode;

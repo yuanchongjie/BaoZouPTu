@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -168,6 +169,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
         } else {
             repealBtn.setImageBitmap(canotRepealBm);
         }
+        Util.P.le("repeal","设置颜色完成");
     }
 
     /**
@@ -179,6 +181,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
         } else {
             redoBtn.setImageBitmap(canotRedoBm);
         }
+        Util.P.le("redo","设置颜色完成");
     }
 
     public ImageButton[] createCenterView(int topBtnWidth, int dividerWidth) {

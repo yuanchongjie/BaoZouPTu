@@ -244,11 +244,11 @@ public class TietuFragment extends Fragment implements BaseFunction {
      */
     @Override
     public StepData getResultData(float ratio) {
-        TietuStepData tsd = new TietuStepData(PtuActivity.EDIT_TIETU);
+        TietuStepData tsd = new TietuStepData(PtuUtil.EDIT_TIETU);
         int count = tietuLayout.getChildCount();
         for (int i = 0; i < count; i++) {
             FloatImageView fiv = (FloatImageView) tietuLayout.getChildAt(i);
-            StepData sd = new StepData(PtuActivity.EDIT_TIETU);
+            StepData sd = new StepData(PtuUtil.EDIT_TIETU);
 //获取每个tietu的范围
             RectF boundRectInPic = new RectF();
             float[] temp = PtuUtil.getLocationAtPicture(fiv.getLeft()+FloatImageView.pad, fiv.getTop()+FloatImageView.pad,

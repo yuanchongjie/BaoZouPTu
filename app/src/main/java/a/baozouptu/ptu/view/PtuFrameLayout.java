@@ -148,10 +148,15 @@ public class PtuFrameLayout extends FrameLayout {
         return true;
     }
 
+    /**
+     * 策略是：
+     * 如果顶层是FloatTextView,做特殊处理，
+     * 否则就不做特殊处理
+     */
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if (getChildCount() > 1) {
-            View childView = getChildAt(1);
+            View childView = getChildAt(getChildCount()-1);
             boolean isConsume = false;
 
             float sx = ev.getX(), sy = ev.getY();

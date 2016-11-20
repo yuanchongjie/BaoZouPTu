@@ -24,6 +24,7 @@ import java.util.List;
 import a.baozouptu.R;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.PtuActivity;
+import a.baozouptu.ptu.PtuUtil;
 
 /**
  * Created by Administrator on 2016/4/29.
@@ -69,11 +70,11 @@ public class MainFunctionFragment extends Fragment {
         ));
 
         functionConstantList = new ArrayList<>(Arrays.asList(
-                PtuActivity.EDIT_CUT,
-                PtuActivity.EDIT_TEXT,
-                PtuActivity.EDIT_TIETU,
-                PtuActivity.EDIT_DRAW,
-                PtuActivity.EDIT_MAT
+                PtuUtil.EDIT_CUT,
+                PtuUtil.EDIT_TEXT,
+                PtuUtil.EDIT_TIETU,
+                PtuUtil.EDIT_DRAW,
+                PtuUtil.EDIT_MAT
         ));
 
         drawableList = new ArrayList<>(Arrays.asList(

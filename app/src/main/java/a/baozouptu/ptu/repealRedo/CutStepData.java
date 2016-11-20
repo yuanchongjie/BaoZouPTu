@@ -5,4 +5,7 @@ package a.baozouptu.ptu.repealRedo;
  */
 
 public class CutStepData extends  StepData{
+    public CutStepData(int editMode) {
+        super(editMode);
+    }
 }

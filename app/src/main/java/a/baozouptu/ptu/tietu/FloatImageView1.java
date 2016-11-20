@@ -15,6 +15,7 @@ import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.FloatView;
 import a.baozouptu.ptu.MicroButtonData;
 import a.baozouptu.ptu.PtuActivity;
+import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TietuStepData;
@@ -253,7 +254,7 @@ public class FloatImageView1 extends View implements FloatView {
      * @param picInitRatio ptuView上图片的初始缩放比例
      */
     public StepData getResultData(float picInitRatio) {
-        TietuStepData sd = new TietuStepData(PtuActivity.EDIT_TIETU);
+        TietuStepData sd = new TietuStepData(PtuUtil.EDIT_TIETU);
         sd.picPath = mPath;
         return sd;
     }

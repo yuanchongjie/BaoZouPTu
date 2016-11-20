@@ -11,6 +11,14 @@ import a.baozouptu.base.util.MU;
  * @description
  */
 public class PtuUtil {
+
+    public static final int EDIT_MAIN = 0;
+    public static final int EDIT_CUT = 1;
+    public static final int EDIT_TEXT = 2;
+    public static final int EDIT_TIETU = 3;
+    public static final int EDIT_DRAW = 4;
+    public static final int EDIT_MAT = 5;
+
     /**
      * 精确计算view中的点在原图片中的位置
      *

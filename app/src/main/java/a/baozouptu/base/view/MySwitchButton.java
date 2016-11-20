@@ -230,7 +230,7 @@ public class MySwitchButton extends View {
     public void moveToDest(final boolean toRight) {
         ValueAnimator toDestAnim = ValueAnimator.ofInt(frontRect_left,
                 toRight ? max_left : min_left);
-        toDestAnim.setDuration(500);
+        toDestAnim.setDuration(30);
         toDestAnim.setInterpolator(new AccelerateDecelerateInterpolator());
         toDestAnim.start();
         toDestAnim.addUpdateListener(new AnimatorUpdateListener() {

@@ -30,6 +30,8 @@ import a.baozouptu.R;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.ptu.BaseFunction;
+import a.baozouptu.ptu.PtuActivity;
+import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.repealRedo.CutStepData;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.repealRedo.StepData;
@@ -137,13 +139,13 @@ public class CutFragment extends Fragment implements BaseFunction {
 
     @Override
     public StepData getResultData(float ratio) {
-        StepData csd = new CutStepData();
+        StepData csd = new CutStepData(PtuUtil.EDIT_CUT);
         return csd;
     }
 
     @Override
     public void addBigStep(StepData sd) {
-
+        ptuView.replaceSourceBm(BitmapTool.getLosslessBitmap(sd.picPath));
     }
 
     @Override
