@@ -152,10 +152,10 @@ public class PtuView extends View implements TSRView {
         if (finalRatio != 1.0) {
             Bitmap bitmap = Bitmap.createScaledBitmap(sourceBitmap, Math.round(srcPicWidth * finalRatio),
                     Math.round(srcPicHeight * finalRatio), true);
-            if (sourceBitmap != null && bitmap.equals(sourceBitmap)) {
+            /*if (sourceBitmap != null && bitmap.equals(sourceBitmap)) {
                 sourceBitmap.recycle();
                 sourceBitmap = null;
-            }
+            }*/
         }
         return sourceBitmap;
     }
@@ -361,6 +361,7 @@ public class PtuView extends View implements TSRView {
     public void onDraw(Canvas canvas) {
         if (sourceBitmap == null) return;
         Bitmap tempBitmap;
+//        如果是缩小，获取局部图片时就直接缩小，
         if (srcRect.right - srcRect.left > dstRect.right - dstRect.left) {
             float ratio = (dstRect.right - dstRect.left) * 1.0f / (srcRect.right - srcRect.left);
             matrix.reset();
@@ -420,10 +421,10 @@ public class PtuView extends View implements TSRView {
         if(newBm==sourceBitmap){
             return;
         }
-        if (sourceBitmap != null) {
+       /* if (sourceBitmap != null) {
             sourceBitmap.recycle();
             sourceBitmap = null;
-        }
+        }*/
         setBitmapAndInit(newBm, totalBound);
         invalidate();
     }
@@ -436,10 +437,6 @@ public class PtuView extends View implements TSRView {
      * 会显示出来
      */
     public void replaceSourceBmNoRecycle(Bitmap newBm) {
-        if (sourceBitmap != null) {
-            sourceBitmap.recycle();
-            sourceBitmap = null;
-        }
         setBitmapAndInit(newBm, totalBound);
         invalidate();
     }
@@ -476,10 +473,10 @@ public class PtuView extends View implements TSRView {
      * 释放资源，目前只有SourceBitmap一个
      */
     public void releaseResource() {
-        if (sourceBitmap != null) {
+      /*  if (sourceBitmap != null) {
             sourceBitmap.recycle();
             sourceBitmap = null;
-        }
+        }*/
     }
 
     public Bitmap getSourceBm() {

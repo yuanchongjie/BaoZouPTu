@@ -169,7 +169,7 @@ public class FileTool {
         Date curDate = new Date(System.currentTimeMillis());//获取当前时间
         String time = formatter.format(curDate);
         String res = null;
-        String prefix = Environment.getExternalStorageDirectory().getAbsolutePath() + "/暴走P图-图片/";
+        String prefix = AllData.appFilePathDefault+"图片/";
         try {
             File dir = new File(prefix);
             if (!dir.exists())

@@ -2,12 +2,16 @@ package a.baozouptu.base.view;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.graphics.Typeface;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -37,7 +41,7 @@ public class FirstUseDialog {
         View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_first_use, null);
         TextView msgView = (TextView) view.findViewById(R.id.first_use_msg);
         msgView.setText(msg);
-        Button btn = (Button) view.findViewById(R.id.first_use_sure);
+        TextView btn = (TextView) view.findViewById(R.id.first_use_sure);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -47,6 +51,9 @@ public class FirstUseDialog {
         });
         dialog = builder.setView(view)
                 .create();
+        dialog.getWindow();
+
+        dialog.setCanceledOnTouchOutside(true);//设置点击Dialog外部任意区域关闭Dialog
         if (title != null)
             dialog.setTitle(title);
         else

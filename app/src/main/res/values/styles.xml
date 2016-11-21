@@ -32,4 +32,5 @@
         <item name="android:gravity">center</item>
         <item name="android:textSize">13pt</item>
     </style>
+
 </resources>

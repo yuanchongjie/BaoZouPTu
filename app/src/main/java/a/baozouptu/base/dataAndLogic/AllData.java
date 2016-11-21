@@ -1,5 +1,7 @@
 package a.baozouptu.base.dataAndLogic;
 
+import android.os.Environment;
+
 import a.baozouptu.common.AppConfig;
 
 /**
@@ -27,10 +29,10 @@ public class AllData {
      */
     public final static int PIC_FILE_SIZE_MAX = 100000*1000;
 
-    public static int text_defualt_color;
-    public static int text_choosed_color;
     public static long lastScanTime = 0;
     public static AsyncImageLoader3 imageLoader3 = AsyncImageLoader3.getInstance();
     public static final String TAG="LOL";
     public static AppConfig appConfig;
+    public static final String appFilePathDefault = Environment.getExternalStorageDirectory().getAbsolutePath() + "/暴走P图/";
+    public static final String zitiDir=Environment.getExternalStorageDirectory().getAbsolutePath() + "/暴走P图/字体/";
 }

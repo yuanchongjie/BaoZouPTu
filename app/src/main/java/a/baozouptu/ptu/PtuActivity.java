@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -34,6 +35,7 @@ import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.FileTool;
 import a.baozouptu.base.util.Util;
+import a.baozouptu.base.view.FirstUseDialog;
 import a.baozouptu.chosePicture.ProcessUsuallyPicPath;
 import a.baozouptu.ptu.control.MainFunctionFragment;
 import a.baozouptu.ptu.cut.CutFragment;
@@ -181,10 +183,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     textFrag.addRubberView(this, ptuFrame);
                     FloatTextView floatTextView = ptuFrame.initAddTextFloat(ptuView.getPicBound());
                     textFrag.setFloatView(floatTextView);
-               /* //让文本框一开始就获得输入法
-                floatTextView.setFocusable(true);
-                floatTextView.requestFocus();
-                onFocusChange(floatTextView.isFocused());*/
                     break;
                 case EDIT_TIETU:
                     if (tietuFrag == null) {
@@ -268,7 +266,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         } else {
             picPath = intent.getStringExtra("pic_path");
         }
-
         if (picPath == null || !new File(picPath).exists()) {
             showFailDialog();
             return false;
@@ -320,6 +317,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 resultIntent.setAction("load_failed");
                 resultIntent.putExtra("failed_path", picPath);
                 setResult(0, resultIntent);
+                finish();
             }
         });
         builder.create().show();
@@ -379,17 +377,14 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     @Override
                     public void onClick(View v) {
                         if (!AllData.appConfig.hasReadGoSend()) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(PtuActivity.this);
-                            builder.setTitle("快捷发送");
-                            builder.setMessage("页面将会关闭，" +
-                                    "点击通讯软件的发送图片即可快捷发送");
-                            builder.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                            FirstUseDialog firstUseDialog = new FirstUseDialog(PtuActivity.this);
+                            firstUseDialog.createDialog("快捷发送", "页面将会关闭，" +
+                                    "点击通讯软件的发送图片即可快捷发送", new FirstUseDialog.ActionListener() {
                                 @Override
-                                public void onClick(DialogInterface dialog, int which) {
+                                public void onSure() {
                                     AllData.appConfig.wiriteConfig_GoSend(true);
                                 }
                             });
-                            builder.create().show();
                         } else goSend();
 
                     }

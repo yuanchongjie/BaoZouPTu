@@ -79,7 +79,7 @@ public class BitmapTool {
 
     public static String saveBitmap(Context context, Bitmap bitmap, String path, boolean isSendBroad) {
         String suffix = path.substring(path.lastIndexOf("."), path.length());
-
+        if(bitmap==null)return "要保存的图片为空";
         Bitmap.CompressFormat bmc;
         if (suffix.equals(".jpg") || suffix.equals(".jpeg"))
             bmc = Bitmap.CompressFormat.JPEG;
@@ -133,6 +133,7 @@ public class BitmapTool {
      * 根据版本不同获取的方式去就不同，有些坑
      */
     public static long getSize(Bitmap bitmap) {
+        if(bitmap==null)return 0;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)   //API 19
         {
             return bitmap.getAllocationByteCount();

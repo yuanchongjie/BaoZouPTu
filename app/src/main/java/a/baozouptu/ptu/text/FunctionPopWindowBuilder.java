@@ -15,12 +15,17 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.util.ArrayList;
+
 import a.baozouptu.R;
 import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.base.view.HorizontalListView;
 import a.baozouptu.base.view.MySwitchButton;
+import a.baozouptu.network.FileDownloader;
 import a.baozouptu.ptu.PtuActivity;
+import a.baozouptu.ptu.saveAndShare.ShareUtil;
 import a.baozouptu.ptu.view.ColorBar;
 import a.baozouptu.ptu.view.ColorLump;
 import a.baozouptu.ptu.view.PtuFrameLayout;
@@ -37,6 +42,7 @@ public class FunctionPopWindowBuilder {
     private int lastFontId = 0;
     private TextFragment textFragment;
     private RubberView rubberView;
+    private ArrayList<Typeface> typefaceList;
 
     public FunctionPopWindowBuilder(Context context, FloatTextView floatTextView, TextFragment textFragment) {
         mContext = context;
@@ -45,21 +51,39 @@ public class FunctionPopWindowBuilder {
     }
 
     void setTypefacePopWindow(View v) {
+        initTypeface();
         View contentView = createTypefacePopWindow();
         setLayout(v, contentView);
+    }
+
+    private void initTypeface() {
+        if (typefaceList == null) {
+            typefaceList = new ArrayList<>();
+            typefaceList.add(null);
+        }
+        for (int i = 1; i < FileDownloader.typefaceNames.size(); i++) {
+            try {
+                Typeface typeface = Typeface.createFromFile(AllData.zitiDir + FileDownloader.typefaceNames.get(i));
+                typefaceList.add(typeface);
+            } catch (Exception e) {
+                typefaceList.add(null);
+                //如果是损坏的文件，删除它
+                File file=new File(AllData.zitiDir+FileDownloader.typefaceNames.get(i));
+                if(file.exists())
+                    file.delete();
+            }
+        }
     }
 
     private View createTypefacePopWindow() {
 
         View contentView = LayoutInflater.from(mContext).inflate(R.layout.popwindow_text_typeface, null);
         HorizontalListView horizontalListView = (HorizontalListView) contentView.findViewById(R.id.hList_text_type);
-        final String[] typefacePath;
-        final String[] typefaceNames = new String[]{"mono", "楷体", "默认", "更多"};
 
         horizontalListView.setAdapter(new BaseAdapter() {
             @Override
             public int getCount() {
-                return typefaceNames.length;
+                return FileDownloader.typefaceChinese.size();
             }
 
             @Override
@@ -75,32 +99,27 @@ public class FunctionPopWindowBuilder {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 TextView textView = new TextView(mContext);
-
                 textView.setTextSize(25);
+                /**设置颜色*/
                 if (position == lastFontId) {
                     textView.setTextColor(Util.getColor(R.color.text_checked_color));
                 } else {
                     textView.setTextColor(Util.getColor(R.color.text_default_color));
                 }
-                textView.setGravity(Gravity.CENTER);
-                textView.setTag(typefaceNames[position]);
+
+                //设置字体
+                textView.setTag(FileDownloader.typefaceNames.get(position));
                 if (position == 0) {
                     textView.setTextSize(30);//注意这里，英文字号增大了一些
-                    textView.setTypeface(Typeface.MONOSPACE);
-                } else if (position == typefaceNames.length - 1) {
-                    textView.setTypeface(Typeface.MONOSPACE);
-                    textView.setTextColor(0xffaabbbb);
-                } else if (position == 1) {
-                    try {
-                        Typeface typeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/kaiti.TTF");
+                } else {
+                    Typeface typeface = typefaceList.get(position);
+                    if (typeface != null)
                         textView.setTypeface(typeface);
-                    } catch (Exception e) {
-                        Toast.makeText(mContext, "获取新字体失败", Toast.LENGTH_SHORT).show();
-                    }
-                } else if (position == 2) {
-                    textView.setTypeface(Typeface.DEFAULT);
                 }
-                textView.setText(typefaceNames[position]);
+
+//其他的属性
+                textView.setGravity(Gravity.CENTER);
+                textView.setText(FileDownloader.typefaceChinese.get(position));
                 HorizontalListView.LayoutParams layoutParams = new HorizontalListView.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
                 textView.setLayoutParams(layoutParams);
@@ -109,38 +128,40 @@ public class FunctionPopWindowBuilder {
                 return textView;
             }
         });
-        horizontalListView.setOnItemClickListener(new HorizontalListView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position == typefaceNames.length - 1) {
-                    Toast.makeText(mContext, "暂不支持", Toast.LENGTH_SHORT).show();
-                } else {
-                    if (position == 0) {
-                        curTypeface = Typeface.MONOSPACE;
-                        floatTextView.setTypeface(curTypeface);
-                        floatTextView.updateSize();
-                    } else if (position == 1) {
-                        try {
-                            curTypeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/kaiti.TTF");
+        horizontalListView.setOnItemClickListener(
+                new HorizontalListView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        if (position == 0) {
+                            curTypeface = Typeface.MONOSPACE;
                             floatTextView.setTypeface(curTypeface);
                             floatTextView.updateSize();
-                        } catch (Exception e) {
-                            Toast.makeText(mContext, "获取新字体失败", Toast.LENGTH_SHORT).show();
+                        } else {
+                            try {
+                                curTypeface = typefaceList.get(position);
+                                if (typefaceList.get(position) == null) {  //如果字体不存在，就进行下载，下载完成之后更新typeface列表，以及视图
+                                    FileDownloader.getInstance().downloadZiti(mContext, FileDownloader.typefaceNames.get(position)
+                                            , typefaceList,(TextView)view);
+                                    return;
+                                } else {
+                                    floatTextView.setTypeface(curTypeface);
+                                    floatTextView.updateSize();
+                                }
+                            } catch (Exception e) {
+
+                            }
                         }
-                    } else if (position == 2) {
-                        curTypeface = Typeface.DEFAULT;
-                        floatTextView.setTypeface(curTypeface);
-                        floatTextView.updateSize();
-                    }
-                    if (lastFontId != position) {
-                        ((TextView) view).setTextColor(AllData.text_choosed_color);
-                        TextView textView = (TextView) ((HorizontalListView) view.getParent()).findViewWithTag(typefaceNames[lastFontId]);
-                        textView.setTextColor(AllData.text_defualt_color);
-                        lastFontId = position;
+                        //切换颜色
+                        if (lastFontId != position) {
+                            ((TextView) view).setTextColor(Util.getColor(R.color.text_checked_color));
+                            TextView textView = (TextView) ((HorizontalListView)
+                                    view.getParent()).findViewWithTag(FileDownloader.typefaceNames.get(lastFontId));
+                            textView.setTextColor(Util.getColor(R.color.text_default_color));
+                            lastFontId = position;
+                        }
                     }
                 }
-            }
-        });
+        );
         horizontalListView.setDividerWidth(Util.dp2Px(10));
         return contentView;
     }

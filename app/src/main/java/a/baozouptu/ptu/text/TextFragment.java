@@ -22,6 +22,8 @@ import a.baozouptu.R;
 import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.view.FirstUseDialog;
+import a.baozouptu.network.FileDownloadProgressBar;
+import a.baozouptu.network.FileDownloader;
 import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.ptu.PtuUtil;
@@ -52,9 +54,10 @@ public class TextFragment extends Fragment implements BaseFunction {
 
     /**
      * 已经存在bitmap的情况下，更快速的添加
+     *
      * @param addBm 要添加的图片
      */
-    public void addBigStep(Bitmap addBm,StepData sd){
+    public void addBigStep(Bitmap addBm, StepData sd) {
         TextStepData tsd = (TextStepData) sd;
         //擦除的东西添加上去
         Canvas canvas = new Canvas(ptuView.getSourceBm());
@@ -64,7 +67,7 @@ public class TextFragment extends Fragment implements BaseFunction {
         }
         if (addBm != null) {
             ptuView.addBitmap(addBm, tsd.boundRectInPic, 0);
-        }else//需要重绘显示出来
+        } else//需要重绘显示出来
         {
             ptuView.invalidate();
         }
@@ -82,7 +85,7 @@ public class TextFragment extends Fragment implements BaseFunction {
         if (sd.picPath != null) {
             Bitmap bm = BitmapTool.getLosslessBitmap(sd.picPath);
             ptuView.addBitmap(bm, tsd.boundRectInPic, 0);
-        }else//需要重绘显示出来
+        } else//需要重绘显示出来
         {
             ptuView.invalidate();
         }
@@ -99,7 +102,7 @@ public class TextFragment extends Fragment implements BaseFunction {
 
     @Override
     public void onResume() {
-        textPopupBuilder = new FunctionPopWindowBuilder(mAcitivty,floatTextView,this);
+        textPopupBuilder = new FunctionPopWindowBuilder(mAcitivty, floatTextView, this);
         textPopupBuilder.setRubberView(rubberView);
         super.onResume();
     }
@@ -152,7 +155,7 @@ public class TextFragment extends Fragment implements BaseFunction {
             public void onClick(View v) {
                 if (!AllData.appConfig.hasReadTextRubber()) {
                     final FirstUseDialog firstUseDialog = new FirstUseDialog(getActivity());
-                    firstUseDialog.createDialog(null, "滑动即可擦除,可在左边选择颜色粗细", new FirstUseDialog.ActionListener() {
+                    firstUseDialog.createDialog(null, "滑动即可擦除,可在左边选择颜色和粗细哟", new FirstUseDialog.ActionListener() {
                         @Override
                         public void onSure() {
                             AllData.appConfig.writeConfig_TextRubber(true);
@@ -169,12 +172,12 @@ public class TextFragment extends Fragment implements BaseFunction {
         if (ptuFrame.indexOfChild(floatTextView) == -1) {
             style.setVisibility(View.VISIBLE);
             typeface.setVisibility(View.VISIBLE);
-            ((TextView)toumingdu.getChildAt(1)).setText("透明度");
+            ((TextView) toumingdu.getChildAt(1)).setText("透明度");
             ptuFrame.addView(floatTextView);
         } else {
             style.setVisibility(View.INVISIBLE);
             typeface.setVisibility(View.INVISIBLE);
-            ((TextView)toumingdu.getChildAt(1)).setText("尺寸");
+            ((TextView) toumingdu.getChildAt(1)).setText("尺寸");
             ptuFrame.removeView(floatTextView);
         }
     }

@@ -38,6 +38,7 @@
     <color name="text_checked_color">#ff5722</color>
     <color name="text_default_color">#ff111111</color>
     <color name="text_light_black">#ff666666</color>
+    <color name="text_middle_black">#ff444444</color>
     <color name="text_deep_black">#ff242328</color>
 
     <color name="back_pic_operation">#998e8e8e</color>
