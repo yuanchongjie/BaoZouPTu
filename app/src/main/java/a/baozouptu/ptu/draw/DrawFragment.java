@@ -4,11 +4,15 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,11 +24,18 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import a.baozouptu.R;
+import a.baozouptu.base.util.BitmapTool;
 import a.baozouptu.base.util.Util;
 import a.baozouptu.base.view.HorizontalListView;
 import a.baozouptu.ptu.PtuActivity;
+import a.baozouptu.ptu.PtuUtil;
+import a.baozouptu.ptu.repealRedo.DrawStepData;
 import a.baozouptu.ptu.repealRedo.StepData;
+import a.baozouptu.ptu.repealRedo.TextStepData;
 import a.baozouptu.ptu.text.TextFragment;
 import a.baozouptu.ptu.view.ColorBar;
 import a.baozouptu.ptu.view.ColorLump;
@@ -44,11 +55,20 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
     private int lastColor = 0xff000000;
 
     @Override
-    public void repeal() {
-
+    public void smallRepeal() {
         drawView.undo();
         Log.e(TAG,
-                "repeal");
+                "repealPrepare");
+    }
+
+    @Override
+    public void smallRedo() {
+        Log.e(TAG, "smallRedo");
+    }
+
+    @Override
+    public void repeal() {
+        Log.e(TAG, "repeal");
     }
 
     @Override
@@ -69,15 +89,34 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
 
     @Override
     public StepData getResultData(float ratio) {
-        return null;
+        DrawStepData tsd = drawView.getResultData(drawView);
+        if (drawView != null) {
+            if (tsd == null)
+                tsd = new DrawStepData(PtuUtil.EDIT_DRAW);
+            tsd.setSavePath(drawView.getResultData());
+        }
+        return tsd;
+    }
+
+    @Override
+    public void addBigStep(StepData sd) {
+        DrawStepData tsd = (DrawStepData) sd;
+        //擦除的东西添加上去
+        Canvas canvas = new Canvas(drawView.originBm);
+        List<DrawView.DrawPath> pathPaintList = tsd.getSavePath();
+        for (DrawView.DrawPath pair : pathPaintList) {
+            canvas.drawPath(pair.path, pair.paint);
+        }
+        if (sd.picPath != null) {
+        }else//需要重绘显示出来
+        {
+            drawView.invalidate();
+        }
+
     }
 
     @Override
     public void releaseResource() {
-
-    }
-
-    public static void addBigStep(Bitmap bm, StepData sd) {
 
     }
 
@@ -108,8 +147,8 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
         size.setOnClickListener(this);
     }
 
-    public View createDrawView(Context context, Rect totalBound, Rect picBound) {
-        drawView = new DrawView(context, totalBound);
+    public View createDrawView(Context context, Rect totalBound,  Bitmap sourceBm) {
+        drawView = new DrawView(context, totalBound,sourceBm);
         return drawView;
     }
 

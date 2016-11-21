@@ -35,7 +35,6 @@ import a.baozouptu.base.util.Util;
 import a.baozouptu.chosePicture.ChosePictureActivity;
 import a.baozouptu.chosePicture.ProcessUsuallyPicPath;
 import a.baozouptu.ptu.PtuActivity;
-import a.baozouptu.ptu.draw.TuyaActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int MY_PERMISSIONS_STOREGE = 0;
@@ -199,10 +198,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivityForResult(intent, 0);
                 break;
             case R.id.fab2:
-                Snackbar.make(v, "手绘图主要是自己画个简单图保存为表情", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                Intent intent1 = new Intent(this, TuyaActivity.class);
-                startActivityForResult(intent1, 0);
                 break;
             case R.id.fab3:
                 Snackbar.make(v, "自拍相机主要", Snackbar.LENGTH_LONG)
