@@ -10,18 +10,21 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.EmbossMaskFilter;
 import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RadialGradient;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.graphics.drawable.ShapeDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
+import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -35,12 +38,23 @@ import java.util.Iterator;
 import java.util.List;
 
 import a.baozouptu.R;
+import a.baozouptu.base.util.BitmapTool;
+import a.baozouptu.base.util.FileTool;
+import a.baozouptu.base.util.MU;
+import a.baozouptu.base.util.Util;
+import a.baozouptu.ptu.BaseFunction;
+import a.baozouptu.ptu.PtuUtil;
+import a.baozouptu.ptu.repealRedo.DrawStepData;
+import a.baozouptu.ptu.repealRedo.StepData;
+import a.baozouptu.ptu.repealRedo.TextStepData;
+import a.baozouptu.ptu.view.PtuView;
 
 /**
  * 涂鸦View
  * Created by yonglong on 2016/7/2.
  */
 public class DrawView extends View {
+
     private Context context;
     private Bitmap mBitmap;
     private Canvas mCanvas;
@@ -59,25 +73,30 @@ public class DrawView extends View {
     private int currentColor = Color.RED;
     public int currentSize = 15;
     private int currentStyle = 0;
-    private int[] paintColor;//颜色集合
+    //原图
+    public Bitmap originBm= null;
+    Rect totalBound=null;
 
-    private class DrawPath {
+    public List<DrawPath> getResultData() {
+        return savePath;
+    }
+
+    public class DrawPath {
         public Path path;// 路径
         public Paint paint;// 画笔
     }
 
     /**
      * @param context
-     * @param picBound
      */
-    public DrawView(Context context, Rect picBound) {
+    public DrawView(Context context, Rect totalBound, Bitmap sourceBm) {
         super(context);
         this.context = context;
-        screenWidth = picBound.width();
-        screenHeight = picBound.height();
-        paintColor = new int[]{
-                Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.BLACK, Color.GRAY, Color.CYAN
-        };
+        this.originBm = sourceBm;
+        this.totalBound = totalBound;
+        screenWidth = totalBound.width();
+        screenHeight = totalBound.height();
+
         setLayerType(LAYER_TYPE_SOFTWARE, null);//设置默认样式，去除dis-in的黑色方框以及clear模式的黑线效果
         initCanvas();
         savePath = new ArrayList<>();
@@ -106,10 +125,7 @@ public class DrawView extends View {
      BlurMaskFilter   指定了一个模糊的样式和半径来处理Paint的边缘。
      EmbossMaskFilter  指定了光源的方向和环境光强度来添加浮雕效果。
      要应用一个MaskFilter，可以使用setMaskFilter方法，并传递给它一个MaskFilter对象。下面的例子是对一个已经存在的Paint应用一个EmbossMaskFilter：
-
-
 */
-
     //初始化画笔样式
     private void setPaintStyle() {
         mPaint = new Paint();
@@ -307,29 +323,6 @@ public class DrawView extends View {
         return true;
     }
 
-    //保存到sd卡
-    public void saveToSDCard() {
-        //获得系统当前时间，并以该时间作为文件名
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        Date curDate = new Date(System.currentTimeMillis());//获取当前时间
-        String str = formatter.format(curDate) + "paint.png";
-        File file = new File("sdcard/lol_picture" + str);
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        mBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-
-
-        //发送Sd卡的就绪广播,要不然在手机图库中不存在
-        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + Environment.getExternalStorageDirectory()));
-        context.sendBroadcast(intent);
-        Toast.makeText(context, "图片已保存", Toast.LENGTH_SHORT).show();
-        Log.e("TAG", "图片已保存");
-    }
 
     //以下为样式修改内容
     //设置画笔样式
@@ -349,5 +342,26 @@ public class DrawView extends View {
     public void selectPaintColor(int which) {
         currentColor = which;
         setPaintStyle();
+    }
+
+
+    public Bitmap getResultBm() {
+        //原图
+        if (savePath != null && savePath.size() > 0) {
+            mCanvas.getClipBounds();
+            return originBm;
+        } else {
+            return originBm;
+        }
+    }
+    public DrawStepData getResultData(DrawView drawView) {
+
+        String path = FileTool.createTempPicPath(context);
+        BitmapTool.saveBitmap(context, originBm, path, false);
+        DrawStepData tsd = new DrawStepData(PtuUtil.EDIT_DRAW);
+        tsd.picPath = path;
+        tsd.rotateAngle = 0;
+
+        return tsd;
     }
 }
