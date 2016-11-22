@@ -202,6 +202,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 case EDIT_DRAW:
                     if (drawFrag == null) {
                         drawFrag = new DrawFragment();
+                        drawFrag.setRepealRedoListener(repealRedoListener);
                     }
                     fm.beginTransaction()
                             .setCustomAnimations(R.animator.slide_bottom_in, R.animator.slide_bottom_out,
@@ -210,9 +211,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                             .commit();
                     FrameLayout.LayoutParams drawFloatParams =
                             new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    drawFloatParams.setMargins(0, 0, 0, 0);
+                    drawFloatParams.setMargins(ptuView.getDstRect().left, ptuView.getDstRect().top, ptuView.getDstRect().left, ptuView.getDstRect().top);
                     ptuFrame.addView(
-                            drawFrag.createDrawView(this, totalBound, ptuView.getPicBound())
+                            drawFrag.createDrawView(this, totalBound, ptuView)
                             , drawFloatParams);
 
                     CURRENT_EDIT_MODE = EDIT_DRAW;
@@ -559,6 +560,11 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         } //绘图
         else if (CURRENT_EDIT_MODE == EDIT_DRAW) {
             StepData dsd = drawFrag.getResultData(1);
+            dsd.EDIT_MODE = EDIT_DRAW;
+            drawFrag.addBigStep(dsd);
+            //释放，删除等部分
+            drawFrag.releaseResource();
+            Util.P.le(TAG, "释放资源成功");
             afterSure(dsd);
         }
         mProgressDialog.dismiss();

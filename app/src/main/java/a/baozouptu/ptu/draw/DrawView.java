@@ -10,18 +10,21 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.EmbossMaskFilter;
 import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RadialGradient;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.graphics.drawable.ShapeDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
+import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -35,61 +38,91 @@ import java.util.Iterator;
 import java.util.List;
 
 import a.baozouptu.R;
+import a.baozouptu.base.util.BitmapTool;
+import a.baozouptu.base.util.FileTool;
+import a.baozouptu.base.util.MU;
+import a.baozouptu.base.util.Util;
+import a.baozouptu.ptu.BaseFunction;
+import a.baozouptu.ptu.PtuUtil;
+import a.baozouptu.ptu.RepealRedoListener;
+import a.baozouptu.ptu.repealRedo.DrawStepData;
+import a.baozouptu.ptu.repealRedo.StepData;
+import a.baozouptu.ptu.repealRedo.TextStepData;
+import a.baozouptu.ptu.view.PtuView;
 
 /**
  * 涂鸦View
  * Created by yonglong on 2016/7/2.
  */
 public class DrawView extends View {
+
     private Context context;
     private Bitmap mBitmap;
     private Canvas mCanvas;
     private Path mPath;
+    private Path mpicPath;
     private Paint mBitmapPaint;// 画布的画笔
     private Paint mPaint;// 真实的画笔
-    private float mX, mY;// 临时点坐标
+    private float mX, mY ,mPicX,mPicY;// 临时点坐标
     private static final float TOUCH_TOLERANCE = 4;
     // 保存Path路径的集合,用List集合来模拟栈
     private static List<DrawPath> savePath;
+    private static List<DrawPath> picsavePath;
     // 保存已删除Path路径的集合
     private static List<DrawPath> deletePath;
+    private static List<DrawPath> picdeletePath;
     // 记录Path路径的对象
     private DrawPath dp;
+    private DrawPath picdp;
     private int screenWidth, screenHeight;
     private int currentColor = Color.RED;
     public int currentSize = 15;
     private int currentStyle = 0;
-    private int[] paintColor;//颜色集合
+    //原图
+    public PtuView ptuView =null;
+    Rect totalBound=null;
+    Rect picBound=null;
+    private RepealRedoListener repealRedoListener;
 
-    private class DrawPath {
+    public List<DrawPath> getResultData() {
+        return picsavePath;
+    }
+
+    public class DrawPath {
         public Path path;// 路径
         public Paint paint;// 画笔
     }
 
     /**
      * @param context
-     * @param picBound
      */
-    public DrawView(Context context, Rect picBound) {
+    public DrawView(Context context, Rect totalBound,PtuView ptuView) {
         super(context);
         this.context = context;
+        this.ptuView = ptuView;
+        this.totalBound = totalBound;
+        this.picBound = ptuView.getPicBound();
         screenWidth = picBound.width();
         screenHeight = picBound.height();
-        paintColor = new int[]{
-                Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.BLACK, Color.GRAY, Color.CYAN
-        };
+
         setLayerType(LAYER_TYPE_SOFTWARE, null);//设置默认样式，去除dis-in的黑色方框以及clear模式的黑线效果
         initCanvas();
+        picsavePath = new ArrayList<>();
         savePath = new ArrayList<>();
+        picdeletePath = new ArrayList<>();
         deletePath = new ArrayList<>();
     }
 
     public void initCanvas() {
+
+
+
         setPaintStyle();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+        Bitmap originBm = null;
         //画布大小
-//        Bitmap.createBitmap(sourceBitmap, rect.left, rect.top,
-//                rect.right - rect.left, rect.bottom - rect.top, matrix, true);
+//        Bitmap.createBitmap(ptuView.getDstRect().left, ptuView.getDstRect().top,
+//                ptuView.getDstRect().width(), ptuView.getDstRect().height());
         mBitmap = Bitmap.createBitmap(screenWidth, screenHeight, Bitmap.Config.ARGB_8888);
         mBitmap.eraseColor(Color.argb(0, 0, 0, 0));
         mCanvas = new Canvas(mBitmap);  //所有mCanvas画的东西都被保存在了mBitmap中
@@ -106,10 +139,7 @@ public class DrawView extends View {
      BlurMaskFilter   指定了一个模糊的样式和半径来处理Paint的边缘。
      EmbossMaskFilter  指定了光源的方向和环境光强度来添加浮雕效果。
      要应用一个MaskFilter，可以使用setMaskFilter方法，并传递给它一个MaskFilter对象。下面的例子是对一个已经存在的Paint应用一个EmbossMaskFilter：
-
-
 */
-
     //初始化画笔样式
     private void setPaintStyle() {
         mPaint = new Paint();
@@ -201,6 +231,11 @@ public class DrawView extends View {
         mX = x;
         mY = y;
     }
+    private void pic_touch_start(float x, float y) {
+        mpicPath.moveTo(x, y);
+        mPicX = x;
+        mPicY = y;
+    }
 
     private void touch_move(float x, float y) {
         float dx = Math.abs(x - mX);
@@ -214,11 +249,40 @@ public class DrawView extends View {
         }
     }
 
+    private void pic_touch_move(float x, float y) {
+        float dx = Math.abs(x - mPicX);
+        float dy = Math.abs(mPicY - y);
+        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+            // 从x1,y1到x2,y2画一条贝塞尔曲线，更平滑(直接用mPath.lineTo也可以)
+            mpicPath.quadTo(mPicX, mPicY, (x + mPicX) / 2, (y + mPicY) / 2);
+            //mPath.lineTo(mX,mY);
+            mPicX = x;
+            mPicY = y;
+        }
+    }
+
     private void touch_up() {
         mPath.lineTo(mX, mY);
         mCanvas.drawPath(mPath, mPaint);
         //将一条完整的路径保存下来(相当于入栈操作)
         savePath.add(dp);
+        mPath = null;// 重新置空
+
+        if (savePath!=null&&savePath.size()>0){
+            repealRedoListener.canRepeal(true);
+        }else {
+            repealRedoListener.canRepeal(false);
+        }
+        if (deletePath!=null&&deletePath.size()>0){
+            repealRedoListener.canRedo(true);
+        }else {
+            repealRedoListener.canRedo(false);
+        }
+    }
+    private void pic_touch_up() {
+        mpicPath.lineTo(mPicX, mPicY);
+        //将一条完整的路径保存下来(相当于入栈操作)
+        picsavePath.add(picdp);
         mPath = null;// 重新置空
     }
 
@@ -231,8 +295,23 @@ public class DrawView extends View {
     public void undo() {
         if (savePath != null && savePath.size() > 0) {
             DrawPath drawPath = savePath.get(savePath.size() - 1);
+            DrawPath picdrawPath = picsavePath.get(picsavePath.size() - 1);
             deletePath.add(drawPath);
+            picdeletePath.add(picdrawPath);
             savePath.remove(savePath.size() - 1);
+            picsavePath.remove(picsavePath.size()-1);
+
+            if (savePath!=null&&savePath.size()>0){
+                repealRedoListener.canRepeal(true);
+            }else {
+                repealRedoListener.canRepeal(false);
+            }
+            if (deletePath!=null&&deletePath.size()>0){
+                repealRedoListener.canRedo(true);
+            }else {
+                repealRedoListener.canRedo(false);
+            }
+
             redrawOnBitmap();
         }
     }
@@ -242,12 +321,28 @@ public class DrawView extends View {
      */
     public void redo() {
         if (savePath != null && savePath.size() > 0) {
+            repealRedoListener.canRedo(true);
+            repealRedoListener.canRepeal(true);
+
             savePath.clear();
+            picsavePath.clear();
+            if (savePath!=null&&savePath.size()>0){
+                repealRedoListener.canRepeal(true);
+            }else {
+                repealRedoListener.canRepeal(false);
+            }
+            if (deletePath!=null&&deletePath.size()>0){
+                repealRedoListener.canRedo(true);
+            }else {
+                repealRedoListener.canRedo(false);
+            }
+
             redrawOnBitmap();
         }
     }
 
     private void redrawOnBitmap() {
+
         /*mBitmap = Bitmap.createBitmap(screenWidth, screenHeight,
                 Bitmap.Config.RGB_565);
         mCanvas.setBitmap(mBitmap);// 重新设置画布，相当于清空画布*/
@@ -267,11 +362,26 @@ public class DrawView extends View {
         if (deletePath.size() > 0) {
             //将删除的路径列表中的最后一个，也就是最顶端路径取出（栈）,并加入路径保存列表中
             DrawPath dp = deletePath.get(deletePath.size() - 1);
+            DrawPath picdp = picdeletePath.get(picdeletePath.size() - 1);
             savePath.add(dp);
+            picsavePath.add(picdp);
             //将取出的路径重绘在画布上
             mCanvas.drawPath(dp.path, dp.paint);
             //将该路径从删除的路径列表中去除
             deletePath.remove(deletePath.size() - 1);
+            picdeletePath.remove(picdeletePath.size() - 1);
+
+            if (savePath!=null&&savePath.size()>0){
+                repealRedoListener.canRepeal(true);
+            }else {
+                repealRedoListener.canRepeal(false);
+            }
+            if (deletePath!=null&&deletePath.size()>0){
+                repealRedoListener.canRedo(true);
+            }else {
+                repealRedoListener.canRedo(false);
+            }
+
             invalidate();
         }
     }
@@ -280,56 +390,39 @@ public class DrawView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
+        float[] pxy = PtuUtil.getLocationAtPicture(x + getLeft(), y + getTop(),
+                ptuView.getSrcRect(), ptuView.getDstRect());
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 // 每次down下去重新new一个Path
                 mPath = new Path();
+                mpicPath = new Path();
+                picdp = new DrawPath();
+                picdp.path = mpicPath;
+                picdp.paint = mPaint;
                 //每一次记录的路径对象是不一样的
                 dp = new DrawPath();
                 dp.path = mPath;
                 dp.paint = mPaint;
                 touch_start(x, y);
-                invalidate();
-                break;
-            case MotionEvent.ACTION_CANCEL:
-                touch_up();
+                pic_touch_start(pxy[0], pxy[1]);
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
                 touch_move(x, y);
+                pic_touch_move(pxy[0],pxy[1]);
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
                 touch_up();
+                pic_touch_up();
                 invalidate();
                 break;
         }
         return true;
     }
 
-    //保存到sd卡
-    public void saveToSDCard() {
-        //获得系统当前时间，并以该时间作为文件名
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        Date curDate = new Date(System.currentTimeMillis());//获取当前时间
-        String str = formatter.format(curDate) + "paint.png";
-        File file = new File("sdcard/lol_picture" + str);
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        mBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-
-
-        //发送Sd卡的就绪广播,要不然在手机图库中不存在
-        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + Environment.getExternalStorageDirectory()));
-        context.sendBroadcast(intent);
-        Toast.makeText(context, "图片已保存", Toast.LENGTH_SHORT).show();
-        Log.e("TAG", "图片已保存");
-    }
 
     //以下为样式修改内容
     //设置画笔样式
@@ -349,5 +442,16 @@ public class DrawView extends View {
     public void selectPaintColor(int which) {
         currentColor = which;
         setPaintStyle();
+    }
+
+
+    public DrawStepData getResultData(DrawView drawView) {
+
+        DrawStepData tsd = new DrawStepData(PtuUtil.EDIT_DRAW);
+        tsd.rotateAngle = 0;
+        return tsd;
+    }
+    public void setRepealRedoListener(RepealRedoListener repealRedoListener) {
+        this.repealRedoListener = repealRedoListener;
     }
 }
