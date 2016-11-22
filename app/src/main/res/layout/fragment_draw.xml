@@ -23,7 +23,7 @@
             android:paddingLeft="@dimen/padding_function_item_image"
             android:paddingRight="@dimen/padding_function_item_image"
             android:paddingTop="@dimen/padding_function_item_image"
-            android:src="@mipmap/fixed_size" />
+            android:src="@mipmap/draw" />
 
         <TextView
             android:layout_width="@dimen/function_width"
@@ -52,7 +52,7 @@
             android:paddingLeft="@dimen/padding_function_item_image"
             android:paddingRight="@dimen/padding_function_item_image"
             android:paddingTop="@dimen/padding_function_item_image"
-            android:src="@mipmap/scale" />
+            android:src="@mipmap/color" />
 
         <TextView
             android:layout_width="@dimen/function_width"
@@ -81,7 +81,7 @@
             android:paddingLeft="@dimen/padding_function_item_image"
             android:paddingRight="@dimen/padding_function_item_image"
             android:paddingTop="@dimen/padding_function_item_image"
-            android:src="@mipmap/rotate" />
+            android:src="@mipmap/fixed_size" />
 
         <TextView
             android:layout_width="@dimen/function_width"
