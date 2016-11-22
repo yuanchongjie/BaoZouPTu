@@ -13,7 +13,7 @@ import android.widget.Toast;
 import a.baozouptu.base.dataAndLogic.AllData;
 
 /**
- * Created by Administrator on 2016/5/19.
+ * Created 0 Administrator on 2016/5/19.
  */
 public class Util {
     private static MyApplication gloableContext;
