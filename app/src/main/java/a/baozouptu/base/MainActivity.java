@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // 第二步：定义Notification
         Intent intent = new Intent(this, ChosePictureActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction("notify_ptu");
         //PendingIntent是待执行的Intent
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent,
@@ -115,14 +115,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         Intent latestIntent = new Intent(this, PtuActivity.class);
-        latestIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        latestIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         latestIntent.setAction("notify_latest");
         //PendingIntent是待执行的Intent
         PendingIntent piLatest = PendingIntent.getActivity(this, 0, latestIntent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
         contentView.setOnClickPendingIntent(R.id.notify_layout_latest, piLatest);
         notification.contentView = contentView;
-        notification.flags = Notification.FLAG_NO_CLEAR;
+        notification.flags = Notification.FLAG_AUTO_CANCEL;
         //第三步：启动通知栏，第一个参数是一个通知的唯一标识
         nm.notify(0, notification);
         Util.P.le(TAG, "发送通知完成");

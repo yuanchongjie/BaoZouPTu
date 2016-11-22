@@ -62,4 +62,5 @@
     <drawable name="dialog_background">#80ffffff</drawable>
     <drawable name="hou">#dcdcdc</drawable>
     <drawable name="text_popup_window_background">#fff</drawable>
+    <drawable name="white">#fff</drawable>
 </resources>

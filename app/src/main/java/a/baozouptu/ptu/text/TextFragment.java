@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Typeface;
+import android.media.Image;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Pair;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -173,11 +175,13 @@ public class TextFragment extends Fragment implements BaseFunction {
             style.setVisibility(View.VISIBLE);
             typeface.setVisibility(View.VISIBLE);
             ((TextView) toumingdu.getChildAt(1)).setText("透明度");
+            ((ImageView)toumingdu.getChildAt(0)).setImageResource(R.mipmap.transparency);
             ptuFrame.addView(floatTextView);
         } else {
             style.setVisibility(View.INVISIBLE);
             typeface.setVisibility(View.INVISIBLE);
             ((TextView) toumingdu.getChildAt(1)).setText("尺寸");
+            ((ImageView)toumingdu.getChildAt(0)).setImageResource(R.mipmap.fixed_size);
             ptuFrame.removeView(floatTextView);
         }
     }

@@ -2,6 +2,7 @@ package a.baozouptu.ptu;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -16,6 +17,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +32,7 @@ import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import java.io.File;
 
+import a.baozouptu.CertainLeaveDialog;
 import a.baozouptu.R;
 import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.util.BitmapTool;
@@ -45,6 +48,7 @@ import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TietuStepData;
 import a.baozouptu.ptu.saveAndShare.SaveSetDialogManager;
+import a.baozouptu.ptu.saveAndShare.SaveSetInstance;
 import a.baozouptu.ptu.text.FloatTextView;
 import a.baozouptu.ptu.text.TextFragment;
 import a.baozouptu.ptu.tietu.TietuFragment;
@@ -99,13 +103,17 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     private String endType = "normal";
     private RepealRedoListener repealRedoListener;
+    private SaveSetInstance saveSetInstance;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        saveSetInstance = new SaveSetInstance();
         setContentView(R.layout.activity_ptu);
         setTitle("");
+        Log.e(TAG, "使用最新图片返回图片-1");
         initView();
+        Log.e(TAG, "使用最新图片返回图片-0");
         initToolbar();
         //如果加载数据不成功，（图片加载失败）返回，
         if (!initData()) return;
@@ -254,7 +262,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
      * @return 是否成功加载图片到PtuView
      */
     private boolean initData() {
-        repealRedoManager = new RepealRedoManager(MAX_STEP);
+        repealRedoManager = new RepealRedoManager<>(MAX_STEP);
         //如果是从其它应用过来需要编辑图片的
         Intent intent = getIntent();
         Uri uri = intent.getData();
@@ -295,6 +303,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     if (picPath == null || !new File(picPath).exists()) {
                         showFailDialog();
                     }
+                    Log.e(TAG, "使用最新图片返回图片成功" + " 路径" + picPath);
                     progressDialog.dismiss();
                     if (totalBound.width() > 0)
                         ptuView.replaceSourceBm(BitmapTool.getLosslessBitmap(picPath));
@@ -320,7 +329,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 finish();
             }
         });
-        builder.create().show();
+        Dialog dialog = builder.create();
+        dialog.setCancelable(false);
+        dialog.show();
     }
 
     private void test() {
@@ -341,7 +352,21 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         */
     }
 
+    /**
+     * 获取屏幕的宽度
+     */
+    void getScreenWidth() {
+        DisplayMetrics metric = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metric);
+        AllData.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
+        AllData.screenHeight = metric.heightPixels;
+    }
+
+    /**
+     * 初始化视图,尤其顶部的视图条
+     */
     private void initView() {
+        if (AllData.screenHeight == 0) getScreenWidth();
         ptuFrame = (PtuFrameLayout) findViewById(R.id.ptu_frame);
         ptuView = (PtuView) findViewById(R.id.ptu_view);
 
@@ -406,7 +431,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        PtuActivity.this.finish();
+                       certainLeave();
                     }
                 }
         );
@@ -424,10 +449,23 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     sure();
             }
         });
-
         topRelativeLayout.addReturn();
         topRelativeLayout.addSaveSet();
     }
+
+    private void certainLeave() {
+        if (repealRedoManager.hasChangePic()) {
+            CertainLeaveDialog certainLeaveDialog = new CertainLeaveDialog(PtuActivity.this);
+            certainLeaveDialog.createDialog(null, null, new CertainLeaveDialog.ActionListener() {
+                @Override
+                public void onSure() {
+                    setReturnResultAndFinish("common", new Bundle(), false);
+                }
+            });
+        }else
+            setReturnResultAndFinish("common", new Bundle(), false);
+    }
+
 
     private void goSend() {
 
@@ -448,7 +486,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    saveSetmanager = new SaveSetDialogManager(PtuActivity.this);
+                    saveSetmanager = saveSetInstance.getInstance(PtuActivity.this);
                 }
             }).start();
         super.onStart();
@@ -476,7 +514,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     private void saveSet() {
         if (saveSetmanager == null)
-            saveSetmanager = new SaveSetDialogManager(this);
+            saveSetmanager = saveSetInstance.getInstance(this);
         saveSetmanager.init(BitmapTool.getSize(
                 ptuView.getSourceBm()));
         saveSetmanager.createDialog();
@@ -488,7 +526,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             @Override
             public void mSure(float saveRatio) {
                 String newPath = saveResultBm(saveRatio);
-                if (newPath == null) return;
                 Bundle bundle = new Bundle();
                 bundle.putString("new_path", newPath);
                 setReturnResultAndFinish("common", bundle, false);
@@ -763,6 +800,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     public void setReturnResultAndFinish(String mAction, Bundle bundle, boolean isGoSend) {
         Intent resultIntent = new Intent(mAction);
+        bundle.putString("recent_use_pic", picPath);
         resultIntent.putExtras(bundle);
         setResult(0, resultIntent);
         finish();
@@ -773,8 +811,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     @Override
     protected void onStop() {
-        if (endType == "share")
-            finish();
+        if (endType.equals("share")) ;
         super.onStop();
     }
 
@@ -788,7 +825,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             }
             cancel();
         } else {
-            super.onBackPressed();
+            certainLeave();
         }
     }
 

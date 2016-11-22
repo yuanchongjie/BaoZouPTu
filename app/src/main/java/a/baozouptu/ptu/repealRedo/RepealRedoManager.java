@@ -173,7 +173,7 @@ public class RepealRedoManager<T> {
     public boolean hasChangePic() {
         if (hasChangePic == true)
             return true;
-        else if (getCurrentIndex() != 0) {
+        else if (getCurrentIndex() >= 0) {
             return true;
         } else {
             return false;

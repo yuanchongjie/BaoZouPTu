@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v4.util.Pair;
+import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +26,7 @@ import java.util.TreeMap;
 import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.dataAndLogic.MyDatabase;
 import a.baozouptu.base.util.FileTool;
+import a.baozouptu.base.util.Util;
 
 
 /**
@@ -447,16 +450,19 @@ public class ProcessUsuallyPicPath {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                Util.P.le("准备获取最新图片线程开始执行");
                 // 排序处理得到的图片的map
                 Map<Long, String> sortedPicPathsByTime = new TreeMap<>();
                 queryPicInfoInSD(sortedPicPathsByTime, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Util.P.le("准备获取最新图片线程开始执行2");
                 queryPicInfoInSD(sortedPicPathsByTime, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-
+                Util.P.le("准备获取最新图片线程开始执行3");
                 Message msg = new Message();
                 msg.obj = "latest_pic";
                 Bundle bundle = new Bundle();
                 List<String> list = new ArrayList<>(sortedPicPathsByTime.values());
                 bundle.putString("pic_path", list.get(list.size() - 1));
+                Util.P.le("准备获取最新图片线程开始执行4"+"图片已获取到");
                 msg.setData(bundle);
                 if (mHandler == null) {
                     throw new IllegalArgumentException(this.getClass().getSimpleName() + "更新图片的handler为空");

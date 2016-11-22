@@ -36,6 +36,7 @@ import a.baozouptu.base.dataAndLogic.AllData;
 import a.baozouptu.base.dataAndLogic.AsyncImageLoader3;
 import a.baozouptu.base.util.FileTool;
 import a.baozouptu.base.util.Util;
+import a.baozouptu.base.view.FirstUseDialog;
 import a.baozouptu.ptu.PtuActivity;
 
 /**
@@ -91,7 +92,6 @@ public class ChosePictureActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_chose_picture);
         test();
         Handler handler = new Handler() {
@@ -109,6 +109,7 @@ public class ChosePictureActivity extends AppCompatActivity {
                 } else if (msg.obj.equals("change_file")) {
                     Util.P.le(TAG, "finish update file");
                     fileAdapter.notifyDataSetChanged();
+                    picAdpter.notifyDataSetChanged();
                 } else {
                     if (editedPicPath != null) {
                         if (!usuPicProcessor.hasRecentPic(editedPicPath)) {
@@ -166,6 +167,15 @@ public class ChosePictureActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        if(AllData.appConfig.hasReadUsuPicUse()) {
+            FirstUseDialog firstUseDialog = new FirstUseDialog(this);
+            firstUseDialog.createDialog(null, "长按图片即可添加到喜爱或删除", new FirstUseDialog.ActionListener() {
+                @Override
+                public void onSure() {
+                    AllData.appConfig.writeConfig_usuPicUse(true);
+                }
+            });
+        }
         fileListDrawer = (DrawerLayout) findViewById(R.id.drawer_layout_show_picture);
         pictureGridview = (RecyclerView) findViewById(R.id.gv_photolist);
         final ImageButton showFile = (ImageButton) findViewById(R.id.show_pic_file);
@@ -223,7 +233,6 @@ public class ChosePictureActivity extends AppCompatActivity {
                         Intent intent = new Intent(ChosePictureActivity.this, PtuActivity.class);
                         intent.putExtra("pic_path", currentPicPathList.get(position));
                         chosedPath = currentPicPathList.get(position);
-                        usuPicProcessor.addUsedPath(chosedPath);
                         startActivityForResult(intent, 0);
                     }
                 }
@@ -472,24 +481,27 @@ public class ChosePictureActivity extends AppCompatActivity {
         Util.P.le(TAG, "onActivityResult:开始处理其它activity的返回");
         if (resultCode == 0 && data != null) {
             String action = data.getAction();
-            if (action != null && action.equals("finish")) {
+            if (action != null && action.equals("finish")) {//结束
                 setResult(0, new Intent(action));
+                usuPicProcessor.addUsedPath(
+                        data.getStringExtra("recent_use_pic"));
                 finish();
                 overridePendingTransition(0, R.anim.go_send_exit);
-            } else if (action != null && action.equals("load_failed")) {
+            } else if (action != null && action.equals("load_failed")) {//加载失败
                 String failedPath = data.getStringExtra("failed_path");
                 currentPicPathList.remove(failedPath);
                 picAdpter.notifyDataSetChanged();
-            } else {
+            } else {  //当前在常用图片下
                 if (usuPicProcessor.isUsuPic(currentPicPathList)) {
                     editedPicPath = data.getStringExtra("new_path");
-                } else {//不是常用的图片，是文件夹中的图片，则更新文件
-                    String new_path = data.getStringExtra("new_path");
-                    if (new_path != null) {
-                        currentPicPathList.add(0, new_path);
-                        picAdpter.notifyDataSetChanged();
-                    }
+                    usuPicProcessor.addUsedPath(
+                            data.getStringExtra("recent_use_pic"));
+                    picAdpter.notifyDataSetChanged();
+                } else {//不是常用的图片，是文件夹中的图片，则更新文件,
+                    // 这里图片没有保存到当前文件夹下面
                     showFilePicUpdate(FileTool.getParentPath(chosedPath));
+                    usuPicProcessor.addUsedPath(
+                            data.getStringExtra("recent_use_pic"));//假如最近使用，不刷新视图
                 }
             }
         }
@@ -510,6 +522,7 @@ public class ChosePictureActivity extends AppCompatActivity {
                     currentPicPathList = newPaths;
                     picAdpter.setList(currentPicPathList);
                     picAdpter.notifyDataSetChanged();
+                    fileAdapter.notifyDataSetChanged();
                 }
                 super.handleMessage(msg);
             }

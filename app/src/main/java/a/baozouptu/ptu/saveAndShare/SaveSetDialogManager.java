@@ -55,7 +55,7 @@ public class SaveSetDialogManager {
         String onShareItemClick(float saveRatio);
     }
 
-    public SaveSetDialogManager(Context context) {
+    SaveSetDialogManager(Context context) {
         mContext = context;
         hasInit = false;
         getShareInfo();

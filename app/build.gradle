@@ -11,6 +11,9 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        /**
+         * 只支持中文，减小包大小
+         */
         resConfigs "zh"
     }
     signingConfigs {
@@ -24,7 +27,7 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            minifyEnabled true
+            minifyEnabled true //开启代码混淆
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {

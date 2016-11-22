@@ -15,7 +15,11 @@ public class AppConfig {
     public final static int DATABASE_VERSION = 2;
     private boolean textRubber;
     private boolean goSend;
+    private boolean usuPicUse;
 
+    public boolean hasReadUsuPicUse() {
+        return usuPicUse;
+    }
 
     public boolean hasReadTextRubber() {
         return textRubber;
@@ -24,6 +28,7 @@ public class AppConfig {
     public boolean hasReadGoSend() {
         return goSend;
     }
+
 
     enum SpType {
         appconfig
@@ -55,11 +60,20 @@ public class AppConfig {
         SharedPreferences sp = mGloableContext.getSharedPreferences("appConfig", Context.MODE_PRIVATE);
         textRubber = sp.getBoolean("text_rubber", false);
         goSend = sp.getBoolean("go_send", false);
+        usuPicUse = sp.getBoolean("usu_pic_use", false);
         init();
     }
 
     private void init() {
 
+    }
+
+    public void writeConfig_usuPicUse(boolean isRead) {
+        usuPicUse = isRead;
+        SharedPreferences sp = mGloableContext.getSharedPreferences("appConfig", Context.MODE_PRIVATE);
+        SharedPreferences.Editor spEditor = sp.edit();
+        spEditor.putBoolean("usu_pic_use", isRead);
+        spEditor.apply();
     }
 
     public void writeConfig_TextRubber(boolean isRead) {
@@ -70,8 +84,8 @@ public class AppConfig {
         spEditor.apply();
     }
 
-    public void wiriteConfig_GoSend(boolean isRead){
-        goSend=isRead;
+    public void wiriteConfig_GoSend(boolean isRead) {
+        goSend = isRead;
         SharedPreferences sp = mGloableContext.getSharedPreferences("appConfig", Context.MODE_PRIVATE);
         SharedPreferences.Editor spEditor = sp.edit();
         spEditor.putBoolean("go_send", isRead);

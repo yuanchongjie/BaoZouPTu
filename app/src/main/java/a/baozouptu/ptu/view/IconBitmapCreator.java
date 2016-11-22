@@ -10,6 +10,8 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 
+import a.baozouptu.base.util.Util;
+
 /**
  *
  */
@@ -172,7 +174,6 @@ public class IconBitmapCreator {
 
 
     public static Bitmap createRedoBitmap( int width, int foregroundColor) {
-
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         canvas.scale(1.25f,1.25f);//一开始图标的边界padding太大，减小边界
@@ -246,7 +247,7 @@ public class IconBitmapCreator {
         Matrix m = new Matrix();
         m.setScale(-1, 1);
         m.postTranslate(tempBitmap.getWidth(), 0); //镜像水平翻转
-        return tempBitmap.createBitmap(tempBitmap, 0, 0, tempBitmap.getWidth(), tempBitmap.getHeight(), m
+        return Bitmap.createBitmap(tempBitmap, 0, 0, tempBitmap.getWidth(), tempBitmap.getHeight(), m
                 , true);
     }
 
