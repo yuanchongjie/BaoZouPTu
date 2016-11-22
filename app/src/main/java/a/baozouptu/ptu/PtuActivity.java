@@ -201,6 +201,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 case EDIT_DRAW:
                     if (drawFrag == null) {
                         drawFrag = new DrawFragment();
+                        drawFrag.setRepealRedoListener(repealRedoListener);
                     }
                     fm.beginTransaction()
                             .setCustomAnimations(R.animator.slide_bottom_in, R.animator.slide_bottom_out,
@@ -209,9 +210,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                             .commit();
                     FrameLayout.LayoutParams drawFloatParams =
                             new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    drawFloatParams.setMargins(0, 0, 0, 0);
+                    drawFloatParams.setMargins(ptuView.getDstRect().left, ptuView.getDstRect().top, ptuView.getDstRect().left, ptuView.getDstRect().top);
                     ptuFrame.addView(
-                            drawFrag.createDrawView(this, totalBound, ptuView.getSourceBm())
+                            drawFrag.createDrawView(this, totalBound, ptuView)
                             , drawFloatParams);
 
                     CURRENT_EDIT_MODE = EDIT_DRAW;

@@ -33,12 +33,14 @@ import a.baozouptu.base.util.Util;
 import a.baozouptu.base.view.HorizontalListView;
 import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.ptu.PtuUtil;
+import a.baozouptu.ptu.RepealRedoListener;
 import a.baozouptu.ptu.repealRedo.DrawStepData;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TextStepData;
 import a.baozouptu.ptu.text.TextFragment;
 import a.baozouptu.ptu.view.ColorBar;
 import a.baozouptu.ptu.view.ColorLump;
+import a.baozouptu.ptu.view.PtuView;
 
 /**
  * Created by Administrator on 2016/7/25.
@@ -51,8 +53,10 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
     private LinearLayout color;
     private DrawView drawView;
     private View view;
-    private  FunctionPopWindowBuilder drawPopupBuilder;
+    private FunctionPopWindowBuilder drawPopupBuilder;
     private int lastColor = 0xff000000;
+    private PtuView ptuView;
+    private RepealRedoListener repealRedoListener;
 
     @Override
     public void smallRepeal() {
@@ -73,8 +77,8 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
 
     @Override
     public void redo(StepData sd) {
-        drawView.redo();
-        Log.e(TAG, "redo");
+        drawView.recover();
+        Log.e(TAG, "recover");
     }
 
     @Override
@@ -102,16 +106,17 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
     public void addBigStep(StepData sd) {
         DrawStepData tsd = (DrawStepData) sd;
         //擦除的东西添加上去
-        Canvas canvas = new Canvas(drawView.originBm);
+        Canvas canvas = new Canvas(ptuView.getSourceBm());
         List<DrawView.DrawPath> pathPaintList = tsd.getSavePath();
         for (DrawView.DrawPath pair : pathPaintList) {
+            float width = pair.paint.getStrokeWidth();
+            pair.paint.setStrokeWidth(pair.paint.getStrokeWidth()
+                    * ptuView.getSrcRect().height() * 1f / ptuView.getDstRect().height());
             canvas.drawPath(pair.path, pair.paint);
+            pair.paint.setStrokeWidth(width);
+
         }
-        if (sd.picPath != null) {
-        }else//需要重绘显示出来
-        {
-            drawView.invalidate();
-        }
+        ptuView.invalidate();
 
     }
 
@@ -125,7 +130,7 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_draw, null);
         mContext = getActivity();
-        drawPopupBuilder = new  FunctionPopWindowBuilder(mContext);
+        drawPopupBuilder = new FunctionPopWindowBuilder(mContext);
         color = (LinearLayout) view.findViewById(R.id.draw_color);
         style = (LinearLayout) view.findViewById(R.id.draw_style);
         size = (LinearLayout) view.findViewById(R.id.draw_size);
@@ -147,8 +152,10 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
         size.setOnClickListener(this);
     }
 
-    public View createDrawView(Context context, Rect totalBound,  Bitmap sourceBm) {
-        drawView = new DrawView(context, totalBound,sourceBm);
+    public View createDrawView(Context context, Rect totalBound, PtuView ptuView) {
+        drawView = new DrawView(context, totalBound, ptuView);
+        this.ptuView = ptuView;
+        drawView.setRepealRedoListener(repealRedoListener);
         return drawView;
     }
 
@@ -167,26 +174,34 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
 
         }
     }
+
     //弹出选择画笔或橡皮擦的对话框
     private int select_paint_style_index = 0;
-    public void showMoreDialog(View parent){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setTitle("选择画笔或橡皮擦：");
-        alertDialogBuilder.setSingleChoiceItems(R.array.paintstyle, select_paint_style_index, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                select_paint_style_index = which;
-                drawView.selectPaintStyle(which);
-                dialog.dismiss();
-            }
-        });
-        alertDialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        alertDialogBuilder.create().show();
+
+    public void showMoreDialog(View parent) {
+        if (Util.DoubleClick.isDoubleClick()) return;
+        new AlertDialog.Builder(getActivity())
+                .setTitle("画笔样式")
+                .setSingleChoiceItems(R.array.paintstyle, select_paint_style_index, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        select_paint_style_index = which;
+                        drawView.selectPaintStyle(which);
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    public void setRepealRedoListener(RepealRedoListener repealRedoListener) {
+        this.repealRedoListener = repealRedoListener;
     }
 
     /**
