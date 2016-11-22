@@ -202,6 +202,8 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
 
     public void setRepealRedoListener(RepealRedoListener repealRedoListener) {
         this.repealRedoListener = repealRedoListener;
+        repealRedoListener.canRepeal(false);
+        repealRedoListener.canRedo(false);
     }
 
     /**

@@ -606,6 +606,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
      * 取消，点击取消按钮，back按键，点击sure按钮保存之后都会有它
      */
     private void cancel() {
+        checkRepealRedo();
         int count = ptuFrame.getChildCount();
         for (int i = count - 1; i > 0; i--) {
 //            移除除了PtuView以外的视图
@@ -748,7 +749,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         StepData resd = repealRedoManager.commit(sd);
         if (resd != null)//超限了，把最开始的的一步添加到基图上
             addBigStep(resd);
-        checkRepealRedo();
         Util.P.le(TAG, "撤销重做资源处理成功");
         cancel();
     }

@@ -83,6 +83,7 @@ public class DrawView extends View {
     Rect totalBound=null;
     Rect picBound=null;
     private RepealRedoListener repealRedoListener;
+    private Shader shader;
 
     public List<DrawPath> getResultData() {
         return picsavePath;
@@ -208,7 +209,9 @@ public class DrawView extends View {
                 mPaint.setShader(mShader);
                 break;
             case 5:
-                mPaint.setShader(mShader);
+                if(shader==null)
+                    shader = new BitmapShader(BitmapFactory.decodeResource(getResources(), R.mipmap.ma), Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+                mPaint.setShader(shader);
                 break;
             case 6:
                 break;

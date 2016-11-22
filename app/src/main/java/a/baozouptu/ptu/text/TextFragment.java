@@ -201,6 +201,8 @@ public class TextFragment extends Fragment implements BaseFunction {
 
     public void setRepealRedoListener(RepealRedoListener repealRedoListener) {
         this.repealRedoListener = repealRedoListener;
+        repealRedoListener.canRepeal(false);
+        repealRedoListener.canRedo(false);
     }
 
     public void setPtuView(PtuView ptuView) {
