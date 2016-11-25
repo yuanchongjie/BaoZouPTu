@@ -460,7 +460,7 @@ public class CutFrame {
         canvas.drawRect(0, frameTop + frameHeight, canvas.getWidth(), canvas.getHeight(), noChoosedPaint);
         canvas.drawRect(0, frameTop, frameLeft, frameTop + frameHeight, noChoosedPaint);//左右
         canvas.drawRect(frameLeft + frameWidth, frameTop, canvas.getWidth(), frameTop + frameHeight, noChoosedPaint);
-
+        canvas.save();
         canvas.translate(frameLeft, frameTop);
         drawFrame(canvas);
         canvas.restore();

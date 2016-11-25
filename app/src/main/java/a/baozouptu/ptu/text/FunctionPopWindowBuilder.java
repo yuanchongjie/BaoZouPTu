@@ -382,10 +382,13 @@ public class FunctionPopWindowBuilder {
         // 我觉得这里是API的一个bug
         pop.setBackgroundDrawable(mContext.getResources().getDrawable(
                 R.drawable.text_popup_window_background));
-        // 设置好参数之后再show
-        pop.showAtLocation(v, Gravity.LEFT | Gravity.BOTTOM, 0, 0);
-        pop.setInputMethodMode(PopupWindow.INPUT_METHOD_NEEDED);
+
+        //防止与虚拟按键冲突
+        //一定设置好参数之后再show,注意注意注意!!!!
+        pop.setSoftInputMode(PopupWindow.INPUT_METHOD_NEEDED);
         pop.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+        pop.showAtLocation(v, Gravity.LEFT | Gravity.BOTTOM, 0, 0);
     }
 
     public void setRubberView(RubberView rubberView) {

@@ -250,7 +250,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     private void initToolbar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
             SystemBarTintManager tintManager = new SystemBarTintManager(this);
             tintManager.setStatusBarTintColor(Util.getColor(this, R.color.base_toolbar_background));
             tintManager.setStatusBarTintEnabled(true);
@@ -432,7 +431,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                       certainLeave();
+                        certainLeave();
                     }
                 }
         );
@@ -460,11 +459,11 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             certainLeaveDialog.createDialog(null, null, new CertainLeaveDialog.ActionListener() {
                 @Override
                 public void onSure() {
-                    setReturnResultAndFinish("common", new Bundle(), false);
+                    setReturnResultAndFinish("leave", new Bundle(), false);
                 }
             });
-        }else
-            setReturnResultAndFinish("common", new Bundle(), false);
+        } else
+            setReturnResultAndFinish("leave", new Bundle(), false);
     }
 
 
@@ -529,7 +528,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 String newPath = saveResultBm(saveRatio);
                 Bundle bundle = new Bundle();
                 bundle.putString("new_path", newPath);
-                setReturnResultAndFinish("common", bundle, false);
+                setReturnResultAndFinish("save_and_leave", bundle, false);
             }
 
             @Override
@@ -539,7 +538,12 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             @Override
             public String onShareItemClick(float saveRatio) {
                 endType = "share";
-                return picPath;
+                String savePath = FileTool.getNewPictureFileDefult(picPath);
+                if (savePath == null) return null;
+                String res = BitmapTool.saveBitmap(PtuActivity.this, ptuView.getSourceBm(), savePath, true);
+                if (!res.equals("success")) return null;
+                repealRedoManager.setHasSavePic(true);//分享过后图片就相当于已经保存了
+                return savePath;
             }
         });
     }
@@ -653,13 +657,13 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 textFrag.smallRedo();
                 break;
             case EDIT_TIETU:
-                tietuFrag.redo(null);
+                tietuFrag.smallRedo();
                 break;
             case EDIT_DRAW:
-                drawFrag.redo(null);
+                drawFrag.smallRedo();
                 break;
             case EDIT_MAT:
-                matFrag.redo(null);
+                matFrag.smallRedo();
                 break;
         }
 
@@ -783,6 +787,8 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         topRelativeLayout.removeSaveSet();
         topRelativeLayout.addCancel();
         topRelativeLayout.addSure();
+        topRelativeLayout.setRedoBtnColor(false);
+        topRelativeLayout.setRepealBtnColor(false);
     }
 
     /**
@@ -792,16 +798,16 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     private String saveResultBm(final float saveRatio) {
         String result = null;
         Bitmap bitmap = ptuView.getFinalPicture(saveRatio);
-        String newPath = FileTool.getNewPictureFileDefult(picPath);
-        if (newPath == null) {
+        String savePath = FileTool.getNewPictureFileDefult(picPath);
+        if (savePath == null) {
             Toast.makeText(this, "创建SD卡文件失败", Toast.LENGTH_LONG).show();
             return null;
         }
-        result = BitmapTool.saveBitmap(PtuActivity.this, bitmap, newPath);
+        result = BitmapTool.saveBitmap(PtuActivity.this, bitmap, savePath);
         if (!result.equals("success")) {
             Toast.makeText(this, result, Toast.LENGTH_LONG).show();
         }
-        return newPath;
+        return savePath;
     }
 
     public void setReturnResultAndFinish(String mAction, Bundle bundle, boolean isGoSend) {

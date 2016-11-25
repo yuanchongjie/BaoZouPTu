@@ -88,16 +88,6 @@ public class MatFragment extends Fragment implements BaseFunction {
     }
 
     @Override
-    public void repeal() {
-
-    }
-
-    @Override
-    public void redo(StepData sd) {
-
-    }
-
-    @Override
     public Bitmap getResultBm(float ratio) {
         return null;
     }

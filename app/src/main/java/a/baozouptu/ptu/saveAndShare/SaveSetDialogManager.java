@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -131,6 +132,11 @@ public class SaveSetDialogManager {
                     public void onItemClick(View view, ListDrawableItem data) {
                         Util.P.le("Savaset", "item受到点击");
                         String picPath = listenner.onShareItemClick(saveRatio);
+                        if (picPath == null) {
+                            Toast.makeText(mContext, "文件保存失败，无法分享", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
                         int clickPosition = shareActivityInfo.indexOf(data);
                         ResolveInfo resolveInfo = resolveInfos.get(clickPosition);
 

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.text.format.DateFormat;
 import android.util.Pair;
 
 import java.io.File;
@@ -21,6 +22,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import a.baozouptu.base.dataAndLogic.AllData;
 
@@ -161,15 +163,14 @@ public class FileTool {
     /**
      * 根据原来的路径创建一个新的路径和名称
      *
-     * @param oldPath 以前的路径
-     * @return
+     * @param oldPath 以前的路径，用于获取图片后缀
      */
     public static String getNewPictureFileDefult(String oldPath) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA);
         Date curDate = new Date(System.currentTimeMillis());//获取当前时间
         String time = formatter.format(curDate);
         String res = null;
-        String prefix = AllData.appFilePathDefault+"图片/";
+        String prefix = AllData.picDir;
         try {
             File dir = new File(prefix);
             if (!dir.exists())

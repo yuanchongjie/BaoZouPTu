@@ -11,17 +11,6 @@ import a.baozouptu.ptu.repealRedo.StepData;
  */
 public interface BaseFunction {
     /**
-     * 撤销
-     */
-    void repeal();
-
-    /**
-     * 重做
-     */
-
-    void redo(StepData sd);
-
-    /**
      * 子功能撤销
      */
     void smallRepeal();

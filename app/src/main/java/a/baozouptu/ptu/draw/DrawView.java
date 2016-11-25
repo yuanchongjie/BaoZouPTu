@@ -63,7 +63,7 @@ public class DrawView extends View {
     private Path mpicPath;
     private Paint mBitmapPaint;// 画布的画笔
     private Paint mPaint;// 真实的画笔
-    private float mX, mY ,mPicX,mPicY;// 临时点坐标
+    private float mX, mY, mPicX, mPicY;// 临时点坐标
     private static final float TOUCH_TOLERANCE = 4;
     // 保存Path路径的集合,用List集合来模拟栈
     private static List<DrawPath> savePath;
@@ -79,11 +79,14 @@ public class DrawView extends View {
     public int currentSize = 15;
     private int currentStyle = 0;
     //原图
-    public PtuView ptuView =null;
-    Rect totalBound=null;
-    Rect picBound=null;
+    public PtuView ptuView = null;
+    Rect totalBound = null;
+    Rect picBound = null;
     private RepealRedoListener repealRedoListener;
     private Shader shader;
+    private EmbossMaskFilter emboss;
+    private BlurMaskFilter blur;
+    private Shader mShader;
 
     public List<DrawPath> getResultData() {
         return picsavePath;
@@ -97,7 +100,7 @@ public class DrawView extends View {
     /**
      * @param context
      */
-    public DrawView(Context context, Rect totalBound,PtuView ptuView) {
+    public DrawView(Context context, Rect totalBound, PtuView ptuView) {
         super(context);
         this.context = context;
         this.ptuView = ptuView;
@@ -115,9 +118,6 @@ public class DrawView extends View {
     }
 
     public void initCanvas() {
-
-
-
         setPaintStyle();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         Bitmap originBm = null;
@@ -154,31 +154,7 @@ public class DrawView extends View {
         mPaint.setStrokeWidth(currentSize);
         mPaint.setColor(currentColor);
 
-        // 设置光源的方向
-        float[] direction = new float[]{1.5f, 1.5f, 1.5f};
-        //设置环境光亮度
-        float light = 0.6f;
-        // 选择要应用的反射等级
-        float specular = 6;
-        // 向mask应用一定级别的模糊
-        float mask_blur = 4.2f;
-        //浮雕
-        EmbossMaskFilter emboss = new EmbossMaskFilter(direction, light, specular, mask_blur);
-        //模糊
-        BlurMaskFilter blur = new BlurMaskFilter(8, BlurMaskFilter.Blur.NORMAL);
 
- /*
-             * LinearGradient shader = new LinearGradient(0, 0, endX, endY, new
-             * int[]{startColor, midleColor, endColor},new float[]{0 , 0.5f,
-             * 1.0f}, TileMode.MIRROR);
-             * 参数一为渐变起初点坐标x位置，参数二为y轴位置，参数三和四分辨对应渐变终点
-             * 其中参数new int[]{startColor, midleColor,endColor}是参与渐变效果的颜色集合，
-             * 其中参数new float[]{0 , 0.5f, 1.0f}是定义每个颜色处于的渐变相对位置， 这个参数可以为null，如果为null表示所有的颜色按顺序均匀的分布
-             */
-        Shader mShader = new LinearGradient(0, 0, 100, 100,
-                new int[]{Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW},
-
-                null, Shader.TileMode.REPEAT);
         // Shader.TileMode三种模式
         // REPEAT:沿着渐变方向循环重复
         // CLAMP:如果在预先定义的范围外画的话，就重复边界的颜色
@@ -190,30 +166,57 @@ public class DrawView extends View {
                 mPaint.setStrokeWidth(currentSize);
                 mPaint.setColor(currentColor);
                 break;
-            case 1:
+          /*  case 1:
                 //橡皮擦
                 mPaint.setAlpha(0);
                 mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
                 mPaint.setColor(Color.TRANSPARENT);
                 mPaint.setStrokeWidth(50);
+                break;*/
+            case 1:
+                // 应用mask
+                if (emboss == null) {
+                    // 设置光源的方向
+                    float[] direction = new float[]{1.5f, 1.5f, 1.5f};
+                    //设置环境光亮度
+                    float light = 0.6f;
+                    // 选择要应用的反射等级
+                    float specular = 6;
+                    // 向mask应用一定级别的模糊
+                    float mask_blur = 4.2f;
+                    //浮雕
+                    emboss = new EmbossMaskFilter(direction, light, specular, mask_blur);
+                }
+                mPaint.setMaskFilter(emboss);
                 break;
             case 2:
                 // 应用mask
-                mPaint.setMaskFilter(emboss);
-                break;
-            case 3:
-                // 应用mask
+                //模糊
+                if (blur == null)
+                    blur = new BlurMaskFilter(8, BlurMaskFilter.Blur.NORMAL);
                 mPaint.setMaskFilter(blur);
                 break;
-            case 4:
+            case 3:
+                /*
+             * LinearGradient shader = new LinearGradient(0, 0, endX, endY, new
+             * int[]{startColor, midleColor, endColor},new float[]{0 , 0.5f,
+             * 1.0f}, TileMode.MIRROR);
+             * 参数一为渐变起初点坐标x位置，参数二为y轴位置，参数三和四分辨对应渐变终点
+             * 其中参数new int[]{startColor, midleColor,endColor}是参与渐变效果的颜色集合，
+             * 其中参数new float[]{0 , 0.5f, 1.0f}是定义每个颜色处于的渐变相对位置， 这个参数可以为null，如果为null表示所有的颜色按顺序均匀的分布
+             */
+                if (mShader == null)
+                    mShader = new LinearGradient(0, 0, 100, 100,
+                            new int[]{Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW},
+                            null, Shader.TileMode.REPEAT);
                 mPaint.setShader(mShader);
                 break;
-            case 5:
-                if(shader==null)
+            case 4:
+               /* if (shader == null)
                     shader = new BitmapShader(BitmapFactory.decodeResource(getResources(), R.mipmap.ma), Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
-                mPaint.setShader(shader);
+                mPaint.setShader(shader);*/
                 break;
-            case 6:
+            case 5:
                 break;
         }
     }
@@ -234,6 +237,7 @@ public class DrawView extends View {
         mX = x;
         mY = y;
     }
+
     private void pic_touch_start(float x, float y) {
         mpicPath.moveTo(x, y);
         mPicX = x;
@@ -271,17 +275,18 @@ public class DrawView extends View {
         savePath.add(dp);
         mPath = null;// 重新置空
 
-        if (savePath!=null&&savePath.size()>0){
+        if (savePath != null && savePath.size() > 0) {
             repealRedoListener.canRepeal(true);
-        }else {
+        } else {
             repealRedoListener.canRepeal(false);
         }
-        if (deletePath!=null&&deletePath.size()>0){
+        if (deletePath != null && deletePath.size() > 0) {
             repealRedoListener.canRedo(true);
-        }else {
+        } else {
             repealRedoListener.canRedo(false);
         }
     }
+
     private void pic_touch_up() {
         mpicPath.lineTo(mPicX, mPicY);
         //将一条完整的路径保存下来(相当于入栈操作)
@@ -302,16 +307,16 @@ public class DrawView extends View {
             deletePath.add(drawPath);
             picdeletePath.add(picdrawPath);
             savePath.remove(savePath.size() - 1);
-            picsavePath.remove(picsavePath.size()-1);
+            picsavePath.remove(picsavePath.size() - 1);
 
-            if (savePath!=null&&savePath.size()>0){
+            if (savePath != null && savePath.size() > 0) {
                 repealRedoListener.canRepeal(true);
-            }else {
+            } else {
                 repealRedoListener.canRepeal(false);
             }
-            if (deletePath!=null&&deletePath.size()>0){
+            if (deletePath != null && deletePath.size() > 0) {
                 repealRedoListener.canRedo(true);
-            }else {
+            } else {
                 repealRedoListener.canRedo(false);
             }
 
@@ -329,14 +334,14 @@ public class DrawView extends View {
 
             savePath.clear();
             picsavePath.clear();
-            if (savePath!=null&&savePath.size()>0){
+            if (savePath != null && savePath.size() > 0) {
                 repealRedoListener.canRepeal(true);
-            }else {
+            } else {
                 repealRedoListener.canRepeal(false);
             }
-            if (deletePath!=null&&deletePath.size()>0){
+            if (deletePath != null && deletePath.size() > 0) {
                 repealRedoListener.canRedo(true);
-            }else {
+            } else {
                 repealRedoListener.canRedo(false);
             }
 
@@ -374,14 +379,14 @@ public class DrawView extends View {
             deletePath.remove(deletePath.size() - 1);
             picdeletePath.remove(picdeletePath.size() - 1);
 
-            if (savePath!=null&&savePath.size()>0){
+            if (savePath != null && savePath.size() > 0) {
                 repealRedoListener.canRepeal(true);
-            }else {
+            } else {
                 repealRedoListener.canRepeal(false);
             }
-            if (deletePath!=null&&deletePath.size()>0){
+            if (deletePath != null && deletePath.size() > 0) {
                 repealRedoListener.canRedo(true);
-            }else {
+            } else {
                 repealRedoListener.canRedo(false);
             }
 
@@ -414,7 +419,7 @@ public class DrawView extends View {
                 break;
             case MotionEvent.ACTION_MOVE:
                 touch_move(x, y);
-                pic_touch_move(pxy[0],pxy[1]);
+                pic_touch_move(pxy[0], pxy[1]);
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
@@ -454,6 +459,7 @@ public class DrawView extends View {
         tsd.rotateAngle = 0;
         return tsd;
     }
+
     public void setRepealRedoListener(RepealRedoListener repealRedoListener) {
         this.repealRedoListener = repealRedoListener;
     }

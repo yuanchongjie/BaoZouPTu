@@ -34,5 +34,7 @@ public class AllData {
     public static final String TAG="LOL";
     public static AppConfig appConfig;
     public static final String appFilePathDefault = Environment.getExternalStorageDirectory().getAbsolutePath() + "/暴走P图/";
-    public static final String zitiDir=Environment.getExternalStorageDirectory().getAbsolutePath() + "/暴走P图/字体/";
+    public static final String zitiDir=appFilePathDefault+"字体/";
+    public static final String picDir=appFilePathDefault+"暴走P图-制作表情/";
+
 }

@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,32 +59,76 @@ public class ChosePictureActivity extends AppCompatActivity {
      */
     private List<String> picPathInFile = new ArrayList<>();
     /**
-     * 当前要现实的所有图片的路径
+     * 当前要显示的所有图片的路径
      */
     private List<String> currentPicPathList = new ArrayList<>();
 
     /**
      * 新P的图片，不好添加，用这个显示添加
      */
-    String editedPicPath;
+    String newPicPath;
 
     /**
      * 文件列表的几个相关list
      */
     private List<String> dirInfoList;
     private List<String> dirPathList;
+    private List<String> dirRepresentPathList;
 
     private DrawerLayout fileListDrawer;
     private PicGridAdapter picAdpter;
     private RecyclerView pictureGridview;
     private ProcessUsuallyPicPath usuPicProcessor;
 
-    private ListView pictureFileListView;
     private MyFileListAdapter fileAdapter;
     boolean isFirst = true;
     private GridLayoutManager gridLayoutManager;
 
     private String chosedPath;
+
+    /**
+     * handler使用静态内部类，防止内存泄漏，减少内存消耗
+     * 非静态内部类会持有对外部类的引用，
+     * 而主线程的Handler会被主线程持有，内部类的handler又会持有activity,
+     * activity是不能不被释放的，所以这里就注意，内部类或者匿名内部类的handler会导致内存泄漏
+     */
+    private static class PicUpdateHandler extends Handler {
+        private final WeakReference<ChosePictureActivity> activityRefernce;
+
+        PicUpdateHandler(ChosePictureActivity activity) {
+            activityRefernce = new WeakReference<ChosePictureActivity>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            ChosePictureActivity partActivity = activityRefernce.get();
+            if (partActivity == null) return;
+
+            partActivity.m_ProgressDialog.dismiss();// 表示此处开始就解除这个进度条Dialog，应该是在相对起始线程的另一个中使用
+            if (msg.obj.equals("change_pic")) {
+                if (partActivity.isFirst) {
+                    partActivity.pictureGridview.setAdapter(partActivity.picAdpter);
+                    partActivity.isFirst = false;
+                } else {
+                    partActivity.picAdpter.notifyDataSetChanged();
+                }
+                Util.P.le(partActivity.TAG, "finish update picture");
+            } else if (msg.obj.equals("change_file")) {
+                Util.P.le(partActivity.TAG, "finish update file");
+                partActivity.fileAdapter.notifyDataSetChanged();
+                partActivity.picAdpter.notifyDataSetChanged();
+            } else {
+                if (partActivity.newPicPath != null) {
+                    if (!partActivity.usuPicProcessor.hasRecentPic(partActivity.newPicPath)) {
+                        partActivity.usuPicProcessor.addRecentPathFirst(partActivity.newPicPath);
+                        partActivity.picAdpter.notifyDataSetChanged();
+                        Util.P.le("已更新图片");
+                    }
+                    partActivity.newPicPath = null;
+                }
+            }
+        }
+    }
 
     /**
      * Called when the activity is first created.
@@ -94,35 +139,8 @@ public class ChosePictureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chose_picture);
 //        test();
-        Handler handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                m_ProgressDialog.dismiss();// 表示此处开始就解除这个进度条Dialog，应该是在相对起始线程的另一个中使用
-                if (msg.obj.equals("change_pic")) {
-                    if (isFirst) {
-                        pictureGridview.setAdapter(picAdpter);
-                        isFirst = false;
-                    } else {
-                        picAdpter.notifyDataSetChanged();
-                    }
-                    Util.P.le(TAG, "finish update picture");
-                } else if (msg.obj.equals("change_file")) {
-                    Util.P.le(TAG, "finish update file");
-                    fileAdapter.notifyDataSetChanged();
-                    picAdpter.notifyDataSetChanged();
-                } else {
-                    if (editedPicPath != null) {
-                        if (!usuPicProcessor.hasRecentPic(editedPicPath)) {
-                            usuPicProcessor.addRecentPathFirst(editedPicPath);
-                            picAdpter.notifyDataSetChanged();
-                            Util.P.le("已更新图片");
-                        }
-                        editedPicPath = null;
-                    }
-                }
-            }
-        };
-        usuPicProcessor = new ProcessUsuallyPicPath(this, handler);
+        PicUpdateHandler picUpdateHandler = new PicUpdateHandler(this);
+        usuPicProcessor = new ProcessUsuallyPicPath(this, picUpdateHandler);
         getScreenWidth();
         initView();
         initToolbar();
@@ -167,7 +185,7 @@ public class ChosePictureActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        if(AllData.appConfig.hasReadUsuPicUse()) {
+        if (AllData.appConfig.hasReadUsuPicUse()) {
             FirstUseDialog firstUseDialog = new FirstUseDialog(this);
             firstUseDialog.createDialog(null, "长按图片即可添加到喜爱或删除", new FirstUseDialog.ActionListener() {
                 @Override
@@ -194,7 +212,6 @@ public class ChosePictureActivity extends AppCompatActivity {
     private void initToolbar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
             SystemBarTintManager tintManager = new SystemBarTintManager(this);
             tintManager.setStatusBarTintColor(Util.getColor(this, R.color.base_toolbar_background));
             tintManager.setStatusBarTintEnabled(true);
@@ -437,10 +454,10 @@ public class ChosePictureActivity extends AppCompatActivity {
     private void disposeDrawer() {
 
         dirPathList = usuPicProcessor.getDirPathList();
-        List<String> dirRepresentPathList = usuPicProcessor.getDirRepresentPathList();
+        dirRepresentPathList = usuPicProcessor.getDirRepresentPathList();
         dirInfoList = usuPicProcessor.getDirInfoList();
 
-        pictureFileListView = (ListView) findViewById(R.id.drawer_picture_file_list);
+        ListView pictureFileListView = (ListView) findViewById(R.id.drawer_picture_file_list);
         fileAdapter = new MyFileListAdapter(ChosePictureActivity.this,
                 dirInfoList, dirRepresentPathList);
         pictureFileListView.setAdapter(fileAdapter);
@@ -491,17 +508,29 @@ public class ChosePictureActivity extends AppCompatActivity {
                 String failedPath = data.getStringExtra("failed_path");
                 currentPicPathList.remove(failedPath);
                 picAdpter.notifyDataSetChanged();
-            } else {  //当前在常用图片下
-                if (usuPicProcessor.isUsuPic(currentPicPathList)) {
-                    editedPicPath = data.getStringExtra("new_path");
-                    usuPicProcessor.addUsedPath(
-                            data.getStringExtra("recent_use_pic"));
+            } else if (action != null && action.equals("save_and_leave")) {
+
+                newPicPath = data.getStringExtra("new_path");
+                usuPicProcessor.addUsedPath(
+                        data.getStringExtra("recent_use_pic"));
+                if (usuPicProcessor.isUsuPic(currentPicPathList)) { //当前在常用图片下
                     picAdpter.notifyDataSetChanged();
-                } else {//不是常用的图片，是文件夹中的图片，则更新文件,
-                    // 这里图片没有保存到当前文件夹下面
-                    showFilePicUpdate(FileTool.getParentPath(chosedPath));
-                    usuPicProcessor.addUsedPath(
-                            data.getStringExtra("recent_use_pic"));//假如最近使用，不刷新视图
+                }
+                // 这里图片没有保存到当前文件夹下面
+                //更新文件信息
+                String parentPath = FileTool.getParentPath(newPicPath);
+                int id = dirPathList.indexOf(parentPath);
+                String info = dirInfoList.get(id);
+                int number = Integer.valueOf(info.substring(info.indexOf('(') + 1, info.indexOf(')')));
+                number++;
+                dirInfoList.set(id, info.substring(0, info.indexOf('(') + 1) + number + ")");
+                dirRepresentPathList.set(id, data.getStringExtra("recent_use_pic"));
+                fileAdapter.notifyDataSetChanged();
+            }else if(action!=null&&action.equals("leave")){
+                usuPicProcessor.addUsedPath(
+                        data.getStringExtra("recent_use_pic"));
+                if (usuPicProcessor.isUsuPic(currentPicPathList)) { //当前在常用图片下
+                    picAdpter.notifyDataSetChanged();
                 }
             }
         }
@@ -509,39 +538,6 @@ public class ChosePictureActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    /**
-     * 更新当前的形式的文件的图片的信息，有增删改时，即时显示出来
-     */
-    private void showFilePicUpdate(final String parentPath) {
-
-        final List<String> newPaths = new ArrayList<String>();
-        final Handler handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                if (msg.obj.equals("change")) {
-                    currentPicPathList = newPaths;
-                    picAdpter.setList(currentPicPathList);
-                    picAdpter.notifyDataSetChanged();
-                    fileAdapter.notifyDataSetChanged();
-                }
-                super.handleMessage(msg);
-            }
-        };
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                FileTool.getOrderedPicListInFile(parentPath, newPaths);
-                Message msg = new Message();
-                if (!newPaths.equals(currentPicPathList))
-                    msg.obj = "change";
-                else
-                    msg.obj = "not";
-                handler.sendMessage(msg);
-            }
-        }).start();
-
-    }
 
     @Override
     protected void onStop() {

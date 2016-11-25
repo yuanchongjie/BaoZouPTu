@@ -71,7 +71,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AllData.screenHeight = metric.heightPixels;
     }
 
+    /**
+     * 傻逼360开发平台
+     */
     private void test() {
+
         //  testDB1();
         //  testDB();
         initData();

@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.nfc.Tag;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -174,6 +175,7 @@ public class CutView extends PtuView implements TSRView {
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         frame.onDraw(canvas);
+        Log.e(TAG,"draw完成");
     }
 
     /**

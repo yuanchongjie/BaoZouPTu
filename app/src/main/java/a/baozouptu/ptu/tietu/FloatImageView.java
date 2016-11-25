@@ -39,6 +39,7 @@ public class FloatImageView extends ImageView {
     private Paint rimPaint;
     private String picPath;
     private Bitmap srcBitmap;
+    private int picId;
 
     public FloatImageView(Context context) {
         super(context);
@@ -157,6 +158,9 @@ public class FloatImageView extends ImageView {
         return picPath;
     }
 
+    public int getPicId(){
+        return picId;
+    }
     /**
      * @return 获取高除以宽的比
      */
@@ -167,6 +171,11 @@ public class FloatImageView extends ImageView {
     public void setImageBitmapAndPath(Bitmap srcBitmap, String path) {
         this.srcBitmap = srcBitmap;
         picPath = path;
+        setImageBitmap(srcBitmap);
+    }
+    public void setImageBitmapAndId(Bitmap srcBitmap,int id){
+        this.srcBitmap=srcBitmap;
+        picId=id;
         setImageBitmap(srcBitmap);
     }
 

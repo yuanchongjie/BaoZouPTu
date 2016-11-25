@@ -235,15 +235,6 @@ public class TextFragment extends Fragment implements BaseFunction {
         rubberView.smallRedo();
     }
 
-    @Override
-    public void repeal() {
-
-    }
-
-    @Override
-    public void redo(StepData sd) {
-
-    }
 
     @Override
     public Bitmap getResultBm(float ratio) {

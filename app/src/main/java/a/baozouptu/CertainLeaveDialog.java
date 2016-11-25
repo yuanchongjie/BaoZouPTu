@@ -25,13 +25,13 @@ public class CertainLeaveDialog {
         if (dialog != null && dialog.isShowing()) return;
         AlertDialog dialog = new AlertDialog.Builder(mContext)
                 .setMessage("已经修改了图片,确定你开吗？")
-                .setNegativeButton("离开", new DialogInterface.OnClickListener() {
+                .setPositiveButton("离开", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         actionListener.onSure();
                     }
                 })
-                .setPositiveButton("取消",null)
+                .setNegativeButton("取消",null)
                 .create();
         if (title != null)
             dialog.setTitle(title);

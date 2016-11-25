@@ -127,10 +127,6 @@ public class CutFragment extends Fragment implements BaseFunction {
         }
     }
 
-    @Override
-    public void redo(StepData sd) {
-        ptuView.replaceSourceBm(BitmapTool.getLosslessBitmap(sd.picPath));
-    }
 
     @Override
     public Bitmap getResultBm(float ratio) {
@@ -388,8 +384,4 @@ public class CutFragment extends Fragment implements BaseFunction {
 
     }
 
-    @Override
-    public void repeal() {
-
-    }
 }
