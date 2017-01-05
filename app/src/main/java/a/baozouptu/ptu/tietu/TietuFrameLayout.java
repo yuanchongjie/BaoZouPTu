@@ -7,11 +7,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import a.baozouptu.base.dataAndLogic.AllData;
-import a.baozouptu.base.util.GeoUtil;
-import a.baozouptu.base.util.Util;
-import a.baozouptu.ptu.repealRedo.RepealRedoManager;
-import a.baozouptu.ptu.repealRedo.StepData;
+import a.baozouptu.common.dataAndLogic.AllData;
+import a.baozouptu.common.util.GeoUtil;
+import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.view.PtuView;
 
 /**

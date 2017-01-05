@@ -2,7 +2,7 @@ package a.baozouptu.ptu;
 
 import android.graphics.Rect;
 
-import a.baozouptu.base.util.MU;
+import a.baozouptu.common.util.MU;
 
 /**
  * p图过程中用到的一些工具

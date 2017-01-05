@@ -7,7 +7,7 @@
     <ListView
         android:id="@+id/cut_choose_ratio_list"
         android:dividerHeight="1dp"
-        android:divider="@drawable/divider_dialog_save_set"
+        android:divider="@drawable/divider_cut_chose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </FrameLayout>

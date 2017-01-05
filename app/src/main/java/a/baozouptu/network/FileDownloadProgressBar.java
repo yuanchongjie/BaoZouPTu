@@ -2,18 +2,11 @@ package a.baozouptu.network;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.ProgressDialog;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.widget.ProgressBar;
 import android.widget.RemoteViews;
 
 import a.baozouptu.R;
-import a.baozouptu.base.util.Util;
-import a.baozouptu.chosePicture.ChosePictureActivity;
-import a.baozouptu.ptu.PtuActivity;
+import a.baozouptu.common.util.Util;
 
 /**
  * Created by Administrator on 2016/11/21 0021.

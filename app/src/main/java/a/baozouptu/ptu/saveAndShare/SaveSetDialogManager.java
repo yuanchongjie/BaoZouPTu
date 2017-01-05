@@ -2,9 +2,12 @@ package a.baozouptu.ptu.saveAndShare;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ResolveInfo;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -18,9 +21,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import a.baozouptu.R;
-import a.baozouptu.base.dataAndLogic.DBUtil;
-import a.baozouptu.base.dataAndLogic.MyDatabase;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.dataAndLogic.ShareDBUtil;
+import a.baozouptu.common.dataAndLogic.MyDatabase;
+import a.baozouptu.common.util.Util;
 
 /**
  * Created by liuguicen on 2016/8/13.
@@ -47,6 +50,7 @@ public class SaveSetDialogManager {
     private List<ResolveInfo> resolveInfos;
     private ShareRecyclerAdapter shareRecyclerAdapter;
     private List<Boolean> canClickList;
+    private MyQQShare myQQShare;
 
     public interface clickListenerInterface {
         void mSure(float saveRatio);
@@ -95,10 +99,17 @@ public class SaveSetDialogManager {
         dialog.show();
     }
 
+    private void initView() {
+        setChoseSizeUi();
+        LinearLayoutManager layoutManager = new LinearLayoutManager(mContext, LinearLayout.HORIZONTAL, false);
+        recyclerShare.setLayoutManager(layoutManager);
+        shareRecyclerAdapter = new ShareRecyclerAdapter(mContext, shareActivityInfo);
+        recyclerShare.setAdapter(shareRecyclerAdapter);
+    }
 
     private void getShareInfo() {
         MyDatabase myDatabase = MyDatabase.getInstance(mContext);
-        List<String> preferShare = new ArrayList<>();
+        List<Pair<String,String>> preferShare = new ArrayList<>();
         try {
             myDatabase.queryAllPreferShare(preferShare);
         } catch (IOException e) {
@@ -128,6 +139,7 @@ public class SaveSetDialogManager {
         });
         shareRecyclerAdapter.setOnItemClickListener(
                 new ShareRecyclerAdapter.OnRecyclerViewItemClickListener() {
+
                     @Override
                     public void onItemClick(View view, ListDrawableItem data) {
                         Util.P.le("Savaset", "item受到点击");
@@ -141,21 +153,26 @@ public class SaveSetDialogManager {
                         ResolveInfo resolveInfo = resolveInfos.get(clickPosition);
 
                         //将优先信息添加到数据库
+                        String packageName=resolveInfo.activityInfo.packageName;
                         String title = resolveInfo.loadLabel(mContext.getPackageManager()).toString();
-                        DBUtil.inseartPreferInfo(mContext, title);
-                        //如果shareType是Image，那么分享的内容应该为图片在SD卡的路径
-                        ShareUtil.exeShare(mContext, "图片分享", resolveInfo, picPath, ShareUtil.Type.Image);
+                        ShareDBUtil.inseartPreferInfo(mContext,packageName,title);
+                        if(title.equals("发送给好友"))
+                        {
+                            myQQShare = new MyQQShare();
+                            ((AppCompatActivity)mContext).getFragmentManager().beginTransaction().add(
+                                    myQQShare,"MyQQShare"
+                            ).commit();
+                            myQQShare.share(picPath,mContext);
+                        }else {
+                            //如果shareType是Image，那么分享的内容应该为图片在SD卡的路径
+                            ShareUtil.exeShare(mContext, "图片分享", resolveInfo, picPath, ShareUtil.Type.Image);
+                        }
                         dialog.dismiss();
                     }
                 });
     }
-
-    private void initView() {
-        setChoseSizeUi();
-        LinearLayoutManager layoutManager = new LinearLayoutManager(mContext, LinearLayout.HORIZONTAL, false);
-        recyclerShare.setLayoutManager(layoutManager);
-        shareRecyclerAdapter = new ShareRecyclerAdapter(mContext, shareActivityInfo);
-        recyclerShare.setAdapter(shareRecyclerAdapter);
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        myQQShare.onActivityResult(requestCode,resultCode,data);
     }
 
     private void setChoseSizeUi() {

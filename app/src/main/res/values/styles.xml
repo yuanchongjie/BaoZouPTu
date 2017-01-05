@@ -7,6 +7,15 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:fitsSystemWindows">true</item>
+        <!-- Active thumb color & Active track color(30% transparency) switch 打开时的拇指按钮的颜色 轨迹颜色默认为30%这个颜色 -->
+    </style>
+
+    <style name="SettingAppThem" parent="AppTheme">
+        <item name="colorControlActivated">@color/base_color1</item>
+        <!-- Inactive thumb color switch关闭时的拇指按钮的颜色 -->
+        <item name="colorSwitchThumbNormal">@color/white</item>
+        <!-- Inactive track color(30% transparency) switch关闭时的轨迹的颜色  30%这个颜色 -->
+        <item name="android:colorForeground">@color/colorPrimaryDark</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -22,6 +31,7 @@
         <item name="android:fitsSystemWindows">true</item>
         <item name="android:clipToPadding">true</item>
     </style>
+
     <style name="SaveSetSizeItem">
         <item name="android:layout_width">@dimen/list_item_width_save_set_middle</item>
         <item name="android:layout_height">@dimen/list_item_width_save_set_middle</item>
@@ -33,4 +43,52 @@
         <item name="android:textSize">13pt</item>
     </style>
 
+    <style name="my_tool_bar">
+        <item name="android:layout_height">@dimen/my_toolbar_height</item>
+        <item name="android:background">@color/base_toolbar_background</item>
+    </style>
+
+    <style name="setting_set_group_layout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">left</item>
+        <item name="android:background">@color/white</item>
+        <item name="android:divider">@drawable/divider_setting_item</item>
+        <item name="android:dividerPadding">1px</item>
+        <item name="android:showDividers">middle|beginning|end</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="setting_item">
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+    </style>
+
+    <style name="setting_group_title">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">8dp</item>
+        <item name="android:layout_marginTop">15dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+    </style>
+
+    <style name="setting_item_text">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:gravity">left</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textColor">@color/text_deep_black</item>
+    </style>
+
+    <style name="setting_item_right">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_alignParentRight">true</item>
+    </style>
 </resources>

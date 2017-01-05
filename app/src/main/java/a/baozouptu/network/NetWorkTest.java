@@ -1,7 +1,7 @@
 /*
 package a.baozouptu.network;
 
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.Util;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
@@ -12,7 +12,7 @@ import cn.bmob.v3.listener.SaveListener;
 
 public class NetWorkTest {
     public void test() {
-        User p2 = new User();
+        SimpleUser p2 = new SimpleUser();
         p2.setName("lucky");
         p2.setAddress("北京海淀");
         p2.save(new SaveListener<String>() {

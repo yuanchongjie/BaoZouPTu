@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import a.baozouptu.R;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.repealRedo.StepData;
 

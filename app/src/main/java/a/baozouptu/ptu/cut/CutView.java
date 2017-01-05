@@ -9,14 +9,13 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.nfc.Tag;
 import android.util.Log;
 import android.view.MotionEvent;
 
 import a.baozouptu.R;
-import a.baozouptu.base.util.GeoUtil;
-import a.baozouptu.base.util.MU;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.GeoUtil;
+import a.baozouptu.common.util.MU;
+import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.view.PtuView;
 import a.baozouptu.ptu.view.TSRView;

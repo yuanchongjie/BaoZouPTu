@@ -1,67 +1,21 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/my_ptr_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/container"
-    android:orientation="vertical" >
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="score"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-        <TextView
-            android:id="@+id/tvScore"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="tscore"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-        <TextView
-            android:id="@+id/tvBestScore"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-    </LinearLayout>
+    android:orientation="vertical">
 
     <Button
-        android:id="@+id/btnNewGame"
+        android:id="@+id/shearToQQ"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="aaa" />
-
-    <FrameLayout
-        android:id="@+id/gameContatiner"
+        android:gravity="center"
+        android:text="分享到qq"
+        android:textSize="20sp" />
+    <ImageView
+        android:id="@+id/image"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <com.example.mygame2048.GameView
-            android:id="@+id/gameView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </com.example.mygame2048.GameView>
-
-        <com.example.mygame2048.AnimLayer
-            android:id="@+id/animlayer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </com.example.mygame2048.AnimLayer>
-
-    </FrameLayout>
-
+        android:layout_height="wrap_content"
+        />
 </LinearLayout>

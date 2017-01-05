@@ -14,9 +14,9 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import a.baozouptu.base.util.BitmapTool;
-import a.baozouptu.base.util.GeoUtil;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.BitmapTool;
+import a.baozouptu.common.util.GeoUtil;
+import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 
 /**

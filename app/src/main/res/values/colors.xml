@@ -52,10 +52,12 @@
     <color name="mat_pen_line2">#ff5e5e5e</color>
     <color name="cut_frame">#ffffff</color>
     <color name="black_deep">#333333</color>
+    <color name="black">#000000</color>
     <color name="light_grey">#aaaaaa</color>
     <color name="half_transparent_black">#68000000</color>
     <color name="background_pressed">#80aaaaaa</color>
 
+    <color name="common_activity_background">#e7e7e7</color>
     <color name="cancel_btn">#ffffff</color>
     <color name="sure_btn">#ffffff</color>
 
@@ -63,4 +65,5 @@
     <drawable name="hou">#dcdcdc</drawable>
     <drawable name="text_popup_window_background">#fff</drawable>
     <drawable name="white">#fff</drawable>
+
 </resources>

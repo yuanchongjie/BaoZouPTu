@@ -4,10 +4,7 @@ import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.Util;
 
 /**
  * 触摸事件处理器，TietuFrameLayout的

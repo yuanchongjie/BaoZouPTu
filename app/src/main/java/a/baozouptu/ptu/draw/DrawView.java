@@ -1,53 +1,26 @@
 package a.baozouptu.ptu.draw;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.EmbossMaskFilter;
 import android.graphics.LinearGradient;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.RadialGradient;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.Shader;
-import android.graphics.SweepGradient;
-import android.graphics.drawable.ShapeDrawable;
-import android.net.Uri;
-import android.os.Environment;
-import android.util.Log;
-import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import a.baozouptu.R;
-import a.baozouptu.base.util.BitmapTool;
-import a.baozouptu.base.util.FileTool;
-import a.baozouptu.base.util.MU;
-import a.baozouptu.base.util.Util;
-import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.RepealRedoListener;
 import a.baozouptu.ptu.repealRedo.DrawStepData;
-import a.baozouptu.ptu.repealRedo.StepData;
-import a.baozouptu.ptu.repealRedo.TextStepData;
 import a.baozouptu.ptu.view.PtuView;
 
 /**

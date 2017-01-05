@@ -27,10 +27,10 @@
             android:layout_gravity="center"
             android:paddingRight="@dimen/padding_function_item_image"/>
 
-        <a.baozouptu.base.view.HorizontalListView
+        <a.baozouptu.common.view.HorizontalListView
             android:id="@+id/color_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-        </a.baozouptu.base.view.HorizontalListView>
+        </a.baozouptu.common.view.HorizontalListView>
     </LinearLayout>
 </LinearLayout>

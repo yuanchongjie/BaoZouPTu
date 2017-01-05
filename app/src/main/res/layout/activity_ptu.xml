@@ -41,8 +41,7 @@
         <a.baozouptu.ptu.view.PtuView
             android:id="@+id/ptu_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#0000" />
+            android:layout_height="match_parent" />
     </a.baozouptu.ptu.view.PtuFrameLayout>
 
     <FrameLayout

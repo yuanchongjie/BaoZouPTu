@@ -12,13 +12,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.util.Pair;
 import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import a.baozouptu.base.dataAndLogic.DBUtil;
+import a.baozouptu.common.dataAndLogic.ShareDBUtil;
 
 
 public class ShareUtil {
@@ -26,15 +27,17 @@ public class ShareUtil {
      * @param preferApps 优先旋转的应用Activity的title，越前面，优先级越高
      * @return
      */
-    public static List<ListDrawableItem> getSortedAppData(Context context, List<String> preferApps, List<ResolveInfo> resolveInfos) {
+    public static List<ListDrawableItem> getSortedAppData(Context context, List<Pair<String,String>> preferApps, List<ResolveInfo> resolveInfos) {
         List<ListDrawableItem> appInfos = getShowData(context, resolveInfos);
-        List<String> delTitles = new ArrayList<>();
+        List<Pair<String,String>> delActivity = new ArrayList<>();
         int size = preferApps.size();
         for (int p = size - 1; p >= 0; p--) {
-            CharSequence cs = preferApps.get(p);
+            CharSequence packageNmae=preferApps.get(p).first;
+            CharSequence title = preferApps.get(p).second;
             int i = 0;
             for (; i < appInfos.size(); i++) {
-                if (appInfos.get(i).getTitle().equals(cs)) {
+                if (appInfos.get(i).getPackageName().equals(packageNmae)&&
+                        appInfos.get(i).getTitle().equals(title)) {
                     resolveInfos.add(0, resolveInfos.remove(i));
                     appInfos.add(0, appInfos.remove(i));
                     break;
@@ -42,13 +45,13 @@ public class ShareUtil {
             }
             //如果没找到这个信息,已经不存在这个开放的activity，将其从数据库删除
             if (i >= appInfos.size()) {
-                delTitles.add(cs.toString());
+                delActivity.add(preferApps.get(p));
             }
         }
-        for (String title : delTitles) {
-            preferApps.remove(title);
+        for (Pair<String,String> ac : delActivity) {
+            preferApps.remove(ac);
         }
-        DBUtil.deletePreferInfo(context, delTitles);
+        ShareDBUtil.deletePreferInfo(context, delActivity);
         return appInfos;
     }
 
@@ -60,7 +63,8 @@ public class ShareUtil {
         PackageManager mPackageManager = context.getPackageManager();
         for (int i = 0; i < resolveInfos.size(); i++) {
             ResolveInfo info = resolveInfos.get(i);
-            ListDrawableItem dialogItemEntity = new ListDrawableItem(info.loadLabel(mPackageManager), info.loadIcon(mPackageManager));
+            ListDrawableItem dialogItemEntity = new ListDrawableItem(info.activityInfo.packageName,
+                    info.loadLabel(mPackageManager), info.loadIcon(mPackageManager));
             drawableItems.add(dialogItemEntity);
         }
         return drawableItems;

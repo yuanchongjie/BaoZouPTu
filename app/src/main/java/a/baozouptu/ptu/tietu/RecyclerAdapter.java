@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import java.util.List;
 
 import a.baozouptu.R;
-import a.baozouptu.base.dataAndLogic.AllData;
+import a.baozouptu.common.dataAndLogic.AllData;
 
 
 /**

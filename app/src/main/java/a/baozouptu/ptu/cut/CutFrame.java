@@ -12,8 +12,8 @@ import android.view.MotionEvent;
 import java.util.Locale;
 
 import a.baozouptu.R;
-import a.baozouptu.base.util.GeoUtil;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.GeoUtil;
+import a.baozouptu.common.util.Util;
 
 /**
  * Created by liuguicen on 2016/8/5.

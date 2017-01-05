@@ -3,20 +3,17 @@ package a.baozouptu.ptu.repealRedo;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ClipDrawable;
 import android.view.View;
 
 import java.io.File;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import a.baozouptu.base.util.FileTool;
-import a.baozouptu.base.util.GeoUtil;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.FileTool;
+import a.baozouptu.common.util.GeoUtil;
+import a.baozouptu.common.util.Util;
 
 /**
  * Created by Administrator on 2016/7/28.

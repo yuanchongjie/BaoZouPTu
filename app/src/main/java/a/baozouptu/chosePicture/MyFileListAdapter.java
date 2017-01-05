@@ -12,8 +12,8 @@ import android.widget.TextView;
 import java.util.List;
 
 import a.baozouptu.R;
-import a.baozouptu.base.dataAndLogic.AllData;
-import a.baozouptu.base.dataAndLogic.AsyncImageLoader3;
+import a.baozouptu.common.dataAndLogic.AllData;
+import a.baozouptu.common.dataAndLogic.AsyncImageLoader3;
 
 /**
  * 使用继承BaseAdapter处理ListView的图片显示

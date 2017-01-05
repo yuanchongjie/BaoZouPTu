@@ -13,19 +13,17 @@ import android.widget.BaseAdapter;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
 
 import a.baozouptu.R;
-import a.baozouptu.base.dataAndLogic.AllData;
-import a.baozouptu.base.util.Util;
-import a.baozouptu.base.view.HorizontalListView;
-import a.baozouptu.base.view.MySwitchButton;
+import a.baozouptu.common.dataAndLogic.AllData;
+import a.baozouptu.common.util.Util;
+import a.baozouptu.common.view.HorizontalListView;
+import a.baozouptu.common.view.MySwitchButton;
 import a.baozouptu.network.FileDownloader;
 import a.baozouptu.ptu.PtuActivity;
-import a.baozouptu.ptu.saveAndShare.ShareUtil;
 import a.baozouptu.ptu.view.ColorBar;
 import a.baozouptu.ptu.view.ColorLump;
 import a.baozouptu.ptu.view.PtuFrameLayout;

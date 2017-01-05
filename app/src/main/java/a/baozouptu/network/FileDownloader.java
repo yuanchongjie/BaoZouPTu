@@ -11,8 +11,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import a.baozouptu.base.dataAndLogic.AllData;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.dataAndLogic.AllData;
+import a.baozouptu.common.util.Util;
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
@@ -21,6 +21,7 @@ import cn.bmob.v3.listener.DownloadFileListener;
 
 /**
  * Created by Administrator on 2016/11/21 0021.
+ *
  */
 
 public class FileDownloader {
@@ -50,7 +51,7 @@ public class FileDownloader {
      * 最好要传入应用的context
      */
     private FileDownloader() {
-        Bmob.initialize(Util.MyApplication.getAppContext(), "3000c4af659e92854854c5b10f0824a2");
+
     }
 
     public static FileDownloader getInstance() {
@@ -78,7 +79,7 @@ public class FileDownloader {
         BmobFile bmobfile = new BmobFile(name, "", url);
         final String savePath = AllData.appFilePathDefault + "字体/" + name;
         final File saveFile = new File(savePath);
-        Toast.makeText(context, "开始下载" + typefaceChinese.get(id) + "字体", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "开始下载" + typefaceChinese.get(id) + "字体，请稍后！", Toast.LENGTH_SHORT).show();
         bmobfile.download(saveFile, new DownloadFileListener() {
             @Override
             public void done(String s, BmobException e) {

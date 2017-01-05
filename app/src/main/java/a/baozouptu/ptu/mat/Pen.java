@@ -10,8 +10,8 @@ import android.graphics.Rect;
 import android.view.ViewConfiguration;
 
 import a.baozouptu.R;
-import a.baozouptu.base.util.GeoUtil;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.GeoUtil;
+import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.view.IconBitmapCreator;
 
 /**

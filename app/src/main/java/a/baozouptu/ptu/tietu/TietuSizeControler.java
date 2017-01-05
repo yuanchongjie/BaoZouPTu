@@ -1,16 +1,12 @@
 package a.baozouptu.ptu.tietu;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.widget.FrameLayout;
 
-import a.baozouptu.base.dataAndLogic.AllData;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.dataAndLogic.AllData;
 
 /**
  * Created by liuguicen on 2016/9/29.

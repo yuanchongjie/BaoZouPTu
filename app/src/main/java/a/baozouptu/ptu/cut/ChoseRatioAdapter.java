@@ -1,16 +1,14 @@
 package a.baozouptu.ptu.cut;
 
 import android.content.Context;
-import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import a.baozouptu.R;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.Util;
 
 /**
  * Created by Administrator on 2016/11/16 0016.

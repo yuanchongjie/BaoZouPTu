@@ -6,7 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 
 import a.baozouptu.R;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.Util;
 
 /**
  * Created by liuguicen on 2016/8/5.

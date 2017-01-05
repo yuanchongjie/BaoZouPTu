@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Typeface;
-import android.media.Image;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Pair;
@@ -21,15 +20,14 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import a.baozouptu.R;
-import a.baozouptu.base.dataAndLogic.AllData;
-import a.baozouptu.base.util.BitmapTool;
-import a.baozouptu.base.view.FirstUseDialog;
-import a.baozouptu.network.FileDownloadProgressBar;
-import a.baozouptu.network.FileDownloader;
+import a.baozouptu.common.dataAndLogic.AllData;
+import a.baozouptu.common.util.BitmapTool;
+import a.baozouptu.common.view.FirstUseDialog;
 import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.RepealRedoListener;
+import a.baozouptu.ptu.common.PtuData;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TextStepData;
 import a.baozouptu.ptu.view.PtuFrameLayout;
@@ -155,12 +153,12 @@ public class TextFragment extends Fragment implements BaseFunction {
         rubber.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!AllData.appConfig.hasReadTextRubber()) {
+                if (!PtuData.ptuConfig.hasReadTextRubber()) {
                     final FirstUseDialog firstUseDialog = new FirstUseDialog(getActivity());
                     firstUseDialog.createDialog(null, "滑动即可擦除,可在左边选择颜色和粗细哟", new FirstUseDialog.ActionListener() {
                         @Override
                         public void onSure() {
-                            AllData.appConfig.writeConfig_TextRubber(true);
+                            PtuData.ptuConfig.writeConfig_TextRubber(true);
                         }
                     });
                 }

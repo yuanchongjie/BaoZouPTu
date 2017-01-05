@@ -12,24 +12,23 @@ import android.widget.TextView;
 import java.util.List;
 
 import a.baozouptu.R;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.Util;
 
 /**
  * Created by liuguicen on 2016/9/8.
  *
- * @description
  */
 class ShareRecyclerAdapter extends RecyclerView.Adapter<ShareViewHolder> implements View.OnClickListener {
 
     private Context mContext;
-    List<ListDrawableItem> shareAcInfo;
+    private List<ListDrawableItem> shareAcInfo;
 
-    public ShareRecyclerAdapter(Context context, List<ListDrawableItem> shareAcInfo) {
+    ShareRecyclerAdapter(Context context, List<ListDrawableItem> shareAcInfo) {
         mContext = context;
         this.shareAcInfo = shareAcInfo;
     }
 
-    public interface OnRecyclerViewItemClickListener {
+    interface OnRecyclerViewItemClickListener {
         void onItemClick(View view, ListDrawableItem data);
     }
 
@@ -71,7 +70,7 @@ class ShareRecyclerAdapter extends RecyclerView.Adapter<ShareViewHolder> impleme
         }
     }
 
-    public void setOnItemClickListener(OnRecyclerViewItemClickListener listener) {
+    void setOnItemClickListener(OnRecyclerViewItemClickListener listener) {
         Util.P.le("item受到点击0");
         this.mOnItemClickListener = listener;
     }

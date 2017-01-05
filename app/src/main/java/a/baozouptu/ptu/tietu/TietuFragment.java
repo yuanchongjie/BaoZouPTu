@@ -6,14 +6,17 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -23,18 +26,18 @@ import java.util.Iterator;
 import java.util.List;
 
 import a.baozouptu.R;
-import a.baozouptu.base.util.BitmapTool;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.Util;
 import a.baozouptu.chosePicture.ChosePictureActivity;
 import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TietuStepData;
+import a.baozouptu.ptu.tietu.pictureSynthesis.ChangeBmTest;
+import a.baozouptu.ptu.view.PtuFrameLayout;
 import a.baozouptu.ptu.view.PtuView;
 
 /**
  * Created by Administrator on 2016/7/1.
- *
  */
 public class TietuFragment extends Fragment implements BaseFunction {
     private static String TAG = "TietuFragment";
@@ -49,6 +52,7 @@ public class TietuFragment extends Fragment implements BaseFunction {
     private LinearLayout more;
 
     private PtuView ptuView;
+    private PtuFrameLayout ptuFrame;
 
     public void setTietuLayout(TietuFrameLayout tietuLayout) {
         this.tietuLayout = tietuLayout;
@@ -192,6 +196,7 @@ public class TietuFragment extends Fragment implements BaseFunction {
         floatImageView.setImageBitmapAndId(srcBitmap, id);
         FrameLayout.LayoutParams params = TietuSizeControler.getFeatParams(srcBitmap.getWidth(), srcBitmap.getHeight(),
                 ptuView.getPicBound());
+        Log.e(TAG,"添加位置"+params.leftMargin+ " "+params.topMargin);
         tietuLayout.addView(floatImageView, params);
     }
 
@@ -275,10 +280,6 @@ public class TietuFragment extends Fragment implements BaseFunction {
         }
     }
 
-    public void setPtuView(PtuView ptuView) {
-        this.ptuView = ptuView;
-    }
-
     public void addBigStep(StepData sd) {
         TietuStepData ttsd = (TietuStepData) sd;
         Iterator<TietuStepData.OneTietu> iterator = ttsd.iterator();
@@ -288,12 +289,44 @@ public class TietuFragment extends Fragment implements BaseFunction {
                 ptuView.addBitmap(TietuSizeControler.getSrcBitmap(oneTietu.getPicPath()),
                         oneTietu.getBoundRectInPic(), oneTietu.getRotateAngle());
             else {
-                Util.P.le(TAG,"lastId= "+oneTietu.getPicId());
+                Util.P.le(TAG, "lastId= " + oneTietu.getPicId());
                 Bitmap tietuBm = BitmapFactory.decodeResource(mContext.getResources(), oneTietu.getPicId());
                 ptuView.addBitmap(tietuBm,
                         oneTietu.getBoundRectInPic(), oneTietu.getRotateAngle());
             }
         }
 
+    }
+
+    public void init(final PtuFrameLayout ptuFrame, final PtuView ptuView) {
+        this.ptuView = ptuView;
+        this.ptuFrame = ptuFrame;
+        setTietuLayout(ptuFrame.initAddImageFloat(new Rect(
+                ptuFrame.getLeft(), ptuFrame.getTop(), ptuFrame.getRight(), ptuFrame.getBottom()
+        )));
+        Button button = new Button(ptuView.getContext());
+        button.setText("融合图片");
+        button.setTextSize(20);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FloatImageView chosenTietu = tietuLayout.chosedView;
+                int innerLeft=chosenTietu.getLeft() + FloatImageView.pad - ptuView.getLeft();
+                int innerTop= chosenTietu.getTop() + FloatImageView.pad - ptuView.getTop();
+                Bitmap bitmap=new ChangeBmTest().
+                        changetBm(
+                                Bitmap.createScaledBitmap(ptuView.getSourceBm(),ptuView.getDstRect().width(),ptuView.getDstRect().height(),true),
+                                chosenTietu.getSrcBitmap(),
+                                new Rect(innerLeft,innerTop,
+                                        innerLeft+chosenTietu.getWidth()-FloatImageView.pad*2,
+                                        innerTop+chosenTietu.getHeight()-FloatImageView.pad*2));
+                chosenTietu.setImageBitmap(bitmap);
+
+            }
+        });
+        FrameLayout.LayoutParams layoutParams=new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(ptuFrame.getWidth()-400,ptuFrame.getHeight()-200,0,0);
+        ptuFrame.addView(button,layoutParams);
     }
 }

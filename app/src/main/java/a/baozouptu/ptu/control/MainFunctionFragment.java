@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import a.baozouptu.R;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.PtuUtil;
 
 /**

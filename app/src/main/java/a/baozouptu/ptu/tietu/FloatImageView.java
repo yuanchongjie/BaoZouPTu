@@ -12,10 +12,8 @@ import android.view.MotionEvent;
 import android.widget.ImageView;
 
 import a.baozouptu.R;
-import a.baozouptu.base.util.BitmapTool;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.MicroButtonData;
-import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.view.IconBitmapCreator;
 
 /**
@@ -148,6 +146,10 @@ public class FloatImageView extends ImageView {
         }
     }
 
+    public Bitmap getSrcBitmap() {
+        return srcBitmap;
+    }
+
     public void releaseResourse() {
         if (srcBitmap != null) srcBitmap.recycle();
         srcBitmap = null;
@@ -168,11 +170,22 @@ public class FloatImageView extends ImageView {
         return srcBitmap.getHeight() * 1f / srcBitmap.getWidth();
     }
 
+    /**
+     * 设置文件中的图片
+     * @param srcBitmap bitmap
+     * @param path 文件路径
+     */
     public void setImageBitmapAndPath(Bitmap srcBitmap, String path) {
         this.srcBitmap = srcBitmap;
         picPath = path;
         setImageBitmap(srcBitmap);
     }
+
+    /**
+     * 设置资源中的图片
+     * @param srcBitmap bitmap
+     * @param id 资源id
+     */
     public void setImageBitmapAndId(Bitmap srcBitmap,int id){
         this.srcBitmap=srcBitmap;
         picId=id;

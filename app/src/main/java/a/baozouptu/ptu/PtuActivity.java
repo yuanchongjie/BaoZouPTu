@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -34,11 +33,11 @@ import java.io.File;
 
 import a.baozouptu.CertainLeaveDialog;
 import a.baozouptu.R;
-import a.baozouptu.base.dataAndLogic.AllData;
-import a.baozouptu.base.util.BitmapTool;
-import a.baozouptu.base.util.FileTool;
-import a.baozouptu.base.util.Util;
-import a.baozouptu.base.view.FirstUseDialog;
+import a.baozouptu.common.dataAndLogic.AllData;
+import a.baozouptu.common.util.BitmapTool;
+import a.baozouptu.common.util.FileTool;
+import a.baozouptu.common.util.Util;
+import a.baozouptu.common.view.FirstUseDialog;
 import a.baozouptu.chosePicture.ProcessUsuallyPicPath;
 import a.baozouptu.ptu.control.MainFunctionFragment;
 import a.baozouptu.ptu.cut.CutFragment;
@@ -108,6 +107,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //test();
         saveSetInstance = new SaveSetInstance();
         setContentView(R.layout.activity_ptu);
         setTitle("");
@@ -119,7 +119,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         if (!initData()) return;
         initFragment();
         setViewContent();
-        test();
+        testPtu();
         Util.P.le(TAG, "onCreate()");
     }
 
@@ -195,9 +195,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 case EDIT_TIETU:
                     if (tietuFrag == null) {
                         tietuFrag = new TietuFragment();
-                        tietuFrag.setPtuView(ptuView);
                     }
-                    tietuFrag.setTietuLayout(ptuFrame.initAddImageFloat(totalBound));
+                    tietuFrag.init(ptuFrame, ptuView);
+
                     fm.beginTransaction()
                             .setCustomAnimations(R.animator.slide_bottom_in, R.animator.slide_bottom_out,
                                     R.animator.slide_bottom_in, R.animator.slide_bottom_out)
@@ -263,10 +263,10 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
      */
     private boolean initData() {
         repealRedoManager = new RepealRedoManager<>(MAX_STEP);
-        //如果是从其它应用过来需要编辑图片的
+
         Intent intent = getIntent();
         Uri uri = intent.getData();
-        if (uri != null) {
+        if (uri != null) { //如果是从其它应用过来需要编辑图片的
             Util.P.le(uri.getPath());
             picPath = FileTool.getImagePathFromUri(this, uri);
         } else if (intent.getAction() != null && intent.getAction().equals("notify_latest")) {
@@ -305,8 +305,11 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     }
                     Log.e(TAG, "使用最新图片返回图片成功" + " 路径" + picPath);
                     progressDialog.dismiss();
-                    if (totalBound.width() > 0)
+                    if (totalBound.width() > 0) {
                         ptuView.replaceSourceBm(BitmapTool.getLosslessBitmap(picPath));
+                        repealRedoManager.setBaseBm(ptuView.getSourceBm()
+                                .copy(Bitmap.Config.ARGB_8888, true));//要设置好撤消重做的图
+                    }
                 }
             }
         };
@@ -335,21 +338,18 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     }
 
     private void test() {
+        startActivity(new Intent(PtuActivity.this, TestActivity.class));
+    }
 
+    private void testPtu() {
         if (getIntent().getStringExtra("test") == null) return;
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                switchFragment(EDIT_TEXT);
+                Log.e(TAG, "执行测试切换" + EDIT_TIETU);
+//                switchFragment(EDIT_TIETU);
             }
         }, 500);
-       /* new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                saveSet();
-            }
-        }, 1000);
-        */
     }
 
     /**
@@ -401,13 +401,13 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (!AllData.appConfig.hasReadGoSend()) {
+                        if (!AllData.commonConfig.hasReadGoSend()) {
                             FirstUseDialog firstUseDialog = new FirstUseDialog(PtuActivity.this);
                             firstUseDialog.createDialog("快捷发送", "页面将会关闭，" +
                                     "点击通讯软件的发送图片即可快捷发送", new FirstUseDialog.ActionListener() {
                                 @Override
                                 public void onSure() {
-                                    AllData.appConfig.wiriteConfig_GoSend(true);
+                                    AllData.commonConfig.write_GoSend(true);
                                 }
                             });
                         } else goSend();
@@ -482,13 +482,17 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     @Override
     protected void onStart() {
         Util.P.le(TAG, "onStart_1");
-        if (saveSetmanager == null)
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    saveSetmanager = saveSetInstance.getInstance(PtuActivity.this);
-                }
-            }).start();
+        if (saveSetmanager == null) {
+            Thread readyThread = new Thread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            saveSetmanager = saveSetInstance.getInstance(PtuActivity.this);
+                        }
+                    });
+            readyThread.start();
+        }
+
         super.onStart();
         Util.P.le(TAG, "onStart_2");
     }
@@ -510,7 +514,6 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 }
         );
     }
-
 
     private void saveSet() {
         if (saveSetmanager == null)
@@ -825,6 +828,12 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     protected void onStop() {
         if (endType.equals("share")) ;
         super.onStop();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        saveSetmanager.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

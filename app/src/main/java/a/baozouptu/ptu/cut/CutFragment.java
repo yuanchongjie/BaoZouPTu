@@ -27,10 +27,9 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import a.baozouptu.R;
-import a.baozouptu.base.util.BitmapTool;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.BitmapTool;
+import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.BaseFunction;
-import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.repealRedo.CutStepData;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
@@ -194,7 +193,7 @@ public class CutFragment extends Fragment implements BaseFunction {
                 TextView d3 = new TextView(mContext);
                 d3.setHeight(1);
                 d3.setBackground(
-                        Util.getDrawable(R.drawable.divider_dialog_save_set));
+                        Util.getDrawable(R.drawable.divider_cut_chose));
 
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -282,7 +281,7 @@ public class CutFragment extends Fragment implements BaseFunction {
                 TextView d3 = new TextView(mContext);
                 d3.setHeight(1);
                 d3.setBackground(
-                        Util.getDrawable(R.drawable.divider_dialog_save_set));
+                        Util.getDrawable(R.drawable.divider_cut_chose));
 
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

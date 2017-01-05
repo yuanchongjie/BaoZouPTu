@@ -9,11 +9,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import a.baozouptu.base.util.GeoUtil;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.GeoUtil;
+import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.FloatView;
-import a.baozouptu.ptu.cut.CutFrame;
-import a.baozouptu.ptu.cut.CutView;
 import a.baozouptu.ptu.text.FloatTextView;
 import a.baozouptu.ptu.tietu.TietuFrameLayout;
 

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#eee"
+    android:orientation="vertical">
+
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/top_constraint"
+        style="@style/my_tool_bar"
+        android:layout_width="match_parent">
+
+        <ImageView
+            android:id="@+id/setting_return_btn"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_arrow_back_white"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="@string/setting"
+            android:textColor="@color/white"
+            android:textSize="23sp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </android.support.constraint.ConstraintLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@drawable/toolbar_shadow" />
+
+    <TextView
+        style="@style/setting_group_title"
+        android:text="快捷工具" />
+
+    <LinearLayout style="@style/setting_set_group_layout">
+
+        <RelativeLayout
+            android:id="@+id/setting_shortcut_notify"
+            style="@style/setting_item">
+
+            <TextView
+                style="@style/setting_item_text"
+                android:text="通知栏快捷工具" />
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/setting_shortcut_switch"
+                style="@style/setting_item_right"
+                />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/setting_shortcut_notitfy_exit"
+            style="@style/setting_item">
+
+            <TextView
+                style="@style/setting_item_text"
+                android:text="退出后显示通知" />
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/setting_shortcut_exit_switch"
+                style="@style/setting_item_right" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <TextView
+        style="@style/setting_group_title"
+        android:text="评价"
+        android:textColor="@color/text_middle_black" />
+
+    <LinearLayout style="@style/setting_set_group_layout">
+
+        <RelativeLayout
+            android:id="@+id/setting_good_comment"
+            style="@style/setting_item">
+
+            <TextView
+                style="@style/setting_item_text"
+                android:text="给个好评吧" />
+
+            <ImageView
+                style="@style/setting_item_right"
+                android:src="@drawable/ic_arrow_right" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/setting_layout_feedback"
+            style="@style/setting_item">
+
+            <TextView
+                style="@style/setting_item_text"
+                android:text="意见反馈" />
+
+            <ImageView
+                style="@style/setting_item_right"
+                android:src="@drawable/ic_arrow_right" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <TextView
+        style="@style/setting_group_title"
+        android:text="其它" />
+
+    <LinearLayout style="@style/setting_set_group_layout">
+
+        <RelativeLayout
+            android:id="@+id/setting_about_app"
+            style="@style/setting_item">
+
+            <TextView
+                style="@style/setting_item_text"
+                android:text="关于暴走P图" />
+
+            <ImageView
+                style="@style/setting_item_right"
+                android:src="@drawable/ic_arrow_right" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="10dp"
+        android:text="清除缓存"
+        android:textSize="18sp"
+        android:textColor="@color/red"/>
+</LinearLayout>

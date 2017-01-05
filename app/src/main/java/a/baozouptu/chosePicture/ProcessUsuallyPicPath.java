@@ -5,13 +5,11 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v4.util.Pair;
-import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,10 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import a.baozouptu.base.dataAndLogic.AllData;
-import a.baozouptu.base.dataAndLogic.MyDatabase;
-import a.baozouptu.base.util.FileTool;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.dataAndLogic.AllData;
+import a.baozouptu.common.dataAndLogic.MyDatabase;
+import a.baozouptu.common.util.FileTool;
+import a.baozouptu.common.util.Util;
 
 
 /**
@@ -42,12 +40,12 @@ import a.baozouptu.base.util.Util;
  * </p>
  */
 public class ProcessUsuallyPicPath {
-    public static String USED_FLAG = "@%^@#GDa_USED_FLAG";
-    public static String RECENT_FLAG = "@%^@#GDa_RECENT_FLAG";
-    public static String PREFER_FLAG = "@%^@#GDa_PREFER_FLAG";
+    static String USED_FLAG = "@%^@#GDa_USED_FLAG";
+    static String RECENT_FLAG = "@%^@#GDa_RECENT_FLAG";
+    static String PREFER_FLAG = "@%^@#GDa_PREFER_FLAG";
     private final Handler mHandler;
-    Context mContext;
-    private final int MAX_USED_NUMBER = 6;
+    private Context mContext;
+    private final int MAX_USED_NUMBER = 4;
     private final int MIN_RECENT_NUMBER = 6;
     private final int MAX_RECENT_NUMBER = 20;
     /**

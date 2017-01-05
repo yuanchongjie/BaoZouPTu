@@ -11,7 +11,7 @@ import android.view.View;
 
 import java.util.ArrayList;
 
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.RepealRedoListener;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;

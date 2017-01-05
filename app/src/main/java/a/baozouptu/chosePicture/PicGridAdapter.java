@@ -14,23 +14,23 @@ import android.widget.TextView;
 import java.util.List;
 
 import a.baozouptu.R;
-import a.baozouptu.base.dataAndLogic.AllData;
-import a.baozouptu.base.dataAndLogic.AsyncImageLoader3;
-import a.baozouptu.base.util.Util;
+import a.baozouptu.common.dataAndLogic.AllData;
+import a.baozouptu.common.dataAndLogic.AsyncImageLoader3;
+import a.baozouptu.common.util.Util;
 
 /**
  * Created by liuguicen on 2016/8/31.
  *
  * @description
  */
-public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int STATIC_SHOW_NUMBER = 25;
 
     private final Context mContext;
     private final LayoutInflater layoutInflater;
     private final AsyncImageLoader3 imageLoader;
-    public boolean isScrollWidthoutTouch;
+    boolean isScrollWidthoutTouch;
 
     public List<String> getImagUrls() {
         return imagUrls;
@@ -39,8 +39,8 @@ public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private List<String> imagUrls;
     private final ProcessUsuallyPicPath usuallyProcessor;
 
-    public static int ITEM = 1;
-    public static int GROUP_HEADER = 2;
+    private static int ITEM = 1;
+    static int GROUP_HEADER = 2;
 
 
     AsyncImageLoader3.ImageCallback imageCallback = new AsyncImageLoader3.ImageCallback() {

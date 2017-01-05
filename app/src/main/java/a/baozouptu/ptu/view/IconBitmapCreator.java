@@ -10,8 +10,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 
-import a.baozouptu.base.util.Util;
-
 /**
  *
  */

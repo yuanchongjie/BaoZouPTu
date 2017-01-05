@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.GravityCompat;
@@ -15,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,12 +35,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import a.baozouptu.R;
-import a.baozouptu.base.dataAndLogic.AllData;
-import a.baozouptu.base.dataAndLogic.AsyncImageLoader3;
-import a.baozouptu.base.util.FileTool;
-import a.baozouptu.base.util.Util;
-import a.baozouptu.base.view.FirstUseDialog;
+import a.baozouptu.common.dataAndLogic.AllData;
+import a.baozouptu.common.dataAndLogic.AsyncImageLoader3;
+import a.baozouptu.common.util.FileTool;
+import a.baozouptu.common.util.Util;
+import a.baozouptu.common.view.FirstUseDialog;
 import a.baozouptu.ptu.PtuActivity;
+import a.baozouptu.user.userSetting.SettingActivity;
 
 /**
  * 显示所选的最近的或某个文件夹下面的所有图片
@@ -53,7 +56,7 @@ public class ChosePictureActivity extends AppCompatActivity {
     /**
      * 保存最近图片的路径
      */
-    public static List<String> usualyPicPathList = new ArrayList<>();
+    public List<String> usualyPicPathList = new ArrayList<>();
     /**
      * 获取和保存某个文件下面所有图片的路径
      */
@@ -109,6 +112,15 @@ public class ChosePictureActivity extends AppCompatActivity {
                 if (partActivity.isFirst) {
                     partActivity.pictureGridview.setAdapter(partActivity.picAdpter);
                     partActivity.isFirst = false;
+                    if (!AllData.commonConfig.hasReadUsuPicUse()) {
+                        FirstUseDialog firstUseDialog = new FirstUseDialog(partActivity);
+                        firstUseDialog.createDialog(null, "长按图片即可添加到喜爱或删除", new FirstUseDialog.ActionListener() {
+                            @Override
+                            public void onSure() {
+                                AllData.commonConfig.write_usuPicUse(true);
+                            }
+                        });
+                    }
                 } else {
                     partActivity.picAdpter.notifyDataSetChanged();
                 }
@@ -138,7 +150,7 @@ public class ChosePictureActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chose_picture);
-//        test();
+        test();
         PicUpdateHandler picUpdateHandler = new PicUpdateHandler(this);
         usuPicProcessor = new ProcessUsuallyPicPath(this, picUpdateHandler);
         getScreenWidth();
@@ -152,12 +164,13 @@ public class ChosePictureActivity extends AppCompatActivity {
 
     private void test() {
         if (getIntent().getStringExtra("test") == null) return;
-        Intent intent1 = new Intent(this, PtuActivity.class);
-        intent1.putExtras(getIntent());
-        String thePath = "/storage/sdcard1/中大图(调试用，不能删).jpg";
-        intent1.putExtra("pic_path", thePath);
+        Intent testIntent = new Intent(this, SettingActivity.class);
+        testIntent.putExtras(getIntent());
+        String thePath = Environment.getExternalStorageDirectory()+"/test.jpg";
+        testIntent.putExtra("pic_path", thePath);
         chosedPath = thePath;
-        startActivityForResult(intent1, 0);
+        startActivityForResult(testIntent, 0);
+        Log.e(TAG,"完成时间  "+System.currentTimeMillis());
     }
 
     /**
@@ -185,15 +198,6 @@ public class ChosePictureActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        if (AllData.appConfig.hasReadUsuPicUse()) {
-            FirstUseDialog firstUseDialog = new FirstUseDialog(this);
-            firstUseDialog.createDialog(null, "长按图片即可添加到喜爱或删除", new FirstUseDialog.ActionListener() {
-                @Override
-                public void onSure() {
-                    AllData.appConfig.writeConfig_usuPicUse(true);
-                }
-            });
-        }
         fileListDrawer = (DrawerLayout) findViewById(R.id.drawer_layout_show_picture);
         pictureGridview = (RecyclerView) findViewById(R.id.gv_photolist);
         final ImageButton showFile = (ImageButton) findViewById(R.id.show_pic_file);
@@ -358,7 +362,7 @@ public class ChosePictureActivity extends AppCompatActivity {
                 }
             });
         } else {
-            frequentlyTextView.setText("常用");
+            frequentlyTextView.setText("喜爱");
             frequentlyTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
