@@ -64,7 +64,9 @@ public class PtuFrameLayout extends FrameLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Util.P.le(TAG, "onTouchEvent");
+        if (!(getChildAt(getChildCount() - 1) instanceof FloatTextView))
+          return  super.onTouchEvent(event);
+
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 if (hasUp) {
@@ -129,21 +131,13 @@ public class PtuFrameLayout extends FrameLayout {
                             floatView.getfLeft() + floatView.getmWidth(), floatView.getfTop() + floatView.getmHeight())
                             .contains(event.getX(), event.getY())))
                         floatView.changeShowState(floatView.STATUS_TOUMING);
-                    Util.P.le("经过了up2");
                 } else {//不是点击事件，将之前状态显示出来
                     floatView.changeShowState(floatView.getDownState());
-                    Util.P.le("经过了up3", floatView.getDownState());
                 }
-                Util.P.le("经过了up4");
                 hasUp = true;
                 break;
         }
         return false;
-    }
-
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return true;
     }
 
     /**
@@ -153,33 +147,33 @@ public class PtuFrameLayout extends FrameLayout {
      */
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (getChildCount() > 1) {
-            View childView = getChildAt(getChildCount()-1);
+        if (getChildCount() > 1 && getChildAt(getChildCount() - 1) instanceof FloatTextView) {//对于文字框特殊处理，其它照旧
             boolean isConsume = false;
-
+            View childView = getChildAt(getChildCount() - 1);
             float sx = ev.getX(), sy = ev.getY();
-            if (childView instanceof FloatView &&
-                    new RectF(childView.getLeft(), childView.getTop(),
-                            childView.getLeft() + childView.getWidth(), childView.getTop() + childView.getHeight())
-                            .contains(sx, sy)) //是浮动图，这判断是否在内部
-            {
-                ev.setLocation(sx - childView.getLeft(), sy - childView.getTop());
-                isConsume = childView.dispatchTouchEvent(ev);
-                if (isConsume)//消费了up事件，up置为true
-                    hasUp = true;
-            } else if (!(childView instanceof FloatView)) {//如果不是浮动图
-                ev.setLocation(sx - childView.getLeft(), sy - childView.getTop());
-                isConsume = childView.dispatchTouchEvent(ev);
+            if (childView instanceof FloatTextView) {
+                if (!childView.isClickable()) {//使用RubberView时
+                    childView = getChildAt(getChildCount() - 2);
+                    ev.setLocation(sx - childView.getLeft(), sy - childView.getTop());
+                    isConsume = childView.dispatchTouchEvent(ev);
+                } else if (new RectF(childView.getLeft(), childView.getTop(),
+                        childView.getLeft() + childView.getWidth(), childView.getTop() + childView.getHeight())
+                        .contains(sx, sy)) //是文字框，并且在内部
+                {
+                    ev.setLocation(sx - childView.getLeft(), sy - childView.getTop());
+                    isConsume = childView.dispatchTouchEvent(ev);
+                    if (isConsume)//消费了up事件，up置为true
+                        hasUp = true;
+                }
+                //没有消费才分发事件，不然就不分发
+                if (!isConsume) {
+                    ev.setLocation(sx, sy);
+                    onTouchEvent(ev);
+                }
             }
-            //没有消费才分发事件，不然就不分发
-            if (!isConsume) {
-                ev.setLocation(sx, sy);
-                onTouchEvent(ev);
-            }
-        }
-        //只有PtuView时只将事件分发给它，坐标不用变换，他们大小一样，PtuView占满了整个布局
-        else getChildAt(0).dispatchTouchEvent(ev);
-        return true;
+            return true;
+        } else //只有PtuView时只将事件分发给它，坐标不用变换，他们大小一样，PtuView占满了整个布局
+            return super.dispatchTouchEvent(ev);
     }
 
     /**

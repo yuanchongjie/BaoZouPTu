@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import a.baozouptu.R;
 import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.util.BitmapTool;
+import a.baozouptu.common.util.FileTool;
 import a.baozouptu.common.view.FirstUseDialog;
 import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.PtuActivity;
@@ -32,6 +33,8 @@ import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TextStepData;
 import a.baozouptu.ptu.view.PtuFrameLayout;
 import a.baozouptu.ptu.view.PtuView;
+import cn.bmob.v3.Bmob;
+import rx.Subscriber;
 
 /**
  * 添加文字功能的fragment
@@ -51,45 +54,6 @@ public class TextFragment extends Fragment implements BaseFunction {
     private RubberView rubberView;
     RepealRedoListener repealRedoListener;
     PtuView ptuView;
-
-    /**
-     * 已经存在bitmap的情况下，更快速的添加
-     *
-     * @param addBm 要添加的图片
-     */
-    public void addBigStep(Bitmap addBm, StepData sd) {
-        TextStepData tsd = (TextStepData) sd;
-        //擦除的东西添加上去
-        Canvas canvas = new Canvas(ptuView.getSourceBm());
-        ArrayList<Pair<Path, Paint>> pathPaintList = tsd.getRubberData();
-        for (Pair<Path, Paint> pair : pathPaintList) {
-            canvas.drawPath(pair.first, pair.second);
-        }
-        if (addBm != null) {
-            ptuView.addBitmap(addBm, tsd.boundRectInPic, 0);
-        } else//需要重绘显示出来
-        {
-            ptuView.invalidate();
-        }
-    }
-
-    public void addBigStep(StepData sd) {
-
-        TextStepData tsd = (TextStepData) sd;
-        //擦除的东西添加上去
-        Canvas canvas = new Canvas(ptuView.getSourceBm());
-        ArrayList<Pair<Path, Paint>> pathPaintList = tsd.getRubberData();
-        for (Pair<Path, Paint> pair : pathPaintList) {
-            canvas.drawPath(pair.first, pair.second);
-        }
-        if (sd.picPath != null) {
-            Bitmap bm = BitmapTool.getLosslessBitmap(sd.picPath);
-            ptuView.addBitmap(bm, tsd.boundRectInPic, 0);
-        } else//需要重绘显示出来
-        {
-            ptuView.invalidate();
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -168,29 +132,24 @@ public class TextFragment extends Fragment implements BaseFunction {
     }
 
     private void switchRubber() {
-        PtuFrameLayout ptuFrame = ((PtuActivity) getActivity()).getPtuFrame();
-        if (ptuFrame.indexOfChild(floatTextView) == -1) {
+        if (!floatTextView.isClickable()) {//显示文字
             style.setVisibility(View.VISIBLE);
             typeface.setVisibility(View.VISIBLE);
             ((TextView) toumingdu.getChildAt(1)).setText("透明度");
-            ((ImageView)toumingdu.getChildAt(0)).setImageResource(R.mipmap.transparency);
-            ptuFrame.addView(floatTextView);
-        } else {
+            ((ImageView) toumingdu.getChildAt(0)).setImageResource(R.mipmap.transparency);
+            floatTextView.setClickable(true);
+        } else {//显示橡皮
             style.setVisibility(View.INVISIBLE);
             typeface.setVisibility(View.INVISIBLE);
             ((TextView) toumingdu.getChildAt(1)).setText("尺寸");
-            ((ImageView)toumingdu.getChildAt(0)).setImageResource(R.mipmap.fixed_size);
-            ptuFrame.removeView(floatTextView);
+            ((ImageView) toumingdu.getChildAt(0)).setImageResource(R.mipmap.fixed_size);
+            floatTextView.setClickable(false);
         }
     }
 
     public void setFloatView(FloatTextView floatView) {
         this.floatTextView = floatView;
         floatTextView.setTypeface(Typeface.DEFAULT);
-    }
-
-    public Bitmap getResultBm() {
-        return floatTextView.getResultBm();
     }
 
     public void releaseResource() {
@@ -240,14 +199,62 @@ public class TextFragment extends Fragment implements BaseFunction {
     }
 
     @Override
-    public StepData getResultData(float ratio) {
-        TextStepData tsd = floatTextView.getResultData(ptuView);
-        if (rubberView != null) {
-            if (tsd == null)
-                tsd = new TextStepData(PtuUtil.EDIT_TEXT);
-            tsd.addRubberDate(rubberView.getResultData());
+    public StepData getResultDataAndDraw(float ratio) {
+        //获取和保存数据
+        TextStepData tsd = new TextStepData(PtuUtil.EDIT_TEXT);
+        Bitmap resultBm = floatTextView.getResultData(ptuView, tsd);
+        if (resultBm != null) {
+            String tempPath = FileTool.createTempPicPath();
+            BitmapTool.asySaveTempBm(tempPath, resultBm, new Subscriber<String>() {
+                @Override
+                public void onCompleted() {
+
+                }
+
+                @Override
+                public void onError(Throwable e) {
+
+                }
+
+                @Override
+                public void onNext(String s) {
+
+                }
+            });
+            tsd.picPath = tempPath;
         }
+        if (rubberView != null) {
+            tsd.setRubberDate(rubberView.getResultData());
+        }
+
+        //绘制结果
+        addBigStep(tsd, resultBm);
         return tsd;
+    }
+
+    public void addBigStep(StepData sd) {
+        addBigStep((TextStepData) sd, sd.picPath == null ? null : BitmapTool.getLosslessBitmap(sd.picPath));
+    }
+    /**
+     * 已经存在bitmap的情况下，更快速的添加
+     *
+     * @param addBm 要添加的图片
+     */
+    private void addBigStep(TextStepData tsd, Bitmap addBm) {
+        //擦除的东西添加上去
+        ArrayList<Pair<Path, Paint>> pathPaintList = tsd.getRubberData();
+        if (pathPaintList != null) {//存在文字数据
+            Canvas canvas = new Canvas(ptuView.getSourceBm());
+            for (Pair<Path, Paint> pair : pathPaintList) {
+                canvas.drawPath(pair.first, pair.second);
+            }
+        }
+        if (addBm != null) {//存在橡皮数据
+            ptuView.addBitmap(addBm, tsd.boundRectInPic, 0);
+        } else if (pathPaintList != null)  //存橡皮数据，只刷新橡皮
+        {
+            ptuView.invalidate();
+        }
     }
 
     public boolean onBackPressed() {

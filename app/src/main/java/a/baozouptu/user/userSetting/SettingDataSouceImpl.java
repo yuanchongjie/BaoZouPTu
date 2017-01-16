@@ -14,6 +14,7 @@ public class SettingDataSouceImpl implements SettingDataSource {
     Context appContext;
     private static final String SEND_SHORTCUT_NOTIFY = "send_shortcut_notify";
     private static final String SEND_SHORTCUT_NOTIFY_EXIT = "send_shortcut_notify_exit";
+    private static final String SHARED_WHTHOUT_LABEL="shared_without_label";
 
     /**
      * 传入app的context
@@ -40,6 +41,13 @@ public class SettingDataSouceImpl implements SettingDataSource {
     }
 
     @Override
+    public void saveSharedWithout(boolean isWith) {
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(SHARED_WHTHOUT_LABEL, isWith);
+        editor.apply();
+    }
+
+    @Override
     public boolean getSendShortcutNotify() {
         return sp.getBoolean(SEND_SHORTCUT_NOTIFY, true);
     }
@@ -47,5 +55,23 @@ public class SettingDataSouceImpl implements SettingDataSource {
     @Override
     public boolean getSendShortcutNotifyExit() {
         return sp.getBoolean(SEND_SHORTCUT_NOTIFY_EXIT, true);
+    }
+
+    /**
+     * @return 默认是要带 false
+     */
+    @Override
+    public boolean getSharedWithout() {
+        return sp.getBoolean(SHARED_WHTHOUT_LABEL,false);//默认是要带 false
+    }
+
+    @Override
+    public float getAppCacheSize() {
+        return 0;
+    }
+
+    @Override
+    public void clearAppCache() {
+
     }
 }

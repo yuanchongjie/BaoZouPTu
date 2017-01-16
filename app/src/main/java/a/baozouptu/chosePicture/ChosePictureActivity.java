@@ -18,6 +18,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -86,8 +87,6 @@ public class ChosePictureActivity extends AppCompatActivity {
     private MyFileListAdapter fileAdapter;
     boolean isFirst = true;
     private GridLayoutManager gridLayoutManager;
-
-    private String chosedPath;
 
     /**
      * handler使用静态内部类，防止内存泄漏，减少内存消耗
@@ -164,11 +163,10 @@ public class ChosePictureActivity extends AppCompatActivity {
 
     private void test() {
         if (getIntent().getStringExtra("test") == null) return;
-        Intent testIntent = new Intent(this, SettingActivity.class);
+        Intent testIntent = new Intent(this, PtuActivity.class);
         testIntent.putExtras(getIntent());
         String thePath = Environment.getExternalStorageDirectory()+"/test.jpg";
         testIntent.putExtra("pic_path", thePath);
-        chosedPath = thePath;
         startActivityForResult(testIntent, 0);
         Log.e(TAG,"完成时间  "+System.currentTimeMillis());
     }
@@ -198,6 +196,13 @@ public class ChosePictureActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        final ImageButton btnToSetting=(ImageButton)findViewById(R.id.chose_pic_navigation);
+        btnToSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               TosettingPopupWindow.show(v,ChosePictureActivity.this);
+            }
+        });
         fileListDrawer = (DrawerLayout) findViewById(R.id.drawer_layout_show_picture);
         pictureGridview = (RecyclerView) findViewById(R.id.gv_photolist);
         final ImageButton showFile = (ImageButton) findViewById(R.id.show_pic_file);
@@ -253,7 +258,6 @@ public class ChosePictureActivity extends AppCompatActivity {
                     } else {//正常的选择
                         Intent intent = new Intent(ChosePictureActivity.this, PtuActivity.class);
                         intent.putExtra("pic_path", currentPicPathList.get(position));
-                        chosedPath = currentPicPathList.get(position);
                         startActivityForResult(intent, 0);
                     }
                 }
@@ -512,7 +516,7 @@ public class ChosePictureActivity extends AppCompatActivity {
                 String failedPath = data.getStringExtra("failed_path");
                 currentPicPathList.remove(failedPath);
                 picAdpter.notifyDataSetChanged();
-            } else if (action != null && action.equals("save_and_leave")) {
+            } else if (action != null && action.equals("save_and_leave")) {//保存了图片
 
                 newPicPath = data.getStringExtra("new_path");
                 usuPicProcessor.addUsedPath(
@@ -530,7 +534,7 @@ public class ChosePictureActivity extends AppCompatActivity {
                 dirInfoList.set(id, info.substring(0, info.indexOf('(') + 1) + number + ")");
                 dirRepresentPathList.set(id, data.getStringExtra("recent_use_pic"));
                 fileAdapter.notifyDataSetChanged();
-            }else if(action!=null&&action.equals("leave")){
+            }else if(action!=null&&action.equals("leave")){//离开没有保存图片
                 usuPicProcessor.addUsedPath(
                         data.getStringExtra("recent_use_pic"));
                 if (usuPicProcessor.isUsuPic(currentPicPathList)) { //当前在常用图片下

@@ -192,7 +192,12 @@ public class TietuFrameLayout extends FrameLayout {
         }
     }
 
-    private void scale(FloatImageView chosedView, float currentRatio) {
+    /**
+     * 缩放还给其它地方使用
+     * @param chosedView 被缩放的FloatImageView
+     * @param currentRatio 需要缩放的比例
+     */
+    public void scale(FloatImageView chosedView, float currentRatio) {
         if (chosedView == null || !chosedView.showRim) return;//边框没显示出来，不缩放
         currentRatio = adjustSize(chosedView, currentRatio);
         TietuFrameLayout.LayoutParams parmas = (TietuFrameLayout.LayoutParams) chosedView.getLayoutParams();
@@ -246,4 +251,5 @@ public class TietuFrameLayout extends FrameLayout {
         double angle = Math.atan2(dy, dx);
         return (float) Math.toDegrees(angle);
     }
+
 }

@@ -70,13 +70,6 @@ public class RubberView extends View {
     float[] plxy = new float[2];
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        if (((PtuFrameLayout) getParent()).getChildCount() > 2)
-            return false;
-        return super.dispatchTouchEvent(event);
-    }
-
-    @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX(), y = event.getY();
         float[] pxy = PtuUtil.getLocationAtPicture(x + getLeft(), y + getTop(),

@@ -75,22 +75,25 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
     }
 
     @Override
-    public StepData getResultData(float ratio) {
-        DrawStepData tsd = drawView.getResultData(drawView);
+    public StepData getResultDataAndDraw(float ratio) {
+        //获取和设置数据
+        DrawStepData dsd = drawView.getResultData(drawView);
         if (drawView != null) {
-            if (tsd == null)
-                tsd = new DrawStepData(PtuUtil.EDIT_DRAW);
-            tsd.setSavePath(drawView.getResultData());
+            if (dsd == null)
+                dsd = new DrawStepData(PtuUtil.EDIT_DRAW);
+            dsd.setSavePath(drawView.getResultData());
         }
-        return tsd;
+        //绘制
+        addBigStep(dsd);//直接调用，这里没有其它优化
+        return dsd;
     }
 
     @Override
     public void addBigStep(StepData sd) {
-        DrawStepData tsd = (DrawStepData) sd;
+        DrawStepData dsd = (DrawStepData) sd;
         //擦除的东西添加上去
         Canvas canvas = new Canvas(ptuView.getSourceBm());
-        List<DrawView.DrawPath> pathPaintList = tsd.getSavePath();
+        List<DrawView.DrawPath> pathPaintList = dsd.getSavePath();
         for (DrawView.DrawPath pair : pathPaintList) {
             float width = pair.paint.getStrokeWidth();
             pair.paint.setStrokeWidth(pair.paint.getStrokeWidth()

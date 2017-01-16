@@ -11,8 +11,15 @@ import java.util.ArrayList;
  * 内部用list存下了多个的stepDate；
  */
 public class TextStepData extends StepData {
-    ArrayList<Pair<Path,Paint>> pathPaintList=new ArrayList<>();
+    ArrayList<Pair<Path,Paint>> pathPaintList=null;
+    public void setRubberDate(ArrayList<Pair<Path,Paint>> pathPaintList){
+        this.pathPaintList=pathPaintList;
+    }
     public void addRubberDate(ArrayList<Pair<Path,Paint>> pathPaintList){
+        if(pathPaintList==null)
+        {
+            pathPaintList=new ArrayList<>();
+        }
         this.pathPaintList.addAll(pathPaintList);
     }
     public ArrayList<Pair<Path,Paint>> getRubberData(){

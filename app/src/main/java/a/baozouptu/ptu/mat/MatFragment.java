@@ -93,7 +93,7 @@ public class MatFragment extends Fragment implements BaseFunction {
     }
 
     @Override
-    public StepData getResultData(float ratio) {
+    public StepData getResultDataAndDraw(float ratio) {
         return null;
     }
 

@@ -15,10 +15,25 @@ android {
          * 只支持中文，减小包大小
          */
         resConfigs "zh"
-        ndk{
-            abiFilters "armeabi"
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++11 -frtti -fexceptions"
+                abiFilters 'armeabi'
+            }
+        }
+        ndk {
+            // Specifies the ABI configurations of your native
+            // libraries Gradle should build and package with your APK.
+            abiFilters 'armeabi'
         }
     }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['F:\\androidProject\\BaoZouPTu\\app\\src\\main\\jniLibs']
+        }
+    }
+    sourceSets { main { jni.srcDirs = ['src/main/jni', 'src/main/jniLibs/'] } }
+
     signingConfigs {
         release {
             storeFile file("androidApk-key1.jks")
@@ -35,18 +50,7 @@ android {
         }
         debug {
             signingConfig signingConfigs.release
-            jniDebuggable false
-        }
-    }
-    productFlavors {
-        tencent {
-            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "tencent"]
-        }
-        _360 {
-            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "_360"]
-        }
-        baidu {
-            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "baidu"]
+            jniDebuggable true
         }
     }
     //删除META-INF信息
@@ -59,7 +63,12 @@ android {
         exclude 'META-INF/maven/com.google.code.gson/gson/pom.xml'
         exclude 'META-INF/maven/com.google.code.gson/gson/pom.properties'
     }
-    sourceSets { main { jni.srcDirs = ['src/main/jni', 'src/main/jniLibs/'] } }
+
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+        }
+    }
 }
 
 dependencies {
@@ -78,20 +87,8 @@ dependencies {
 
     //腾讯qq开放平台的sdk
     compile files('src/main/libs/open_sdk_r5756.jar')
-    compile project(':openCVLibrary310')
-    compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
+
+    // compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
 
     testCompile 'junit:junit:4.12'
-}
-
-task nativeLibsToJar(type: Jar, description: 'create a jar archive of the native libs') {
-    destinationDir file("$buildDir/native-libs")
-    baseName 'native-libs'
-    from fileTree(dir: 'libs', include: 'armeabi/*.so')
-    into 'lib/'
-}
-
-
-tasks.withType(JavaCompile) {
-    compileTask -> compileTask.dependsOn(nativeLibsToJar)
 }

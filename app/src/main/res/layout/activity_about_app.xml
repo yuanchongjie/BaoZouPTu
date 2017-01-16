@@ -43,7 +43,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="50dp"
         android:src="@mipmap/icon" />
 
     <TextView
@@ -54,17 +54,17 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="测试"
-        android:textSize="23sp"/>
+        android:textSize="18sp"/>
 <TextView
 
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
-    android:layout_marginLeft="8dp"
-    android:layout_marginRight="8dp"
-    android:layout_marginTop="15dp"
+    android:layout_marginLeft="32dp"
+    android:layout_marginRight="32dp"
+    android:layout_marginTop="45dp"
+    android:lineSpacingExtra="5dp"
     android:text="本软件基于个人业余爱好开发，希望分享一些有趣的功能给大家"
     android:textColor="@color/black_deep"
-    android:textSize="23sp"
-    android:background="@color/white" />
+    android:textSize="18sp" />
 </LinearLayout>

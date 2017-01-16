@@ -35,7 +35,7 @@ public interface BaseFunction {
      * @param ratio
      * @return stepDate的子类
      */
-    StepData getResultData(float ratio);
+    StepData getResultDataAndDraw(float ratio);
 
     /**
      * 做一大步功能

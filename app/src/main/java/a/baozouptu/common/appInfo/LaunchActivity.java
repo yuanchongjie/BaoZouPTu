@@ -22,7 +22,9 @@ import static a.baozouptu.common.dataAndLogic.AllData.appConfig;
  * @description
  */
 public class LaunchActivity extends AppCompatActivity {
-    public static String TAG="LaunchActivity";
+    public static String TAG = "LaunchActivity";
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,11 +42,12 @@ public class LaunchActivity extends AppCompatActivity {
 
     /**
      * 启动后台服务，
+     *
      * @see AppIntentService
-     *<p>1.在后台发送用户使用信息
+     * <p>1.在后台发送用户使用信息
      */
     private void startBackgroundService() {
-        Intent intent=new Intent("start");
+        Intent intent = new Intent("start");
         intent.setAction("a.baozouptu.common.appInfo.AppIntentService");
         startService(intent);
     }
@@ -53,7 +56,7 @@ public class LaunchActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("test", "test");
         startActivity(intent);
-        Log.e(TAG,"完成时间  "+System.currentTimeMillis());
+        Log.e(TAG, "完成时间  " + System.currentTimeMillis());
         this.finish();
     }
 

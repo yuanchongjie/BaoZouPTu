@@ -28,7 +28,7 @@ public class TietuSizeControler {
      * 获取合适大小的Bitmap，Bitmap占用的内存不能超过剩余内存，如果超过，则返回空
      * @return 如果Bitmap用的内存超过剩余的值，会返回空
      */
-    public static Bitmap getBitmapInSize(Context context, String path, int nwidth, int nheight) {
+    public static Bitmap getBitmapInSize(String path, int nwidth, int nheight) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(path,options);
@@ -86,7 +86,7 @@ public class TietuSizeControler {
      * @param picBound 显示的范围
      * @return 布局参数
      */
-    public static  FrameLayout.LayoutParams getFeatParams(int srcWidth, int srcHeight, Rect picBound) {
+    static  FrameLayout.LayoutParams getFeatParams(int srcWidth, int srcHeight, Rect picBound) {
         //宽和高
         int exceptWidth=picBound.width()/2;//1/2图片宽
         if(exceptWidth>AllData.screenWidth*2/5)

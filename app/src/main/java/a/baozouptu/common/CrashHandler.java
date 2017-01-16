@@ -8,7 +8,8 @@ package a.baozouptu.common;
 public class CrashHandler implements Thread.UncaughtExceptionHandler {
     @Override
     public void uncaughtException(Thread thread, Throwable ex) {
-        if(Thread.getDefaultUncaughtExceptionHandler()!=null)
-            Thread.getDefaultUncaughtExceptionHandler().uncaughtException(thread,ex);
+        if(Thread.getDefaultUncaughtExceptionHandler()!=null) {
+            new CrashLog(thread,ex).commit();
+        }
     }
 }

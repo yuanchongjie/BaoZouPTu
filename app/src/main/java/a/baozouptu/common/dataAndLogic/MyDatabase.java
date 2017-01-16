@@ -45,6 +45,10 @@ public class MyDatabase {
      * usedpic(path text primary key,time varchar(20))
      */
     public void deleteOdlestUsedPic() throws IOException {
+/*        Cursor cursor = db.rawQuery("select path from usedpic where time = ( select min(time) from usedpic ) ", new String[]{});
+        cursor.moveToNext();String path = cursor.getString(0);
+        return path;
+        */
         db.execSQL("delete from usedpic where time = ( select min(time) from usedpic )", new Object[]{});
     }
 
@@ -164,17 +168,20 @@ public class MyDatabase {
 
 
     /**
-     * "create table  IF NOT EXISTS prefer_share(title text primary key,time varchar(50))"
+     * db.execSQL("create table  IF NOT EXISTS prefer_share(packageName text,title text,time varchar(50))");
      * inert时如果存在就替换，使用replace，不然就会出错，
      * 这样就不需要update了
      */
     public void insertPreferShare(String packageName,String title, long time) throws IOException {
+    /*    Cursor cursor = db.rawQuery("select * from sqlite_master where type= ? and name= ? ",new String[]{"table","prefer_share"});
+        while (cursor.moveToNext()) {
+            cursor.moveToNext();
+        }*/
         db.execSQL("insert into prefer_share(packageName,title,time) values(?,?,?) ", new Object[]{packageName,title, String.valueOf(time)});
     }
 
     /**
-     * "create table  IF NOT EXISTS prefer_share(title text primary key,time varchar(50))"
-     *
+     * db.execSQL("create table  IF NOT EXISTS prefer_share(packageName text,title text,time varchar(50))");
      * @param packageName ac的包名     * @param title ac的title
      */
     public void deletePreferShare(String packageName,String title) throws IOException {

@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -26,15 +25,19 @@ import java.util.Iterator;
 import java.util.List;
 
 import a.baozouptu.R;
+import a.baozouptu.common.util.BitmapTool;
+import a.baozouptu.common.util.FileTool;
 import a.baozouptu.common.util.Util;
 import a.baozouptu.chosePicture.ChosePictureActivity;
 import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TietuStepData;
-import a.baozouptu.ptu.tietu.pictureSynthesis.ChangeBmTest;
+import a.baozouptu.ptu.tietu.pictureSynthesis.PictureSynthesis;
+import a.baozouptu.ptu.tietu.pictureSynthesis.SynthesisImagePopupWindow;
 import a.baozouptu.ptu.view.PtuFrameLayout;
 import a.baozouptu.ptu.view.PtuView;
+import rx.Subscriber;
 
 /**
  * Created by Administrator on 2016/7/1.
@@ -53,6 +56,8 @@ public class TietuFragment extends Fragment implements BaseFunction {
 
     private PtuView ptuView;
     private PtuFrameLayout ptuFrame;
+    private SynthesisImagePopupWindow synthesisImagePopupWindow;
+
 
     public void setTietuLayout(TietuFrameLayout tietuLayout) {
         this.tietuLayout = tietuLayout;
@@ -162,6 +167,34 @@ public class TietuFragment extends Fragment implements BaseFunction {
             }
         });
         setOnclick();
+        //图片融合按钮
+        synthesisImagePopupWindow = new SynthesisImagePopupWindow();
+        synthesisImagePopupWindow.show(
+                getActivity().findViewById(R.id.fragment_main_function),
+                getActivity(),
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        FloatImageView chosenTietu = tietuLayout.chosedView;
+                        int innerLeft = chosenTietu.getLeft() + FloatImageView.pad - ptuView.getLeft();
+                        int innerTop = chosenTietu.getTop() + FloatImageView.pad - ptuView.getTop();
+                        Bitmap bitmap = new PictureSynthesis().
+                                changeBm(
+                                        Bitmap.createScaledBitmap(ptuView.getSourceBm(), ptuView.getDstRect().width(), ptuView.getDstRect().height(), true),
+                                        chosenTietu.getSrcBitmap(),
+                                        new Rect(innerLeft, innerTop,
+                                                innerLeft + chosenTietu.getWidth() - FloatImageView.pad * 2,
+                                                innerTop + chosenTietu.getHeight() - FloatImageView.pad * 2));
+                        //如果转换失败，获取的数据为空
+                        if (bitmap == null) {
+                            if (chosenTietu.getPicPath() != null)
+                                bitmap = TietuSizeControler.getSrcBitmap(chosenTietu.getPicPath());
+                            else
+                                bitmap = BitmapFactory.decodeResource(getResources(), chosenTietu.getPicId());
+                        }
+                        chosenTietu.setImageBitmap(bitmap);
+                    }
+                });
         return view;
     }
 
@@ -196,7 +229,7 @@ public class TietuFragment extends Fragment implements BaseFunction {
         floatImageView.setImageBitmapAndId(srcBitmap, id);
         FrameLayout.LayoutParams params = TietuSizeControler.getFeatParams(srcBitmap.getWidth(), srcBitmap.getHeight(),
                 ptuView.getPicBound());
-        Log.e(TAG,"添加位置"+params.leftMargin+ " "+params.topMargin);
+        Log.e(TAG, "添加位置" + params.leftMargin + " " + params.topMargin);
         tietuLayout.addView(floatImageView, params);
     }
 
@@ -243,10 +276,11 @@ public class TietuFragment extends Fragment implements BaseFunction {
      * @return {@link StepData}
      */
     @Override
-    public StepData getResultData(float ratio) {
+    public StepData getResultDataAndDraw(float ratio) {
         TietuStepData tsd = new TietuStepData(PtuUtil.EDIT_TIETU);
         int count = tietuLayout.getChildCount();
         for (int i = 0; i < count; i++) {
+            //获取数据
             FloatImageView fiv = (FloatImageView) tietuLayout.getChildAt(i);
 //获取每个tietu的范围
             RectF boundRectInPic = new RectF();
@@ -259,13 +293,34 @@ public class TietuFragment extends Fragment implements BaseFunction {
                     ptuView.getSrcRect(), ptuView.getDstRect());
             boundRectInPic.right = temp[0];
             boundRectInPic.bottom = temp[1];
-            TietuStepData.OneTietu oneTietu;
+            Bitmap tietuBm = fiv.getSrcBitmap();
 
-            if (fiv.getPicPath() != null)//是路径的形式
-                oneTietu = new TietuStepData.OneTietu(fiv.getPicPath(), boundRectInPic, fiv.getRotation());
-            else
-                oneTietu = new TietuStepData.OneTietu(fiv.getPicId(), boundRectInPic, fiv.getRotation());
+            //暂存数据到sd卡上面
+            String tempPath = FileTool.createTempPicPath();
+            BitmapTool.asySaveTempBm(tempPath, tietuBm, new Subscriber<String>() {
+                @Override
+                public void onCompleted() {
+
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    Log.e(TAG, "onNext: 保存出错" + Thread.currentThread().getName());
+                }
+
+                @Override
+                public void onNext(String s) {
+                    Log.e(TAG, "onNext: 保存完成" + Thread.currentThread().getName());
+                }
+
+            });
+
+            TietuStepData.OneTietu oneTietu = new TietuStepData.OneTietu(tempPath, boundRectInPic, fiv.getRotation());
             tsd.addOneTietu(oneTietu);
+
+            //绘制结果到ptuView上面
+            ptuView.addBitmap(tietuBm,
+                    oneTietu.getBoundRectInPic(), oneTietu.getRotateAngle());
         }
         return tsd;
 
@@ -280,53 +335,35 @@ public class TietuFragment extends Fragment implements BaseFunction {
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        synthesisImagePopupWindow.dismiss();
+        super.onDestroyView();
+    }
+
     public void addBigStep(StepData sd) {
         TietuStepData ttsd = (TietuStepData) sd;
         Iterator<TietuStepData.OneTietu> iterator = ttsd.iterator();
         while (iterator.hasNext()) {
             TietuStepData.OneTietu oneTietu = iterator.next();
-            if (oneTietu.getPicPath() != null)
-                ptuView.addBitmap(TietuSizeControler.getSrcBitmap(oneTietu.getPicPath()),
-                        oneTietu.getBoundRectInPic(), oneTietu.getRotateAngle());
+            Bitmap tietuBm = BitmapTool.getLosslessBitmap(oneTietu.getPicPath());
+            if (tietuBm != null) {
+            } else if (oneTietu.getPicPath() != null)
+                tietuBm = TietuSizeControler.getSrcBitmap(oneTietu.getPicPath());
             else {
-                Util.P.le(TAG, "lastId= " + oneTietu.getPicId());
-                Bitmap tietuBm = BitmapFactory.decodeResource(mContext.getResources(), oneTietu.getPicId());
-                ptuView.addBitmap(tietuBm,
-                        oneTietu.getBoundRectInPic(), oneTietu.getRotateAngle());
+                tietuBm = BitmapFactory.decodeResource(mContext.getResources(), oneTietu.getPicId());
             }
+            ptuView.addBitmap(tietuBm,
+                    oneTietu.getBoundRectInPic(), oneTietu.getRotateAngle());
         }
-
     }
 
-    public void init(final PtuFrameLayout ptuFrame, final PtuView ptuView) {
+    public void initBeforeCreateView(final PtuFrameLayout ptuFrame, final PtuView ptuView) {
         this.ptuView = ptuView;
         this.ptuFrame = ptuFrame;
         setTietuLayout(ptuFrame.initAddImageFloat(new Rect(
                 ptuFrame.getLeft(), ptuFrame.getTop(), ptuFrame.getRight(), ptuFrame.getBottom()
         )));
-        Button button = new Button(ptuView.getContext());
-        button.setText("融合图片");
-        button.setTextSize(20);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FloatImageView chosenTietu = tietuLayout.chosedView;
-                int innerLeft=chosenTietu.getLeft() + FloatImageView.pad - ptuView.getLeft();
-                int innerTop= chosenTietu.getTop() + FloatImageView.pad - ptuView.getTop();
-                Bitmap bitmap=new ChangeBmTest().
-                        changetBm(
-                                Bitmap.createScaledBitmap(ptuView.getSourceBm(),ptuView.getDstRect().width(),ptuView.getDstRect().height(),true),
-                                chosenTietu.getSrcBitmap(),
-                                new Rect(innerLeft,innerTop,
-                                        innerLeft+chosenTietu.getWidth()-FloatImageView.pad*2,
-                                        innerTop+chosenTietu.getHeight()-FloatImageView.pad*2));
-                chosenTietu.setImageBitmap(bitmap);
-
-            }
-        });
-        FrameLayout.LayoutParams layoutParams=new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(ptuFrame.getWidth()-400,ptuFrame.getHeight()-200,0,0);
-        ptuFrame.addView(button,layoutParams);
     }
+
 }

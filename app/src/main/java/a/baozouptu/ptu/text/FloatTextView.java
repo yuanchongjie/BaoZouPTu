@@ -78,7 +78,6 @@ public class FloatTextView extends EditText implements FloatView {
     private String mText = "";
     private int mBackGroundColor = 0x00000000;
     private Bitmap[] justifyBm;
-    private Bitmap resultBm;
 
     public void setDownState() {
         downShowState = SHOW_SATUS;
@@ -158,7 +157,7 @@ public class FloatTextView extends EditText implements FloatView {
     }
 
     private void init(final Rect picBound) {
-        Util.P.le(TAG, "init");
+        Util.P.le(TAG, "initBeforeCreateView");
         //获取ptuView的范围
         this.picBound = picBound;
         rect = new RectF(fLeft, fTop, fLeft + mWidth, fTop + mHeight);
@@ -418,8 +417,8 @@ public class FloatTextView extends EditText implements FloatView {
      * @param ptuView 底图图片视图，用于获取地图的各种信息。
      * @return 成功返回数据，否则返回空
      */
-    public TextStepData getResultData(PtuView ptuView) {
-        if (mText.trim().equals("")) return null;
+    public Bitmap getResultData(PtuView ptuView,TextStepData tsd) {
+        if (mText.trim().equals("")) return null;//表示没有添加以
         setCursorVisible(false);
         //文本在view中的位置
          /*代表view有效区域在底图上的位置的rect，相对于原始图片的左上角上下左右边的距离*/
@@ -428,18 +427,14 @@ public class FloatTextView extends EditText implements FloatView {
 
         String realRatio = MU.di(Double.toString(1), Float.toString(ptuView.getTotalRatio()));
         Bitmap textViewBm = generateProximateScaleBm(realRatio);
-        resultBm = Bitmap.createBitmap(textViewBm, Math.round(rimLeft), Math.round(rimTop),
+        Bitmap resultBm = Bitmap.createBitmap(textViewBm, Math.round(rimLeft), Math.round(rimTop),
                 Math.round(rimRight - rimLeft), Math.round(rimBottom - rimTop));
         textViewBm.recycle();
-        textViewBm = null;
-        String path = FileTool.createTempPicPath(mContext);
-        BitmapTool.saveBitmap(mContext, resultBm, path, false);
-        TextStepData tsd = new TextStepData(PtuUtil.EDIT_TEXT);
-        tsd.picPath = path;
+
         tsd.boundRectInPic = boundRectInPic;
         tsd.rotateAngle = 0;
         Util.P.le(TAG, "获取添加文字的Bitmap和相关数据成功");
-        return tsd;
+        return resultBm;
     }
 
 
@@ -669,6 +664,7 @@ public class FloatTextView extends EditText implements FloatView {
      */
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
+        if(!isFocusable())return false;
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (hasUp) hasUp = false;
@@ -687,18 +683,18 @@ public class FloatTextView extends EditText implements FloatView {
                 if (!hasUp && GeoUtil.getDis(downX, downY, event.getX(), event.getY()) < minMoveDis
                         && System.currentTimeMillis() - downTime < 500) {
                     Util.P.le(TAG, "drawItem");
-                    float x = event.getX();//变换为本view的坐标
+                    float x = event.getX();
                     float y = event.getY();
 
                     //内部子item的处理
-
+//对其按钮
                     RectF itemBound = new RectF(items.get(1).x - 10, items.get(1).y - 10,
                             items.get(1).x + mPadding + 10, items.get(1).y + mPadding);
                     if (SHOW_SATUS >= STATUS_ITEM && itemBound.contains(x, y)) {
                         onClickJustify();
                         return true;
                     }
-
+//背景按钮
                     itemBound.set(items.get(2).x, items.get(2).y - 10,
                             items.get(2).x + mPadding + 10, items.get(2).y + mPadding);
                     if (SHOW_SATUS >= STATUS_ITEM && itemBound.contains(x, y)) {
@@ -764,10 +760,6 @@ public class FloatTextView extends EditText implements FloatView {
         fLeft = centerX - mWidth / 2;
         fTop = centerY - mHeight / 2;
         ((PtuFrameLayout) getParent()).changeLocation();
-    }
-
-    public Bitmap getResultBm() {
-        return resultBm;
     }
 
     public void releaseResource() {

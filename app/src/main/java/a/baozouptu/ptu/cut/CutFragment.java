@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import a.baozouptu.R;
 import a.baozouptu.common.util.BitmapTool;
+import a.baozouptu.common.util.FileTool;
 import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.BaseFunction;
 import a.baozouptu.ptu.PtuUtil;
@@ -35,6 +36,7 @@ import a.baozouptu.ptu.repealRedo.CutStepData;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.view.PtuView;
+import rx.Subscriber;
 
 public class CutFragment extends Fragment implements BaseFunction {
     private String TAG = "CutFragment";
@@ -133,8 +135,31 @@ public class CutFragment extends Fragment implements BaseFunction {
     }
 
     @Override
-    public StepData getResultData(float ratio) {
+    public StepData getResultDataAndDraw(float ratio) {
+        //获取并保存数据
         StepData csd = new CutStepData(PtuUtil.EDIT_CUT);
+        Bitmap resultBm = getResultBm(1);
+        String tempPath = FileTool.createTempPicPath();
+        BitmapTool.asySaveTempBm(tempPath, resultBm, new Subscriber<String>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(String s) {
+
+            }
+        });
+        csd.picPath = tempPath;
+
+        //重新绘制
+        ptuView.replaceSourceBm(resultBm);
         return csd;
     }
 
@@ -297,23 +322,23 @@ public class CutFragment extends Fragment implements BaseFunction {
     }
 
     private void userDefinedRatio() {
-        sizeRatioDialog=new SizeRatioDialog(mContext,1);
+        sizeRatioDialog = new SizeRatioDialog(mContext, 1);
         sizeRatioDialog.createDialog();
         sizeRatioDialog.setActionListener(new SizeRatioDialog.ActionListener() {
             @Override
             public void onSure(float w, float h) {
-                cutView.setFixedRatio(h/w);
+                cutView.setFixedRatio(h / w);
             }
         });
     }
 
-    private void userDefinedSize(){
-        sizeRatioDialog=new SizeRatioDialog(mContext,0);
+    private void userDefinedSize() {
+        sizeRatioDialog = new SizeRatioDialog(mContext, 0);
         sizeRatioDialog.createDialog();
         sizeRatioDialog.setActionListener(new SizeRatioDialog.ActionListener() {
             @Override
             public void onSure(float w, float h) {
-                cutView.setFixedSize((int)(w+0.5f),(int)(h+0.5f));
+                cutView.setFixedSize((int) (w + 0.5f), (int) (h + 0.5f));
             }
         });
     }

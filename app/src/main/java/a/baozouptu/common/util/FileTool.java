@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.util.Pair;
 
 import java.io.File;
@@ -118,6 +119,10 @@ public class FileTool {
         return context.getApplicationContext().getFilesDir().getAbsolutePath();
     }
 
+    public static String createTempPicPath() {
+        return createTempPicPath(AllData.appContext);
+    }
+
     public static String createTempPicPath(Context context) {
         String appPath = getApplacationDir(context);
         String tempDir = appPath + "/tempPic/text";
@@ -125,7 +130,8 @@ public class FileTool {
         if (!file.exists()) {
             {
                 if (!file.mkdirs()) {
-                    Util.T(context, "保存失败");
+                    Log.e("FileTool", "createTempPicPath: 创建文件失败");
+                    return null;
                 }
             }
         }
@@ -175,9 +181,9 @@ public class FileTool {
             if (!dir.exists())
                 dir.mkdirs();
             res = oldPath.substring(oldPath.lastIndexOf("."), oldPath.length());
-            res=prefix + "baozou" + time + res;
+            res = prefix + "baozou" + time + res;
         } catch (SecurityException se) {
-            res=null;
+            res = null;
         } finally {
             return res;
         }

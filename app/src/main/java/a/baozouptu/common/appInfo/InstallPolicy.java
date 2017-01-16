@@ -1,8 +1,10 @@
 package a.baozouptu.common.appInfo;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
 import a.baozouptu.common.dataAndLogic.MyDatabase;
 import a.baozouptu.common.util.Util;
@@ -11,7 +13,6 @@ import static a.baozouptu.common.dataAndLogic.AllData.appConfig;
 
 /**
  * Created by liuguicen on 2016/8/13.
- *
  */
 public class InstallPolicy {
     Context mGlobalContext;
@@ -72,18 +73,19 @@ public class InstallPolicy {
         MyDatabase myDatabase = null;
         try {//添加分享的优先选项
             String[] shareTitles = new String[]{"添加到微信收藏", "陌陌", "保存到QQ收藏",
-                            "发送到朋友圈", "微博", "发送给朋友", "发送给好友"};
-            String[] packageNames = new String[]{"com.tencent.mm","com.immomo.momo","com.tencent.mobileqq",
-                      "com.tencent.mm", "com.sina.weibo","com.tencent.mm","com.tencent.mobileqq"};
+                    "发送到朋友圈", "微博", "发送给朋友", "发送给好友"};
+            String[] packageNames = new String[]{"com.tencent.mm", "com.immomo.momo", "com.tencent.mobileqq",
+                    "com.tencent.mm", "com.sina.weibo", "com.tencent.mm", "com.tencent.mobileqq"};
             myDatabase = MyDatabase.getInstance(mGlobalContext);
-            long time=System.currentTimeMillis();
+            long time = System.currentTimeMillis();
             for (int i = 0; i < packageNames.length; i++)
-                myDatabase.insertPreferShare(packageNames[i], shareTitles[i],time++);
+                myDatabase.insertPreferShare(packageNames[i], shareTitles[i], time++);
         } catch (IOException e) {
-
+            Log.e("数据库", e.getMessage());
         } finally {
             myDatabase.close();
         }
+
     }
 
     /**

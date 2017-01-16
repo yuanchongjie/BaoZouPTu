@@ -115,12 +115,13 @@ public class ProcessUsuallyPicPath {
         try {
             mDB = MyDatabase.getInstance(mContext);
             //如果存在，需要先删除原来的
-            if (mUsualyPicPathList.indexOf(path) <= usedNumber) {
+            int id = mUsualyPicPathList.indexOf(path);
+            if (id != -1 && id <= usedNumber) {
                 mDB.deleteUsedPic(path);
                 mUsualyPicPathList.remove(path);
                 usedNumber--;
             }
-            if (usedNumber > MAX_USED_NUMBER) {
+            if (usedNumber >= MAX_USED_NUMBER) {
                 mDB.deleteOdlestUsedPic();//超过预定数量时，删除一个，再添加
                 mUsualyPicPathList.remove(usedNumber);
                 usedNumber--;
@@ -142,6 +143,7 @@ public class ProcessUsuallyPicPath {
         mUsualyPicPathList.add(usedNumber + 2 + recentNumber, path);
         recentNumber++;
     }
+
     /**
      * 添加最近图片，最前面
      */
@@ -460,7 +462,7 @@ public class ProcessUsuallyPicPath {
                 Bundle bundle = new Bundle();
                 List<String> list = new ArrayList<>(sortedPicPathsByTime.values());
                 bundle.putString("pic_path", list.get(list.size() - 1));
-                Util.P.le("准备获取最新图片线程开始执行4"+"图片已获取到");
+                Util.P.le("准备获取最新图片线程开始执行4" + "图片已获取到");
                 msg.setData(bundle);
                 if (mHandler == null) {
                     throw new IllegalArgumentException(this.getClass().getSimpleName() + "更新图片的handler为空");
@@ -512,8 +514,8 @@ public class ProcessUsuallyPicPath {
     }
 
     public boolean hasRecentPic(String picPath) {
-        int id=mUsualyPicPathList.indexOf(picPath);
-        if( usedNumber + 2<=id&&id<recentNumber + usedNumber + 2)return true;
+        int id = mUsualyPicPathList.indexOf(picPath);
+        if (usedNumber + 2 <= id && id < recentNumber + usedNumber + 2) return true;
         return false;
     }
 }

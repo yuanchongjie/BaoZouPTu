@@ -29,14 +29,15 @@
             android:orientation="horizontal">
 
             <ImageButton
-                android:id="@+id/navigation"
+                android:id="@+id/chose_pic_navigation"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
                 android:layout_marginLeft="@dimen/margin_big_x"
                 android:layout_marginStart="@dimen/margin_big_x"
-                android:background="#00000000"
+                android:background="@drawable/btn_pressable_background_rectangle"
                 android:scaleType="centerCrop"
-                android:src="@mipmap/icon" />
+                android:src="@mipmap/icon"
+                />
 
             <TextView
                 android:layout_width="wrap_content"

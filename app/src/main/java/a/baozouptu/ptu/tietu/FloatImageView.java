@@ -160,9 +160,10 @@ public class FloatImageView extends ImageView {
         return picPath;
     }
 
-    public int getPicId(){
+    public int getPicId() {
         return picId;
     }
+
     /**
      * @return 获取高除以宽的比
      */
@@ -172,8 +173,9 @@ public class FloatImageView extends ImageView {
 
     /**
      * 设置文件中的图片
+     *
      * @param srcBitmap bitmap
-     * @param path 文件路径
+     * @param path      文件路径
      */
     public void setImageBitmapAndPath(Bitmap srcBitmap, String path) {
         this.srcBitmap = srcBitmap;
@@ -183,13 +185,19 @@ public class FloatImageView extends ImageView {
 
     /**
      * 设置资源中的图片
+     *
      * @param srcBitmap bitmap
-     * @param id 资源id
+     * @param id        资源id
      */
-    public void setImageBitmapAndId(Bitmap srcBitmap,int id){
-        this.srcBitmap=srcBitmap;
-        picId=id;
+    public void setImageBitmapAndId(Bitmap srcBitmap, int id) {
+        this.srcBitmap = srcBitmap;
+        picId = id;
         setImageBitmap(srcBitmap);
     }
 
+    @Override
+    public void setImageBitmap(Bitmap bm) {
+        srcBitmap = bm;
+        super.setImageBitmap(bm);
+    }
 }

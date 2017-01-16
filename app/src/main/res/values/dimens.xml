@@ -33,4 +33,5 @@
     <dimen name="list_item_width_save_set_middle">50dp</dimen>
     <dimen name="margin_big">10dp</dimen>
     <dimen name="my_toolbar_height">50dp</dimen>
+    <dimen name="width_synthesis_image">55dp</dimen>
 </resources>

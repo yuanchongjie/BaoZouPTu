@@ -73,6 +73,19 @@
                 style="@style/setting_item_right" />
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/setting_share_without_label"
+            style="@style/setting_item">
+
+            <TextView
+                style="@style/setting_item_text"
+                android:text="分享时不带应用标签" />
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/setting_share_without_switch"
+                style="@style/setting_item_right" />
+        </RelativeLayout>
+
     </LinearLayout>
 
     <TextView
@@ -130,6 +143,7 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/setting_clear_cache"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"

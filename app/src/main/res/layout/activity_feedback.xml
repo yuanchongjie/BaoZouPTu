@@ -51,12 +51,11 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/setting_item_text"
             android:layout_marginRight="10dp"
-            android:text="联系方式"
+            android:text="联系方式:"
             android:textColor="@color/text_deep_black"
-            android:textSize="17sp" />
+            />
 
         <EditText
             android:id="@+id/feedback_contact_edit"
@@ -90,7 +89,6 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="25dp"
-        android:background="@drawable/rip_blue_cornor_backgound"
         android:text="提交"
         android:textSize="23sp" />
 </LinearLayout>

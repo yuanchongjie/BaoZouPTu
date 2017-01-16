@@ -11,6 +11,10 @@ public interface SettingDataSource {
      * 应用退出后是否仍发送通知
      */
     void saveSendShortCutNotifyExit(boolean isSend);
+    void saveSharedWithout(boolean isWith);
     boolean getSendShortcutNotify();
     boolean getSendShortcutNotifyExit();
+    boolean getSharedWithout();
+    float getAppCacheSize();
+    void clearAppCache();
 }

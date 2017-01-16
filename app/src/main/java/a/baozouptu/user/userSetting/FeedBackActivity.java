@@ -1,7 +1,7 @@
 package a.baozouptu.user.userSetting;
 
+import android.os.Build;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +14,8 @@ import a.baozouptu.common.util.Util;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
 import a.baozouptu.common.util.CustomToast;
+
+import static java.util.ResourceBundle.clearCache;
 
 public class FeedbackActivity extends BaseActivity {
     String lastComment;
@@ -30,8 +32,20 @@ public class FeedbackActivity extends BaseActivity {
         final EditText commentEdit = (EditText) findViewById(R.id.feedback_comment);
         contactEdit = (EditText) findViewById(R.id.feedback_contact_edit);
         Button btnCommit = (Button) findViewById(R.id.feedback_btn_commit);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            btnCommit.setBackground(Util.getDrawable(R.drawable.rip_blue_cornor_backgound));
+        }else{
+            btnCommit.setBackground(Util.getDrawable(R.drawable.background_round_corner_blue));
+        }
         ImageView btnReturn = (ImageView) findViewById(R.id.feedback_return_btn);
         btnReturn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        findViewById(R.id.feedback_return_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
@@ -77,4 +91,5 @@ public class FeedbackActivity extends BaseActivity {
             }
         });
     }
+
 }
