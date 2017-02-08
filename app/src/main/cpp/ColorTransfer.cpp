@@ -1,7 +1,10 @@
+/*
 //
 // Created by Administrator on 2017/1/11 0011.
 //
 #include <android/log.h>
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
 #include "ColorTransfer.h"
 #include "MyUtil.h"
 
@@ -76,9 +79,11 @@ Mat  ColorTransfer::LabToRGB(Mat &m) {
     return I;
 }
 
+*/
 /**
  * 分别计算源图像和目标图像均值及标准差
- */
+ *//*
+
 vector<double>  ColorTransfer::computeMeans(Mat &m) {
     double sum[3] = {};
     int pixes = m.cols * m.rows;
@@ -97,9 +102,11 @@ vector<double>  ColorTransfer::computeMeans(Mat &m) {
     return means;
 }
 
+*/
 /**
  * 分别计算源图像和目标图像均值及标准差
- */
+ *//*
+
 vector<double>  ColorTransfer::computeVariances(Mat &m, vector<double> &means) {
     double sum[3] = {};
     int pixes = m.cols * m.rows;
@@ -142,3 +149,4 @@ Mat transferColorSyle(Mat &under, Mat &above) {
 
     return clt.computeResult();
 }
+*/

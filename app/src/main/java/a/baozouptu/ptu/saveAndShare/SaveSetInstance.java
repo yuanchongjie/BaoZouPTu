@@ -4,6 +4,7 @@ import android.content.Context;
 
 /**
  * Created by Administrator on 2016/11/22 0022.
+ * 通过代理的非静态单例模式
  */
 
 public class SaveSetInstance {

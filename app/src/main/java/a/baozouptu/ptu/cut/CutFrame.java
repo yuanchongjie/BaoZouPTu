@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import java.util.Locale;
 
 import a.baozouptu.R;
+import a.baozouptu.common.appInfo.MyApplication;
 import a.baozouptu.common.util.GeoUtil;
 import a.baozouptu.common.util.Util;
 
@@ -97,7 +98,7 @@ public class CutFrame {
         textPaint.setColor(color);
 
         //尺寸
-        Resources resources = Util.MyApplication.getAppContext().getResources();
+        Resources resources = MyApplication.appContext.getResources();
         cornerWidth = resources.getDimension(R.dimen.cut_frame_lump_width);
         edgeWidth = cornerWidth * 0.8f;
 

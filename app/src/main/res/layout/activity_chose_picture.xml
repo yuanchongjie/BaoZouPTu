@@ -50,7 +50,7 @@
                 android:textColor="@color/white"
                 android:textSize="23sp"
 
-                />
+                android:id="@+id/textView4" />
         </LinearLayout>
 
         <ImageButton

@@ -129,10 +129,6 @@ public interface FloatView {
 
     void drawItem(Canvas canvas, MicroButtonData item);
 
-    void setDownState();
-
-    int getDownState();
-
     void initItems();
 
 }

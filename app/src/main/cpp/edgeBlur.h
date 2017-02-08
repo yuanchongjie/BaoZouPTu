@@ -9,7 +9,7 @@
 #include <opencv2/core.hpp>
 using namespace cv;
 Mat edge_blur(bool **vis, Mat src);
-bool** createVisArray(int w, int h);
-void deleteVisArray(bool ** &p, int h);
-void recordTransparentInfo(Mat &src, bool **transInfo);
-void restoreTransparentInfo(Mat &src, bool **transInfo);
+uchar ** createArray(int w, int h);
+void deleteVisArray(uchar ** &p, int h);
+void recordTransparentInfo(Mat &src, uchar **transInfo);
+void restoreTransparentInfo(Mat &src, uchar **transInfo);

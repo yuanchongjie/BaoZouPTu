@@ -2,12 +2,12 @@ package a.baozouptu.common.appInfo;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
-import java.util.logging.Level;
 
 import a.baozouptu.common.dataAndLogic.MyDatabase;
-import a.baozouptu.common.util.Util;
+import a.baozouptu.common.util.CustomToast;
 
 import static a.baozouptu.common.dataAndLogic.AllData.appConfig;
 
@@ -19,7 +19,7 @@ public class InstallPolicy {
     private MyDatabase myDatabase;
 
     public InstallPolicy() {
-        mGlobalContext = Util.MyApplication.getAppContext();
+        mGlobalContext = MyApplication.appContext;
     }
 
     /**
@@ -28,12 +28,15 @@ public class InstallPolicy {
      */
     public void processPolicy() {
 
-        float appVersion = appConfig.readAppVersion();
-        if (Float.compare(AppConfig.CUR_APPVERSION, appVersion) == 0) {
-            return;//是当前版本,已完成版本更新，正常启动
-        } else {
+        int lastVersion = appConfig.readAppVersion();
 
-            if (appVersion == -1f && !appConfig.hasNewInstall())//是新安装
+        if (AppConfig.CUR_APP_VERSION == lastVersion) {//已经更新版本数据，或者新安装的版本相同
+            return;
+        } else if (AppConfig.CUR_APP_VERSION < lastVersion) {//更新的版本小于当前安装好的版本
+            Toast.makeText(MyApplication.appContext,"更新的版本过低，请安装较新版本",Toast.LENGTH_LONG).show();
+        } else {//执行版本更新操作=》是大于，不是==或《=
+
+            if (lastVersion == -1 && !appConfig.hasNewInstall())//是新安装
             {
                 createAppFile();
                 setShearInfo();
@@ -46,7 +49,7 @@ public class InstallPolicy {
                 setShearInfo();
             } else {//执行其他版本的
                     /*
-                   if(appVersion==AppConfig.APPVERSION_1_1){
+                   if(appVersion==AppConfig.APP_VERSION_2){
 
                    }*/
             }
@@ -56,6 +59,10 @@ public class InstallPolicy {
     }
 
     private void writeCurVersionInfo() {
+        //每次更新之后重新上传一次设备信息，因为版本已经更新，
+        //顺便还有os版本等更新的检查
+        //后面后台线程检测到false，就会自动更新了
+        appConfig.writeSendDeviceInfo(false);
     }
 
     /**
@@ -72,10 +79,10 @@ public class InstallPolicy {
     private void setShearInfo() {
         MyDatabase myDatabase = null;
         try {//添加分享的优先选项
-            String[] shareTitles = new String[]{"添加到微信收藏", "陌陌", "保存到QQ收藏",
-                    "发送到朋友圈", "微博", "发送给朋友", "发送给好友"};
             String[] packageNames = new String[]{"com.tencent.mm", "com.immomo.momo", "com.tencent.mobileqq",
                     "com.tencent.mm", "com.sina.weibo", "com.tencent.mm", "com.tencent.mobileqq"};
+            String[] shareTitles = new String[]{"添加到微信收藏", "陌陌", "保存到QQ收藏",
+                    "发送到朋友圈", "微博", "发送给朋友", "发送给好友"};
             myDatabase = MyDatabase.getInstance(mGlobalContext);
             long time = System.currentTimeMillis();
             for (int i = 0; i < packageNames.length; i++)

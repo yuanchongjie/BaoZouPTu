@@ -9,8 +9,8 @@ android {
         applicationId "a.baozouptu"
         minSdkVersion 16
         targetSdkVersion 19
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1.0"
         /**
          * 只支持中文，减小包大小
          */
@@ -18,7 +18,6 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++11 -frtti -fexceptions"
-                abiFilters 'armeabi'
             }
         }
         ndk {
@@ -32,7 +31,6 @@ android {
             jniLibs.srcDirs = ['F:\\androidProject\\BaoZouPTu\\app\\src\\main\\jniLibs']
         }
     }
-    sourceSets { main { jni.srcDirs = ['src/main/jni', 'src/main/jniLibs/'] } }
 
     signingConfigs {
         release {
@@ -73,22 +71,22 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    //官方的
+    compile 'com.android.support:appcompat-v7:25.1.1'
+    compile 'com.android.support:design:25.1.1'
+    compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
+    compile 'com.google.dagger:dagger:2.9'
+
+    //
+    //第三方的
+    //腾讯qq开放平台的sdk
+    compile files('src/main/libs/open_sdk_r5778_lite.jar')
     //bmob-sdk：Bmob的android sdk包，包含了Bmob的数据存储、文件等服务，以下是最新的bmob-sdk:
     //3.5.0：请务必查看下面注释[1]
     compile 'cn.bmob.android:bmob-sdk:3.5.0'
     //如果你想应用能够兼容Android6.0，请添加此依赖(org.apache.http.legacy.jar)
     compile 'cn.bmob.android:http-legacy:1.0'
-
-    //官方的
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:design:25.1.0'
-    compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
-
-    //腾讯qq开放平台的sdk
-    compile files('src/main/libs/open_sdk_r5756.jar')
-
     // compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
-
     testCompile 'junit:junit:4.12'
 }

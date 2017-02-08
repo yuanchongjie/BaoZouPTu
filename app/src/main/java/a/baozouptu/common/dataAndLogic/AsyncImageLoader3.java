@@ -1,6 +1,7 @@
 package a.baozouptu.common.dataAndLogic;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.support.v4.util.LruCache;
 import android.widget.ImageView;
@@ -40,7 +41,7 @@ public class AsyncImageLoader3 {
     }
 
     private AsyncImageLoader3() {
-        lque= new LinkedBlockingQueue<Runnable>();
+        lque = new LinkedBlockingQueue<Runnable>();
         int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         imageCache = new LruCache<String, Bitmap>(maxMemory / 6) {
             @Override
@@ -48,7 +49,7 @@ public class AsyncImageLoader3 {
                 return value.getRowBytes() * value.getHeight() / 1024;
             }
         };
-        executorService = new ThreadPoolExecutor(CPU_COUNT*2+1, CPU_COUNT*2+1,
+        executorService = new ThreadPoolExecutor(CPU_COUNT * 2 + 1, CPU_COUNT * 2 + 1,
                 5L, TimeUnit.SECONDS,
                 lque);//核心线程=cup数量*2+1，5秒为运行后关闭之
         executorService.allowCoreThreadTimeOut(true);
@@ -61,10 +62,12 @@ public class AsyncImageLoader3 {
      * @return
      */
     public Bitmap getBitmap(String imageUrl) {
-        if (imageCache.get(imageUrl) != null) {
-            return imageCache.get(imageUrl);
-        }
-        return null;
+        return imageCache.get(imageUrl);
+    }
+
+    public Bitmap getBitmap(int id) {
+        String key = String.valueOf(id);
+        return getBitmap(key);
     }
 
     /**
@@ -77,7 +80,7 @@ public class AsyncImageLoader3 {
      * @return 返回内存中缓存的图像，第一次加载返回null
      */
     public Bitmap loadBitmap(final String imageUrl, final ImageView image, final int position,
-                             final ImageCallback callback,final int needWidth) {
+                             final ImageCallback callback, final int needWidth) {
         // 缓存中没有图像，则从SDcard取出数据，并将取出的数据缓存到内存中
         if (imageCache.get(imageUrl) != null) {
             return imageCache.get(imageUrl);
@@ -85,7 +88,7 @@ public class AsyncImageLoader3 {
         executorService.submit(new Runnable() {// 线程池执行取出图片的进程
             public void run() {
                 try {
-                    final Bitmap bitmap = loadImageFromSD(imageUrl,needWidth);// 获取图片URL对应的图片Bitmap
+                    final Bitmap bitmap = BitmapTool.decodeInSize(imageUrl, needWidth, Bitmap.Config.ARGB_8888);// 获取图片URL对应的图片Bitmap
                     imageCache.put(imageUrl, bitmap);
                     handler.post(// handler的轻量级方法，利用handler的post方法，在attached的即handler依附的线程中执行下面的代码
                             new Runnable() {
@@ -102,24 +105,35 @@ public class AsyncImageLoader3 {
         return null;
     }
 
-    public void cancelLoad() {
-        while (!lque.isEmpty())lque.clear();
-    }
-    /**
-     * 从所给路径，返回对应大小的图片Bitmap对象
-     *
-     * @param path String 路径
-     * @return Bitmap对象
-     */
-    private Bitmap loadImageFromSD(String path,int needWidth) {
-        try {
-            // 测试时，模拟网络延时，实际时这行代码不能有
-            // SystemClock.sleep(2000);
-            Bitmap bm = new BitmapTool().charge(path,needWidth);
-            return bm;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public Bitmap loadBitmap(final int id, final ImageView image, final int position,
+                             final ImageCallback callback, final int needWidth) {
+        // 缓存中没有图像，则从SDcard取出数据，并将取出的数据缓存到内存中
+        final String key = String.valueOf(id);
+        if (imageCache.get(key) != null) {
+            return imageCache.get(key);
         }
+        executorService.submit(new Runnable() {// 线程池执行取出图片的进程
+            public void run() {
+                try {
+                    final Bitmap bitmap = BitmapFactory.decodeResource(AllData.appContext.getResources(), id);// 获取图片URL对应的图片Bitmap
+                    imageCache.put(key, bitmap);
+                    handler.post(// handler的轻量级方法，利用handler的post方法，在attached的即handler依附的线程中执行下面的代码
+                            new Runnable() {
+                                public void run() {
+                                    callback.imageLoaded(bitmap, image, position,
+                                            key);
+                                }
+                            });
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        return null;
+    }
+
+    public void cancelLoad() {
+        while (!lque.isEmpty()) lque.clear();
     }
 
     // 对外界开放的回调接口
@@ -137,16 +151,17 @@ public class AsyncImageLoader3 {
     /**
      * 清除调用的内存
      */
-    public void evitAll(){
+    public void evitAll() {
         imageCache.evictAll();
     }
 
-    public void stop(){
+    public void stop() {
         executorService.shutdown();
     }
-    public void reStart(){
-        if(executorService.isShutdown()){
-            executorService=new ThreadPoolExecutor(CPU_COUNT*2+1, 0,
+
+    public void reStart() {
+        if (executorService.isShutdown()) {
+            executorService = new ThreadPoolExecutor(CPU_COUNT * 2 + 1, 0,
                     0L, TimeUnit.MILLISECONDS,
                     lque);
         }

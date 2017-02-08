@@ -8,11 +8,11 @@ import android.content.SharedPreferences;
  * 基本的设置
  */
 
-public class CommonConfig {
+public class HasReadConfig {
 
     private final SharedPreferences sp;
 
-    public CommonConfig() {
+    public HasReadConfig() {
         sp = AllData.appContext.getSharedPreferences("common_config", Context.MODE_PRIVATE);
     }
 

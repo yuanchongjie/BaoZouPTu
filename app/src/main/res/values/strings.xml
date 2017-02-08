@@ -39,7 +39,7 @@
     <string name="prefer_pic">喜爱图片</string>
     <string name="setting">设置</string>
     <string name="title_activity_about_app">AboutAppActivity</string>
-    <string name="synthesis_image">融合</string>
+    <string name="synthesis_image">调色</string>
 
 
 </resources>

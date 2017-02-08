@@ -91,4 +91,17 @@
         <item name="android:layout_centerVertical">true</item>
         <item name="android:layout_alignParentRight">true</item>
     </style>
+
+    <style name="function_text">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/text_color1</item>
+        <item name="android:textSize">@dimen/text_size_main_function</item>
+    </style>
+
+    <style name="function_image">
+        <item name="android:paddingBottom">@dimen/padding_function_item_image</item>
+        <item name="android:paddingLeft">@dimen/padding_function_item_image</item>
+        <item name="android:paddingRight">@dimen/padding_function_item_image</item>
+        <item name="android:paddingTop">@dimen/padding_function_item_image</item>
+    </style>
 </resources>

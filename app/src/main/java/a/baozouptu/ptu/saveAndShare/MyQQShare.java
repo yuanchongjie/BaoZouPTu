@@ -57,7 +57,7 @@ public class MyQQShare extends Fragment {
     private class BaseUiListener implements IUiListener {
         @Override
         public void onComplete(Object o) {
-            Toast.makeText(mContext, "onComplete:", Toast.LENGTH_LONG).show();
+            //Toast.makeText(mContext, "onComplete:", Toast.LENGTH_LONG).show();
             doComplete((JSONObject) o);
         }
 
@@ -66,13 +66,14 @@ public class MyQQShare extends Fragment {
 
         @Override
         public void onError(UiError e) {
-            Toast.makeText(mContext, "onError:" + "code:" + e.errorCode + ", msg:"
-                    + e.errorMessage + "+detail:" + e.errorDetail, Toast.LENGTH_LONG).show();
+          /*  Toast.makeText(mContext, "onError:" + "code:" + e.errorCode + ", msg:"
+                    + e.errorMessage + "+detail:" + e.errorDetail, Toast.LENGTH_LONG).show();*/
+            Toast.makeText(mContext, "分享出错了！", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onCancel() {
-            Toast.makeText(mContext, "onCancel", Toast.LENGTH_LONG).show();
+          //  Toast.makeText(mContext, "onCancel", Toast.LENGTH_LONG).show();
         }
     }
 }

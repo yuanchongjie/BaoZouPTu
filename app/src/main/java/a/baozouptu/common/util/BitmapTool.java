@@ -32,12 +32,25 @@ public class BitmapTool {
 
 
     /**
-     * 获取并缩放路径下的图片 ，返回其Bitmap对象
+     * 解析出指定大小的图片 ，返回其Bitmap对象
      *
-     * @param path String 图片，
+     * @param path     String 图片，
+     * @param needWith 需要长边的宽
      * @return Bitmap 路径下适应大小的图片
      */
-    public static Bitmap charge(String path, int needWith) {
+    public static Bitmap decodeInSize(String path, int needWith) {
+        return decodeInSize(path, needWith, Bitmap.Config.ARGB_8888);
+    }
+
+    /**
+     * 解析出指定大小的图片 ，返回其Bitmap对象
+     *
+     * @param path      String 图片，
+     * @param needWidth 需要长边的宽
+     * @param config    格式配置
+     * @return Bitmap 路径下适应大小的图片
+     */
+    public static Bitmap decodeInSize(String path, int needWidth, Bitmap.Config config) {
         Bitmap bm = null;
         BitmapFactory.Options optsa = new BitmapFactory.Options();
         optsa.inJustDecodeBounds = true;
@@ -46,8 +59,8 @@ public class BitmapTool {
 
         optsa.inJustDecodeBounds = false;
         /** 不同尺寸图片的缩放比例 */
-        optsa.inSampleSize = (int) (Math.min(height, width) / needWith);
-        optsa.inPreferredConfig = Bitmap.Config.RGB_565;
+        optsa.inSampleSize = (int) (Math.min(height, width) / needWidth);
+        optsa.inPreferredConfig = config;
         optsa.inDither = true;
         bm = BitmapFactory.decodeFile(path, optsa);
         return bm;
@@ -80,17 +93,17 @@ public class BitmapTool {
      * @param bitmap 要保存的bitmap
      * @param result 结果监听器
      */
-    public static void asySaveTempBm(final String tempPath,final Bitmap bitmap, Subscriber<? super String> result) {
+    public static void asySaveTempBm(final String tempPath, final Bitmap bitmap, Subscriber<? super String> result) {
         //处理图片
         Observable.create(
                 new Observable.OnSubscribe<String>() {
                     @Override
                     public void call(Subscriber<? super String> subscriber) {
-                        Log.e("Bitmap toll ", "call: 发出事件 " +Thread.currentThread().getName());
-                        if(tempPath==null)subscriber.onError(new Throwable("创建文件件失败"));
+                        Log.e("Bitmap toll ", "call: 发出事件 " + Thread.currentThread().getName());
+                        if (tempPath == null) subscriber.onError(new Throwable("创建文件件失败"));
                         subscriber.onNext(tempPath);
-                        String result=saveBitmap(AllData.appContext, bitmap, tempPath);
-                        if(result.equals("success"))
+                        String result = saveBitmap(AllData.appContext, bitmap, tempPath);
+                        if (result.equals("success"))
                             subscriber.onNext(result);
                         else subscriber.onError(new Throwable("保存Bitmap失败"));
                     }
@@ -113,7 +126,6 @@ public class BitmapTool {
     }
 
     /**
-     *
      * @param isSendBroad 默认为false
      * @return 结果 成功为 "success"
      */

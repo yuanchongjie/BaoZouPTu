@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import a.baozouptu.common.appInfo.MyApplication;
 import a.baozouptu.common.util.FileTool;
 import a.baozouptu.common.util.GeoUtil;
 import a.baozouptu.common.util.Util;
@@ -124,7 +125,7 @@ public class RepealRedoManager<T> {
         baseCanvas.save();
         float centerX = (boundRect.left + boundRect.right) / 2, centerY = (boundRect.bottom + boundRect.top) / 2;
         //将realBm到图上
-        BitmapDrawable addDrawable = new BitmapDrawable(Util.MyApplication.getAppContext().getResources(), addBitmap);
+        BitmapDrawable addDrawable = new BitmapDrawable(MyApplication.appContext.getResources(), addBitmap);
         addDrawable.setDither(true);
         addDrawable.setAntiAlias(true);
         addDrawable.setFilterBitmap(true);

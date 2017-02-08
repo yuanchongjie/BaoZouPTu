@@ -4,8 +4,10 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,7 +16,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -31,11 +32,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import a.baozouptu.R;
+import a.baozouptu.chosePicture.ChosePictureActivity;
+import a.baozouptu.chosePicture.data.UsuPathManger;
+import a.baozouptu.common.appInfo.AppIniter;
 import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.dataAndLogic.MyDatabase;
 import a.baozouptu.common.util.Util;
-import a.baozouptu.chosePicture.ChosePictureActivity;
-import a.baozouptu.chosePicture.ProcessUsuallyPicPath;
 import a.baozouptu.ptu.PtuActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -47,6 +49,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initApp();
+        getScreenWidth();
+
 //关闭通知
 //nm.stop(0);
 
@@ -57,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             sendNotify();
         } else {
             setContentView(R.layout.activity_main);
-            initData();
             initToolbar();
 
             initview();
@@ -66,12 +70,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void initData() {
+    private void initApp() {
+        new AppIniter(this).init();
+    }
+
+    /**
+     * 获取屏幕的宽度
+     */
+    void getScreenWidth() {
         DisplayMetrics metric = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metric);
         AllData.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
         AllData.screenHeight = metric.heightPixels;
     }
+
 
     /**
      * 傻逼360开发平台
@@ -80,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //  testDB1();
         //  testDB();
-        initData();
         //  if (checkVersion()) {
         Intent intent = new Intent(this, ChosePictureActivity.class);
         intent.putExtra("test", "test");
@@ -92,7 +103,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void sendNotify() {
+        //如果设置为不允许则不发送
+        if(!AllData.settingDataSource.getSendShortcutNotify())
+            return;
         // 第一步：获取NotificationManager
+
         NotificationManager nm = (NotificationManager)
                 getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -135,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void testDB1() {
-        ProcessUsuallyPicPath ups = new ProcessUsuallyPicPath(this);
+        UsuPathManger ups = new UsuPathManger(this);
         ups.addUsedPath("1111");
         ups.addUsedPath("2222");
         ups.addUsedPath("3333");

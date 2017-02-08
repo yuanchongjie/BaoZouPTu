@@ -107,7 +107,7 @@ public class TietuFrameLayout extends FrameLayout {
                     //旋转
                     float curAngle = getAngle(x0, y0,
                             x1, y1);
-                    if (chosedView != null)
+                    if (chosedView != null && chosedView.showRim)
                         chosedView.setRotation(chosedView.getRotation() + curAngle - lastAngle);
                     lastAngle = curAngle;
                     //移动
@@ -176,59 +176,60 @@ public class TietuFrameLayout extends FrameLayout {
         updateViewLayout(chosedView, parmas);
     }
 
-    private void adjustBound(LayoutParams parmas, FloatImageView chosedView) {
+    private void adjustBound(LayoutParams params, FloatImageView chosenView) {
         View ptuView = ((FrameLayout) getParent()).getChildAt(0);
         if (ptuView instanceof PtuView) {
             int pad = FloatImageView.pad;
             Rect picBound = ((PtuView) ptuView).getPicBound();
-            parmas.leftMargin = Math.max(parmas.leftMargin,
-                    picBound.left + pad - chosedView.getWidth());//左边界判断
+            params.leftMargin = Math.max(params.leftMargin,
+                    picBound.left + pad - chosenView.getWidth());//左边界判断
 
-            parmas.topMargin = Math.max(parmas.topMargin,
-                    picBound.top - (chosedView.getHeight() - pad));//上边界
-            parmas.leftMargin = Math.min(parmas.leftMargin, picBound.right - pad);//右边界
-            parmas.topMargin = Math.min(parmas.topMargin, picBound.bottom - pad);//下边界
+            params.topMargin = Math.max(params.topMargin,
+                    picBound.top - (chosenView.getHeight() - pad));//上边界
+            params.leftMargin = Math.min(params.leftMargin, picBound.right - pad);//右边界
+            params.topMargin = Math.min(params.topMargin, picBound.bottom - pad);//下边界
             Util.P.le(TAG, "适配TietuView边界完成");
         }
     }
 
     /**
      * 缩放还给其它地方使用
-     * @param chosedView 被缩放的FloatImageView
+     *
+     * @param chosenView   被缩放的FloatImageView
      * @param currentRatio 需要缩放的比例
      */
-    public void scale(FloatImageView chosedView, float currentRatio) {
-        if (chosedView == null || !chosedView.showRim) return;//边框没显示出来，不缩放
-        currentRatio = adjustSize(chosedView, currentRatio);
-        TietuFrameLayout.LayoutParams parmas = (TietuFrameLayout.LayoutParams) chosedView.getLayoutParams();
+    public void scale(FloatImageView chosenView, float currentRatio) {
+        if (chosenView == null || !chosenView.showRim) return;//边框没显示出来，不缩放
+        currentRatio = adjustSize(chosenView, currentRatio);
+        TietuFrameLayout.LayoutParams parmas = (TietuFrameLayout.LayoutParams) chosenView.getLayoutParams();
         //=当前位置-当前距离 chosedView.getWidth()/2 缩放后多出来的currentRatio-1距离
-        parmas.leftMargin = Math.round (chosedView.getLeft() - chosedView.getWidth() / 2 * (currentRatio - 1));
-        parmas.topMargin = Math.round (chosedView.getTop() - chosedView.getHeight() / 2 * (currentRatio - 1));
-        parmas.width = Math.round (chosedView.getWidth() * currentRatio);
-        parmas.height = Math.round (parmas.width * chosedView.getHWRatio());
-        updateViewLayout(chosedView, parmas);
+        parmas.leftMargin = Math.round(chosenView.getLeft() - chosenView.getWidth() / 2 * (currentRatio - 1));
+        parmas.topMargin = Math.round(chosenView.getTop() - chosenView.getHeight() / 2 * (currentRatio - 1));
+        parmas.width = Math.round(chosenView.getWidth() * currentRatio);
+        parmas.height = Math.round(parmas.width * chosenView.getHWRatio());
+        updateViewLayout(chosenView, parmas);
         Util.P.le(TAG, "长宽比 " + parmas.width * 1f / parmas.height);
     }
 
-    private float adjustSize(FloatImageView chosedView, float currentRatio) {
-        currentRatio = Math.max(currentRatio, FloatImageView.minWidth * 1f / chosedView.getWidth());//大于最小宽
-        currentRatio = Math.min(currentRatio, AllData.screenWidth * 1.2f / chosedView.getWidth());//小于最大宽
-        currentRatio = Math.max(currentRatio, FloatImageView.minHeight * 1f / chosedView.getHeight());//大于最小高
-        currentRatio = Math.min(currentRatio, AllData.screenHeight * 1.2f / chosedView.getHeight());
+    private float adjustSize(FloatImageView chosenView, float currentRatio) {
+        currentRatio = Math.max(currentRatio, FloatImageView.minWidth * 1f / chosenView.getWidth());//大于最小宽
+        currentRatio = Math.min(currentRatio, AllData.screenWidth * 1.2f / chosenView.getWidth());//小于最大宽
+        currentRatio = Math.max(currentRatio, FloatImageView.minHeight * 1f / chosenView.getHeight());//大于最小高
+        currentRatio = Math.min(currentRatio, AllData.screenHeight * 1.2f / chosenView.getHeight());
         return currentRatio;
     }
 
-    public void removeFloatView(FloatImageView chosedView) {
+    public void removeFloatView(FloatImageView chosenView) {
         if (tietuChangeListener != null)
-            tietuChangeListener.onTietuRemove(chosedView);
-        removeView(chosedView);
+            tietuChangeListener.onTietuRemove(chosenView);
+        removeView(chosenView);
     }
 
     /**
      * View被选中的时候，会先判断是否与选中相同，相同者不变化
      * 否则显示边框
      */
-    void onChosedView(FloatImageView childView) {
+    void onChosenView(FloatImageView childView) {
         if (childView.equals(chosedView))
             chosedView.setShowRim(true);
         else {

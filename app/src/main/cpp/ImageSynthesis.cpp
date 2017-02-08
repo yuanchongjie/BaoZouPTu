@@ -8,10 +8,6 @@
 #include <android/log.h>
 #include<android/bitmap.h>
 
-#include <opencv2/core.hpp>
-#include<opencv2/photo.hpp>
-#include <opencv2/imgproc.hpp>
-
 #include "MyUtil.h"
 #include "ColorTransfer.h"
 #include"NewColorTransfer.h"
@@ -69,17 +65,17 @@ Java_a_baozouptu_ptu_tietu_pictureSynthesis_PictureSynthesis_synthesisBm(JNIEnv 
         LOGE("获取图片bitmap失败");
         return NULL;
     }
-    LOGE("JNI PictureSynthesis：  under获取到的宽%d", underInfo.width);
+   /* LOGE("JNI PictureSynthesis：  under获取到的宽%d", underInfo.width);
     LOGE("JNI PictureSynthesis：  under获取到的高%d", underInfo.height);
     LOGE("JNI PictureSynthesis：  above获取到的宽%d", aboveInfo.width);
-    LOGE("JNI PictureSynthesis：  above获取到的高%d", aboveInfo.height);
+    LOGE("JNI PictureSynthesis：  above获取到的高%d", aboveInfo.height);*/
 
     Mat m_under(underInfo.height, underInfo.width, CV_8UC4, underPixes);
     Mat m_above(aboveInfo.height, aboveInfo.width, CV_8UC4, abovePixes);
 
 
     int w=m_above.cols,h=m_above.rows;
-    bool **transparentInfo=createVisArray(w,h);
+    uchar **transparentInfo= createArray(w, h);
     recordTransparentInfo(m_above,transparentInfo);
 
     LOGE("Java层传入的图转换为Mat成功");
@@ -90,7 +86,8 @@ Java_a_baozouptu_ptu_tietu_pictureSynthesis_PictureSynthesis_synthesisBm(JNIEnv 
         return NULL;
     }
     restoreTransparentInfo(mat_result,transparentInfo);
-    edge_blur(transparentInfo, mat_result);
+    deleteVisArray(transparentInfo,h);
+   // edge_blur(transparentInfo, mat_result);
 
 
     AndroidBitmap_unlockPixels(env, under);

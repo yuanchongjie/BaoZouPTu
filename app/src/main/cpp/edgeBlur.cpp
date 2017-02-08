@@ -23,15 +23,12 @@ int w = 100, h = 100;
 /**
  * 记录下透明像素的信息
  */
-void recordTransparentInfo(Mat &src, bool **transInfo) {
-    int *p = (int *) src.data;
+void recordTransparentInfo(Mat &src, uchar **transInfo) {
+    uchar *p = src.data;
     int w = src.cols, h = src.rows;
     for (int i = 0; i < h; i++) {
-        LOGE("第一个元素的值%d", p[i * w + w / 2]>>24);
         for (int j = 0; j < w; j++) {
-
-            if (p[i * w + j] >> 24 != -1) transInfo[i][j] = 0;
-            else transInfo[i][j] = 1;
+            transInfo[i][j] = p[i * w * 4 + j * 4+3];
         }
     }
 }
@@ -39,26 +36,25 @@ void recordTransparentInfo(Mat &src, bool **transInfo) {
 /**
  * 恢复透明像素的信息
  */
-void restoreTransparentInfo(Mat &src, bool **transInfo) {
-    int *p = (int *) src.data;
+void restoreTransparentInfo(Mat &src, uchar **transInfo) {
+    uchar *p = src.data;
     int w = src.cols, h = src.rows;
     for (int i = 0; i < h; i++)
         for (int j = 0; j < w; j++)
-            if (transInfo[i][j] == 0)
-                p[i * w + j] = 0;
+            p[i * w * 4 + j*4+3] = transInfo[i][j];
 }
 
-bool **createVisArray(int w, int h) {
-    bool **p = new bool *[h];
+uchar **createArray(int w, int h) {
+    uchar **p = new uchar *[h];
     for (int i = 0; i < h; i++) {
-        p[i] = new bool[w];
+        p[i] = new uchar[w];
         for (int j = 0; j < w; j++)
-            p[i][j] = false;
+            p[i][j] = 0;
     }
     return p;
 }
 
-void deleteVisArray(bool **&p, int h) {
+void deleteVisArray(uchar ** &p, int h) {
     for (int i = 0; i < h; i++)
         delete[] p[i];
     delete[] p;
@@ -66,7 +62,7 @@ void deleteVisArray(bool **&p, int h) {
 
 /*进行边界模糊的算法，没成功
  */
- struct MyPoint {
+struct MyPoint {
     int x, y;
 
     MyPoint(int xx, int yy) {
@@ -83,7 +79,7 @@ bool isDivideMyPoint(int y, int x, int *pic) {
     for (int i = 0; i < 4; i++) {
         int ny = y + di4[i][0], nx = x + di4[i][1];
         if ((nx < 0 || nx >= w || ny < 0 || ny >= h) ||
-            pic[ny * w + nx] >>24 != -1)//相邻8个点中有空白点或者到了边界，一定是分界点
+            pic[ny * w + nx] >> 24 != -1)//相邻8个点中有空白点或者到了边界，一定是分界点
             return true;
     }
     return false;
@@ -93,7 +89,7 @@ void dfs(MyPoint st, vector<MyPoint> &edgeP, int *pic, bool **vis) {
     for (int i = 0; i < 8; i++) {
         int nx = st.y + di8[i][0], ny = st.x + di8[i][1];
         if ((nx < 0 || nx >= w || ny < 0 || ny >= h) || vis[ny][nx] ||
-            pic[ny * w + nx] >>24 != -1)//是透明或者边界点，不管
+            pic[ny * w + nx] >> 24 != -1)//是透明或者边界点，不管
             continue;
         else if (isDivideMyPoint(ny, nx, pic))//如果非透明点，再判断是否是边界点，是加入并深度访问
         {
@@ -111,7 +107,7 @@ vector<MyPoint> searchEdge(bool **vis, int w, int h, int *pic) {
     for (int i = 0; i < h; i++) {
         int j;
         for (j = 0; j < w; j++)
-            if (pic[i * w + j]>>24 == -1) {//找到完全不透明的点
+            if (pic[i * w + j] >> 24 == -1) {//找到完全不透明的点
                 st.y = i;
                 st.x = j;
                 break;
@@ -163,15 +159,15 @@ void blur(vector<MyPoint> &edgeP, int *pic) {
 }
 
 Mat edge_blur(bool **vis, Mat src) {
-    h = src.rows;
+    /*  h = src.rows;
     w = src.cols;
-    int *pic = (int *) src.data;
+  int *pic = (int *) src.data;
     initVisArray(vis, w, h);
     vector<MyPoint> edgeP = searchEdge(vis, w, h, pic);
     LOGE("边界点的数量：%d", edgeP.size());
     blur(edgeP, pic);
     deleteVisArray(vis, h);
-    edgeP.clear();
+    edgeP.clear();*/
     return src;
 }
 

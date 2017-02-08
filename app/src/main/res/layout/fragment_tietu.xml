@@ -36,11 +36,13 @@
             android:src="@mipmap/more" />
 
         <TextView
+            style="@style/function_text"
             android:layout_width="@dimen/function_width"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:text="本地"
             android:gravity="center"
-            android:text="更多"
+            android:layout_gravity="center_horizontal"
             android:textColor="@color/text_color1"
             android:textSize="@dimen/text_size_main_function" />
 

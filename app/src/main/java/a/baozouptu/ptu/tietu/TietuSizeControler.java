@@ -1,12 +1,12 @@
 package a.baozouptu.ptu.tietu;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.widget.FrameLayout;
 
 import a.baozouptu.common.dataAndLogic.AllData;
+import a.baozouptu.common.util.BitmapTool;
 
 /**
  * Created by liuguicen on 2016/9/29.
@@ -111,5 +111,12 @@ public class TietuSizeControler {
         parmas.leftMargin=picBound.left+mleft;
         parmas.topMargin=picBound.top+mtop;
         return parmas;
+    }
+
+    public static Bitmap getBitmap2Transfer(String path) {
+        return BitmapTool.decodeInSize(path,500);
+    }
+    public static Bitmap getBitmap2Transfer(int id){
+        return BitmapFactory.decodeResource(AllData.appContext.getResources(),id);
     }
 }

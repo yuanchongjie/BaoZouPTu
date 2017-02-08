@@ -31,7 +31,7 @@ public class CustomToast {
         View layout = inflater.inflate(R.layout.layout_custom_toast, null);
 
         TextView textView = (TextView) layout.findViewById(R.id.tv_toast);
-        textView.setText(msg);
+        textView.setText(" "+msg+" ");
 
 
         sToast = new Toast(act.getApplicationContext());

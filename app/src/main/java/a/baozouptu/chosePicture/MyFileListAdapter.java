@@ -2,6 +2,7 @@ package a.baozouptu.chosePicture;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import a.baozouptu.R;
+import a.baozouptu.chosePicture.data.PicDirInfo;
 import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.dataAndLogic.AsyncImageLoader3;
 
@@ -21,27 +23,24 @@ import a.baozouptu.common.dataAndLogic.AsyncImageLoader3;
  * @author acm_lgc
  */
 public class MyFileListAdapter extends BaseAdapter {
+    private final List<PicDirInfo> picDirInfos;
     Context mContext;
-    List<String> picFileInfoList;
 
-    List<String> representPicturePathList;
     AsyncImageLoader3 asyLoader3 = AsyncImageLoader3.getInstance();
 
-    private LayoutInflater  layoutInflater;
+    private LayoutInflater layoutInflater;
 
-    MyFileListAdapter(Context context,List<String> list, List<String> picPathList) {
-        mContext=context;
-        picFileInfoList = list;
-        representPicturePathList = picPathList;
+    MyFileListAdapter(Context context, List<PicDirInfo> picDirInfos) {
+        mContext = context;
+        this.picDirInfos = picDirInfos;
         layoutInflater = LayoutInflater
                 .from(mContext);
     }
 
 
-
     @Override
     public int getCount() {
-        return picFileInfoList.size();
+        return picDirInfos.size();
     }
 
     @Override
@@ -63,7 +62,6 @@ public class MyFileListAdapter extends BaseAdapter {
     public View getView(final int position, View convertView,
                         ViewGroup parent) {
         final ViewHolder viewHolder;
-
         if (convertView == null) {
             viewHolder = new ViewHolder();
             convertView = layoutInflater.inflate(
@@ -77,12 +75,12 @@ public class MyFileListAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.ivText.setText(picFileInfoList.get(position));
+        viewHolder.ivText.setText(picDirInfos.get(position).getPicNumInfo());
         // 这个地方主义，imageLoader启动了一个新线程获取图片到cacheImage里面，新线程运行，本线程也会运行，
         // 因为新线程耗时，所以本线程已经执行到后面了，先加载了一张预设的图片，然后这个新线程会使用handler类更新UI线程，
         // 妙啊！
         Bitmap cacheBitmap = asyLoader3.loadBitmap(
-                representPicturePathList.get(position), viewHolder.ivImage, position,
+                picDirInfos.get(position).getRepresentPicPath(), viewHolder.ivImage, position,
                 new AsyncImageLoader3.ImageCallback() {
                     public void imageLoaded(Bitmap imageDrawable,
                                             ImageView image, int poition, String imageUrl) {
@@ -95,6 +93,7 @@ public class MyFileListAdapter extends BaseAdapter {
         } else {
             viewHolder.ivImage.setImageBitmap(cacheBitmap);
         }
+
         return convertView;
     }
 

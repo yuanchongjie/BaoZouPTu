@@ -1,4 +1,4 @@
-package a.baozouptu.ptu.control;
+package a.baozouptu.ptu.common;
 
 import android.annotation.TargetApi;
 import android.app.Fragment;

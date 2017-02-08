@@ -18,8 +18,8 @@ public class Comment extends BmobObject{
      * @param comment 反馈意见
      */
     Comment(String comment){
-        userIdentify= new UserExclusiveIdentify(AllData.appContext).toString();
         this.comment=comment;
+        this.userIdentify=UserExclusiveIdentify.getExclusiveIndentify();
     }
 
 
@@ -39,7 +39,6 @@ public class Comment extends BmobObject{
     }
 
     public String getUserIdentify() {
-
         return userIdentify;
     }
 

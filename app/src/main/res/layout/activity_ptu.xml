@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <!--   <android.support.v7.widget.Toolbar
-            android:id="@+id/ptu_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:clipToPadding="true"
-            android:fitsSystemWindows="true"
-            android:background="@color/base_toolbar_background"
-            app:contentInsetLeft="0dp"
-            app:contentInsetStart="0dp"
-            >-->
     <a.baozouptu.ptu.view.PtuTopRelativeLayout
         android:id="@+id/ptu_toolbar_relative"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/my_toolbar_height"
-        android:background="@color/base_toolbar_background">
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:background="@color/base_toolbar_background"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/ptu_frame"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
 
         <LinearLayout
             android:id="@+id/ptu_top_center"
@@ -28,26 +24,36 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:background="#0000"
-            android:orientation="horizontal"></LinearLayout>
+            android:orientation="horizontal" />
     </a.baozouptu.ptu.view.PtuTopRelativeLayout>
+
+
 
     <a.baozouptu.ptu.view.PtuFrameLayout
         android:id="@+id/ptu_frame"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="85"
-        android:background="#eee">
+        app:layout_constraintVertical_weight="85"
+        android:background="#eee"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ptu_toolbar_relative"
+        app:layout_constraintBottom_toTopOf="@+id/fragment_main_function">
 
         <a.baozouptu.ptu.view.PtuView
             android:id="@+id/ptu_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"  />
     </a.baozouptu.ptu.view.PtuFrameLayout>
 
     <FrameLayout
         android:id="@+id/fragment_main_function"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="11"
-        android:background="#0000" />
-</LinearLayout>
+        app:layout_constraintVertical_weight="11"
+        android:background="#0000"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ptu_frame"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</android.support.constraint.ConstraintLayout>

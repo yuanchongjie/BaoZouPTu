@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import a.baozouptu.R;
+import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.dataAndLogic.ShareDBUtil;
 import a.baozouptu.common.dataAndLogic.MyDatabase;
 import a.baozouptu.common.util.Util;
@@ -109,7 +110,7 @@ public class SaveSetDialogManager {
 
     private void getShareInfo() {
         MyDatabase myDatabase = MyDatabase.getInstance(mContext);
-        List<Pair<String,String>> preferShare = new ArrayList<>();
+        List<Pair<String, String>> preferShare = new ArrayList<>();
         try {
             myDatabase.queryAllPreferShare(preferShare);
         } catch (IOException e) {
@@ -142,7 +143,7 @@ public class SaveSetDialogManager {
 
                     @Override
                     public void onItemClick(View view, ListDrawableItem data) {
-                        Util.P.le("Savaset", "item受到点击");
+                        Util.P.le("Savaset", "分享受到点击");
                         String picPath = listenner.onShareItemClick(saveRatio);
                         if (picPath == null) {
                             Toast.makeText(mContext, "文件保存失败，无法分享", Toast.LENGTH_SHORT).show();
@@ -153,17 +154,19 @@ public class SaveSetDialogManager {
                         ResolveInfo resolveInfo = resolveInfos.get(clickPosition);
 
                         //将优先信息添加到数据库
-                        String packageName=resolveInfo.activityInfo.packageName;
+                        String packageName = resolveInfo.activityInfo.packageName;
                         String title = resolveInfo.loadLabel(mContext.getPackageManager()).toString();
-                        ShareDBUtil.inseartPreferInfo(mContext,packageName,title);
-                        if(title.equals("发送给好友"))
-                        {
+                        ShareDBUtil.inseartPreferInfo(mContext, packageName, title);
+                        //是腾讯的分享且用户设置可带有应用图标
+                        if (title.equals("发送给好友")
+                                && packageName.equals("com.tencent.mobileqq")
+                                && !AllData.settingDataSource.getSharedWithout()) {
                             myQQShare = new MyQQShare();
-                            ((AppCompatActivity)mContext).getFragmentManager().beginTransaction().add(
-                                    myQQShare,"MyQQShare"
+                            ((AppCompatActivity) mContext).getFragmentManager().beginTransaction().add(
+                                    myQQShare, "MyQQShare"
                             ).commit();
-                            myQQShare.share(picPath,mContext);
-                        }else {
+                            myQQShare.share(picPath, mContext);
+                        } else {
                             //如果shareType是Image，那么分享的内容应该为图片在SD卡的路径
                             ShareUtil.exeShare(mContext, "图片分享", resolveInfo, picPath, ShareUtil.Type.Image);
                         }
@@ -171,8 +174,9 @@ public class SaveSetDialogManager {
                     }
                 });
     }
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        myQQShare.onActivityResult(requestCode,resultCode,data);
+        myQQShare.onActivityResult(requestCode, resultCode, data);
     }
 
     private void setChoseSizeUi() {

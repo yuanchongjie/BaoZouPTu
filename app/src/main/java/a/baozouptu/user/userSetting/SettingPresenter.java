@@ -7,7 +7,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.widget.Toast;
 
-import a.baozouptu.common.dataAndLogic.AllData;
+import java.util.Arrays;
+
 import a.baozouptu.common.util.CustomToast;
 
 /**
@@ -46,12 +47,27 @@ public class SettingPresenter implements SettingContract.Presenter {
     }
 
     private String getAppCache() {
-        return "清除缓存" + "(" + dataSource.getAppCacheSize() + "M)";
+        return "清除缓存" + "(" + dataSource.getAppDataSize() + "M)";
     }
 
     @Override
-    public void clearAppCache() {
-        dataSource.clearAppCache();
+    public void clearAppData() {
+        String[] dataItemInfos = dataSource.getDataItemInfos();
+        boolean[] preChosen = new boolean[dataItemInfos.length];
+        Arrays.fill(preChosen, true);
+        view.showClearDialog(dataItemInfos, preChosen);
+    }
+
+    @Override
+    public void realClearData(boolean[] userChosenItems) {
+        String res = dataSource.clearAppCache(userChosenItems);
+        if(res.isEmpty())
+            res="清除成功";
+        else
+            res = "清除成功!" + res+"未清除";
+        view.showClearResult(res);
+        //除以清除完成之后刷新视图
+        view.showAppCache(getAppCache());
     }
 
     @Override

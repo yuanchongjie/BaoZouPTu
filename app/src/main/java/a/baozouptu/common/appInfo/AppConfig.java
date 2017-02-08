@@ -2,28 +2,40 @@ package a.baozouptu.common.appInfo;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 import a.baozouptu.common.dataAndLogic.AllData;
-import a.baozouptu.ptu.common.PtuData;
 
 /**
  * Created by liuguicen on 2016/8/13.
  * <p> 本App的一些信息，特别升级的时候挺多的信息要记录，因为你不知道是从哪个版本升级过来的
  * <p> app版本，数据库版本,..
- *
+ * <p>
  * <p><p>
  * //各个历史版本，别删
- * <p>public final static float APPVERSION_1_0 = 1.0f;
- * <p>public final static float APPVERSION_1_1 = 1.1f;
+ * <p>public final static float APP_VERSION_1 = 1.0f;
+ * <p>public final static float APP_VERSION_2 = 1.1f;
  * <p>public final static int DATABASE_VERSION_2 = 2;
  * <p>public final static int DATABASE_VERSION_3=3;
  */
 public class AppConfig {
     //各个历史版本，别删
-    public final static float APPVERSION_1_0 = 1.0f;
-    public final static float APPVERSION_1_1 = 1.1f;
-    public final static float CUR_APPVERSION = APPVERSION_1_1;
+    private static PackageInfo pi;
+    static {
+        PackageManager pm = MyApplication.appContext.getPackageManager();
+        try {
+            pi = pm.getPackageInfo(MyApplication.appContext.getPackageName(), PackageManager.GET_ACTIVITIES);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public final static int APP_VERSION_1 = 1;
+    public final static int APP_VERSION_2 = pi.versionCode;
+    public final static String CUR_VERSION_NAME = pi.versionName;
+    public final static int CUR_APP_VERSION = APP_VERSION_2;
     public final static int DATABASE_VERSION_2 = 2;
     public final static int DATABASE_VERSION_3 = 3;
     public final static int CUR_DATABASE_VERSION = DATABASE_VERSION_3;
@@ -34,20 +46,20 @@ public class AppConfig {
         return CUR_DATABASE_VERSION;
     }
 
-    public static float getAppversion() {
-        return CUR_APPVERSION;
+    public static int getAppversion() {
+        return CUR_APP_VERSION;
     }
 
     public AppConfig(Context globalContext) {
         sp = AllData.appContext.getSharedPreferences("appConfig", Context.MODE_PRIVATE);
     }
 
-    public float readAppVersion() {
-        return sp.getFloat("app_version", -1);
+    public int readAppVersion() {
+        return sp.getInt("app_version", -1);
     }
 
     public void writeCurAppVersion() {
-        sp.edit().putFloat("app_version", CUR_APPVERSION)
+        sp.edit().putInt("app_version", CUR_APP_VERSION)
                 .apply();
     }
 
@@ -67,6 +79,7 @@ public class AppConfig {
         spEditor.remove("text_rubber");
         spEditor.remove("go_send");
         spEditor.remove("usu_pic_use");
+        spEditor.remove("isNewInstall");
         if (!spEditor.commit()) {
             Log.e("暴走P图", "移除1.0版本Config信息失败");
         }
@@ -74,5 +87,14 @@ public class AppConfig {
 
     public boolean hasNewInstall() {
         return sp.contains("isNewInstall");
+    }
+
+    public void writeSendDeviceInfo(boolean isSend){
+        SharedPreferences.Editor spEditor = sp.edit();
+        //移除1.0版本的ptu上的配置信息，当时模块划分不清晰，也没考虑到模块会变大，变大之后这里变得复杂难写了
+        spEditor.putBoolean("has_send_device",isSend).apply();
+    }
+    public boolean hasSendDeviceInfos() {
+        return sp.getBoolean("has_send_device", false);
     }
 }

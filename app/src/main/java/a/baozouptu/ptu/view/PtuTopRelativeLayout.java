@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,7 +82,6 @@ public class PtuTopRelativeLayout extends RelativeLayout {
     public View createReturn(int top_btn_width) {
         returnLayout = (LinearLayout) LayoutInflater.from(mContext)
                 .inflate(R.layout.layout_ptu_return, null);
-        returnLayout.setBackground(Util.getDrawable(R.drawable.btn_pressable_background_rectangle));
         ImageView returnImage = (ImageView) returnLayout.findViewById(R.id.ptu_return_image);
         returnImage.setImageBitmap(IconBitmapCreator.createReturnIcon(
                 top_btn_width,
@@ -92,7 +92,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
 
     public void addReturn() {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT);
         params.setMargins(Util.dp2Px(12), 0, 0, 0);
         params.addRule(RelativeLayout.CENTER_VERTICAL);
         if (returnLayout.getParent() != null) {
@@ -114,7 +114,7 @@ public class PtuTopRelativeLayout extends RelativeLayout {
 
     public void addSaveSet() {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT);
         params.addRule(RelativeLayout.CENTER_VERTICAL);
         params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN)

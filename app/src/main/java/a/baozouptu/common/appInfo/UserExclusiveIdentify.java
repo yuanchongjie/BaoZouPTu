@@ -1,6 +1,7 @@
 package a.baozouptu.common.appInfo;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings;
@@ -8,6 +9,8 @@ import android.telephony.TelephonyManager;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import a.baozouptu.common.dataAndLogic.AllData;
 
 import static android.content.Context.TELEPHONY_SERVICE;
 
@@ -17,21 +20,14 @@ import static android.content.Context.TELEPHONY_SERVICE;
  * 综合多种方法，取MD5值，目前没有单一可行的方法
  */
 public class UserExclusiveIdentify {
-    Context context;
-
-    public UserExclusiveIdentify(Context context) {
-        this.context = context;
-    }
-
     /**
      * The IMEI: 仅仅只对Android手机有效:
      * 需要通话权限，对用户体验以一定影响
      */
-    private String getIMEI() {
-        TelephonyManager TelephonyMgr = (TelephonyManager) context.getSystemService(TELEPHONY_SERVICE);
+    private static String getIMEI() {
+        TelephonyManager TelephonyMgr = (TelephonyManager) MyApplication.appContext.getSystemService(TELEPHONY_SERVICE);
         String szImei = TelephonyMgr.getDeviceId();
         return szImei + "";
-
     }
 
     /**
@@ -41,7 +37,7 @@ public class UserExclusiveIdentify {
      * <p>这样计算出来的ID不是唯一的（因为如果两个手机应用了同样的硬件以及Rom 镜像）。但出现类似情况的可能性基本可以忽略。
      * <p> 要实现这一点，你可以使用Build类
      */
-    private String getPseudoUniqueId() {
+    private static String getPseudoUniqueId() throws Exception {
         String m_szDevIDShort = "35" + //we make this look like a valid IMEI
                 Build.BOARD.length() % 10 +
                 Build.BRAND.length() % 10 +
@@ -62,11 +58,10 @@ public class UserExclusiveIdentify {
     /**
      * The Android ID
      * 通常被认为不可信，因为它有时为null。
-     * 开发文档中说明了：如果进行了出厂设置,这个ID会改变.
-     * 如果某个Andorid手机被Root过的话，这个ID也可以被任意改变。
+     * 开发文档中说明了：如果进行了出厂设置或者被Root过的话,这个ID会改变.
      */
-    private String getTheAndroidID() {
-        String m_szAndroidID = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+    private static String getTheAndroidID() throws Exception {
+        String m_szAndroidID = Settings.Secure.getString(MyApplication.appContext.getContentResolver(), Settings.Secure.ANDROID_ID);
         return m_szAndroidID + "";
     }
 
@@ -74,8 +69,8 @@ public class UserExclusiveIdentify {
      * The WLAN MAC Address string
      * 是另一个唯一ID。但是你需要为你的工程加入android.permission.ACCESS_WIFI_STATE 权限，否则这个地址会为null。
      */
-    private String getWLAN_MAC() {
-        WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+    private static String getWLAN_MAC() throws Exception {
+        WifiManager wm = (WifiManager) MyApplication.appContext.getSystemService(Context.WIFI_SERVICE);
         String m_szWLANMAC = wm.getConnectionInfo().getMacAddress();
         return m_szWLANMAC + "";
     }
@@ -87,9 +82,19 @@ public class UserExclusiveIdentify {
      * @return 可产生32位的16进制数据:
      * 比如 9DDDF85AFF0A87974CE4541BD94D5F55
      */
-    public String getExclusiveIndentify() {
-        String m_szLongID ="S"+getIMEI()+ getPseudoUniqueId() + getTheAndroidID()
-                + getWLAN_MAC();
+    public static String getExclusiveIndentify() {
+        SharedPreferences sp = AllData.appContext.getSharedPreferences("appConfig", Context.MODE_PRIVATE);
+        String deviceIdentify = sp.getString("device_identify", null);
+        if (deviceIdentify != null)
+            return deviceIdentify;
+
+        String m_szLongID = "S";
+        try {
+            m_szLongID += getIMEI() + getPseudoUniqueId() + getTheAndroidID()
+                    + getWLAN_MAC();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 // compute md5
         MessageDigest m = null;
         try {
@@ -111,11 +116,8 @@ public class UserExclusiveIdentify {
             m_szUniqueID += Integer.toHexString(b);
         }   // hex string to uppercase
         m_szUniqueID = m_szUniqueID.toUpperCase();
+        SharedPreferences.Editor editor=sp.edit();
+        editor.putString("device_identify",m_szUniqueID).apply();
         return m_szUniqueID;
-    }
-
-    @Override
-    public String toString() {
-        return getExclusiveIndentify();
     }
 }

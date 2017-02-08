@@ -14,6 +14,7 @@ import java.util.List;
 
 import a.baozouptu.R;
 import a.baozouptu.common.dataAndLogic.AllData;
+import a.baozouptu.common.dataAndLogic.AsyncImageLoader3;
 
 
 /**
@@ -21,7 +22,7 @@ import a.baozouptu.common.dataAndLogic.AllData;
  *
  * @description
  */
-class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> implements View.OnClickListener {
+class TietuRecyclerAdapter extends RecyclerView.Adapter<TietuRecyclerAdapter.MyViewHolder> implements View.OnClickListener {
 
     /**
      * 其中的ImageView iv会放入路径
@@ -40,7 +41,7 @@ class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder>
     private final List<Integer> tietuIds;
     private Context mContext;
 
-    RecyclerAdapter(Context context, List<Integer> tietuIds) {
+    TietuRecyclerAdapter(Context context, List<Integer> tietuIds) {
         mContext = context;
         this.tietuIds = tietuIds;
     }
@@ -70,14 +71,25 @@ class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder>
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         holder.iv.setTag(tietuIds.get(position));
-
-        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), tietuIds.get(position));
+       // AsyncImageLoader3 imageLoader = AsyncImageLoader3.getInstance();
+       // Bitmap bitmap = imageLoader.getBitmap(tietuIds.get(position));
+        Bitmap bitmap=BitmapFactory.decodeResource(mContext.getResources(),tietuIds.get(position));
         if (bitmap != null)
             holder.iv.setImageBitmap(bitmap);
-        else
+        else {
             holder.iv.setImageResource(R.mipmap.instead_icon);
+           // imageLoader.loadBitmap(tietuIds.get(position), holder.iv, position, imageCallback, AllData.screenWidth / 3);
+        }
     }
 
+    private AsyncImageLoader3.ImageCallback imageCallback = new AsyncImageLoader3.ImageCallback() {
+        @Override
+        public void imageLoaded(Bitmap imageDrawable, ImageView image, int position, String imageUrl) {
+            if (image != null && position == (int) image.getTag())
+                if (imageDrawable != null)
+                    image.setImageBitmap(imageDrawable);
+        }
+    };
 
     @Override
     public int getItemCount() {

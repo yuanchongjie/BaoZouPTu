@@ -4,7 +4,8 @@ import android.content.Context;
 import android.os.Environment;
 
 import a.baozouptu.common.appInfo.AppConfig;
-import a.baozouptu.common.util.Util;
+import a.baozouptu.common.appInfo.MyApplication;
+import a.baozouptu.user.userSetting.SettingDataSource;
 
 /**
  * 保存应用所需的一些常用通用的数据项
@@ -31,18 +32,15 @@ public class AllData {
      */
     public final static int PIC_FILE_SIZE_MAX = 100000*1000;
 
-    public static long lastScanTime = 0;
     public static AsyncImageLoader3 imageLoader3 = AsyncImageLoader3.getInstance();
     public static final String TAG="LOL";
-    public static AppConfig appConfig;
-    public static CommonConfig commonConfig;
     public static final String appFilePathDefault = Environment.getExternalStorageDirectory().getAbsolutePath() + "/暴走P图/";
     public static final String zitiDir=appFilePathDefault+"字体/";
     public static final String picDir=appFilePathDefault+"暴走P图-制作表情/";
-    public static final Context appContext= Util.MyApplication.getAppContext();
+    public static final Context appContext= MyApplication.appContext;
 
-    public static void init(Context appContext) {
-        appConfig = new AppConfig(appContext);
-        commonConfig=new CommonConfig();
-    }
+    //一些基本配置
+    public static AppConfig appConfig;
+    public static HasReadConfig hasReadConfig;
+    public static SettingDataSource settingDataSource;
 }

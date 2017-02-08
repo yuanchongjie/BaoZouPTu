@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 
 import a.baozouptu.common.dataAndLogic.AllData;
+import okio.Okio;
 
 /**
  * 主要用于获取图片文件夹下的所有图片的路径，图片大小支取5k-6000k的见方法注解
@@ -115,7 +116,11 @@ public class FileTool {
         return false;
     }
 
-    public static String getApplacationDir(Context context) {
+    public static String getFileNameInPath(String path) {
+        return path.substring(path.lastIndexOf("/") + 1, path.length());
+    }
+
+    public static String getApplicationDir(Context context) {
         return context.getApplicationContext().getFilesDir().getAbsolutePath();
     }
 
@@ -124,8 +129,8 @@ public class FileTool {
     }
 
     public static String createTempPicPath(Context context) {
-        String appPath = getApplacationDir(context);
-        String tempDir = appPath + "/tempPic/text";
+        String appPath = getApplicationDir(context);
+        String tempDir = appPath + "/tempPic";
         File file = new File(tempDir);
         if (!file.exists()) {
             {
@@ -140,6 +145,30 @@ public class FileTool {
         String time = formatter.format(curDate);
         String tempPath = tempDir + "/text_step_bm" + time + ".png";
         return tempPath;
+    }
+
+    /**
+     * 处理路径不存在的情况
+     *
+     * @param file 文件
+     * @return 是否创建成功
+     */
+    public static boolean createNewFile(File file) {
+        //处理目录
+        File dir = file.getParentFile();
+        if (!dir.exists()) {
+            if (!dir.mkdirs())
+                return false;
+        }
+        //文件
+        if (!file.exists())
+            try {
+                return file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        return true;
     }
 
     /**
@@ -163,6 +192,32 @@ public class FileTool {
         }
         // 若是目录，此时为空，可以删除
         return dir.delete();
+    }
+
+    public static long getFileSize(File dir) {
+        long size = 0;
+        if (dir.isDirectory()) {
+            File[] children = dir.listFiles();
+            //递归删除目录中的子目录下
+            for (File file : children) {
+                size += getFileSize(file);
+            }
+        } else
+            size += dir.length();
+        return size;
+    }
+
+    //删除文件夹中所有存在的子文件
+    public static boolean deleteAllChileFile(File dir) {
+        if (dir.isDirectory()) {
+            File[] children = dir.listFiles();
+            //递归删除目录中的子目录下
+            for (File file : children) {
+                boolean success = deleteDir(file);
+                if (!success) return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -295,4 +350,5 @@ public class FileTool {
     public static String getParentPath(String path) {
         return path.substring(0, path.lastIndexOf('/'));
     }
+
 }

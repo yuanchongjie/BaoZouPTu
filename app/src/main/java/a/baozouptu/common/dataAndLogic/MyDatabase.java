@@ -177,7 +177,7 @@ public class MyDatabase {
         while (cursor.moveToNext()) {
             cursor.moveToNext();
         }*/
-        db.execSQL("insert into prefer_share(packageName,title,time) values(?,?,?) ", new Object[]{packageName,title, String.valueOf(time)});
+        db.execSQL("replace into prefer_share(packageName,title,time) values(?,?,?) ", new Object[]{packageName,title, String.valueOf(time)});
     }
 
     /**

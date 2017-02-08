@@ -22,8 +22,6 @@ import android.widget.FrameLayout;
 import java.util.ArrayList;
 
 import a.baozouptu.R;
-import a.baozouptu.common.util.BitmapTool;
-import a.baozouptu.common.util.FileTool;
 import a.baozouptu.common.util.GeoUtil;
 import a.baozouptu.common.util.MU;
 import a.baozouptu.common.util.Util;
@@ -64,7 +62,7 @@ public class FloatTextView extends EditText implements FloatView {
      * floatView的宽和高，包括padding，保证加上mleft，mtop之后不会超出原图片的边界
      */
     public float mWidth, mHeight;
-    private static int SHOW_SATUS;
+    private static int CUR_SHOW_STATUS;
     private int rimColor;
     private int itemColor;
     private int downShowState;
@@ -80,7 +78,7 @@ public class FloatTextView extends EditText implements FloatView {
     private Bitmap[] justifyBm;
 
     public void setDownState() {
-        downShowState = SHOW_SATUS;
+        downShowState = CUR_SHOW_STATUS;
     }
 
     public int getDownState() {
@@ -109,7 +107,7 @@ public class FloatTextView extends EditText implements FloatView {
     }
 
     public int getShowState() {
-        return SHOW_SATUS;
+        return CUR_SHOW_STATUS;
     }
 
     public float getRelativeY() {
@@ -181,7 +179,7 @@ public class FloatTextView extends EditText implements FloatView {
         //获取了实际的宽高之后才能获取初始位置
         fLeft = (picBound.left + picBound.right) / 2 - mWidth / 2;
         fTop = picBound.bottom - mHeight;
-        SHOW_SATUS = STATUS_ITEM;
+        CUR_SHOW_STATUS = STATUS_ITEM;
         setRim();
         initItems();
         addTextChangedListener(new TextWatcher() {
@@ -417,7 +415,7 @@ public class FloatTextView extends EditText implements FloatView {
      * @param ptuView 底图图片视图，用于获取地图的各种信息。
      * @return 成功返回数据，否则返回空
      */
-    public Bitmap getResultData(PtuView ptuView,TextStepData tsd) {
+    public Bitmap getResultData(PtuView ptuView, TextStepData tsd) {
         if (mText.trim().equals("")) return null;//表示没有添加以
         setCursorVisible(false);
         //文本在view中的位置
@@ -497,7 +495,7 @@ public class FloatTextView extends EditText implements FloatView {
         fTop = centerY - mHeight / 2;
         ((PtuFrameLayout) getParent()).changeLocation();
         Bitmap bitmap = Bitmap.createBitmap(Math.round(mWidth), Math.round(mHeight), Bitmap.Config.ARGB_8888);
-        SHOW_SATUS = STATUS_TOUMING;
+        CUR_SHOW_STATUS = STATUS_TOUMING;
         requestLayout();
         setHeight(Math.round(mHeight));
         setWidth(Math.round(mHeight));
@@ -591,7 +589,7 @@ public class FloatTextView extends EditText implements FloatView {
         setRim();
         mPaint.setColor(mBackGroundColor);
         canvas.drawRect(rimLeft, rimTop, rimRight, rimBottom, mPaint);
-        if (SHOW_SATUS >= STATUS_RIM) {//要显示的东西不止边框
+        if (CUR_SHOW_STATUS >= STATUS_RIM) {//要显示的东西不止边框
             mPaint.setColor(rimColor);
             mPaint.setStrokeWidth(3);
             //上边的线
@@ -603,7 +601,7 @@ public class FloatTextView extends EditText implements FloatView {
             //右边的线
             canvas.drawLine(rimRight, rimTop, rimRight, rimBottom, mPaint);
         }
-        if (SHOW_SATUS >= STATUS_ITEM) {
+        if (CUR_SHOW_STATUS >= STATUS_ITEM) {
             mPaint.setColor(itemColor);
             items.get(1).x = mWidth / 2 - mPadding / 2;
             items.get(1).y = rimTop - mPadding + mPadding / 8;
@@ -638,8 +636,8 @@ public class FloatTextView extends EditText implements FloatView {
      * @param state
      */
     public void changeShowState(int state) {
-        if (SHOW_SATUS != state) {
-            if (SHOW_SATUS == STATUS_INPUT && state != STATUS_INPUT) {//如果当前是输入状态，改变到非输入状态，这需要取消输入法
+        if (state != CUR_SHOW_STATUS) {//非输入状态
+            if (CUR_SHOW_STATUS == STATUS_INPUT) {//如果当前是输入状态，要改变到非输入状态，则需要取消输入法
                 InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(this.getApplicationWindowToken(), 0);
                 setCursorVisible(false);
@@ -648,15 +646,15 @@ public class FloatTextView extends EditText implements FloatView {
                 setCursorVisible(true);
             }
             //不需要重绘的情况
-            if (SHOW_SATUS == STATUS_ITEM && state == STATUS_INPUT
-                    || SHOW_SATUS == STATUS_INPUT && state == STATUS_ITEM)
-                SHOW_SATUS = state;
+            if (CUR_SHOW_STATUS == STATUS_ITEM && state == STATUS_INPUT
+                    || CUR_SHOW_STATUS == STATUS_INPUT && state == STATUS_ITEM)
+                CUR_SHOW_STATUS = state;
             else {//需要重绘的情况
-                SHOW_SATUS = state;
+                CUR_SHOW_STATUS = state;
                 invalidate();
             }
         }
-        Util.P.le(TAG, "changeShowState=" + SHOW_SATUS);
+        Util.P.le(TAG, "changeShowState=" + CUR_SHOW_STATUS);
     }
 
     /**
@@ -664,7 +662,7 @@ public class FloatTextView extends EditText implements FloatView {
      */
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        if(!isFocusable())return false;
+        if (!isFocusable()) return false;
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (hasUp) hasUp = false;
@@ -675,7 +673,7 @@ public class FloatTextView extends EditText implements FloatView {
                     break;
                 downTime = System.currentTimeMillis();
                 //大于等于显示item时才分发事件，引起输入法
-                if (SHOW_SATUS >= STATUS_ITEM)
+                if (CUR_SHOW_STATUS >= STATUS_ITEM)
                     super.dispatchTouchEvent(event);
                 break;
             case MotionEvent.ACTION_UP:
@@ -690,14 +688,14 @@ public class FloatTextView extends EditText implements FloatView {
 //对其按钮
                     RectF itemBound = new RectF(items.get(1).x - 10, items.get(1).y - 10,
                             items.get(1).x + mPadding + 10, items.get(1).y + mPadding);
-                    if (SHOW_SATUS >= STATUS_ITEM && itemBound.contains(x, y)) {
+                    if (CUR_SHOW_STATUS >= STATUS_ITEM && itemBound.contains(x, y)) {
                         onClickJustify();
                         return true;
                     }
 //背景按钮
                     itemBound.set(items.get(2).x, items.get(2).y - 10,
                             items.get(2).x + mPadding + 10, items.get(2).y + mPadding);
-                    if (SHOW_SATUS >= STATUS_ITEM && itemBound.contains(x, y)) {
+                    if (CUR_SHOW_STATUS >= STATUS_ITEM && itemBound.contains(x, y)) {
                         if (mBackGroundColor == 0x00000000)
                             mBackGroundColor = 0xffffffff;
                         else
@@ -708,18 +706,20 @@ public class FloatTextView extends EditText implements FloatView {
                     //点击到了重置位置按钮
                     itemBound.set(items.get(6).x - 10, items.get(6).y,
                             items.get(6).x + mPadding + 10, items.get(6).y + mPadding + 10);
-                    if (SHOW_SATUS >= STATUS_ITEM && itemBound.contains(x, y)) {
+                    if (CUR_SHOW_STATUS >= STATUS_ITEM && itemBound.contains(x, y)) {
                         onClickBottomCenter();
                         return true;
                     }
 
                     //点击到view的其他部分
-                    if (SHOW_SATUS < STATUS_ITEM) {//没显示item时就不发送事件，不弹出输入法
+                    if (CUR_SHOW_STATUS < STATUS_ITEM) {//没显示item时就不发送事件，不弹出输入法
                         changeShowState(STATUS_ITEM);
                         return true;
                     } else {//显示item时，就要弹出输入法
                         Util.P.le(TAG, "显示输入法了");
                         super.dispatchTouchEvent(event);
+                        //如果没有弹出输入法，强制弹出
+                        showKeyboard(this);
                         changeShowState(STATUS_INPUT);
                         return true;
                     }
@@ -727,6 +727,14 @@ public class FloatTextView extends EditText implements FloatView {
                 hasUp = true;
         }
         return false;
+    }
+
+    //显示虚拟键盘
+    public static void showKeyboard(View v) {
+        InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        imm.showSoftInput(v, InputMethodManager.SHOW_FORCED);
+
     }
 
     private void onClickJustify() {

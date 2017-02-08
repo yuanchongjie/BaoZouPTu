@@ -35,7 +35,7 @@ public class FileDownloader {
             "http://bmob-cdn-6999.b0.upaiyun.com/2016/11/21/8a5b35b5404164ea8052040e210c09a4.ttf",
             "http://bmob-cdn-6999.b0.upaiyun.com/2016/11/21/04f24d4240709536807c7c538ea310d8.ttf"));
 
-    String zitiDir = AllData.appFilePathDefault + "字体/";
+    private String zitiDir = AllData.zitiDir;
     final String[] typefaceLoacalPath = new String[]{
             "default",
             zitiDir + "kaiti.ttf",
@@ -77,7 +77,7 @@ public class FileDownloader {
         final String name = typefaceNames.get(id);
         String url = typefaceUrl.get(id);
         BmobFile bmobfile = new BmobFile(name, "", url);
-        final String savePath = AllData.appFilePathDefault + "字体/" + name;
+        final String savePath = AllData.zitiDir + name;
         final File saveFile = new File(savePath);
         Toast.makeText(context, "开始下载" + typefaceChinese.get(id) + "字体，请稍后！", Toast.LENGTH_SHORT).show();
         bmobfile.download(saveFile, new DownloadFileListener() {
@@ -112,9 +112,9 @@ public class FileDownloader {
         }
         if (state == 1)//是wifi
         {
-            msg = "已连接到WiFi，字体大小:" + size + "MB," + "确认下载吗？";
+            msg = "已连接到WiFi，字体包大小:" + size + "MB," + "确认下载吗？";
         } else {
-            msg = "WiFi未连接，字体大小：" + size + "MB," + "会产生流量消耗，确定下载吗?";
+            msg = "WiFi未连接，字体包大小：" + size + "MB," + "会产生流量消耗，确定下载吗?";
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("字体下载")

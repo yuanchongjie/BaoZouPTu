@@ -42,7 +42,7 @@ class TouchEventProcessor {
                     rect.top = child.getTop();
                     rect.bottom = child.getBottom();
                     if (rect.contains((int) x, (int) y)) {
-                        layout.onChosedView((FloatImageView) child);
+                        layout.onChosenView((FloatImageView) child);
                         return true;
                     }
                 }

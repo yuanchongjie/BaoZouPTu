@@ -1,16 +1,19 @@
 package a.baozouptu;
 
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 /**
- * To work on unit tests, switch the FloatView Artifact in the Build Variants view.
+ * To work on unit tests, switch the Test Artifact in the Build Variants view.
  */
 public class ExampleUnitTest {
+    int a;
+    int aa[]=new int[2];
     @Test
     public void addition_isCorrect() throws Exception {
         assertEquals(4, 2 + 2);
-        System.out.printf("%f",5e8);
+        System.out.println(a);
+        System.out.println(aa[0]);
     }
-
 }

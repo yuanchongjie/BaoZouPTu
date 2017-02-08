@@ -1,8 +1,8 @@
 //
 // Created by Administrator on 2017/1/13 0013.
 //
-#include<opencv2/core.hpp>
 #include <jni.h>
+#include <opencv2/core.hpp>
 
 using namespace cv;
 

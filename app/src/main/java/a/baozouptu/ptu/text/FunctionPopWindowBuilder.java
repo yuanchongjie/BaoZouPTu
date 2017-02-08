@@ -12,17 +12,13 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.lang.ref.WeakReference;
 
 import a.baozouptu.R;
-import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.util.Util;
 import a.baozouptu.common.view.HorizontalListView;
 import a.baozouptu.common.view.MySwitchButton;
-import a.baozouptu.network.FileDownloader;
 import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.ptu.view.ColorBar;
 import a.baozouptu.ptu.view.ColorLump;
@@ -32,143 +28,47 @@ import a.baozouptu.ptu.view.PtuFrameLayout;
  * 创建添加文字模块功能区的功能操作视图
  * Created by Administrator on 2016/5/24.
  */
-public class FunctionPopWindowBuilder {
-    private Typeface curTypeface = Typeface.MONOSPACE;
+class FunctionPopWindowBuilder {
     private FloatTextView floatTextView;
-    private Context mContext;
+    private Context acContext;
+    Typeface curTypeface = Typeface.MONOSPACE;
     private boolean isBold = false, isItalic = false, hasShadow = false;
-    private int lastFontId = 0;
     private TextFragment textFragment;
     private RubberView rubberView;
-    private ArrayList<Typeface> typefaceList;
+
+    /**
+     * 使用弱引用持有字体功能视图，节省内存
+     */
+    private WeakReference<TypefacePopWindow> weakTypefacePopup;
 
     public FunctionPopWindowBuilder(Context context, FloatTextView floatTextView, TextFragment textFragment) {
-        mContext = context;
+        acContext = context;
         this.floatTextView = floatTextView;
         this.textFragment = textFragment;
     }
 
     void setTypefacePopWindow(View v) {
-        initTypeface();
-        View contentView = createTypefacePopWindow();
+        if (weakTypefacePopup == null || weakTypefacePopup.get() == null) {
+            weakTypefacePopup = new WeakReference<>(new TypefacePopWindow(acContext, this, floatTextView));
+        }
+//        注意这里contentView的监听器是持有TypefacePopWindow的，contentView被window持有，
+//      window消失之后监听器当做强引用方式回收，这时相当于TypefacePopWindow没被引用了那样回收
+        //既FunctionPopWindowBuilder还在，TypefacePopWindow相当于不存在了
+        View contentView = weakTypefacePopup.get().createTypefacePopWindow();
         setLayout(v, contentView);
     }
 
-    private void initTypeface() {
-        if (typefaceList == null) {
-            typefaceList = new ArrayList<>();
-            typefaceList.add(null);
-        }
-        for (int i = 1; i < FileDownloader.typefaceNames.size(); i++) {
-            try {
-                Typeface typeface = Typeface.createFromFile(AllData.zitiDir + FileDownloader.typefaceNames.get(i));
-                typefaceList.add(typeface);
-            } catch (Exception e) {
-                typefaceList.add(null);
-                //如果是损坏的文件，删除它
-                File file=new File(AllData.zitiDir+FileDownloader.typefaceNames.get(i));
-                if(file.exists())
-                    file.delete();
-            }
-        }
-    }
-
-    private View createTypefacePopWindow() {
-
-        View contentView = LayoutInflater.from(mContext).inflate(R.layout.popwindow_text_typeface, null);
-        HorizontalListView horizontalListView = (HorizontalListView) contentView.findViewById(R.id.hList_text_type);
-
-        horizontalListView.setAdapter(new BaseAdapter() {
-            @Override
-            public int getCount() {
-                return FileDownloader.typefaceChinese.size();
-            }
-
-            @Override
-            public Object getItem(int position) {
-                return null;
-            }
-
-            @Override
-            public long getItemId(int position) {
-                return position;
-            }
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                TextView textView = new TextView(mContext);
-                textView.setTextSize(25);
-                /**设置颜色*/
-                if (position == lastFontId) {
-                    textView.setTextColor(Util.getColor(R.color.text_checked_color));
-                } else {
-                    textView.setTextColor(Util.getColor(R.color.text_default_color));
-                }
-
-                //设置字体
-                textView.setTag(FileDownloader.typefaceNames.get(position));
-                if (position == 0) {
-                    textView.setTextSize(30);//注意这里，英文字号增大了一些
-                } else {
-                    Typeface typeface = typefaceList.get(position);
-                    if (typeface != null)
-                        textView.setTypeface(typeface);
-                }
-
-//其他的属性
-                textView.setGravity(Gravity.CENTER);
-                textView.setText(FileDownloader.typefaceChinese.get(position));
-                HorizontalListView.LayoutParams layoutParams = new HorizontalListView.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                textView.setLayoutParams(layoutParams);
-                textView.setGravity(Gravity.CENTER);
-
-                return textView;
-            }
-        });
-        horizontalListView.setOnItemClickListener(
-                new HorizontalListView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        if (position == 0) {
-                            curTypeface = Typeface.MONOSPACE;
-                            floatTextView.setTypeface(curTypeface);
-                            floatTextView.updateSize();
-                        } else {
-                            try {
-                                curTypeface = typefaceList.get(position);
-                                if (typefaceList.get(position) == null) {  //如果字体不存在，就进行下载，下载完成之后更新typeface列表，以及视图
-                                    FileDownloader.getInstance().downloadZiti(mContext, FileDownloader.typefaceNames.get(position)
-                                            , typefaceList,(TextView)view);
-                                    return;
-                                } else {
-                                    floatTextView.setTypeface(curTypeface);
-                                    floatTextView.updateSize();
-                                }
-                            } catch (Exception e) {
-
-                            }
-                        }
-                        //切换颜色
-                        if (lastFontId != position) {
-                            ((TextView) view).setTextColor(Util.getColor(R.color.text_checked_color));
-                            TextView textView = (TextView) ((HorizontalListView)
-                                    view.getParent()).findViewWithTag(FileDownloader.typefaceNames.get(lastFontId));
-                            textView.setTextColor(Util.getColor(R.color.text_default_color));
-                            lastFontId = position;
-                        }
-                    }
-                }
-        );
-        horizontalListView.setDividerWidth(Util.dp2Px(10));
+    //    风格
+    private View getStylePopView() {
+        View contentView = LayoutInflater.from(acContext).inflate(R.layout.popwindow_text_style, null);
         return contentView;
     }
 
     void setStylePopWindow(View v) {
-
         View contentView = getStylePopView();
         //粗体
         MySwitchButton switchBold = (MySwitchButton) contentView.findViewById(R.id.switch_button_bold);
+
         switchBold.setState(isBold);
         switchBold.setOnSlideListener(new MySwitchButton.SlideListener() {
             @Override
@@ -242,11 +142,7 @@ public class FunctionPopWindowBuilder {
         setLayout(v, contentView);
     }
 
-    private View getStylePopView() {
-        View contentView = LayoutInflater.from(mContext).inflate(R.layout.popwindow_text_style, null);
-        return contentView;
-    }
-
+    //颜色
     void setColorPopWindow(View v) {
         View contentView = getColorPopView();
         setLayout(v, contentView);
@@ -259,7 +155,7 @@ public class FunctionPopWindowBuilder {
      */
     private View getColorPopView() {
         final PtuFrameLayout ptuFrameLayout = ((PtuActivity) textFragment.getActivity()).getPtuFrame();
-        View contentView = LayoutInflater.from(mContext).inflate(R.layout.popwindow_chose_color, null);
+        View contentView = LayoutInflater.from(acContext).inflate(R.layout.popwindow_chose_color, null);
         //颜色选择条
         final ColorBar colorBar = (ColorBar) contentView.findViewById(R.id.color_picker);
         //颜色块
@@ -311,12 +207,12 @@ public class FunctionPopWindowBuilder {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 //创建颜色块
-                ColorLump colorLump = new ColorLump(mContext);
+                ColorLump colorLump = new ColorLump(acContext);
                 colorLump.setColor(colors[position]);
 
                 //item的设置布局
                 HorizontalListView.LayoutParams mLayoutParams = new HorizontalListView.LayoutParams(
-                        mContext.getResources().getDimensionPixelSize(R.dimen.color_lump_width),
+                        acContext.getResources().getDimensionPixelSize(R.dimen.color_lump_width),
                         ViewGroup.LayoutParams.MATCH_PARENT);
                 colorLump.setLayoutParams(mLayoutParams);
                 return colorLump;
@@ -334,15 +230,15 @@ public class FunctionPopWindowBuilder {
         return contentView;
     }
 
-
+    //透明度
     void setToumingduPopWindow(View v) {
-        View contentView = createTouminduPopView();
+        View contentView = createToumingduPopView();
         setLayout(v, contentView);
     }
 
-    private View createTouminduPopView() {
+    private View createToumingduPopView() {
         final PtuFrameLayout ptuFrameLayout = ((PtuActivity) textFragment.getActivity()).getPtuFrame();
-        View contentView = LayoutInflater.from(mContext).inflate(R.layout.popwindow_toumindu, null);
+        View contentView = LayoutInflater.from(acContext).inflate(R.layout.popwindow_toumindu, null);
         SeekBar seekBar = (SeekBar) contentView.findViewById(R.id.seekbar_toumingdu);
         seekBar.setMax(100);
         if (ptuFrameLayout.getChildAt(ptuFrameLayout.getChildCount() - 1) instanceof FloatTextView)
@@ -371,14 +267,14 @@ public class FunctionPopWindowBuilder {
      * 设置功能子视图的布局
      * 注意这里popupwindow的高度要加上view所在布局的padding
      */
-    private void setLayout(View v, View contentView) {
+    void setLayout(View v, View contentView) {
         PopupWindow pop = new PopupWindow(contentView,
                 WindowManager.LayoutParams.MATCH_PARENT,
                 v.getHeight() + Util.dp2Px(5), true);
         pop.setTouchable(true);
         // 如果不设置PopupWindow的背景，无论是点击外部区域还是Back键都无法dismiss弹框
         // 我觉得这里是API的一个bug
-        pop.setBackgroundDrawable(mContext.getResources().getDrawable(
+        pop.setBackgroundDrawable(acContext.getResources().getDrawable(
                 R.drawable.text_popup_window_background));
 
         //防止与虚拟按键冲突

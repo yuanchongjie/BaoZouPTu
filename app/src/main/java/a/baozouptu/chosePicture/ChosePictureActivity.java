@@ -1,145 +1,53 @@
 package a.baozouptu.chosePicture;
 
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.PopupWindow;
-import android.widget.TextView;
-
-import com.readystatesoftware.systembartint.SystemBarTintManager;
-
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
 
 import a.baozouptu.R;
+import a.baozouptu.chosePicture.view.LongPicPopupWindow;
+import a.baozouptu.chosePicture.view.ToSettingPopupWindow;
+import a.baozouptu.common.BaseActivity;
 import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.dataAndLogic.AsyncImageLoader3;
-import a.baozouptu.common.util.FileTool;
 import a.baozouptu.common.util.Util;
 import a.baozouptu.common.view.FirstUseDialog;
 import a.baozouptu.ptu.PtuActivity;
-import a.baozouptu.user.userSetting.SettingActivity;
 
 /**
  * 显示所选的最近的或某个文件夹下面的所有图片
  * 并且有选择文件夹，相机，空白图画图的功能
  */
-public class ChosePictureActivity extends AppCompatActivity {
+public class ChosePictureActivity extends BaseActivity implements ChoosePicContract.View {
     private String TAG = "ChosePictureActivity";
     /**
      * 进度条
      */
     private ProgressDialog m_ProgressDialog = null;
-    /**
-     * 保存最近图片的路径
-     */
-    public List<String> usualyPicPathList = new ArrayList<>();
-    /**
-     * 获取和保存某个文件下面所有图片的路径
-     */
-    private List<String> picPathInFile = new ArrayList<>();
-    /**
-     * 当前要显示的所有图片的路径
-     */
-    private List<String> currentPicPathList = new ArrayList<>();
-
-    /**
-     * 新P的图片，不好添加，用这个显示添加
-     */
-    String newPicPath;
-
-    /**
-     * 文件列表的几个相关list
-     */
-    private List<String> dirInfoList;
-    private List<String> dirPathList;
-    private List<String> dirRepresentPathList;
 
     private DrawerLayout fileListDrawer;
-    private PicGridAdapter picAdpter;
+    private PicGridAdapter picAdapter;
     private RecyclerView pictureGridview;
-    private ProcessUsuallyPicPath usuPicProcessor;
 
-    private MyFileListAdapter fileAdapter;
-    boolean isFirst = true;
     private GridLayoutManager gridLayoutManager;
-
-    /**
-     * handler使用静态内部类，防止内存泄漏，减少内存消耗
-     * 非静态内部类会持有对外部类的引用，
-     * 而主线程的Handler会被主线程持有，内部类的handler又会持有activity,
-     * activity是不能不被释放的，所以这里就注意，内部类或者匿名内部类的handler会导致内存泄漏
-     */
-    private static class PicUpdateHandler extends Handler {
-        private final WeakReference<ChosePictureActivity> activityRefernce;
-
-        PicUpdateHandler(ChosePictureActivity activity) {
-            activityRefernce = new WeakReference<ChosePictureActivity>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            ChosePictureActivity partActivity = activityRefernce.get();
-            if (partActivity == null) return;
-
-            partActivity.m_ProgressDialog.dismiss();// 表示此处开始就解除这个进度条Dialog，应该是在相对起始线程的另一个中使用
-            if (msg.obj.equals("change_pic")) {
-                if (partActivity.isFirst) {
-                    partActivity.pictureGridview.setAdapter(partActivity.picAdpter);
-                    partActivity.isFirst = false;
-                    if (!AllData.commonConfig.hasReadUsuPicUse()) {
-                        FirstUseDialog firstUseDialog = new FirstUseDialog(partActivity);
-                        firstUseDialog.createDialog(null, "长按图片即可添加到喜爱或删除", new FirstUseDialog.ActionListener() {
-                            @Override
-                            public void onSure() {
-                                AllData.commonConfig.write_usuPicUse(true);
-                            }
-                        });
-                    }
-                } else {
-                    partActivity.picAdpter.notifyDataSetChanged();
-                }
-                Util.P.le(partActivity.TAG, "finish update picture");
-            } else if (msg.obj.equals("change_file")) {
-                Util.P.le(partActivity.TAG, "finish update file");
-                partActivity.fileAdapter.notifyDataSetChanged();
-                partActivity.picAdpter.notifyDataSetChanged();
-            } else {
-                if (partActivity.newPicPath != null) {
-                    if (!partActivity.usuPicProcessor.hasRecentPic(partActivity.newPicPath)) {
-                        partActivity.usuPicProcessor.addRecentPathFirst(partActivity.newPicPath);
-                        partActivity.picAdpter.notifyDataSetChanged();
-                        Util.P.le("已更新图片");
-                    }
-                    partActivity.newPicPath = null;
-                }
-            }
-        }
-    }
+    boolean isFromCreate = false;
+    private ChoosePicContract.PicPresenter presenter;
+    private boolean isChooseTietu = false;
+    private MyFileListAdapter fileInfosAdapter;
 
     /**
      * Called when the activity is first created.
@@ -149,60 +57,42 @@ public class ChosePictureActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chose_picture);
-        test();
-        PicUpdateHandler picUpdateHandler = new PicUpdateHandler(this);
-        usuPicProcessor = new ProcessUsuallyPicPath(this, picUpdateHandler);
-        getScreenWidth();
+        Log.e(TAG, "启动了");
+        Intent sourceIntent = getIntent();
+        if (sourceIntent != null) {
+            String s = sourceIntent.getAction();
+            if (s != null && s.equals("tietu"))
+                isChooseTietu = true;
+        }
+//        test();
+        presenter = new ChosePicPresenter(this);
         initView();
-        initToolbar();
-        m_ProgressDialog = ProgressDialog.show(ChosePictureActivity.this, "请稍后",
-                "数据读取中...", true);
-        initPicInfo();
+        isFromCreate = true;
     }
-
 
     private void test() {
         if (getIntent().getStringExtra("test") == null) return;
         Intent testIntent = new Intent(this, PtuActivity.class);
         testIntent.putExtras(getIntent());
-        String thePath = Environment.getExternalStorageDirectory()+"/test.jpg";
+        String thePath = Environment.getExternalStorageDirectory() + "/test.jpg";
         testIntent.putExtra("pic_path", thePath);
         startActivityForResult(testIntent, 0);
-        Log.e(TAG,"完成时间  "+System.currentTimeMillis());
-    }
-
-    /**
-     * 获取所有图片的文件信息，最近的图片，
-     * <p>并且为图片grid，文件列表加载数据
-     */
-    private void initPicInfo() {
-        usualyPicPathList = usuPicProcessor.getUsuallyPathFromDB();
-        currentPicPathList = usualyPicPathList;
-        Util.P.le(TAG, "获取了上次数据库中的图片");
-        disposeShowPicture();
-        Util.P.le(TAG, "初始化显示图片完成");
-        disposeDrawer();
-        Util.P.le(TAG, "初始化显示Drawer完成");
-    }
-
-    /**
-     * 获取屏幕的宽度
-     */
-    void getScreenWidth() {
-        DisplayMetrics metric = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metric);
-        AllData.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
-        AllData.screenHeight = metric.heightPixels;
+        Log.e(TAG, "完成时间  " + System.currentTimeMillis());
     }
 
     private void initView() {
-        final ImageButton btnToSetting=(ImageButton)findViewById(R.id.chose_pic_navigation);
-        btnToSetting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               TosettingPopupWindow.show(v,ChosePictureActivity.this);
-            }
-        });
+        if (isChooseTietu)
+            switchViewForTietu();
+        else {
+            final ImageButton btnToSetting = (ImageButton) findViewById(R.id.chose_pic_navigation);
+            btnToSetting.setMaxWidth(Util.dp2Px(35));
+            btnToSetting.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ToSettingPopupWindow.show(v, ChosePictureActivity.this);
+                }
+            });
+        }
         fileListDrawer = (DrawerLayout) findViewById(R.id.drawer_layout_show_picture);
         pictureGridview = (RecyclerView) findViewById(R.id.gv_photolist);
         final ImageButton showFile = (ImageButton) findViewById(R.id.show_pic_file);
@@ -215,222 +105,168 @@ public class ChosePictureActivity extends AppCompatActivity {
                     fileListDrawer.openDrawer(GravityCompat.END);
             }
         });
-    }
-
-    @TargetApi(19)
-    private void initToolbar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            SystemBarTintManager tintManager = new SystemBarTintManager(this);
-            tintManager.setStatusBarTintColor(Util.getColor(this, R.color.base_toolbar_background));
-            tintManager.setStatusBarTintEnabled(true);
-        }
+        initPicListView();
     }
 
     /**
-     * 为显示图片的gridView加载数据
+     * 从贴图过来时，就切换到贴图的情况
      */
-    private void disposeShowPicture() {
-        picAdpter = new PicGridAdapter(
-                ChosePictureActivity.this, currentPicPathList, usuPicProcessor);
+    private void switchViewForTietu() {
+        final ImageButton returnBtn = (ImageButton) findViewById(R.id.chose_pic_navigation);
+        returnBtn.setImageDrawable(Util.getDrawable(R.drawable.ic_arrow_back_white));
+        returnBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
+
+    private void initPicListView() {
+        picAdapter = presenter.getPicAdapter();
         gridLayoutManager = new GridLayoutManager(this, 3);
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                if (picAdpter.getItemViewType(position) == PicGridAdapter.GROUP_HEADER)
+                if (picAdapter.getItemViewType(position) == PicGridAdapter.GROUP_HEADER)
                     return 3;
                 return 1;
             }
         });
         pictureGridview.setLayoutManager(gridLayoutManager);
-        picAdpter.setClickListener(new PicGridAdapter.ItemClickListener() {
-            @Override
-            public void onItemClick(PicGridAdapter.ItemHolder itemHolder) {
-                int position = itemHolder.getAdapterPosition();
-                Intent sourceIntent = getIntent();
-                if (sourceIntent != null) {
-                    String s = sourceIntent.getAction();
-                    if (s != null && s.equals("tietu")) {//选择贴图,不是一般的选择图片
-                        Intent intent1 = new Intent();
-                        intent1.putExtra("pic_path", currentPicPathList.get(position));
-                        setResult(3, intent1);
-                        ChosePictureActivity.this.finish();
-                    } else {//正常的选择
-                        Intent intent = new Intent(ChosePictureActivity.this, PtuActivity.class);
-                        intent.putExtra("pic_path", currentPicPathList.get(position));
-                        startActivityForResult(intent, 0);
+        picAdapter.setClickListener(
+                new PicGridAdapter.ItemClickListener() {
+                    @Override
+                    public void onItemClick(PicGridAdapter.ItemHolder itemHolder) {
+                        int position = itemHolder.getAdapterPosition();
+                        String chosenPath = presenter.getCurrentPath(position);
+
+                        if (isChooseTietu) {//选择贴图,不是一般的选择图片
+                            Intent intent1 = new Intent();
+                            intent1.putExtra("pic_path", chosenPath);
+                            setResult(3, intent1);
+                            ChosePictureActivity.this.finish();
+                        } else {//正常的选择
+                            Intent intent = new Intent(ChosePictureActivity.this, PtuActivity.class);
+                            intent.putExtra("pic_path", chosenPath);
+                            startActivityForResult(intent, 0);
+                        }
+                    }
+                });
+
+
+        picAdapter.setLongClickListener(
+                new PicGridAdapter.LongClickListener()
+
+                {
+                    @Override
+                    public boolean onItemLongClick(PicGridAdapter.ItemHolder itemHolder) {
+                        View view = itemHolder.iv;
+                        int position = itemHolder.getAdapterPosition();
+                        Util.P.le("position " + position);
+
+                        return LongPicPopupWindow.setPicPopWindow(presenter, ChosePictureActivity.this, view, position);
                     }
                 }
-            }
-        });
 
-        picAdpter.setLongClickListener(new PicGridAdapter.LongClickListener() {
-            @Override
-            public boolean onItemLongClick(PicGridAdapter.ItemHolder itemHolder) {
+        );
 
-                View view = itemHolder.iv;
-                int position = itemHolder.getAdapterPosition();
-                Util.P.le("position " + position);
-                return setPicPopWindow(view, position);
-            }
-        });
+        pictureGridview.addOnScrollListener(
+                new RecyclerView.OnScrollListener() {
+                    AsyncImageLoader3 imageLoader = AsyncImageLoader3.getInstance();
+                    int lastScrollState = RecyclerView.SCROLL_STATE_IDLE;
 
-        pictureGridview.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            AsyncImageLoader3 imageLoader = AsyncImageLoader3.getInstance();
-            int lastScrollState = RecyclerView.SCROLL_STATE_IDLE;
-
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                int first, last;
-                switch (newState) {
-                    case RecyclerView.SCROLL_STATE_IDLE://停止时候
-                        picAdpter.isScrollWidthoutTouch = false;
-                        if (lastScrollState == RecyclerView.SCROLL_STATE_SETTLING)//上次是无触摸滑动，才需要显示
-                        {
-                            first = gridLayoutManager.findFirstVisibleItemPosition();
-                            last = gridLayoutManager.findLastVisibleItemPosition();
-                            showAdjacentPic(first, last);
+                    @Override
+                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                        super.onScrollStateChanged(recyclerView, newState);
+                        int first, last;
+                        switch (newState) {
+                            case RecyclerView.SCROLL_STATE_IDLE://停止时候
+                                picAdapter.isScrollWidthoutTouch = false;
+                                if (lastScrollState == RecyclerView.SCROLL_STATE_SETTLING)//上次是无触摸滑动，才需要显示
+                                {
+                                    first = gridLayoutManager.findFirstVisibleItemPosition();
+                                    last = gridLayoutManager.findLastVisibleItemPosition();
+                                    showAdjacentPic(first, last);
+                                }
+                                lastScrollState = RecyclerView.SCROLL_STATE_IDLE;
+                                break;
+                            case RecyclerView.SCROLL_STATE_DRAGGING://触摸滑动
+                                //如果上一次是无触摸下的滑动
+                                picAdapter.isScrollWidthoutTouch = false;
+                                if (lastScrollState == RecyclerView.SCROLL_STATE_SETTLING) {
+                                    first = gridLayoutManager.findFirstVisibleItemPosition();
+                                    last = gridLayoutManager.findLastVisibleItemPosition();
+                                    //显示出无指滑动后没有显示的
+                                    showAdjacentPic(first, last);
+                                }
+                                lastScrollState = RecyclerView.SCROLL_STATE_DRAGGING;
+                                break;
+                            case RecyclerView.SCROLL_STATE_SETTLING://无触摸滑动
+                                picAdapter.isScrollWidthoutTouch = true;
+                                imageLoader.cancelLoad();//取消解析，提交的任务还没有执行的就不执行了
+                                lastScrollState = RecyclerView.SCROLL_STATE_SETTLING;
+                                break;
                         }
-                        lastScrollState = RecyclerView.SCROLL_STATE_IDLE;
-                        break;
-                    case RecyclerView.SCROLL_STATE_DRAGGING://触摸滑动
-                        //如果上一次是无触摸下的滑动
-                        picAdpter.isScrollWidthoutTouch = false;
-                        if (lastScrollState == RecyclerView.SCROLL_STATE_SETTLING) {
-                            first = gridLayoutManager.findFirstVisibleItemPosition();
-                            last = gridLayoutManager.findLastVisibleItemPosition();
-                            //显示出无指滑动后没有显示的
-                            showAdjacentPic(first, last);
-                        }
-                        lastScrollState = RecyclerView.SCROLL_STATE_DRAGGING;
-                        break;
-                    case RecyclerView.SCROLL_STATE_SETTLING://无触摸滑动
-                        picAdpter.isScrollWidthoutTouch = true;
-                        imageLoader.cancelLoad();//取消解析，提交的任务还没有执行的就不执行了
-                        lastScrollState = RecyclerView.SCROLL_STATE_SETTLING;
-                        break;
-                }
-            }
-
-            private void showAdjacentPic(int first, int last) {
-                for (int position = first; position <= last; position++) {
-                    if (position < 0 || position >= currentPicPathList.size())
-                        break;//一行中左边有数据，右边没有数据，各自position仍然当做存在
-                    Util.P.le(TAG, "" + position);
-                    View view = pictureGridview.findViewWithTag(currentPicPathList.get(position));
-                    if (view != null) {
-                        picAdpter.myBindViewHolder(pictureGridview.
-                                getChildViewHolder(view), position);
                     }
-                }
-            }
-        });
+
+                    private void showAdjacentPic(int first, int last) {
+                        Log.e(TAG, "showAdjacentPic: 开始显示邻近的图片");
+                        for (int position = first; position <= last; position++) {
+                            if (position < 0 || position >= presenter.getCurrentSize())
+                                break;//一行中左边有数据，右边没有数据，各自position仍然当做存在
+                            Util.P.le(TAG, "" + position);
+                            View view = pictureGridview.findViewWithTag(presenter.getCurrentPath(position));
+                            if (view != null) {
+                                picAdapter.myBindViewHolder(pictureGridview.getChildViewHolder(view),
+                                        position);
+                            }
+                        }
+                    }
+                });
 
     }
 
-    /**
-     * @param view     被点击的view
-     * @param position 注意是常用图片时position要先转换
-     * @return
-     */
-    private boolean setPicPopWindow(View view, int position) {
-        final PopupWindow popWindowFile = new PopupWindow(ChosePictureActivity.this);
-        LinearLayout linearLayout = new LinearLayout(ChosePictureActivity.this);
-        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-        linearLayout.setGravity(Gravity.CENTER);
-        linearLayout.setDividerPadding(10);
-        linearLayout.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
-        linearLayout.setDividerDrawable(Util.getDrawable(R.drawable.divider_picture_opration));
-        linearLayout.setLayoutParams(
-                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        WindowManager.LayoutParams.WRAP_CONTENT));
-        linearLayout.setPadding(Util.dp2Px(2), Util.dp2Px(2), Util.dp2Px(2), Util.dp2Px(2));
-        TextView frequentlyTextView = new TextView(ChosePictureActivity.this);
-        frequentlyTextView.setGravity(Gravity.CENTER);
-        frequentlyTextView.setWidth(view.getWidth() / 2);
-        frequentlyTextView.setGravity(Gravity.CENTER_HORIZONTAL);
-        final String path = currentPicPathList.get(position);
-        if (usualyPicPathList.lastIndexOf(path) >= usuPicProcessor.getPreferStart()) {
-            frequentlyTextView.setText("取消");
-            final int finalPosition = position;
-            frequentlyTextView.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void showPicList() {
+        if (!AllData.hasReadConfig.hasReadUsuPicUse()) {
+            final FirstUseDialog firstUseDialog = new FirstUseDialog(ChosePictureActivity.this);
+            firstUseDialog.createDialog(null, "长按图片即可添加到喜爱或删除", new FirstUseDialog.ActionListener() {
                 @Override
-                public void onClick(View v) {
-                    usuPicProcessor.deletePreferPath(path, finalPosition);
-                    dirInfoList.remove(0);
-                    dirInfoList.add(0, "  " + "常用图片(" + usualyPicPathList.size() + ")");
-                    if (currentPicPathList == usualyPicPathList)
-                        picAdpter.notifyDataSetChanged();
-                    popWindowFile.dismiss();
-                }
-            });
-        } else {
-            frequentlyTextView.setText("喜爱");
-            frequentlyTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    popWindowFile.dismiss();
-                    boolean change = usuPicProcessor.addPreferPath(path);
-                    dirInfoList.remove(0);
-                    dirInfoList.add(0, "  " + "常用图片(" + usualyPicPathList.size() + ")");
-                    if (change && currentPicPathList == usualyPicPathList)
-                        picAdpter.notifyDataSetChanged();
+                public void onSure() {
+                    FirstUseDialog firstUseSetting = new FirstUseDialog(ChosePictureActivity.this);
+                    firstUseSetting.createDialog(null, "点击左上角图标可进入设置", new FirstUseDialog.ActionListener() {
+                        @Override
+                        public void onSure() {
+                            AllData.hasReadConfig.write_usuPicUse(true);
+                        }
+                    });
                 }
             });
         }
-        frequentlyTextView.setTextSize(22);
-        frequentlyTextView.setTextColor(Util.getColor(R.color.text_deep_black));
-
-        linearLayout.addView(frequentlyTextView);
-
-        TextView deleteTextView = new TextView(ChosePictureActivity.this);
-
-        deleteTextView.setGravity(Gravity.CENTER);
-        deleteTextView.setWidth(view.getWidth() / 2);
-        deleteTextView.setGravity(Gravity.CENTER_HORIZONTAL);
-        deleteTextView.setText("删除");
-        deleteTextView.setTextSize(22);
-        deleteTextView.setTextColor(Util.getColor(R.color.text_deep_black));
-
-        final int finalPosition1 = position;
-        deleteTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popWindowFile.dismiss();
-                deletePicture(currentPicPathList.get(finalPosition1));
-            }
-        });
-        linearLayout.addView(deleteTextView);
-
-
-        int[] popWH = new int[2];
-        Util.getMesureWH(linearLayout, popWH);
-        popWindowFile.setContentView(linearLayout);
-        popWindowFile.setWidth(view.getWidth());
-        popWindowFile.setHeight(popWH[1]);
-        popWindowFile.setFocusable(true);
-        popWindowFile.setBackgroundDrawable(Util.getDrawable(
-                R.drawable.background_pic_operation));
-        popWindowFile.showAsDropDown(view, 0, -view.getHeight());
-        return true;
+        pictureGridview.setAdapter(picAdapter);
+        m_ProgressDialog.dismiss();
     }
 
-    private void deletePicture(final String path) {
+    /**
+     * 删除一张图片
+     *
+     * @param path
+     */
+    public void deleteOnePic(final String path) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         AlertDialog alertDialog = builder.setTitle("完全删除此图片吗")
                 .setPositiveButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                     }
                 })
                 .setNegativeButton("删除", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 //                        先从文件中删除，不能删除则不行
-                        if (!usuPicProcessor.onDeleteOnePicInfile(path))//删除图片文件并更新目录列表信息
+                        if (!presenter.onDeleteOnePicInfile(path))//删除图片文件并更新目录列表信息
                         {
                             AlertDialog alertDialog1 = new AlertDialog.Builder(ChosePictureActivity.this)
                                     .setTitle("删除失败，此图片无法删除")
@@ -443,61 +279,54 @@ public class ChosePictureActivity extends AppCompatActivity {
                             alertDialog1.show();
                             return;
                         }
-                        if (usualyPicPathList.contains(path)) {//包含才常用列表里面，删除常用列表中的信息
-                            usuPicProcessor.onDeleteUsuallyPicture(path);
-                        }
-                        currentPicPathList.remove(path);
-                        picAdpter.notifyDataSetChanged();
-                        fileAdapter.notifyDataSetChanged();
+                        presenter.onDelOnePicSuccess(path);
                     }
                 })
                 .create();
         alertDialog.show();
     }
 
-
-    /**
-     * 加载Drawer的ListView数据
-     */
-    private void disposeDrawer() {
-
-        dirPathList = usuPicProcessor.getDirPathList();
-        dirRepresentPathList = usuPicProcessor.getDirRepresentPathList();
-        dirInfoList = usuPicProcessor.getDirInfoList();
-
+    @Override
+    public void showFileInfoList() {
         ListView pictureFileListView = (ListView) findViewById(R.id.drawer_picture_file_list);
-        fileAdapter = new MyFileListAdapter(ChosePictureActivity.this,
-                dirInfoList, dirRepresentPathList);
-        pictureFileListView.setAdapter(fileAdapter);
-        pictureFileListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        fileInfosAdapter = presenter.getFileAdapter();
+        pictureFileListView.setAdapter(fileInfosAdapter);
+        pictureFileListView.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        fileListDrawer.closeDrawer(GravityCompat.END);
+                        presenter.togglePicData(position);//切换数据，然后会切换视图
+                    }
+                });
 
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0) {
-                    currentPicPathList = usualyPicPathList;
-                    picAdpter.setList(usualyPicPathList);
-                } else
-                    getCurrentPicPathList(dirPathList.get(position));
-                fileListDrawer.closeDrawer(GravityCompat.END);
-                picAdpter.notifyDataSetChanged();
-            }
+    }
 
-            /**
-             * 获取将要显示的图片的列表，并且将当前要显示的列表{@code currentPicPathList}和adpter内的数据指向获取的列表
-             *
-             */
-            private void getCurrentPicPathList(String pictureFilePath) {
-                picPathInFile.clear();
-                FileTool.getOrderedPicListInFile(pictureFilePath, picPathInFile);
-                currentPicPathList = picPathInFile;
-                picAdpter.setList(picPathInFile);
-            }
-        });
+    @Override
+    public void onTogglePicList(PicGridAdapter picAdapter) {
+        pictureGridview.setAdapter(picAdapter);
+    }
+
+    @Override
+    public void refreshPicList() {
+        picAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void refreshFileInfosList() {
+        fileInfosAdapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onResume() {
-        usuPicProcessor.getAllPicInfoAndRecent();
+        if (isFromCreate) {
+            m_ProgressDialog = ProgressDialog.show(ChosePictureActivity.this, "请稍后",
+                    "数据读取中...", true);
+            presenter.start();
+            isFromCreate = false;
+        } else {
+            presenter.detectAndUpdateInfo();
+        }
         super.onResume();
     }
 
@@ -506,46 +335,27 @@ public class ChosePictureActivity extends AppCompatActivity {
         Util.P.le(TAG, "onActivityResult:开始处理其它activity的返回");
         if (resultCode == 0 && data != null) {
             String action = data.getAction();
-            if (action != null && action.equals("finish")) {//结束
+            if (action != null && action.equals("finish")) {//直接结束了
                 setResult(0, new Intent(action));
-                usuPicProcessor.addUsedPath(
+                presenter.addUsedPath(
                         data.getStringExtra("recent_use_pic"));
                 finish();
                 overridePendingTransition(0, R.anim.go_send_exit);
             } else if (action != null && action.equals("load_failed")) {//加载失败
                 String failedPath = data.getStringExtra("failed_path");
-                currentPicPathList.remove(failedPath);
-                picAdpter.notifyDataSetChanged();
+                presenter.removeCurrent(failedPath);
+                picAdapter.notifyDataSetChanged();
             } else if (action != null && action.equals("save_and_leave")) {//保存了图片
-
-                newPicPath = data.getStringExtra("new_path");
-                usuPicProcessor.addUsedPath(
+                String newPicPath = data.getStringExtra("new_path");
+                presenter.addUsedAndNewPath(data.getStringExtra("recent_use_pic"), newPicPath);
+            } else if (action != null && action.equals("leave")) {//离开没有保存图片
+                presenter.addUsedPath(
                         data.getStringExtra("recent_use_pic"));
-                if (usuPicProcessor.isUsuPic(currentPicPathList)) { //当前在常用图片下
-                    picAdpter.notifyDataSetChanged();
-                }
-                // 这里图片没有保存到当前文件夹下面
-                //更新文件信息
-                String parentPath = FileTool.getParentPath(newPicPath);
-                int id = dirPathList.indexOf(parentPath);
-                String info = dirInfoList.get(id);
-                int number = Integer.valueOf(info.substring(info.indexOf('(') + 1, info.indexOf(')')));
-                number++;
-                dirInfoList.set(id, info.substring(0, info.indexOf('(') + 1) + number + ")");
-                dirRepresentPathList.set(id, data.getStringExtra("recent_use_pic"));
-                fileAdapter.notifyDataSetChanged();
-            }else if(action!=null&&action.equals("leave")){//离开没有保存图片
-                usuPicProcessor.addUsedPath(
-                        data.getStringExtra("recent_use_pic"));
-                if (usuPicProcessor.isUsuPic(currentPicPathList)) { //当前在常用图片下
-                    picAdpter.notifyDataSetChanged();
-                }
             }
         }
 
         super.onActivityResult(requestCode, resultCode, data);
     }
-
 
     @Override
     protected void onStop() {
@@ -561,18 +371,27 @@ public class ChosePictureActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (currentPicPathList == usualyPicPathList) {
+        if (presenter.isInUsu()) {
             super.onBackPressed();
         } else {
-            currentPicPathList = usualyPicPathList;
-            picAdpter.setList(usualyPicPathList);
-            pictureGridview.setAdapter(picAdpter);
+            presenter.toggleToUsu();
         }
     }
 
     @Override
     protected void onDestroy() {
-        AllData.lastScanTime = 0;
+//        如果设置退出后关闭应用，就需要在用户主动退出应用后关闭
+        if (!AllData.settingDataSource.getSendShortcutNotifyExit()) {
+            NotificationManager nm = (NotificationManager)
+                    getSystemService(Context.NOTIFICATION_SERVICE);
+            nm.cancel(0);
+
+        }
         super.onDestroy();
+    }
+
+    @Override
+    public void setPresenter(ChoosePicContract.PicPresenter presenter) {
+
     }
 }

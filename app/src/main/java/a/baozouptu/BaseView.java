@@ -1,4 +1,4 @@
-package a.baozouptu.user.userSetting;
+package a.baozouptu;
 
 /**
  * Created by LiuGuicen on 2017/1/5 0005.

@@ -1,3 +1,4 @@
+/*
 //
 // Created by Administrator on 2017/1/11 0011.
 //
@@ -44,12 +45,15 @@ private:
 
     vector<double> computeVariances(Mat &m, vector<double> &means);
 };
+*/
 /**
  *
- */
+ *//*
+
 Mat transferColorSyle(Mat &under, Mat &above);
 
 
 
 
 #endif //BAOZOUPTU_COLORTRANSFER_H
+*/

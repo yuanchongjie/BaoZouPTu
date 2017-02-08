@@ -34,4 +34,5 @@
     <dimen name="margin_big">10dp</dimen>
     <dimen name="my_toolbar_height">50dp</dimen>
     <dimen name="width_synthesis_image">55dp</dimen>
+    <dimen name="choose_pic_item_divider">1.5dp</dimen>
 </resources>

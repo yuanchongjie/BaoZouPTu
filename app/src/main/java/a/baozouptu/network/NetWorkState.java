@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import a.baozouptu.common.CrashLog;
+
 /**
  * Created by Administrator on 2016/11/21 0021.
  */
@@ -25,8 +27,9 @@ public class NetworkState {
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
         if (!isConnected) return -1;
-        else if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) return 1;
-        else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) return 0;
+        else if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+            return 1;
+        } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) return 0;
         else return 2;
     }
 }

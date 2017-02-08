@@ -15,6 +15,12 @@ public interface SettingDataSource {
     boolean getSendShortcutNotify();
     boolean getSendShortcutNotifyExit();
     boolean getSharedWithout();
-    float getAppCacheSize();
-    void clearAppCache();
+    float getAppDataSize();
+
+    /**
+     * @param userChosenItems 用户选定的清除内容
+     * @return 返回哪些内容清除失败
+     */
+    String clearAppCache(boolean[] userChosenItems);
+    String[] getDataItemInfos();
 }

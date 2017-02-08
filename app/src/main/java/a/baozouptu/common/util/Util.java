@@ -1,6 +1,5 @@
 package a.baozouptu.common.util;
 
-import android.app.Application;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -10,13 +9,13 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Toast;
 
+import a.baozouptu.common.appInfo.MyApplication;
 import a.baozouptu.common.dataAndLogic.AllData;
 
 /**
  * Created 0 Administrator on 2016/5/19.
  */
 public class Util {
-    private static MyApplication gloableContext;
 
     public static int dp2Px(Context context, float dp) {
         final float scale = context.getResources().getDisplayMetrics().density;
@@ -24,7 +23,7 @@ public class Util {
     }
 
     public static int dp2Px(float dp) {
-        final float scale = MyApplication.getAppContext().getResources().getDisplayMetrics().density;
+        final float scale = MyApplication.appContext.getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
     }
 
@@ -34,33 +33,26 @@ public class Util {
     }
 
     public static int px2Dp(float px) {
-        final float scale = MyApplication.getAppContext().getResources().getDisplayMetrics().density;
+        final float scale = MyApplication.appContext.getResources().getDisplayMetrics().density;
         return (int) (px / scale + 0.5f);
     }
 
     public static Drawable getDrawable(int id) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            return gloableContext.getResources().getDrawable(id, null);
-        return gloableContext.getResources().getDrawable(id);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            return MyApplication.appContext.getResources().getDrawable(id, null);
+        return MyApplication.appContext.getResources().getDrawable(id);
     }
 
     /**
-     * 在mainifest中使用android:name=".MyApplication"，系统将会创建myapplication替代一般的application
+     * @return 返回字符串的最后一个数字，没找到返回-1
      */
-    public static class MyApplication extends Application {
-        private static MyApplication mcontext;
-
-        @Override
-        public void onCreate() {
-            // TODO Auto-generated method stub
-            super.onCreate();
-            mcontext = this;
-            gloableContext = this;
+    public static int lastDigit(String s) {
+        for (int i = s.length() - 1; i >= 0; i--) {
+            if ('0' <= s.charAt(i) && s.charAt(i) <= '9') {
+                return i;
+            }
         }
-
-        public static Context getAppContext() {
-            return mcontext;
-        }
+        return -1;
     }
 
     /**
@@ -109,8 +101,8 @@ public class Util {
      * @param s
      */
     public static void T(Object s) {
-        if (MyApplication.getAppContext() != null)
-            T(MyApplication.getAppContext(), s);
+        if (MyApplication.appContext != null)
+            T(MyApplication.appContext, s);
         else
             P.le("全局的context不存在");
     }
@@ -143,8 +135,8 @@ public class Util {
     }
 
     public static void getMesureWH(View v, int[] WH) {
-        int width = View.MeasureSpec.makeMeasureSpec((1<<30)-1, View.MeasureSpec.AT_MOST);
-        int height = View.MeasureSpec.makeMeasureSpec((1<<30)-1, View.MeasureSpec.AT_MOST);
+        int width = View.MeasureSpec.makeMeasureSpec((1 << 30) - 1, View.MeasureSpec.AT_MOST);
+        int height = View.MeasureSpec.makeMeasureSpec((1 << 30) - 1, View.MeasureSpec.AT_MOST);
         v.measure(width, height);
         WH[0] = v.getMeasuredWidth();
         WH[1] = v.getMeasuredHeight();
@@ -172,7 +164,7 @@ public class Util {
 
     public static int getColor(@ColorRes int id) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            return gloableContext.getResources().getColor(id, null);
-        return gloableContext.getResources().getColor(id);
+            return MyApplication.appContext.getResources().getColor(id, null);
+        return MyApplication.appContext.getResources().getColor(id);
     }
 }

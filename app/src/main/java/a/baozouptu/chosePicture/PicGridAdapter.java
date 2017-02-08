@@ -14,6 +14,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import a.baozouptu.R;
+import a.baozouptu.chosePicture.data.UsuPathManger;
 import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.dataAndLogic.AsyncImageLoader3;
 import a.baozouptu.common.util.Util;
@@ -23,7 +24,7 @@ import a.baozouptu.common.util.Util;
  *
  * @description
  */
-class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int STATIC_SHOW_NUMBER = 25;
 
@@ -33,11 +34,11 @@ class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     boolean isScrollWidthoutTouch;
 
     public List<String> getImagUrls() {
-        return imagUrls;
+        return imageUrls;
     }
 
-    private List<String> imagUrls;
-    private final ProcessUsuallyPicPath usuallyProcessor;
+    private List<String> imageUrls;
+    private final UsuPathManger usuallyProcessor;
 
     private static int ITEM = 1;
     static int GROUP_HEADER = 2;
@@ -57,8 +58,9 @@ class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     };
 
-    public void setList(List<String> usualyPicPathList) {
-        imagUrls = usualyPicPathList;
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public interface ItemClickListener {
@@ -80,17 +82,12 @@ class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.longClickListener = longClickListenner;
     }
 
-    /**
-     * @param context
-     * @param imagUrls 要显示在GridView上的所有 图片的路径
-     */
-    public PicGridAdapter(Context context, List<String> imagUrls, ProcessUsuallyPicPath usuallyProcessor) {
+    public PicGridAdapter(Context context, UsuPathManger usuallyProcessor) {
         mContext = context;
         layoutInflater = LayoutInflater.from(context);
-        this.imagUrls = imagUrls;
         imageLoader = AllData.imageLoader3;
         this.usuallyProcessor = usuallyProcessor;
-        isScrollWidthoutTouch=false;
+        isScrollWidthoutTouch = false;
     }
 
     @Override
@@ -122,14 +119,15 @@ class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        holder.itemView.setTag(imagUrls.get(position));
+        holder.itemView.setTag(imageUrls.get(position));
         myBindViewHolder(holder, position);
     }
 
     void myBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+
         //如果是分组标题
         ItemHolder itemHolder = null;
-        if (usuallyProcessor.isUsuPic(imagUrls)) {
+        if (usuallyProcessor.isUsuPic(imageUrls)) {
             int headerValue = getHeaderValue(position);
             if (headerValue == 0) {
                 ((HeaderHolder) holder).tv.setText(R.string.latest_use);
@@ -149,10 +147,9 @@ class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         // 这个地方主义，imageLoader启动了一个新线程获取图片到cacheImage里面，新线程运行，本线程也会运行，
         // 因为新线程耗时，所以本线程已经执行到后面了，先加载了一张预设的图片，然后这个新线程会使用handler类更新UI线程， 妙啊！
         itemHolder.iv.setTag(position);
-        String path = imagUrls.get(position);
-        Bitmap cachedImage = null;
-        cachedImage = imageLoader.getBitmap(path);
-        if (cachedImage == null && (!isScrollWidthoutTouch||position <= STATIC_SHOW_NUMBER)) {
+        String path = imageUrls.get(position);
+        Bitmap cachedImage = imageLoader.getBitmap(path);
+        if (cachedImage == null && (!isScrollWidthoutTouch || position <= STATIC_SHOW_NUMBER)) {
             imageLoader.loadBitmap(path, itemHolder.iv, position, imageCallback, AllData.screenWidth / 3);
         }
         if (cachedImage != null && itemHolder.iv != null) {
@@ -164,14 +161,14 @@ class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        if (usuallyProcessor.isUsuPic(imagUrls))
-            return imagUrls.size();
-        return imagUrls.size();
+        if (usuallyProcessor.isUsuPic(imageUrls))
+            return imageUrls.size();
+        return imageUrls.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (usuallyProcessor.isUsuPic(imagUrls) && getHeaderValue(position) >= 0) {
+        if (usuallyProcessor.isUsuPic(imageUrls) && getHeaderValue(position) >= 0) {
             return GROUP_HEADER;
         }
         return ITEM;
@@ -179,15 +176,14 @@ class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     /**
      * 获取分组的值
-     *
      */
     private int getHeaderValue(int position) {
-        String path=imagUrls.get(position);
-        if (path.equals(ProcessUsuallyPicPath.USED_FLAG))//存在使用过的图片
+        String path = imageUrls.get(position);
+        if (path.equals(UsuPathManger.USED_FLAG))//存在使用过的图片
             return 0;
-        if (path.equals(ProcessUsuallyPicPath.RECENT_FLAG))
+        if (path.equals(UsuPathManger.RECENT_FLAG))
             return 1;
-        if (path.equals(ProcessUsuallyPicPath.PREFER_FLAG))
+        if (path.equals(UsuPathManger.PREFER_FLAG))
             return 2;
         return -1;
     }

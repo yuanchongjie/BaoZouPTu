@@ -4,9 +4,7 @@
 
 #include "NewColorTransfer.h"
 #include "MyUtil.h"
-#include<opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
-#include <jni.h>
 
 using namespace cv;
 
@@ -21,7 +19,6 @@ void NewColorTransfer::colorTransfer(Mat &src, Mat &tar, Mat &dst) {
     Vec3f srcMean3f, tarMean3f;// 源/目标图像均值
     Vec3f srcVariance3f, tarVariance3f;// 源/目标图像标准差
     Vec3f ratioVariance3f;// 标准差比例
-
     // BGR空间转Lab空间
     cvtColor(src, srcLab, CV_BGR2Lab);
     cvtColor(tar, tarLab, CV_BGR2Lab);
@@ -111,7 +108,6 @@ Mat new_transferColorSyle(_JNIEnv *env, Mat &under, Mat &above, jintArray &in_re
     LOGE("颜色转换完成");
     return dst;
 }
-
 Mat toInterceptRect(JNIEnv *env, Mat under, jintArray in_rect) {
     LOGE("开始获取内部的Mat");
     jboolean isCopy = (jboolean) false;
@@ -119,15 +115,10 @@ Mat toInterceptRect(JNIEnv *env, Mat under, jintArray in_rect) {
     int in_width = pi[2] - pi[0], in_height = pi[3] - pi[1];
     int left = pi[0], top = pi[1], right = pi[2], bottom = pi[3];
     //将适配颜色的边界调整为为原来边界的一倍
-    left = max(0, left - in_width / 2);
-    right = min(under.rows, right + in_width / 2);
-    top = max(0, top - in_width / 2);
-    bottom = min(under.cols, bottom + in_height / 2);
-    LOGE("调整颜色转换边界成功");
-    LOGE("调整到的的做%d", left);
-    LOGE("调整到的的上%d", top);
-    LOGE("调整到的的右%d", right);
-    LOGE("调整到的的下%d", bottom);
+    left = max(0, left - in_width / 6);
+    right = min(under.rows, right + in_width / 6);
+    top = max(0, top - in_height / 6);
+    bottom = min(under.cols, bottom + in_height / 6);
 
     Mat m_in_under = under(Range(left, right),Range(top, bottom));
 
