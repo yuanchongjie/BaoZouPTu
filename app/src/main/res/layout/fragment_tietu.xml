@@ -2,25 +2,74 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/tietu_function_bar"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="60dp"
     android:orientation="horizontal">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycle_list_tietu"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/tietu_function_expression"
+        android:layout_width="70dp"
         android:layout_height="match_parent"
-        android:layout_weight="40"
-        android:background="#fff" />
+        android:orientation="vertical">
 
-    <FrameLayout
-        android:layout_width="2dp"
+
+        <ImageView
+            android:id="@+id/tietu_image_expression"
+            android:layout_width="50dp"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:clickable="false"
+            android:paddingBottom="@dimen/padding_function_item_image"
+            android:paddingLeft="@dimen/padding_function_item_image"
+            android:paddingRight="@dimen/padding_function_item_image"
+            android:paddingTop="@dimen/padding_function_item_image"
+            android:src="@mipmap/edit"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/background_balloon"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clickable="false"
+            android:gravity="center"
+            android:text="表情"
+            android:textColor="@color/text_color1"
+            android:textSize="@dimen/text_size_main_function" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/tietu_function_property"
+        android:layout_width="70dp"
         android:layout_height="match_parent"
-        android:background="#333" />
+        android:orientation="vertical">
+
+
+        <ImageView
+            android:id="@+id/main_function_cut_iv"
+            android:layout_width="50dp"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:paddingBottom="@dimen/padding_function_item_image"
+            android:paddingLeft="@dimen/padding_function_item_image"
+            android:paddingRight="@dimen/padding_function_item_image"
+            android:paddingTop="@dimen/padding_function_item_image"
+            android:src="@mipmap/text"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/background_balloon"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="道具"
+            android:textColor="@color/text_color1"
+            android:textSize="@dimen/text_size_main_function" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/function_tietu_more"
-        android:layout_width="0dp"
-        android:layout_weight="9"
+        android:layout_width="70dp"
         android:layout_height="match_parent"
         android:background="@color/white"
         android:orientation="vertical">
@@ -39,12 +88,13 @@
             style="@style/function_text"
             android:layout_width="@dimen/function_width"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="本地"
-            android:gravity="center"
             android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="本地"
             android:textColor="@color/text_color1"
             android:textSize="@dimen/text_size_main_function" />
 
     </LinearLayout>
+
 </LinearLayout>

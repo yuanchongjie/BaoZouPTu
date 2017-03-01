@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import a.baozouptu.common.appInfo.AppConfig;
 import a.baozouptu.common.appInfo.MyApplication;
 import a.baozouptu.common.appInfo.UserExclusiveIdentify;
 import a.baozouptu.common.util.FileTool;
@@ -57,7 +58,7 @@ public class CrashLog extends BmobObject {
 
 
     public CrashLog() {
-        crash_version=2;
+        crash_version = AppConfig.CUR_APP_VERSION;
     }
 
     /**
@@ -69,9 +70,14 @@ public class CrashLog extends BmobObject {
     public void commit(Thread thread, Throwable ex) {
         //获取异常常栈信息到字符串中
         StringBuilder sb = new StringBuilder();
-        sb.append("线程名称:");
-        sb.append(thread.getName());
-        sb.append("\n");
+        sb.append("线程名称:")
+                .append(thread.getName())
+                .append("\n");
+        sb.append("异常信息：")
+                .append(ex.getCause().getClass().getSimpleName())
+                .append("类:\n")
+                .append(ex.getMessage())
+                .append("\n");
         for (StackTraceElement stackTraceElement : ex.getStackTrace()) {
             sb.append(stackTraceElement.toString());
             sb.append("\n");

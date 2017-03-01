@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 25
@@ -72,14 +73,17 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     //官方的
-    compile 'com.android.support:appcompat-v7:25.1.1'
-    compile 'com.android.support:design:25.1.1'
+    compile 'com.android.support:appcompat-v7:25.2.0'
+    compile 'com.android.support:design:25.2.0'
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
-    compile 'com.google.dagger:dagger:2.9'
 
-    //
-    //第三方的
+    //框架
+    provided 'org.glassfish:javax.annotation:10.0-b28'
+    apt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
+    compile "com.google.dagger:dagger:$rootProject.daggerVersion"
+    compile 'com.squareup.picasso:picasso:2.5.2'
+
+    //第三方的sdk
     //腾讯qq开放平台的sdk
     compile files('src/main/libs/open_sdk_r5778_lite.jar')
     //bmob-sdk：Bmob的android sdk包，包含了Bmob的数据存储、文件等服务，以下是最新的bmob-sdk:
@@ -89,4 +93,5 @@ dependencies {
     compile 'cn.bmob.android:http-legacy:1.0'
     // compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
     testCompile 'junit:junit:4.12'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
 }

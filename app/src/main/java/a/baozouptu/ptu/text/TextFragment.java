@@ -20,11 +20,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import a.baozouptu.R;
-import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.util.BitmapTool;
 import a.baozouptu.common.util.FileTool;
 import a.baozouptu.common.view.FirstUseDialog;
-import a.baozouptu.ptu.BaseFunction;
+import a.baozouptu.ptu.BasePtuFragment;
+import a.baozouptu.ptu.BasePtuFunction;
 import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.RepealRedoListener;
@@ -33,14 +33,13 @@ import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TextStepData;
 import a.baozouptu.ptu.view.PtuFrameLayout;
 import a.baozouptu.ptu.view.PtuView;
-import cn.bmob.v3.Bmob;
 import rx.Subscriber;
 
 /**
  * 添加文字功能的fragment
  * Created by Administrator on 2016/5/1.
  */
-public class TextFragment extends Fragment implements BaseFunction {
+public class TextFragment extends BasePtuFragment {
     PtuActivity mAcitivty;
     LinearLayout toumingdu;
     LinearLayout style;
@@ -235,22 +234,23 @@ public class TextFragment extends Fragment implements BaseFunction {
     public void addBigStep(StepData sd) {
         addBigStep((TextStepData) sd, sd.picPath == null ? null : BitmapTool.getLosslessBitmap(sd.picPath));
     }
+
     /**
      * 已经存在bitmap的情况下，更快速的添加
      *
-     * @param addBm 要添加的图片
+     * @param textAddBm 要添加的图片
      */
-    private void addBigStep(TextStepData tsd, Bitmap addBm) {
+    private void addBigStep(TextStepData tsd, Bitmap textAddBm) {
         //擦除的东西添加上去
         ArrayList<Pair<Path, Paint>> pathPaintList = tsd.getRubberData();
-        if (pathPaintList != null) {//存在文字数据
+        if (pathPaintList != null) {//存在橡皮数据
             Canvas canvas = new Canvas(ptuView.getSourceBm());
             for (Pair<Path, Paint> pair : pathPaintList) {
                 canvas.drawPath(pair.first, pair.second);
             }
         }
-        if (addBm != null) {//存在橡皮数据
-            ptuView.addBitmap(addBm, tsd.boundRectInPic, 0);
+        if (textAddBm != null) {//存在文字数据
+            ptuView.addBitmap(textAddBm, tsd.boundRectInPic, 0);
         } else if (pathPaintList != null)  //存橡皮数据，只刷新橡皮
         {
             ptuView.invalidate();
@@ -260,8 +260,8 @@ public class TextFragment extends Fragment implements BaseFunction {
     public boolean onBackPressed() {
         if (((PtuActivity) getActivity()).getPtuFrame().indexOfChild(floatTextView) == -1) {
             switchRubber();
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 }

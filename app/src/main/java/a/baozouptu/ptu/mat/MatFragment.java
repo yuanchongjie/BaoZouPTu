@@ -13,7 +13,8 @@ import android.widget.LinearLayout;
 
 import a.baozouptu.R;
 import a.baozouptu.common.util.Util;
-import a.baozouptu.ptu.BaseFunction;
+import a.baozouptu.ptu.BasePtuFragment;
+import a.baozouptu.ptu.BasePtuFunction;
 import a.baozouptu.ptu.repealRedo.StepData;
 
 /**
@@ -21,7 +22,7 @@ import a.baozouptu.ptu.repealRedo.StepData;
  *
  * @description
  */
-public class MatFragment extends Fragment implements BaseFunction {
+public class MatFragment extends BasePtuFragment {
     private static final String TAG = "MatFragment";
     private Context mContext;
     private LinearLayout shape;

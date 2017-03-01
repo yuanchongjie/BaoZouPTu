@@ -40,8 +40,8 @@ public class SettingDataSourceImpl implements SettingDataSource {
         /**
          * 写死的部分
          */
-        DATA_DIRS = new String[]{AllData.zitiDir, ""};
-        DATA_NAMES = new String[]{"字体文件", "图片缓存"};
+        DATA_DIRS = new String[]{AllData.zitiDir,AllData.tietuDir};
+        DATA_NAMES = new String[]{"字体文件", "贴图文件"};
 
         initDataInfo();
     }
@@ -64,6 +64,9 @@ public class SettingDataSourceImpl implements SettingDataSource {
                     sizeStrings[i] = "0";
                 } else {
                     sizeStrings[i] = df.format(size);
+                    if(sizeStrings[i].length()==2){
+                        sizeStrings[i]="0"+sizeStrings[i];
+                    }
                 }
                 totalSize += (float) size;
             } else
@@ -134,15 +137,15 @@ public class SettingDataSourceImpl implements SettingDataSource {
         }
         //清除缓存的贴图
         if (userChosenItems[1]) {
-            if (!clearImageCahe())
+            if (!clearTietuCache())
                 failRes += DATA_NAMES[1];
         }
         initDataInfo();
         return failRes;
     }
 
-    private boolean clearImageCahe() {
-        return true;
+    private boolean clearTietuCache() {
+        return FileTool.deleteAllChileFile(new File(AllData.tietuDir));
     }
 
     private boolean clearTypeface() {

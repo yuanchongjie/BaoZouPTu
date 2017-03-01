@@ -38,7 +38,7 @@ import a.baozouptu.ptu.view.PtuView;
 /**
  * Created by Administrator on 2016/7/25.
  */
-public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnClickListener {
+public class DrawFragment extends DrawBasePtuFunction implements View.OnClickListener {
     private String TAG = "DrawFragment";
     private Context mContext;
     private LinearLayout style;
@@ -59,7 +59,7 @@ public class DrawFragment extends Fragment implements DrawBaseFunction, View.OnC
     }
 
     @Override
-    public void smallRedo(){
+    public void smallRedo() {
         drawView.recover();
         Log.e(TAG, "recover");
     }

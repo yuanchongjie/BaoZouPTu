@@ -15,7 +15,7 @@ public class AboutAppActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about_app);
         ((TextView) findViewById(R.id.about_version)).
-                setText("暴走P图 " + AppConfig.CUR_VERSION_NAME + ".0");
+                setText("暴走P图 " + AppConfig.CUR_VERSION_NAME);
 
         findViewById(R.id.about_return_btn).
                 setOnClickListener(

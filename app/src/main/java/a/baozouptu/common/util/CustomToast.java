@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import a.baozouptu.R;
+import a.baozouptu.common.appInfo.MyApplication;
 import a.baozouptu.common.dataAndLogic.AllData;
 
 
@@ -26,15 +27,18 @@ import a.baozouptu.common.dataAndLogic.AllData;
 public class CustomToast {
 
     public static Toast makeText(Activity act, String msg, int time) {
+        return makeText(msg, time);
+    }
+
+    public static Toast makeText(String msg, int time) {
         Toast sToast;
-        LayoutInflater inflater = act.getLayoutInflater();
+        LayoutInflater inflater = LayoutInflater.from(MyApplication.appContext);
         View layout = inflater.inflate(R.layout.layout_custom_toast, null);
 
         TextView textView = (TextView) layout.findViewById(R.id.tv_toast);
-        textView.setText(" "+msg+" ");
+        textView.setText(" " + msg + " ");
 
-
-        sToast = new Toast(act.getApplicationContext());
+        sToast = new Toast(MyApplication.appContext);
         sToast.setView(layout);
         sToast.setGravity(Gravity.BOTTOM, 0, 300);
 

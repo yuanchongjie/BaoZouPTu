@@ -32,7 +32,7 @@ public class PtuFrameLayout extends FrameLayout {
     private boolean onFloat = false;
     private float downX;
     private float downY;
-    private float minMoveDis = Util.dp2Px(3);
+    private float minMoveDis;
     private long downTime;
     private float scaleCenterX;
     private float scaleCenterY;
@@ -41,10 +41,28 @@ public class PtuFrameLayout extends FrameLayout {
      */
     private boolean hasUp = true;
 
+    public PtuFrameLayout(Context context) {
+        super(context);
+        init();
+    }
+
+    public PtuFrameLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
 
     public PtuFrameLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
+        init();
+    }
+
+    private void init() {
+        //以下是在IED中显示是不能依赖的代码，使用isInEditMode返回
+        if (isInEditMode()) {
+            return;
+        }
+        minMoveDis = Util.dp2Px(3);
     }
 
     public FloatTextView initAddTextFloat(Rect picBound) {

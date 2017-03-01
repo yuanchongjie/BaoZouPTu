@@ -30,7 +30,7 @@ public class UsuPathManger {
     private Context mContext;
     private final int MAX_USED_NUMBER = 4;
     private final int MIN_RECENT_NUMBER = 6;
-    private final int MAX_RECENT_NUMBER = 20;
+    private final int MAX_RECENT_NUMBER = 17;
     /**
      * 3天的毫秒数
      */
@@ -44,13 +44,13 @@ public class UsuPathManger {
      * 只获取一次系统时间，以后都以它为基础相加，避免加入太快，毫秒不能记数
      */
     private long lastTime = System.currentTimeMillis();
-    private List<String> mUsualyPicPathList = new ArrayList<>();
+    private List<String> mUsuallyPicPathList = new ArrayList<>();
 
 
     /**
      * 添加出常用的图片
      */
-    private List<String> usualyFilesList = new ArrayList<>();
+    private List<String> usuallyFilesList = new ArrayList<>();
 
     public UsuPathManger(Context context) {
         mContext = context;
@@ -59,21 +59,21 @@ public class UsuPathManger {
     public List<String> initFromDB() {
         try {
             mDB = MyDatabase.getInstance(mContext);
-            mUsualyPicPathList.add(USED_FLAG);
-            mDB.queryAllUsedPic(mUsualyPicPathList);
-            usedNumber = mUsualyPicPathList.size() - 1;
-            mUsualyPicPathList.add(RECENT_FLAG);
-            mUsualyPicPathList.add(PREFER_FLAG);
-            mDB.queryAllPreferPic(mUsualyPicPathList);
-            for (String path : usualyFilesList) {
-                FileTool.getOrderedPicListInFile(path, mUsualyPicPathList);
+            mUsuallyPicPathList.add(USED_FLAG);
+            mDB.queryAllUsedPic(mUsuallyPicPathList);
+            usedNumber = mUsuallyPicPathList.size() - 1;
+            mUsuallyPicPathList.add(RECENT_FLAG);
+            mUsuallyPicPathList.add(PREFER_FLAG);
+            mDB.queryAllPreferPic(mUsuallyPicPathList);
+            for (String path : usuallyFilesList) {
+                FileTool.getOrderedPicListInFile(path, mUsuallyPicPathList);
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             mDB.close();
         }
-        return mUsualyPicPathList;
+        return mUsuallyPicPathList;
     }
 
     /**
@@ -85,19 +85,19 @@ public class UsuPathManger {
         try {
             mDB = MyDatabase.getInstance(mContext);
             //如果存在，需要先删除原来的
-            int id = mUsualyPicPathList.indexOf(path);
+            int id = mUsuallyPicPathList.indexOf(path);
             if (id != -1 && id <= usedNumber) {
                 mDB.deleteUsedPic(path);
-                mUsualyPicPathList.remove(path);
+                mUsuallyPicPathList.remove(path);
                 usedNumber--;
             }
             if (usedNumber >= MAX_USED_NUMBER) {
                 mDB.deleteOdlestUsedPic();//超过预定数量时，删除一个，再添加
-                mUsualyPicPathList.remove(usedNumber);
+                mUsuallyPicPathList.remove(usedNumber);
                 usedNumber--;
             }
             mDB.insertUsedPic(path, lastTime++);
-            mUsualyPicPathList.add(1, path);
+            mUsuallyPicPathList.add(1, path);
             usedNumber++;
         } catch (IOException e) {
             e.printStackTrace();
@@ -110,7 +110,7 @@ public class UsuPathManger {
      * 添加最近图片,最后面
      */
     private void addRecentPathEnd(String path) {
-        mUsualyPicPathList.add(usedNumber + 2 + recentNumber, path);
+        mUsuallyPicPathList.add(usedNumber + 2 + recentNumber, path);
         recentNumber++;
     }
 
@@ -118,7 +118,7 @@ public class UsuPathManger {
      * 添加最近图片，最前面
      */
     public void addRecentPathFirst(String path) {
-        mUsualyPicPathList.add(usedNumber + 2, path);
+        mUsuallyPicPathList.add(usedNumber + 2, path);
         recentNumber++;
         Log.e("---------", "addRecentPathFirst: 添加最近图片成功+数量=" + recentNumber);
     }
@@ -130,7 +130,7 @@ public class UsuPathManger {
         try {
             mDB = MyDatabase.getInstance(mContext);
             mDB.insertPreferPic(path, lastTime++);
-            mUsualyPicPathList.add(getPreferStart(), path);
+            mUsuallyPicPathList.add(getPreferStart(), path);
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -146,7 +146,7 @@ public class UsuPathManger {
     public void deletePreferPath(String path, int index) {
         try {
             mDB = MyDatabase.getInstance(mContext);
-            mUsualyPicPathList.remove(index);
+            mUsuallyPicPathList.remove(index);
             mDB.deleteFrequentlyPic(path);
         } catch (IOException e) {
             e.printStackTrace();
@@ -163,9 +163,9 @@ public class UsuPathManger {
     public boolean checkRecentExit() {
         boolean has=false;
         for (int i = usedNumber + 2; i < recentNumber + usedNumber + 2; i++) {
-            String path = mUsualyPicPathList.get(i);
+            String path = mUsuallyPicPathList.get(i);
             if (!new File(path).exists()) {
-                mUsualyPicPathList.remove(i);
+                mUsuallyPicPathList.remove(i);
                 recentNumber--;
                 has=true;
             }
@@ -175,7 +175,7 @@ public class UsuPathManger {
 
     private boolean isInRecent(String path) {
         for (int i = usedNumber + 2; i < recentNumber + usedNumber + 2; i++) {
-            if (mUsualyPicPathList.get(i).equals(path))
+            if (mUsuallyPicPathList.get(i).equals(path))
                 return true;
         }
         return false;
@@ -194,22 +194,22 @@ public class UsuPathManger {
         try {
             //如果包含在最近使用列表
 
-            int id = mUsualyPicPathList.indexOf(path);
+            int id = mUsuallyPicPathList.indexOf(path);
             if (1 <= id && id <= usedNumber) {
                 mDB.deleteUsedPic(path);
-                mUsualyPicPathList.remove(id);
+                mUsuallyPicPathList.remove(id);
                 usedNumber--;
             }
             //如果包含在最近图片列表
-            id = mUsualyPicPathList.indexOf(path);
+            id = mUsuallyPicPathList.indexOf(path);
             if (usedNumber + 2 <= id && id < usedNumber + recentNumber + 2) {
-                mUsualyPicPathList.remove(id);
+                mUsuallyPicPathList.remove(id);
                 recentNumber--;
             }
             //如果包含在常用列表
-            if (mUsualyPicPathList.contains(path)) {
+            if (mUsuallyPicPathList.contains(path)) {
                 mDB.deleteFrequentlyPic(path);
-                mUsualyPicPathList.remove(path);
+                mUsuallyPicPathList.remove(path);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -227,15 +227,15 @@ public class UsuPathManger {
     }
 
     public int getPreferNumber() {
-        return usualyFilesList.size() - usedNumber - recentNumber - 3;
+        return usuallyFilesList.size() - usedNumber - recentNumber - 3;
     }
 
     public boolean isUsuPic(List<String> imagUrls) {
-        return imagUrls == mUsualyPicPathList;
+        return imagUrls == mUsuallyPicPathList;
     }
 
     public boolean hasRecentPic(String picPath) {
-        int id = mUsualyPicPathList.indexOf(picPath);
+        int id = mUsuallyPicPathList.indexOf(picPath);
         if (usedNumber + 2 <= id && id < recentNumber + usedNumber + 2) return true;
         return false;
     }
@@ -253,7 +253,7 @@ public class UsuPathManger {
 
         //先清空所有的最近图片路径
         for (int i = usedNumber + recentNumber + 1; i >= usedNumber + 2; i--) {
-            mUsualyPicPathList.remove(i);
+            mUsuallyPicPathList.remove(i);
         }
         recentNumber = 0;
 
@@ -261,16 +261,16 @@ public class UsuPathManger {
         long lastTime = System.currentTimeMillis() - RECENT_DURATION_TIME;
         for (Pair<Long, String> pair : sortedPicPathsByTime) {
             if (pair.first < lastTime && recentNumber >= MIN_RECENT_NUMBER) break;
-            if (recentNumber > MAX_RECENT_NUMBER) break;
+            if (recentNumber >= MAX_RECENT_NUMBER) break;
             addRecentPathEnd(pair.second);
         }
     }
 
     public List<String> getUsuPaths() {
-        return mUsualyPicPathList;
+        return mUsuallyPicPathList;
     }
 
     public int lastIndexOf(String path) {
-        return mUsualyPicPathList.lastIndexOf(path);
+        return mUsuallyPicPathList.lastIndexOf(path);
     }
 }

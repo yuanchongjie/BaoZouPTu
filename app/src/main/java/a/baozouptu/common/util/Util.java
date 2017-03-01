@@ -1,6 +1,7 @@
 package a.baozouptu.common.util;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.ColorRes;
@@ -53,6 +54,17 @@ public class Util {
             }
         }
         return -1;
+    }
+
+    /**
+     * 点是否在View内部,注意参数值都是绝对坐标
+     */
+    public static boolean pointInView(float x, float y, View view) {
+        if (view == null) return false;
+        int[] xy = new int[2];
+        view.getLocationOnScreen(xy);
+        Rect bound = new Rect(xy[0], xy[1], xy[0] + view.getWidth(), xy[1] + view.getHeight());
+        return bound.contains((int) (x + 0.5f), (int) (y + 0.5f));
     }
 
     /**

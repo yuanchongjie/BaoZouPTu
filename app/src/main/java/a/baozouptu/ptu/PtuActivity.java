@@ -16,7 +16,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +37,7 @@ import a.baozouptu.common.util.BitmapTool;
 import a.baozouptu.common.util.FileTool;
 import a.baozouptu.common.util.Util;
 import a.baozouptu.common.view.FirstUseDialog;
+import a.baozouptu.common.view.PtuConstraintLayout;
 import a.baozouptu.ptu.common.MainFunctionFragment;
 import a.baozouptu.ptu.cut.CutFragment;
 import a.baozouptu.ptu.draw.DrawFragment;
@@ -87,6 +87,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     public PtuView ptuView;
 
     private PtuFrameLayout ptuFrame;
+    private PtuConstraintLayout ptuLayout;
     /**
      * 子功能获取的bitmap的参数,0为获取图片相对原图片的左边距，1为获取图片相对原图片的上边距，
      * <p>2为获取图片的宽，3为获取图片的高度
@@ -110,7 +111,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     /**
      * 这两个用于处理fragment切换动画时出现的异常
      */
-    private Fragment lastFrag, currentFrag;
+    private BasePtuFragment lastFrag, currentFrag;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -318,8 +319,8 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                         else subscriber.onNext(picPath);
                         subscriber.onCompleted();
                     }
-                }
-        ).subscribeOn(Schedulers.io())
+                })
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<String>() {
                     @Override
@@ -384,6 +385,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
      * 初始化视图,尤其顶部的视图条
      */
     private void initView() {
+        ptuLayout = (PtuConstraintLayout) findViewById(R.id.ptu_layout);
         ptuFrame = (PtuFrameLayout) findViewById(R.id.ptu_frame);
         ptuView = (PtuView) findViewById(R.id.ptu_view);
 
@@ -441,7 +443,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cancel();
+                onReturnMain();
             }
         });
         returnLayout.setOnClickListener(
@@ -593,7 +595,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         else if (CURRENT_EDIT_MODE == EDIT_TEXT) {
             StepData tsd = textFrag.getResultDataAndDraw(1);
             if (tsd == null) {//有些情况下会返回空
-                cancel();
+                onReturnMain();
                 return;
             }
             //释放，删除等部分
@@ -625,13 +627,13 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
         if (resd != null)//超限了，把最开始的的一步添加到基图上
             addBigStep(resd);
         Util.P.le(TAG, "撤销重做资源处理成功");
-        cancel();
+        onReturnMain();
     }
 
     /**
-     * 取消功能，点击取消按钮，back按键，和sure按钮三个地方之后都用到它
+     * 回到主功能界面时，点击取消按钮，back按键，和sure按钮三个地方之后都用到它
      */
-    private void cancel() {
+    private void onReturnMain() {
         if (lastFrag != null && lastFrag.isRemoving()) return;
         checkRepealRedo();
         int count = ptuFrame.getChildCount();
@@ -815,12 +817,8 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     @Override
     public void onBackPressed() {
         if (CURRENT_EDIT_MODE != EDIT_MAIN) {
-            if (CURRENT_EDIT_MODE == EDIT_TEXT) {
-                if (textFrag.onBackPressed())
-                    cancel();
-                return;
-            }
-            cancel();
+            if (currentFrag.onBackPressed()) return;
+            onReturnMain();
         } else {
             certainLeave();
         }

@@ -99,13 +99,12 @@ public class BitmapTool {
                 new Observable.OnSubscribe<String>() {
                     @Override
                     public void call(Subscriber<? super String> subscriber) {
-                        Log.e("Bitmap toll ", "call: 发出事件 " + Thread.currentThread().getName());
                         if (tempPath == null) subscriber.onError(new Throwable("创建文件件失败"));
                         subscriber.onNext(tempPath);
                         String result = saveBitmap(AllData.appContext, bitmap, tempPath);
                         if (result.equals("success"))
                             subscriber.onNext(result);
-                        else subscriber.onError(new Throwable("保存Bitmap失败"));
+                        else subscriber.onError(new Throwable(result));
                     }
                 })
                 .subscribeOn(Schedulers.io())
@@ -162,14 +161,11 @@ public class BitmapTool {
                 context.sendBroadcast(intent);
             }
         } catch (SecurityException se) {
-            return "创建文件失败";
+            return se.getMessage();
         } catch (FileNotFoundException e) {
-            Util.P.le("Bitmaptool.savePicture", "存储文件失败");
-            e.printStackTrace();
-            return "保存失败";
+            return e.getMessage();
         } catch (IOException e) {
-            e.printStackTrace();
-            return "创建文件失败";
+            return e.getMessage();
         } finally {
             if (fo != null)
                 try {

@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +35,7 @@ import okio.Okio;
  * @version jdk 1.8, sdk 21
  */
 public class FileTool {
-
+    private static long lastTempTime=System.currentTimeMillis();
     private String suffix;
 
     /**
@@ -140,10 +141,11 @@ public class FileTool {
                 }
             }
         }
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        Date curDate = new Date(System.currentTimeMillis());//获取当前时间
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        Date curDate = new Date(lastTempTime++);//获取当前时间
         String time = formatter.format(curDate);
-        String tempPath = tempDir + "/text_step_bm" + time + ".png";
+        time+="_"+lastTempTime%1000;
+        String tempPath = tempDir + "/ptu" + time + ".png";
         return tempPath;
     }
 
@@ -207,7 +209,9 @@ public class FileTool {
         return size;
     }
 
-    //删除文件夹中所有存在的子文件
+    /**
+     * 删除文件夹中所有存在的子文件
+     */
     public static boolean deleteAllChileFile(File dir) {
         if (dir.isDirectory()) {
             File[] children = dir.listFiles();
@@ -351,4 +355,14 @@ public class FileTool {
         return path.substring(0, path.lastIndexOf('/'));
     }
 
+    /**
+     * 获取所有的子文件,不存在时创建
+     */
+    public static File[] getAllChildFiles(String dirPath) {
+        File dir = new File(dirPath);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return dir.listFiles();
+    }
 }

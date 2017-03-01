@@ -16,7 +16,7 @@ import java.util.List;
 import a.baozouptu.R;
 import a.baozouptu.chosePicture.data.UsuPathManger;
 import a.baozouptu.common.dataAndLogic.AllData;
-import a.baozouptu.common.dataAndLogic.AsyncImageLoader3;
+import a.baozouptu.common.dataAndLogic.AsyncImageLoader;
 import a.baozouptu.common.util.Util;
 
 /**
@@ -30,7 +30,7 @@ public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private final Context mContext;
     private final LayoutInflater layoutInflater;
-    private final AsyncImageLoader3 imageLoader;
+    private final AsyncImageLoader imageLoader;
     boolean isScrollWidthoutTouch;
 
     public List<String> getImagUrls() {
@@ -44,7 +44,7 @@ public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     static int GROUP_HEADER = 2;
 
 
-    AsyncImageLoader3.ImageCallback imageCallback = new AsyncImageLoader3.ImageCallback() {
+    AsyncImageLoader.ImageCallback imageCallback = new AsyncImageLoader.ImageCallback() {
         @Override
         public void imageLoaded(Bitmap imageDrawable, ImageView image, int position, String imageUrl) {
 
@@ -93,7 +93,7 @@ public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == ITEM) {
-            LinearLayout layout = creatItemLayout(parent);
+            LinearLayout layout = createItemLayout(parent);
             final ItemHolder itemHolder = new ItemHolder(layout);
             itemHolder.iv = creatItemImage(layout);
             itemHolder.iv.setOnClickListener(new View.OnClickListener() {
@@ -128,18 +128,30 @@ public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         //如果是分组标题
         ItemHolder itemHolder = null;
         if (usuallyProcessor.isUsuPic(imageUrls)) {
-            int headerValue = getHeaderValue(position);
-            if (headerValue == 0) {
-                ((HeaderHolder) holder).tv.setText(R.string.latest_use);
-                return;
-            } else if (headerValue == 1) {
-                ((HeaderHolder) holder).tv.setText(R.string.recent_pic);
-                return;
-            } else if (headerValue == 2) {
-                ((HeaderHolder) holder).tv.setText(R.string.prefer_pic);
+            if (holder instanceof HeaderHolder) {
+                int headerType = getHeaderType(position);
+                if (headerType == -1) headerType = searchHeaderType(position);
+                if (headerType == 0) {//// TODO: 2017/3/1 0001 这里有个挺麻烦的地方，header的View和adapter中的数据对不上，
+                    // TODO: 2017/3/1 0001  可能原因是RecyclerView获取到了类型到显示期间，其他线程让Adapter的数据更新了，但是RecyclerView的没有更新，导致View和数据错位。
+                    // TODO：目前只使用了简单的判断holder类型的方法，但是会出现不显示header的问题
+                    ((HeaderHolder) holder).tv.setText(R.string.latest_use);
+                    return;
+                } else if (headerType == 1) {
+                    ((HeaderHolder) holder).tv.setText(R.string.recent_pic);
+                    return;
+                } else if (headerType == 2) {
+                    ((HeaderHolder) holder).tv.setText(R.string.prefer_pic);
+                    return;
+                } else {
+                    ((HeaderHolder) holder).tv.setText(" ");
+                }
                 return;
             } else {
                 itemHolder = (ItemHolder) holder;
+                if (getHeaderType(position) != -1) {//如果数据错位，item位置的数据时header的
+                    itemHolder.iv.setImageResource(R.mipmap.instead_icon);
+                    return;
+                }
             }
         } else {
             itemHolder = (ItemHolder) holder;
@@ -159,6 +171,7 @@ public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
+
     @Override
     public int getItemCount() {
         if (usuallyProcessor.isUsuPic(imageUrls))
@@ -168,7 +181,7 @@ public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemViewType(int position) {
-        if (usuallyProcessor.isUsuPic(imageUrls) && getHeaderValue(position) >= 0) {
+        if (usuallyProcessor.isUsuPic(imageUrls) && getHeaderType(position) >= 0) {
             return GROUP_HEADER;
         }
         return ITEM;
@@ -177,7 +190,7 @@ public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     /**
      * 获取分组的值
      */
-    private int getHeaderValue(int position) {
+    private int getHeaderType(int position) {
         String path = imageUrls.get(position);
         if (path.equals(UsuPathManger.USED_FLAG))//存在使用过的图片
             return 0;
@@ -188,15 +201,23 @@ public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return -1;
     }
 
-    public static class ItemHolder extends RecyclerView.ViewHolder {
-        ImageView iv;
-
-        public ItemHolder(View itemView) {
-            super(itemView);
+    /**
+     * 临时方法，pictureListView的View数据和Adapter数据不同步的问题
+     *
+     * @param position 搜索的中间起始位置
+     */
+    private int searchHeaderType(int position) {
+        int resId;
+        for (int i = 1; position - i >= 0 || position + i < imageUrls.size(); i++) {
+            if (position - i >= 0)
+                if ((resId = getHeaderType(position - i)) != -1) return resId;
+            if (position + i < imageUrls.size())
+                if ((resId = getHeaderType(position + i)) != -1) return resId;
         }
+        return -1;
     }
 
-    LinearLayout creatItemLayout(ViewGroup parent) {
+    LinearLayout createItemLayout(ViewGroup parent) {
         // 创建LinearLayout对象
         LinearLayout mLinearLayout = new LinearLayout(mContext);
 
@@ -218,6 +239,14 @@ public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 LinearLayout.LayoutParams.MATCH_PARENT, AllData.screenWidth / 3 - 4);
         linearLayout.addView(imageView, mLayoutParams);
         return imageView;
+    }
+
+    public static class ItemHolder extends RecyclerView.ViewHolder {
+        ImageView iv;
+
+        public ItemHolder(View itemView) {
+            super(itemView);
+        }
     }
 
     public static class HeaderHolder extends RecyclerView.ViewHolder {

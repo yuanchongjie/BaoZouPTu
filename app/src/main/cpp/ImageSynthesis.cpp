@@ -42,13 +42,10 @@ JNIEXPORT inline bool transformData(JNIEnv *env, jobject jbitmap,
     }
     return true;
 }
-/*
- * 参数
- * in_rect依次是 左上右下
- */
+
 extern "C"
 JNIEXPORT jintArray JNICALL
-Java_a_baozouptu_ptu_tietu_pictureSynthesis_PictureSynthesis_synthesisBm(JNIEnv *env,
+Java_a_baozouptu_ptu_tietu_tietuImpact_PictureSynthesis_synthesisBm(JNIEnv *env,
                                                                          jobject instance,
                                                                          jobject under,
                                                                          jobject above,

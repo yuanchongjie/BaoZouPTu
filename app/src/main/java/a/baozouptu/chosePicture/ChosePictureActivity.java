@@ -23,7 +23,7 @@ import a.baozouptu.chosePicture.view.LongPicPopupWindow;
 import a.baozouptu.chosePicture.view.ToSettingPopupWindow;
 import a.baozouptu.common.BaseActivity;
 import a.baozouptu.common.dataAndLogic.AllData;
-import a.baozouptu.common.dataAndLogic.AsyncImageLoader3;
+import a.baozouptu.common.dataAndLogic.AsyncImageLoader;
 import a.baozouptu.common.util.Util;
 import a.baozouptu.common.view.FirstUseDialog;
 import a.baozouptu.ptu.PtuActivity;
@@ -64,7 +64,7 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
             if (s != null && s.equals("tietu"))
                 isChooseTietu = true;
         }
-//        test();
+        test();
         presenter = new ChosePicPresenter(this);
         initView();
         isFromCreate = true;
@@ -173,7 +173,7 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
 
         pictureGridview.addOnScrollListener(
                 new RecyclerView.OnScrollListener() {
-                    AsyncImageLoader3 imageLoader = AsyncImageLoader3.getInstance();
+                    AsyncImageLoader imageLoader = AsyncImageLoader.getInstance();
                     int lastScrollState = RecyclerView.SCROLL_STATE_IDLE;
 
                     @Override
@@ -202,7 +202,7 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
                                 }
                                 lastScrollState = RecyclerView.SCROLL_STATE_DRAGGING;
                                 break;
-                            case RecyclerView.SCROLL_STATE_SETTLING://无触摸滑动
+                            case RecyclerView.SCROLL_STATE_SETTLING://惯性滑动，无触摸滑动
                                 picAdapter.isScrollWidthoutTouch = true;
                                 imageLoader.cancelLoad();//取消解析，提交的任务还没有执行的就不执行了
                                 lastScrollState = RecyclerView.SCROLL_STATE_SETTLING;
@@ -359,13 +359,13 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
 
     @Override
     protected void onStop() {
-        //  AsyncImageLoader3.getInstance().stop();
+        //  AsyncImageLoader.getInstance().stop();
         super.onStop();
     }
 
     @Override
     protected void onRestart() {
-        //AsyncImageLoader3.getInstance().reStart();
+        //AsyncImageLoader.getInstance().reStart();
         super.onRestart();
     }
 

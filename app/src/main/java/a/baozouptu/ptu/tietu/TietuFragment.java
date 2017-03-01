@@ -1,11 +1,9 @@
 package a.baozouptu.ptu.tietu;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -21,9 +19,12 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import a.baozouptu.R;
 import a.baozouptu.common.util.BitmapTool;
@@ -31,10 +32,14 @@ import a.baozouptu.common.util.CustomToast;
 import a.baozouptu.common.util.FileTool;
 import a.baozouptu.common.util.Util;
 import a.baozouptu.chosePicture.ChosePictureActivity;
-import a.baozouptu.ptu.BaseFunction;
+import a.baozouptu.common.view.PtuConstraintLayout;
+import a.baozouptu.ptu.BasePtuFragment;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TietuStepData;
+import a.baozouptu.ptu.tietu.onlineTietu.PriorTietuManager;
+import a.baozouptu.ptu.tietu.onlineTietu.TietuRecyclerAdapter;
+import a.baozouptu.ptu.tietu.onlineTietu.tietu_material;
 import a.baozouptu.ptu.tietu.tietuImpact.PictureSynthesis;
 import a.baozouptu.ptu.tietu.tietuImpact.SynthesisImagePopupWindow;
 import a.baozouptu.ptu.view.PtuFrameLayout;
@@ -47,23 +52,29 @@ import rx.schedulers.Schedulers;
 /**
  * Created by Administrator on 2016/7/1.
  */
-public class TietuFragment extends Fragment implements BaseFunction
-        , TietuContract.TietuView {
+public class TietuFragment extends BasePtuFragment implements TietuContract.TietuView {
     private static String TAG = "TietuFragment";
     private TietuFrameLayout tietuLayout;
-    private TietuContract.TietuPresenter tietuPresenter;
+    @Inject
+    TietuContract.TietuPresenter presenter;
+    @Inject
+    @Named("expression")
+    TietuRecyclerAdapter expressionAdapter;
+    @Inject
+    @Named("property")
+    TietuRecyclerAdapter propertyAdapter;
     Context mContext;
     List<Integer> tietuIds = new ArrayList<>();
 
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
-    private TietuRecyclerAdapter tietuAdapter;
 
     private LinearLayout more;
 
     private PtuView ptuView;
     private PtuFrameLayout ptuFrame;
     private SynthesisImagePopupWindow synthesisImagePopupWindow;
+    private String curCategory = "-----------";
 
 
     public void setTietuLayout(TietuFrameLayout tietuLayout) {
@@ -72,38 +83,9 @@ public class TietuFragment extends Fragment implements BaseFunction
                 new TietuFrameLayout.TietuChangeListener() {
                     @Override
                     public void onTietuRemove(FloatImageView view) {
-                        removeFloatImageView(view);
+                        //暂无操作
                     }
                 });
-    }
-
-    private void loadTietuPath() {
-        if (tietuIds.size() != 0) return;
-        tietuIds.addAll(Arrays.asList(
-                R.mipmap.biaoqing2,
-                R.mipmap.biaoqing7,
-                R.mipmap.biaoqing5,
-                R.mipmap.biaoqing4,
-                R.mipmap.biaoqing10,
-                R.mipmap.biaoqing9,
-                R.mipmap.meng2,
-                R.mipmap.baojian,
-                R.mipmap.huanggua,
-                R.mipmap.kuaibo,
-                R.mipmap.latiao1,
-                R.mipmap.latiao2,
-                R.mipmap.dog1,
-                R.mipmap.dog2,
-                R.mipmap.biaoqing1,
-                R.mipmap.biaoqing3,
-                R.mipmap.biaoqing6,
-                R.mipmap.biaoqing8,
-                R.mipmap.meng1,
-                R.mipmap.touxie,
-                R.mipmap.xiaoqian1,
-                R.mipmap.xiaoqing2,
-                R.mipmap.xiongmao,
-                R.mipmap.jinmao));
     }
 
 
@@ -111,28 +93,25 @@ public class TietuFragment extends Fragment implements BaseFunction
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = getActivity();
-        loadTietuPath();
+        DaggerTietuComponent.builder().tietuModule(new TietuModule(this)).build().inject(this);
     }
-
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tietu, container, false);
 
+
         //底部的贴图列表
-        tietuAdapter = new TietuRecyclerAdapter(mContext, tietuIds);
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycle_list_tietu);
-        recyclerView.setBackgroundColor(Color.BLACK);
+        recyclerView = new RecyclerView(mContext);
         layoutManager = new LinearLayoutManager(mContext, LinearLayout.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(tietuAdapter);
 
         more = (LinearLayout) view.findViewById(R.id.function_tietu_more);
 //图片融合按钮
         synthesisImagePopupWindow = new SynthesisImagePopupWindow();
 
-        setOnclick();
+        setOnclick(view);
         return view;
     }
 
@@ -144,7 +123,7 @@ public class TietuFragment extends Fragment implements BaseFunction
                 new Observable.OnSubscribe<Bitmap>() {
                     @Override
                     public void call(Subscriber<? super Bitmap> subscriber) {
-                        chosenTietu = tietuLayout.chosedView;
+                        chosenTietu = tietuLayout.chosenView;
                         int innerLeft = chosenTietu.getLeft() + FloatImageView.pad - ptuView.getLeft();
                         int innerTop = chosenTietu.getTop() + FloatImageView.pad - ptuView.getTop();
                         Bitmap aboveBm;
@@ -210,10 +189,14 @@ public class TietuFragment extends Fragment implements BaseFunction
      */
     private void addTietuByPath(String path) {
         Bitmap srcBitmap = TietuSizeControler.getSrcBitmap(path);
+        if (srcBitmap == null) {
+            CustomToast.makeText("获取贴图失败", Toast.LENGTH_SHORT).show();
+            return;
+        }
         FloatImageView floatImageView = new FloatImageView(mContext);
         floatImageView.setAdjustViewBounds(true);
         floatImageView.setImageBitmapAndPath(srcBitmap, path);
-        FrameLayout.LayoutParams params = TietuSizeControler.getFeatParams(srcBitmap.getWidth(), srcBitmap.getHeight(),
+        FrameLayout.LayoutParams params = TietuSizeControler.getFeatParams(floatImageView,srcBitmap.getWidth(), srcBitmap.getHeight(),
                 ptuView.getPicBound());
         tietuLayout.addView(floatImageView, params);
     }
@@ -223,20 +206,17 @@ public class TietuFragment extends Fragment implements BaseFunction
      */
     private void addTietuById(Integer id) {
         Bitmap srcBitmap = BitmapFactory.decodeResource(getResources(), id);
+
         FloatImageView floatImageView = new FloatImageView(mContext);
         floatImageView.setAdjustViewBounds(true);
         floatImageView.setImageBitmapAndId(srcBitmap, id);
-        FrameLayout.LayoutParams params = TietuSizeControler.getFeatParams(srcBitmap.getWidth(), srcBitmap.getHeight(),
+        FrameLayout.LayoutParams params = TietuSizeControler.getFeatParams(floatImageView, srcBitmap.getWidth(), srcBitmap.getHeight(),
                 ptuView.getPicBound());
         Log.e(TAG, "添加位置" + params.leftMargin + " " + params.topMargin);
         tietuLayout.addView(floatImageView, params);
     }
 
-    private void removeFloatImageView(FloatImageView view) {
-        tietuLayout.removeView(view);
-    }
-
-    private void setOnclick() {
+    private void setOnclick(final View view) {
         more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -246,57 +226,27 @@ public class TietuFragment extends Fragment implements BaseFunction
             }
         });
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                switch (newState) {
-                    case RecyclerView.SCROLL_STATE_IDLE:
-                        tietuAdapter.setScroll(false);
-                        break;
-                    case RecyclerView.SCROLL_STATE_DRAGGING:
-                        tietuAdapter.setScroll(true);
-                        break;
-                }
-            }
-        });
-
-        tietuAdapter.setOnItemClickListener(new TietuRecyclerAdapter.OnRecyclerViewItemClickListener() {
-            @Override
-            public void onItemClick(View view, Integer data) {
-                /*
-//                处理设置贴图失败的情况，暂不实现
-                boolean flag=false;
-                while(!floatImageView.setBitmapAndInit(data)&&tietuIds.fixed_size()>0)
-                {
-                    flag=true;
-                    int id=tietuIds.indexOf(data);
-                    tietuIds.remove(data);
-                    if(tietuIds.fixed_size()==0){
-                        ((ViewGroup)floatImageView.getParent()).removeView(floatImageView);
-                        Toast.makeText(mContext,"贴图加载失败了！",Toast.LENGTH_SHORT).show();
-                        tietuAdapter.notifyDataSetChanged();
-                        return;
+        final LinearLayout layoutExpression = ((LinearLayout) view.findViewById(R.id.tietu_function_expression));
+        layoutExpression.setTag("tietuExpression");
+        layoutExpression.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        prepareSomeTietu(view, tietu_material.CATEGORY_EXPRESSION);
                     }
-                    else{
-                        data=tietuIds.get(id%tietuIds.fixed_size());
+                });
+        final LinearLayout layoutProperty = (LinearLayout) view.findViewById(R.id.tietu_function_property);
+        layoutProperty.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        prepareSomeTietu(view, tietu_material.CATEGORY_PROPERTY);
                     }
-                }
-                if(flag) {
-                    Toast.makeText(mContext,"贴图加载失败了！",Toast.LENGTH_SHORT).show();
-                    tietuAdapter.notifyDataSetChanged();
-                }*/
-                addTietuById(data);
+                });
+        layoutProperty.setTag("tietuProperty");
 
-                int clickPosition = tietuIds.indexOf(data);
-                int lastPosition = layoutManager.findLastVisibleItemPosition();
-                if (clickPosition == lastPosition) {//将下一个隐藏的item移出来
-                    int[] location = new int[2];
-                    view.getLocationInWindow(location); //获取在当前窗口内的绝对坐标
-                    recyclerView.smoothScrollBy(view.getWidth() + location[0] + view.getWidth() - more.getLeft() + 10, 0);
-                }
-            }
-        });
+        expressionAdapter.setOnItemClickListener(tietuRecyclerListener);
+        propertyAdapter.setOnItemClickListener(tietuRecyclerListener);
 
         synthesisImagePopupWindow.show(
                 getActivity().findViewById(R.id.fragment_main_function),
@@ -309,6 +259,32 @@ public class TietuFragment extends Fragment implements BaseFunction
                     }
                 });
     }
+
+    private void prepareSomeTietu(View view, String category) {
+        PtuConstraintLayout parent = (PtuConstraintLayout) view.getParent().getParent();
+        if (curCategory.equals(category) && recyclerView.getParent() != null) {
+            recyclerView.setAdapter(null);
+            ((ViewGroup) recyclerView.getParent()).removeView(recyclerView);
+            curCategory = "-------------";
+            return;
+        }
+        if (parent.indexOfChild(recyclerView) == -1) {
+            parent.addTietuListView(recyclerView, view);
+        }
+        presenter.prepareTietuByCategory(category);
+        curCategory = category;
+    }
+
+    private TietuRecyclerAdapter.OnRecyclerViewItemClickListener tietuRecyclerListener =
+            new TietuRecyclerAdapter.OnRecyclerViewItemClickListener() {
+                @Override
+                public void onItemClick(View view, Object data) {
+                    if (data instanceof Integer)
+                        addTietuById((Integer) data);
+                    else
+                        addTietuByPath(PriorTietuManager.getTietuFilePath(((tietu_material) data)));
+                }
+            };
 
     @Override
     public void smallRepeal() {
@@ -339,20 +315,20 @@ public class TietuFragment extends Fragment implements BaseFunction
             FloatImageView fiv = (FloatImageView) tietuLayout.getChildAt(i);
 //获取每个tietu的范围
             RectF boundRectInPic = new RectF();
-            float[] temp = PtuUtil.getLocationAtPicture(fiv.getLeft() + FloatImageView.pad, fiv.getTop() + FloatImageView.pad,
+            float[] realLocation = PtuUtil.getLocationAtPicture(fiv.getLeft() + FloatImageView.pad, fiv.getTop() + FloatImageView.pad,
                     ptuView.getSrcRect(), ptuView.getDstRect());
-            boundRectInPic.left = temp[0];
-            boundRectInPic.top = temp[1];
+            boundRectInPic.left = realLocation[0];
+            boundRectInPic.top = realLocation[1];
 
-            temp = PtuUtil.getLocationAtPicture(fiv.getRight() - FloatImageView.pad, fiv.getBottom() - FloatImageView.pad,
+            realLocation = PtuUtil.getLocationAtPicture(fiv.getRight() - FloatImageView.pad, fiv.getBottom() - FloatImageView.pad,
                     ptuView.getSrcRect(), ptuView.getDstRect());
-            boundRectInPic.right = temp[0];
-            boundRectInPic.bottom = temp[1];
+            boundRectInPic.right = realLocation[0];
+            boundRectInPic.bottom = realLocation[1];
             Bitmap tietuBm = fiv.getSrcBitmap();
 
             //暂存数据到sd卡上面
             String tempPath = FileTool.createTempPicPath();
-            BitmapTool.asySaveTempBm(tempPath, tietuBm, new Subscriber<String>() {
+            BitmapTool.asySaveTempBm(tempPath, tietuBm, new MySubscriber<String>(tietuBm) {
                 @Override
                 public void onCompleted() {
 
@@ -360,7 +336,7 @@ public class TietuFragment extends Fragment implements BaseFunction
 
                 @Override
                 public void onError(Throwable throwable) {
-                    Log.e(TAG, "onNext: 保存出错" + Thread.currentThread().getName());
+                    Log.e(TAG, "onNext: 保存出错" + throwable.getMessage());
                 }
 
                 @Override
@@ -381,6 +357,18 @@ public class TietuFragment extends Fragment implements BaseFunction
 
     }
 
+    public void addBigStep(StepData sd) {
+        TietuStepData ttsd = (TietuStepData) sd;
+        Iterator<TietuStepData.OneTietu> iterator = ttsd.iterator();
+        while (iterator.hasNext()) {
+            TietuStepData.OneTietu oneTietu = iterator.next();
+            Bitmap tietuBm = BitmapTool.getLosslessBitmap(oneTietu.getPicPath());
+            Log.e(TAG, "addBigStep: 重做贴图" + tietuBm);
+            ptuView.addBitmap(tietuBm,
+                    oneTietu.getBoundRectInPic(), oneTietu.getRotateAngle());
+        }
+    }
+
     @Override
     public void releaseResource() {
         int count = tietuLayout.getChildCount();
@@ -396,22 +384,6 @@ public class TietuFragment extends Fragment implements BaseFunction
         super.onDestroyView();
     }
 
-    public void addBigStep(StepData sd) {
-        TietuStepData ttsd = (TietuStepData) sd;
-        Iterator<TietuStepData.OneTietu> iterator = ttsd.iterator();
-        while (iterator.hasNext()) {
-            TietuStepData.OneTietu oneTietu = iterator.next();
-            Bitmap tietuBm = BitmapTool.getLosslessBitmap(oneTietu.getPicPath());
-            if (tietuBm != null) {
-            } else if (oneTietu.getPicPath() != null)
-                tietuBm = TietuSizeControler.getSrcBitmap(oneTietu.getPicPath());
-            else {
-                tietuBm = BitmapFactory.decodeResource(mContext.getResources(), oneTietu.getPicId());
-            }
-            ptuView.addBitmap(tietuBm,
-                    oneTietu.getBoundRectInPic(), oneTietu.getRotateAngle());
-        }
-    }
 
     public void initBeforeCreateView(final PtuFrameLayout ptuFrame, final PtuView ptuView) {
         this.ptuView = ptuView;
@@ -422,7 +394,59 @@ public class TietuFragment extends Fragment implements BaseFunction
     }
 
     @Override
+    public boolean onBackPressed() {
+        if (recyclerView.getParent() != null) {
+            ((ViewGroup) recyclerView.getParent()).removeView(recyclerView);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public void setPresenter(Object presenter) {
 
     }
+
+    @Override
+    public void showExpressionList() {
+        recyclerView.swapAdapter(expressionAdapter, true);
+    }
+
+    @Override
+    public void showPropertyList() {
+        recyclerView.swapAdapter(propertyAdapter, true);
+    }
 }
+
+abstract class MySubscriber<T> extends Subscriber<T> {
+    Bitmap bitmapData;
+
+    MySubscriber(Bitmap bitmapData) {
+        super();
+        this.bitmapData = bitmapData;
+    }
+}
+//else addTietuByPath();
+
+                /*
+//                处理设置贴图失败的情况，暂不实现
+                boolean flag=false;
+                while(!floatImageView.setBitmapAndInit(data)&&tietuIds.fixed_size()>0)
+                {
+                    flag=true;
+                    int id=tietuIds.indexOf(data);
+                    tietuIds.remove(data);
+                    if(tietuIds.fixed_size()==0){
+                        ((ViewGroup)floatImageView.getParent()).removeView(floatImageView);
+                        Toast.makeText(mContext,"贴图加载失败了！",Toast.LENGTH_SHORT).show();
+                        tietuAdapter.notifyDataSetChanged();
+                        return;
+                    }
+                    else{
+                        data=tietuIds.get(id%tietuIds.fixed_size());
+                    }
+                }
+                if(flag) {
+                    Toast.makeText(mContext,"贴图加载失败了！",Toast.LENGTH_SHORT).show();
+                    tietuAdapter.notifyDataSetChanged();
+                }*/

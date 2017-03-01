@@ -24,22 +24,24 @@ import a.baozouptu.common.util.BitmapTool;
  */
 public class TietuSizeControler {
     private static final String TAG = "TietuSizeControler";
+
     /**
      * 获取合适大小的Bitmap，Bitmap占用的内存不能超过剩余内存，如果超过，则返回空
+     *
      * @return 如果Bitmap用的内存超过剩余的值，会返回空
      */
     public static Bitmap getBitmapInSize(String path, int nwidth, int nheight) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(path,options);
+        BitmapFactory.decodeFile(path, options);
 
         options.inJustDecodeBounds = false;
         options.inDither = true;
         options.inPreferQualityOverSpeed = true;
-        options.inSampleSize =  Math.min(options.outWidth / nwidth, options.outHeight  / nheight);
-        long totalSize=options.outWidth/options.inSampleSize*(options.outHeight/options.inSampleSize)*4;
-        long realFreeMemory=Runtime.getRuntime().maxMemory()-Runtime.getRuntime().totalMemory();//使用freeMemaory不对
-        if(totalSize>realFreeMemory){
+        options.inSampleSize = Math.min(options.outWidth / nwidth, options.outHeight / nheight);
+        long totalSize = options.outWidth / options.inSampleSize * (options.outHeight / options.inSampleSize) * 4;
+        long realFreeMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory();//使用freeMemaory不对
+        if (totalSize > realFreeMemory) {
             return null;//内存超出了剩余内存
         }
         return BitmapFactory.decodeFile(path, options);
@@ -47,26 +49,27 @@ public class TietuSizeControler {
 
     /**
      * 获取合适大小的Bitmap，Bitmap占用的内存不能超过剩余内存，如果超过，则返回空
+     *
      * @return 如果Bitmap用的内存超过剩余的值，会返回空
      */
     public static Bitmap getSrcBitmap(String path) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(path,options);
+        BitmapFactory.decodeFile(path, options);
 
         int totalWidth = AllData.screenWidth;
         int totalHeight = AllData.screenHeight;
 
-        int srcWidth = Math.min(options.outWidth,totalWidth);
-        int srcHeight = Math.min(options.outHeight,totalHeight);
+        int srcWidth = Math.min(options.outWidth, totalWidth);
+        int srcHeight = Math.min(options.outHeight, totalHeight);
 
         options.inJustDecodeBounds = false;
         options.inDither = true;
         options.inPreferQualityOverSpeed = true;
-        options.inSampleSize =  Math.min(options.outWidth / srcWidth, options.outHeight  / srcHeight);
-        long totalSize=options.outWidth/options.inSampleSize*(options.outHeight/options.inSampleSize)*4;
-        long realFreeMemory=Runtime.getRuntime().maxMemory()-Runtime.getRuntime().totalMemory();//使用freeMemaory不对
-        if(totalSize>realFreeMemory){
+        options.inSampleSize = Math.min(options.outWidth / srcWidth, options.outHeight / srcHeight);
+        long totalSize = options.outWidth / options.inSampleSize * (options.outHeight / options.inSampleSize) * 4;
+        long realFreeMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory();//使用freeMemaory不对
+        if (totalSize > realFreeMemory) {
             return null;//内存超出了剩余内存
         }
         return BitmapFactory.decodeFile(path, options);
@@ -79,44 +82,47 @@ public class TietuSizeControler {
      * <p> （2）对于底图很小的情况，其实不必考虑，照样保持正常大小即可
      * <p> 解析图片时，解析的就是一个适中的图，如果图片本身是特别小的，
      * 设置好view的大小，自动缩放即可
-     *
+     * <p>
      * 位置为图片范围内的一个随机值
-     * @param srcWidth 原图的大小
-     * @param srcHeight 原图的大小
-     * @param picBound 显示的范围
+     *
+     * @param floatImageView
+     * @param srcWidth       原图的大小
+     * @param srcHeight      原图的大小
+     * @param picBound       显示的范围
      * @return 布局参数
      */
-    static  FrameLayout.LayoutParams getFeatParams(int srcWidth, int srcHeight, Rect picBound) {
+    static FrameLayout.LayoutParams getFeatParams(FloatImageView floatImageView, int srcWidth, int srcHeight, Rect picBound) {
         //宽和高
-        int exceptWidth=picBound.width()/2;//1/2图片宽
-        if(exceptWidth>AllData.screenWidth*2/5)
-            exceptWidth=AllData.screenWidth*2/5;//不能大于屏幕的1/3宽
-        else if(exceptWidth<AllData.screenWidth/6)//太小
-            exceptWidth=AllData.screenWidth/6;
+        int exceptWidth = picBound.width() / 2;//1/2图片宽
+        if (exceptWidth > AllData.screenWidth * 2 / 5)
+            exceptWidth = AllData.screenWidth * 2 / 5;//不能大于屏幕的1/3宽
+        else if (exceptWidth < AllData.screenWidth / 6)//太小
+            exceptWidth = AllData.screenWidth / 6;
 
-        int exceptHeight=picBound.height()/2;//1/2图片高
-        if(exceptHeight>AllData.screenHeight*2/7)
-            exceptHeight=AllData.screenHeight*2/7;//不能大于屏幕的1/5高
-        else if(exceptHeight<AllData.screenHeight/7)//太小
-            exceptHeight=AllData.screenHeight/7;
+        int exceptHeight = picBound.height() / 2;//1/2图片高
+        if (exceptHeight > AllData.screenHeight * 2 / 7)
+            exceptHeight = AllData.screenHeight * 2 / 7;//不能大于屏幕的1/5高
+        else if (exceptHeight < AllData.screenHeight / 7)//太小
+            exceptHeight = AllData.screenHeight / 7;
 
-        float ratio=Math.min(exceptHeight*1f/srcHeight,exceptWidth*1f/srcWidth);//保持长宽比，取小的一个
-        exceptWidth=Math.round(srcWidth*ratio)+FloatImageView.pad*2;
-        exceptHeight=Math.round(srcHeight*ratio)+FloatImageView.pad*2;
-        FrameLayout.LayoutParams parmas=new FrameLayout.LayoutParams(exceptWidth,exceptHeight);
-
+        float ratio = Math.min(exceptHeight * 1f / srcHeight, exceptWidth * 1f / srcWidth);//保持长宽比，取小的一个
+        exceptWidth = Math.round(srcWidth * ratio) + FloatImageView.pad * 2;
+        exceptHeight = Math.round(srcHeight * ratio) + FloatImageView.pad * 2;
+        FrameLayout.LayoutParams parmas = new FrameLayout.LayoutParams(exceptWidth, exceptHeight);
+        floatImageView.scaleRatio = ratio;
         //位置，随机数，需要图片范围内
-        int mleft=(int)Math.round(Math.random()*(picBound.width()-exceptWidth));
-        int mtop=(int)Math.round(Math.random()*(picBound.height()-exceptHeight));
-        parmas.leftMargin=picBound.left+mleft;
-        parmas.topMargin=picBound.top+mtop;
+        int mleft = (int) Math.round(Math.random() * (picBound.width() - exceptWidth));
+        int mtop = (int) Math.round(Math.random() * (picBound.height() - exceptHeight));
+        parmas.leftMargin = picBound.left + mleft;
+        parmas.topMargin = picBound.top + mtop;
         return parmas;
     }
 
     public static Bitmap getBitmap2Transfer(String path) {
-        return BitmapTool.decodeInSize(path,500);
+        return BitmapTool.decodeInSize(path, 500);
     }
-    public static Bitmap getBitmap2Transfer(int id){
-        return BitmapFactory.decodeResource(AllData.appContext.getResources(),id);
+
+    public static Bitmap getBitmap2Transfer(int id) {
+        return BitmapFactory.decodeResource(AllData.appContext.getResources(), id);
     }
 }

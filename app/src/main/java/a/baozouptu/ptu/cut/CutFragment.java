@@ -30,7 +30,8 @@ import a.baozouptu.R;
 import a.baozouptu.common.util.BitmapTool;
 import a.baozouptu.common.util.FileTool;
 import a.baozouptu.common.util.Util;
-import a.baozouptu.ptu.BaseFunction;
+import a.baozouptu.ptu.BasePtuFragment;
+import a.baozouptu.ptu.BasePtuFunction;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.repealRedo.CutStepData;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
@@ -38,7 +39,7 @@ import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.view.PtuView;
 import rx.Subscriber;
 
-public class CutFragment extends Fragment implements BaseFunction {
+public class CutFragment extends BasePtuFragment {
     private String TAG = "CutFragment";
     private Context mContext;
     private PtuView ptuView;

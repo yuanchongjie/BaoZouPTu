@@ -382,7 +382,6 @@ public class PtuView extends View implements TSRView {
             tempBitmap.recycle();
         }
         super.onDraw(canvas);
-        Log.e(TAG, "绘制完成");
     }
 
     /**
@@ -400,7 +399,6 @@ public class PtuView extends View implements TSRView {
     }
 
     /**
-     * addBitmap以及缩放的bitmap会立即回收
      *
      * @param addBitmap   需要添加的floatBitmap的局部
      * @param boundRect   rect代表view有效区域在底图上的位置的rect，相对于原始图片的左上角上下左右边的距离

@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -22,13 +23,15 @@ import java.util.List;
 
 import a.baozouptu.R;
 import a.baozouptu.common.util.Util;
+import a.baozouptu.ptu.BasePtuFragment;
 import a.baozouptu.ptu.PtuUtil;
+import a.baozouptu.ptu.repealRedo.StepData;
 
 /**
  * Created by Administrator on 2016/4/29.
  */
 @TargetApi(Build.VERSION_CODES.M)
-public class MainFunctionFragment extends Fragment {
+public class MainFunctionFragment extends BasePtuFragment {
     int chosedId = 0;
     Context mContext;
 
@@ -43,6 +46,36 @@ public class MainFunctionFragment extends Fragment {
     private List<Drawable> chosenDrawableList;
     private int tietuPosition = 2;
     private final String TAG = "MainFunctionFragment";
+
+    @Override
+    public void smallRepeal() {
+
+    }
+
+    @Override
+    public void smallRedo() {
+
+    }
+
+    @Override
+    public Bitmap getResultBm(float ratio) {
+        return null;
+    }
+
+    @Override
+    public StepData getResultDataAndDraw(float ratio) {
+        return null;
+    }
+
+    @Override
+    public void addBigStep(StepData sd) {
+
+    }
+
+    @Override
+    public void releaseResource() {
+
+    }
 
     public interface Listen {
         void switchFragment(int function);

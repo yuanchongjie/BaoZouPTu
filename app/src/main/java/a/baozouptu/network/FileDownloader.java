@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import a.baozouptu.common.dataAndLogic.AllData;
-import a.baozouptu.common.util.Util;
-import cn.bmob.v3.Bmob;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.DownloadFileListener;
@@ -54,6 +52,9 @@ public class FileDownloader {
 
     }
 
+    public static void downLoadBmobFile(String url, String tietuDir) {
+
+    }
     public static FileDownloader getInstance() {
         if (instance == null)
             instance = new FileDownloader();
@@ -104,7 +105,7 @@ public class FileDownloader {
 
     private void adjustNetwork(final Context context, final int id, final ArrayList<Typeface> typefaceList, final TextView textView) {
         float size = typefaceSizes[id];
-        int state = NetworkState.detecteNetworkType(context);
+        int state = NetworkState.detectNetworkType(context);
         String msg;
         if (state == -1) {//没有网络
             Toast.makeText(context, "网络未连接，不能下载字体，请稍后再试！", Toast.LENGTH_LONG).show();

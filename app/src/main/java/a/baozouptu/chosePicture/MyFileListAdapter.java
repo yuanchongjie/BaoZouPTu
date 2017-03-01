@@ -2,7 +2,6 @@ package a.baozouptu.chosePicture;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,7 @@ import java.util.List;
 import a.baozouptu.R;
 import a.baozouptu.chosePicture.data.PicDirInfo;
 import a.baozouptu.common.dataAndLogic.AllData;
-import a.baozouptu.common.dataAndLogic.AsyncImageLoader3;
+import a.baozouptu.common.dataAndLogic.AsyncImageLoader;
 
 /**
  * 使用继承BaseAdapter处理ListView的图片显示
@@ -26,7 +25,7 @@ public class MyFileListAdapter extends BaseAdapter {
     private final List<PicDirInfo> picDirInfos;
     Context mContext;
 
-    AsyncImageLoader3 asyLoader3 = AsyncImageLoader3.getInstance();
+    AsyncImageLoader asyLoader3 = AsyncImageLoader.getInstance();
 
     private LayoutInflater layoutInflater;
 
@@ -81,7 +80,7 @@ public class MyFileListAdapter extends BaseAdapter {
         // 妙啊！
         Bitmap cacheBitmap = asyLoader3.loadBitmap(
                 picDirInfos.get(position).getRepresentPicPath(), viewHolder.ivImage, position,
-                new AsyncImageLoader3.ImageCallback() {
+                new AsyncImageLoader.ImageCallback() {
                     public void imageLoaded(Bitmap imageDrawable,
                                             ImageView image, int poition, String imageUrl) {
                         image.setImageBitmap(imageDrawable);

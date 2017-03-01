@@ -27,6 +27,7 @@ public class FloatImageView extends ImageView {
     private static Bitmap iconBitmap = IconBitmapCreator.createCancelBitmap(pad * 2, Color.WHITE, Util.getColor(R.color.mat_pen_line2));
     public static final int minWidth = 9;
     public static final int minHeight = 16;
+    public float scaleRatio = 1;
     MicroButtonData[] items;
     Paint itemPaint;
     /**
@@ -168,7 +169,7 @@ public class FloatImageView extends ImageView {
      * @return 获取高除以宽的比
      */
     public float getHWRatio() {
-        return srcBitmap.getHeight() * 1f / srcBitmap.getWidth();
+        return (srcBitmap.getHeight() + pad * 2) * 1f / (srcBitmap.getWidth() + pad * 2);
     }
 
     /**
@@ -199,5 +200,29 @@ public class FloatImageView extends ImageView {
     public void setImageBitmap(Bitmap bm) {
         srcBitmap = bm;
         super.setImageBitmap(bm);
+    }
+
+    public float getCurPicWidth() {
+        return srcBitmap.getWidth() * scaleRatio;
+    }
+
+    public float getCurPicHeight() {
+        return srcBitmap.getHeight() * scaleRatio;
+    }
+
+    public int calculateTotalWidth(float scaleRatio) {
+        return Math.round(srcBitmap.getWidth() * scaleRatio + pad * 2);
+    }
+
+    public int calculateTotalHeight(float scaleRatio) {
+        return Math.round(srcBitmap.getHeight() * scaleRatio + pad * 2);
+    }
+
+    public float getCenterX() {
+        return (getLeft() + getRight()) / 2;
+    }
+
+    public float getCenterY() {
+        return (getTop() + getBottom()) / 2;
     }
 }

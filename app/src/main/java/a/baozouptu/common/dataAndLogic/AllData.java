@@ -6,6 +6,7 @@ import android.os.Environment;
 import a.baozouptu.common.appInfo.AppConfig;
 import a.baozouptu.common.appInfo.MyApplication;
 import a.baozouptu.user.userSetting.SettingDataSource;
+import okhttp3.OkHttpClient;
 
 /**
  * 保存应用所需的一些常用通用的数据项
@@ -32,12 +33,13 @@ public class AllData {
      */
     public final static int PIC_FILE_SIZE_MAX = 100000*1000;
 
-    public static AsyncImageLoader3 imageLoader3 = AsyncImageLoader3.getInstance();
+    public static AsyncImageLoader imageLoader3 = AsyncImageLoader.getInstance();
     public static final String TAG="LOL";
     public static final String appFilePathDefault = Environment.getExternalStorageDirectory().getAbsolutePath() + "/暴走P图/";
     public static final String zitiDir=appFilePathDefault+"字体/";
     public static final String picDir=appFilePathDefault+"暴走P图-制作表情/";
     public static final Context appContext= MyApplication.appContext;
+    public static final String tietuDir=appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath()+"/tietu";
 
     //一些基本配置
     public static AppConfig appConfig;

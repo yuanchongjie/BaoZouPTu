@@ -18,7 +18,7 @@ import a.baozouptu.common.util.BitmapTool;
  * Map<String, SoftReference<Bitmap>> imageCache = new HashMap<String,
  * SoftReference<Bitmap>>();
  */
-public class AsyncImageLoader3 {
+public class AsyncImageLoader {
     /**
      * 使用LRU算法，用key-value形式查找对象；
      */
@@ -32,15 +32,19 @@ public class AsyncImageLoader3 {
     private ThreadPoolExecutor executorService;
 
     private final Handler handler = new Handler();
-    private static AsyncImageLoader3 asyncImageLoader3;
+    private static AsyncImageLoader asyncImageLoader;
 
-    public static AsyncImageLoader3 getInstance() {
-        if (asyncImageLoader3 == null)
-            asyncImageLoader3 = new AsyncImageLoader3();
-        return asyncImageLoader3;
+    public static AsyncImageLoader getInstance() {
+        return SingleTonHolder.asyncImageLoader;
     }
 
-    private AsyncImageLoader3() {
+    /**
+     * 较好的线程安全的获取单例的形式
+     */
+    private static class SingleTonHolder{
+        private static final AsyncImageLoader asyncImageLoader=new AsyncImageLoader();
+    }
+    private AsyncImageLoader() {
         lque = new LinkedBlockingQueue<Runnable>();
         int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         imageCache = new LruCache<String, Bitmap>(maxMemory / 6) {
