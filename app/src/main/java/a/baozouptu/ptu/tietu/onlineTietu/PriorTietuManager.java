@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.util.FileTool;
+import a.baozouptu.network.NetworkState;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.datatype.BmobQueryResult;
 import cn.bmob.v3.exception.BmobException;

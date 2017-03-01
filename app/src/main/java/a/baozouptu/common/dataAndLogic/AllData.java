@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Environment;
 
 import a.baozouptu.common.appInfo.AppConfig;
+import a.baozouptu.common.appInfo.HasReadConfig;
 import a.baozouptu.common.appInfo.MyApplication;
 import a.baozouptu.user.userSetting.SettingDataSource;
 import okhttp3.OkHttpClient;
