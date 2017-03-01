@@ -9,7 +9,6 @@ import android.util.Log;
 
 import a.baozouptu.common.CrashHandler;
 import a.baozouptu.common.dataAndLogic.AllData;
-import a.baozouptu.common.dataAndLogic.HasReadConfig;
 import a.baozouptu.user.userSetting.SettingDataSourceImpl;
 import cn.bmob.v3.Bmob;
 

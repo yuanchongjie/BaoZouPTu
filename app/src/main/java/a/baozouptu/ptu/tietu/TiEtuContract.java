@@ -16,9 +16,11 @@ public class TietuContract {
      */
 
     public  interface TietuPresenter extends BasePresenter {
+        void prepareTietuByCategory(String TietuType);
     }
 
     public interface TietuView extends BaseView{
-
+        void showExpressionList();
+        void showPropertyList();
     }
 }
