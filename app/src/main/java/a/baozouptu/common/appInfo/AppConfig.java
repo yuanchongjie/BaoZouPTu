@@ -6,7 +6,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import a.baozouptu.R;
 import a.baozouptu.common.dataAndLogic.AllData;
+import a.baozouptu.common.dataAndLogic.MyDatabase;
 
 /**
  * Created by liuguicen on 2016/8/13.
@@ -23,6 +25,7 @@ import a.baozouptu.common.dataAndLogic.AllData;
 public class AppConfig {
     //各个历史版本，别删
     private static PackageInfo pi;
+
     static {
         PackageManager pm = MyApplication.appContext.getPackageManager();
         try {
@@ -50,8 +53,8 @@ public class AppConfig {
         return CUR_APP_VERSION;
     }
 
-    public AppConfig(Context globalContext) {
-        sp = AllData.appContext.getSharedPreferences("appConfig", Context.MODE_PRIVATE);
+    public AppConfig(Context appContext) {
+        sp = appContext.getSharedPreferences("appConfig", Context.MODE_PRIVATE);
     }
 
     public int readAppVersion() {
@@ -81,7 +84,7 @@ public class AppConfig {
         spEditor.remove("usu_pic_use");
         spEditor.remove("isNewInstall");
         if (!spEditor.commit()) {
-            Log.e("暴走P图", "移除1.0版本Config信息失败");
+            Log.e(MyApplication.appContext.getResources().getText(R.string.app_name).toString(), "移除1.0版本Config信息失败");
         }
     }
 
@@ -89,11 +92,12 @@ public class AppConfig {
         return sp.contains("isNewInstall");
     }
 
-    public void writeSendDeviceInfo(boolean isSend){
+    public void writeSendDeviceInfo(boolean isSend) {
         SharedPreferences.Editor spEditor = sp.edit();
         //移除1.0版本的ptu上的配置信息，当时模块划分不清晰，也没考虑到模块会变大，变大之后这里变得复杂难写了
-        spEditor.putBoolean("has_send_device",isSend).apply();
+        spEditor.putBoolean("has_send_device", isSend).apply();
     }
+
     public boolean hasSendDeviceInfos() {
         return sp.getBoolean("has_send_device", false);
     }

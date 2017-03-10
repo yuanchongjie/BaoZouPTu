@@ -115,23 +115,16 @@ public class MyDatabase {
     }
 
     /**
-     * usualypic(path text primary key,time varchar(20))
+     * 删除一张喜爱的图片
      *
-     * @param path
+     * @param path 路径
+     * @throws IOException
+     * @see MySQLiteOpenHandler usualypic(path text primary key,time varchar(20))
      */
-    public void deleteFrequentlyPic(String path) throws IOException {
+    public void deletePreferPicPath(String path) throws IOException {
         db.execSQL("delete from usualypic where path = ?", new Object[]{path});
     }
 
-    /**
-     * usualypic(path text primary key,time varchar(20))
-     *
-     * @param path
-     * @param time
-     */
-    public void updateFrequentlyPic(String path, long time) throws IOException {
-        insertPreferPic(path, time);
-    }
 
     /**
      * 获取存入数据库的所有的选择出常用的得图片
@@ -145,7 +138,7 @@ public class MyDatabase {
         while (cursor.moveToNext()) {
             String path = cursor.getString(0);
             if (!(new File(path).exists()))
-                deleteFrequentlyPic(path);
+                deletePreferPicPath(path);
             else
                 pathList.add(path);
         }
@@ -157,12 +150,12 @@ public class MyDatabase {
      * 按时间倒序，即越前面优先级越高
      */
     //    有两个返回值，不能直接返回，传入应用获取
-    public void queryAllPreferShare(List<Pair<String,String>> titleList) throws IOException {
+    public void queryAllPreferShare(List<Pair<String, String>> titleList) throws IOException {
         Cursor cursor = db.rawQuery("select packageName,title from prefer_share order by time desc ", new String[]{});
         while (cursor.moveToNext()) {
-            String packageName=cursor.getString(0);
+            String packageName = cursor.getString(0);
             String title = cursor.getString(1);
-            titleList.add(new Pair<>(packageName,title));
+            titleList.add(new Pair<>(packageName, title));
         }
     }
 
@@ -172,20 +165,21 @@ public class MyDatabase {
      * inert时如果存在就替换，使用replace，不然就会出错，
      * 这样就不需要update了
      */
-    public void insertPreferShare(String packageName,String title, long time) throws IOException {
+    public void insertPreferShare(String packageName, String title, long time) throws IOException {
     /*    Cursor cursor = db.rawQuery("select * from sqlite_master where type= ? and name= ? ",new String[]{"table","prefer_share"});
         while (cursor.moveToNext()) {
             cursor.moveToNext();
         }*/
-        db.execSQL("replace into prefer_share(packageName,title,time) values(?,?,?) ", new Object[]{packageName,title, String.valueOf(time)});
+        db.execSQL("replace into prefer_share(packageName,title,time) values(?,?,?) ", new Object[]{packageName, title, String.valueOf(time)});
     }
 
     /**
      * db.execSQL("create table  IF NOT EXISTS prefer_share(packageName text,title text,time varchar(50))");
+     *
      * @param packageName ac的包名     * @param title ac的title
      */
-    public void deletePreferShare(String packageName,String title) throws IOException {
-        db.execSQL("delete from prefer_share where packageName = ? and title = ? ", new Object[]{packageName,title});
+    public void deletePreferShare(String packageName, String title) throws IOException {
+        db.execSQL("delete from prefer_share where packageName = ? and title = ? ", new Object[]{packageName, title});
     }
 
     public void close() {

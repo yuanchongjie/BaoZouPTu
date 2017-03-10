@@ -49,4 +49,9 @@ public interface BasePtuFunction {
      * @return 是否消费返回按键
      */
     boolean onBackPressed();
+
+    /**
+     * 清除数据
+     */
+    void clear();
 }

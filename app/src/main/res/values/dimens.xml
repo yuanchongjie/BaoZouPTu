@@ -6,7 +6,7 @@
     <dimen name="height_picture_file_item">100dp</dimen>
     <dimen name="picture_item_height">200dp</dimen>
     <dimen name="padding_main_function">10dp</dimen>
-    <dimen name="padding_function_item_image">2dp</dimen>
+    <dimen name="padding_function_item_image">7dp</dimen>
 
     <dimen name="margin_small">3dp</dimen>
     <dimen name="margin_middle">5dp</dimen>

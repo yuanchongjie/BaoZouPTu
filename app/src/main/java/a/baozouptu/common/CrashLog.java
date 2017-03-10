@@ -58,7 +58,7 @@ public class CrashLog extends BmobObject {
 
 
     public CrashLog() {
-        crash_version = AppConfig.CUR_APP_VERSION;
+        crash_version = AppConfig.CUR_APP_VERSION;//crash版本高于版本号
     }
 
     /**
@@ -69,13 +69,15 @@ public class CrashLog extends BmobObject {
      */
     public void commit(Thread thread, Throwable ex) {
         //获取异常常栈信息到字符串中
+        if(ex==null)return;
         StringBuilder sb = new StringBuilder();
         sb.append("线程名称:")
                 .append(thread.getName())
                 .append("\n");
         sb.append("异常信息：")
-                .append(ex.getCause().getClass().getSimpleName())
-                .append("类:\n")
+                .append("类:")
+                .append(ex.getClass().getSimpleName())
+                .append("\n")
                 .append(ex.getMessage())
                 .append("\n");
         for (StackTraceElement stackTraceElement : ex.getStackTrace()) {

@@ -10,7 +10,7 @@ import android.widget.FrameLayout;
 import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.util.GeoUtil;
 import a.baozouptu.common.util.Util;
-import a.baozouptu.ptu.view.PtuView;
+import a.baozouptu.ptu.view.PtuSeeView;
 
 /**
  * Created by liuguicen on 2016/10/2.
@@ -198,9 +198,9 @@ public class TietuFrameLayout extends FrameLayout {
 
     private void adjustBound(LayoutParams params, FloatImageView chosenView) {
         View ptuView = ((FrameLayout) getParent()).getChildAt(0);
-        if (ptuView instanceof PtuView) {
+        if (ptuView instanceof PtuSeeView) {
             int pad = FloatImageView.pad;
-            Rect picBound = ((PtuView) ptuView).getPicBound();
+            Rect picBound = ((PtuSeeView) ptuView).getPicBound();
             params.leftMargin = Math.max(params.leftMargin,
                     picBound.left + pad - chosenView.getWidth());//左边界判断
 
@@ -259,7 +259,7 @@ public class TietuFrameLayout extends FrameLayout {
             LayoutParams layoutParams = (FrameLayout.LayoutParams) childView.getLayoutParams();
             super.removeView(childView);
             childView.setShowRim(true);
-            super.addView(childView, layoutParams);
+            addView(childView, layoutParams);
         }
     }
 

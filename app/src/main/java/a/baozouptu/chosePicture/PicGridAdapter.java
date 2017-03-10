@@ -21,10 +21,8 @@ import a.baozouptu.common.util.Util;
 
 /**
  * Created by liuguicen on 2016/8/31.
- *
- * @description
  */
-public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int STATIC_SHOW_NUMBER = 25;
 
@@ -95,7 +93,7 @@ public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if (viewType == ITEM) {
             LinearLayout layout = createItemLayout(parent);
             final ItemHolder itemHolder = new ItemHolder(layout);
-            itemHolder.iv = creatItemImage(layout);
+            itemHolder.iv = createItemImage(layout);
             itemHolder.iv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -119,21 +117,25 @@ public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (position >= imageUrls.size()) return;
         holder.itemView.setTag(imageUrls.get(position));
         myBindViewHolder(holder, position);
     }
 
+    //b
     void myBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-
+        if (position >= imageUrls.size()) return;
         //如果是分组标题
-        ItemHolder itemHolder = null;
+        ItemHolder itemHolder;
         if (usuallyProcessor.isUsuPic(imageUrls)) {
             if (holder instanceof HeaderHolder) {
                 int headerType = getHeaderType(position);
                 if (headerType == -1) headerType = searchHeaderType(position);
                 if (headerType == 0) {//// TODO: 2017/3/1 0001 这里有个挺麻烦的地方，header的View和adapter中的数据对不上，
-                    // TODO: 2017/3/1 0001  可能原因是RecyclerView获取到了类型到显示期间，其他线程让Adapter的数据更新了，但是RecyclerView的没有更新，导致View和数据错位。
-                    // TODO：目前只使用了简单的判断holder类型的方法，但是会出现不显示header的问题
+                    //   可能原因是RecyclerView获取到了类型到显示期间，其他线程让Adapter的数据更新了，但是RecyclerView的没有更新，导致View和数据错位。
+                    // 目前只使用了简单的判断holder类型的方法，但是会出现不显示header的问题
+                    //  解决方法之一（源码异常说明）是将所有的数据修改操作交到UI线程，扫描等才用其它线程，然后调用notifyDataSetChanged()
+                    //(目前改掉一个file图与常用图切换问题，可能是主原因）。
                     ((HeaderHolder) holder).tv.setText(R.string.latest_use);
                     return;
                 } else if (headerType == 1) {
@@ -191,7 +193,9 @@ public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
      * 获取分组的值
      */
     private int getHeaderType(int position) {
-        String path = imageUrls.get(position);
+        String path;
+        if (position >= imageUrls.size()) return -1;
+        path = imageUrls.get(position);
         if (path.equals(UsuPathManger.USED_FLAG))//存在使用过的图片
             return 0;
         if (path.equals(UsuPathManger.RECENT_FLAG))
@@ -232,7 +236,7 @@ public class PicGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return mLinearLayout;
     }
 
-    ImageView creatItemImage(LinearLayout linearLayout) {
+    private ImageView createItemImage(LinearLayout linearLayout) {
         ImageView imageView = new ImageView(mContext);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         LinearLayout.LayoutParams mLayoutParams = new LinearLayout.LayoutParams(

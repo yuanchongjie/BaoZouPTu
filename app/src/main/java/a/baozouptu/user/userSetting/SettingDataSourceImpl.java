@@ -40,7 +40,9 @@ public class SettingDataSourceImpl implements SettingDataSource {
         /**
          * 写死的部分
          */
-        DATA_DIRS = new String[]{AllData.zitiDir,AllData.tietuDir};
+         // TODO: 2017/3/5 0005 目前的贴图位置有两个
+        DATA_DIRS = new String[]{AllData.zitiDir, AllData.getTietuDir()};
+
         DATA_NAMES = new String[]{"字体文件", "贴图文件"};
 
         initDataInfo();
@@ -64,8 +66,8 @@ public class SettingDataSourceImpl implements SettingDataSource {
                     sizeStrings[i] = "0";
                 } else {
                     sizeStrings[i] = df.format(size);
-                    if(sizeStrings[i].length()==2){
-                        sizeStrings[i]="0"+sizeStrings[i];
+                    if (sizeStrings[i].length() == 2) {
+                        sizeStrings[i] = "0" + sizeStrings[i];
                     }
                 }
                 totalSize += (float) size;
@@ -145,7 +147,7 @@ public class SettingDataSourceImpl implements SettingDataSource {
     }
 
     private boolean clearTietuCache() {
-        return FileTool.deleteAllChileFile(new File(AllData.tietuDir));
+        return FileTool.deleteAllChileFile(new File(AllData.getTietuDir()));
     }
 
     private boolean clearTypeface() {

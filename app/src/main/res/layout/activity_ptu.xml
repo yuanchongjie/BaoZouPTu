@@ -41,7 +41,7 @@
         app:layout_constraintTop_toBottomOf="@+id/ptu_toolbar_relative"
         app:layout_constraintBottom_toTopOf="@+id/fragment_main_function">
 
-        <a.baozouptu.ptu.view.PtuView
+        <a.baozouptu.ptu.view.PtuSeeView
             android:id="@+id/ptu_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"  />

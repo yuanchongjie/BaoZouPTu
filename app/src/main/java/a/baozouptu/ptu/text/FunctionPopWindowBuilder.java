@@ -16,12 +16,15 @@ import android.widget.SeekBar;
 import java.lang.ref.WeakReference;
 
 import a.baozouptu.R;
+import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.util.Util;
+import a.baozouptu.common.view.FirstUseDialog;
 import a.baozouptu.common.view.HorizontalListView;
 import a.baozouptu.common.view.MySwitchButton;
 import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.ptu.view.ColorBar;
 import a.baozouptu.ptu.view.ColorLump;
+import a.baozouptu.ptu.view.ColorPicker;
 import a.baozouptu.ptu.view.PtuFrameLayout;
 
 /**
@@ -143,92 +146,33 @@ class FunctionPopWindowBuilder {
     }
 
     //颜色
-    void setColorPopWindow(View v) {
-        View contentView = getColorPopView();
-        setLayout(v, contentView);
+    void setColorPopWindow(View v, ColorPicker.ColorTarget colorTarget) {
+        ColorPicker colorPicker = new ColorPicker(acContext);
+        colorPicker.setColorTarget(colorTarget);
+        colorPicker.addViewToGetColor(textFragment.ptuSeeView, textFragment.ptuSeeView.getSourceBm(),
+                textFragment.ptuSeeView.getSrcRect(), textFragment.ptuSeeView.getDstRect());
+        colorPicker.setAbsorbListener(new ColorPicker.AbsorbListener() {
+            @Override
+            public void startAbsorb(ColorPicker colorPicker) {
+                if (!AllData.hasReadConfig.hasRead_absorb()) {
+                    FirstUseDialog firstUseDialog = new FirstUseDialog(acContext);
+                    firstUseDialog.createDialog("吸取颜色", "可在图片中吸取想要的颜色，吸取之后点击其它地方即可使用", new FirstUseDialog.ActionListener() {
+                        @Override
+                        public void onSure() {
+                            AllData.hasReadConfig.write_absorb(true);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public boolean stopAbsorbColor() {
+                return false;
+            }
+        });
+        ColorPicker.showInDefaultLocation(acContext, colorPicker, v.getHeight() + Util.dp2Px(5), v);
     }
 
-    /**
-     * 获取功能子视图
-     *
-     * @return
-     */
-    private View getColorPopView() {
-        final PtuFrameLayout ptuFrameLayout = ((PtuActivity) textFragment.getActivity()).getPtuFrame();
-        View contentView = LayoutInflater.from(acContext).inflate(R.layout.popwindow_chose_color, null);
-        //颜色选择条
-        final ColorBar colorBar = (ColorBar) contentView.findViewById(R.id.color_picker);
-        //颜色块
-        final ColorLump colorLump = (ColorLump) contentView.findViewById(R.id.chosed_color);
-        if (ptuFrameLayout.getChildAt(ptuFrameLayout.getChildCount() - 1) instanceof FloatTextView)
-            colorLump.setColor(floatTextView.getTextColors().getDefaultColor());
-        else colorLump.setColor(rubberView.getColor());
-        colorBar.setOnColorChangerListener(new ColorBar.ColorChangeListener() {
-            @Override
-            public void colorChange(int color) {
-                colorLump.setColor(color);
-                if (ptuFrameLayout.getChildAt(ptuFrameLayout.getChildCount() - 1) instanceof FloatTextView)
-                    floatTextView.setTextColor(color);
-                else rubberView.setColor(color);
-            }
-        });
-        colorBar.setOnColorChosedListener(new ColorBar.ColorChosedListener() {
-            @Override
-            public void colorChosed(int color) {
-
-            }
-        });
-        /**
-         * 预先定义的颜色
-         */
-        final int[] colors = new int[]{0xff000000, 0xffff0000, 0xff00ff00, 0xff0000ff, 0xffffff00,
-                0xffffffff, 0xff555555, 0xff880088, 0xff008800, 0xff880000, 0xff000088, 0xff008888};
-        /**
-         * 横向的颜色选择列表，里面是颜色选择块
-         */
-        final HorizontalListView colorList = (HorizontalListView) contentView.findViewById(R.id.color_list);
-
-        colorList.setAdapter(new BaseAdapter() {
-            @Override
-            public int getCount() {
-                return colors.length;
-            }
-
-            @Override
-            public Object getItem(int position) {
-                return null;
-            }
-
-            @Override
-            public long getItemId(int position) {
-                return position;
-            }
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                //创建颜色块
-                ColorLump colorLump = new ColorLump(acContext);
-                colorLump.setColor(colors[position]);
-
-                //item的设置布局
-                HorizontalListView.LayoutParams mLayoutParams = new HorizontalListView.LayoutParams(
-                        acContext.getResources().getDimensionPixelSize(R.dimen.color_lump_width),
-                        ViewGroup.LayoutParams.MATCH_PARENT);
-                colorLump.setLayoutParams(mLayoutParams);
-                return colorLump;
-            }
-        });
-        colorList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                colorLump.setColor(colors[position]);
-                if (ptuFrameLayout.getChildAt(ptuFrameLayout.getChildCount() - 1) instanceof FloatTextView)
-                    floatTextView.setTextColor(colors[position]);
-                else rubberView.setColor(colors[position]);
-            }
-        });
-        return contentView;
-    }
 
     //透明度
     void setToumingduPopWindow(View v) {
@@ -241,13 +185,13 @@ class FunctionPopWindowBuilder {
         View contentView = LayoutInflater.from(acContext).inflate(R.layout.popwindow_toumindu, null);
         SeekBar seekBar = (SeekBar) contentView.findViewById(R.id.seekbar_toumingdu);
         seekBar.setMax(100);
-        if (ptuFrameLayout.getChildAt(ptuFrameLayout.getChildCount() - 1) instanceof FloatTextView)
+        if (floatTextView.isClickable())
             seekBar.setProgress((int) floatTextView.getAlpha());
         else seekBar.setProgress(rubberView.getRubberWidth());
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (ptuFrameLayout.getChildAt(ptuFrameLayout.getChildCount() - 1) instanceof FloatTextView)
+                if (floatTextView.isClickable())
                     floatTextView.setAlpha(1 - (float) progress / 100.0f);
                 else rubberView.setRubberWidth(progress);
             }

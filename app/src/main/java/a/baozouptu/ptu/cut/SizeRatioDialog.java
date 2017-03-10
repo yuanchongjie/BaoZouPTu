@@ -59,6 +59,7 @@ class SizeRatioDialog {
         return false;
     }
 
+
     interface ActionListener {
         void onSure(float w, float h);
     }
@@ -156,6 +157,12 @@ class SizeRatioDialog {
 
     void setActionListener(ActionListener actionListener) {
         this.actionListener = actionListener;
+    }
+
+    public void dismissDialog() {
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
     }
 }
 

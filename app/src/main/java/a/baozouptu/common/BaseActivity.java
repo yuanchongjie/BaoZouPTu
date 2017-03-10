@@ -31,4 +31,5 @@ public class BaseActivity extends AppCompatActivity{
             tintManager.setStatusBarTintEnabled(true);
         }
     }
+
 }

@@ -22,7 +22,6 @@ import a.baozouptu.R;
 /**
  * Created by liuguicen on 2016/6/17.
  *
- * @description
  */
 public class TietuRecyclerAdapter extends RecyclerView.Adapter<TietuRecyclerAdapter.MyViewHolder>
         implements View.OnClickListener {

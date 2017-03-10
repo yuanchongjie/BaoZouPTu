@@ -100,6 +100,12 @@ public class SaveSetDialogManager {
         dialog.show();
     }
 
+    public void dismissDialog() {
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
+    }
+
     private void initView() {
         setChoseSizeUi();
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext, LinearLayout.HORIZONTAL, false);
@@ -176,7 +182,8 @@ public class SaveSetDialogManager {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        myQQShare.onActivityResult(requestCode, resultCode, data);
+        if (myQQShare != null)
+            myQQShare.onActivityResult(requestCode, resultCode, data);
     }
 
     private void setChoseSizeUi() {

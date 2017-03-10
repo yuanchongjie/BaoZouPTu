@@ -11,12 +11,12 @@ import android.view.View;
 
 import java.util.ArrayList;
 
+import a.baozouptu.common.util.GeoUtil;
 import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.RepealRedoListener;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
-import a.baozouptu.ptu.view.PtuFrameLayout;
-import a.baozouptu.ptu.view.PtuView;
+import a.baozouptu.ptu.view.PtuSeeView;
 
 /**
  * Created by Administrator on 2016/11/19 0019.
@@ -24,13 +24,14 @@ import a.baozouptu.ptu.view.PtuView;
 
 public class RubberView extends View {
 
-    private PtuView ptuView;
+    private PtuSeeView ptuSeeView;
     float lastX, lastY;
     private Paint paint;
     private Paint picPaint;
     private Path path;
     private Path picPath;
     private boolean isUp = false;
+    private boolean hasMove;
 
     private RepealRedoListener repealRedoListener;
 
@@ -40,15 +41,15 @@ public class RubberView extends View {
     private final RepealRedoManager<Pair<Path, Paint>> picRR_manager;
 
 
-    public RubberView(Context context, PtuView ptuView) {
+    public RubberView(Context context, PtuSeeView ptuSeeView) {
         super(context);
-        this.ptuView = ptuView;
+        this.ptuSeeView = ptuSeeView;
         setBackground(null);
         color = Color.WHITE;
         width = Util.dp2Px(20);
 
-        paint = getNewPaint(color,width);
-        picPaint =getNewPaint(color,width * ptuView.getSrcRect().height() * 1f / ptuView.getDstRect().height());
+        paint = getNewPaint(color, width);
+        picPaint = getNewPaint(color, width * ptuSeeView.getSrcRect().height() * 1f / ptuSeeView.getDstRect().height());
 
         repealRedoManager = new RepealRedoManager<>(100);
         picRR_manager = new RepealRedoManager<>(100);
@@ -56,7 +57,7 @@ public class RubberView extends View {
         picPath = new Path();
     }
 
-    private Paint getNewPaint(int  color, float width) {
+    private Paint getNewPaint(int color, float width) {
         Paint paint = new Paint();
         paint.setDither(true);
         paint.setAntiAlias(true);
@@ -64,6 +65,7 @@ public class RubberView extends View {
         paint.setStrokeWidth(width);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setStrokeJoin(Paint.Join.ROUND);// 设置外边缘(Paint.Cap.ROUND);
         return paint;
     }
 
@@ -73,9 +75,10 @@ public class RubberView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX(), y = event.getY();
         float[] pxy = PtuUtil.getLocationAtPicture(x + getLeft(), y + getTop(),
-                ptuView.getSrcRect(), ptuView.getDstRect());
+                ptuSeeView.getSrcRect(), ptuSeeView.getDstRect());
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
+                hasMove = false;
                 isUp = false;
                 path = new Path();
                 picPath = new Path();
@@ -88,6 +91,9 @@ public class RubberView extends View {
                 picPath.moveTo(pxy[0], pxy[1]);
                 break;
             case MotionEvent.ACTION_MOVE:
+                if (GeoUtil.getDis(lastX, lastY, x, y) >= 1) {
+                    hasMove = true;
+                }
                 path.quadTo(lastX, lastY, x, y);
                 picPath.quadTo(plxy[0], plxy[1], pxy[0], pxy[1]);
                 lastX = x;
@@ -97,6 +103,13 @@ public class RubberView extends View {
                 break;
             case MotionEvent.ACTION_UP:
                 isUp = true;
+                if (!hasMove) {
+                    x += 1;
+                    y += 1;
+                    pxy[0] += 1;
+                    pxy[1] += 1;
+                }
+                hasMove = false;
                 path.quadTo(lastX, lastY, x, y);
                 picPath.quadTo(plxy[0], plxy[1], pxy[0], pxy[1]);
                 repealRedoManager.commit(new Pair<>(path, paint));
@@ -152,14 +165,14 @@ public class RubberView extends View {
 
     void setColor(int color) {
         this.color = color;
-        paint =getNewPaint(color,width);
-        picPaint= getNewPaint(color,width * ptuView.getSrcRect().height() * 1f / ptuView.getDstRect().height());
+        paint = getNewPaint(color, width);
+        picPaint = getNewPaint(color, width * ptuSeeView.getSrcRect().height() * 1f / ptuSeeView.getDstRect().height());
     }
 
     void setRubberWidth(int width) {
         this.width = width;
-        paint =getNewPaint(color,width);
-        picPaint= getNewPaint(color,width * ptuView.getSrcRect().height() * 1f / ptuView.getDstRect().height());
+        paint = getNewPaint(color, width);
+        picPaint = getNewPaint(color, width * ptuSeeView.getSrcRect().height() * 1f / ptuSeeView.getDstRect().height());
     }
 
     int getRubberWidth() {

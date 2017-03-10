@@ -1,97 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:baselineAligned="true"
-    android:paddingBottom="@dimen/padding_function_item_image"
-    android:paddingTop="2dp">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/function_total_layout"
+    app:layout_constraintHorizontal_chainStyle="spread">
 
-    <LinearLayout
+    <android.support.constraint.ConstraintLayout
         android:id="@+id/draw_style"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        style="@style/function_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/draw_color"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.333">
 
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2"
-            android:layout_gravity="center"
-            android:paddingBottom="@dimen/padding_function_item_image"
-            android:paddingLeft="@dimen/padding_function_item_image"
-            android:paddingRight="@dimen/padding_function_item_image"
-            android:paddingTop="@dimen/padding_function_item_image"
-            android:src="@mipmap/draw" />
+            android:id="@+id/main_function_cut_iv"
+            style="@style/function_draw_image"
+            android:src="@mipmap/draw"
+            app:layout_constraintBottom_toTopOf="@+id/draw_guideline_style"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:layout_width="@dimen/function_width"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:gravity="center"
+            android:id="@+id/main_function_cut_tv"
+            style="@style/function_text"
             android:text="画笔样式"
-            android:textColor="@color/text_color1"
-            android:textSize="@dimen/text_size_main_function" />
-    </LinearLayout>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/draw_guideline_style" />
 
-    <LinearLayout
+        <android.support.constraint.Guideline
+            android:id="@+id/draw_guideline_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.666" />
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
         android:id="@+id/draw_color"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        style="@style/function_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintLeft_toRightOf="@+id/draw_style"
+        app:layout_constraintRight_toLeftOf="@+id/draw_size"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2"
-            android:layout_gravity="center"
-            android:paddingBottom="@dimen/padding_function_item_image"
-            android:paddingLeft="@dimen/padding_function_item_image"
-            android:paddingRight="@dimen/padding_function_item_image"
-            android:paddingTop="@dimen/padding_function_item_image"
-            android:src="@mipmap/color" />
+            android:id="@+id/function_draw_iv"
+            style="@style/function_draw_image"
+            android:src="@mipmap/color"
+            app:layout_constraintBottom_toTopOf="@+id/text_guideline"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:layout_width="@dimen/function_width"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:gravity="center"
+            android:id="@+id/main_function_text_tv"
+            style="@style/function_text"
             android:text="画笔颜色"
-            android:textColor="@color/text_color1"
-            android:textSize="@dimen/text_size_main_function" />
-    </LinearLayout>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_guideline" />
 
-    <LinearLayout
+        <android.support.constraint.Guideline
+            android:id="@+id/text_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.666" />
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
         android:id="@+id/draw_size"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        style="@style/function_layout"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintLeft_toRightOf="@+id/draw_color"
+
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2"
-            android:layout_gravity="center"
-            android:paddingBottom="@dimen/padding_function_item_image"
-            android:paddingLeft="@dimen/padding_function_item_image"
-            android:paddingRight="@dimen/padding_function_item_image"
-            android:paddingTop="@dimen/padding_function_item_image"
-            android:src="@mipmap/fixed_size" />
+            android:id="@+id/function_draw_size_iv"
+            style="@style/function_draw_image"
+            android:src="@mipmap/fixed_size"
+            app:layout_constraintBottom_toTopOf="@+id/draw_guideline_size"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:layout_width="@dimen/function_width"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:gravity="center"
+            android:id="@+id/function_draw_size_tv"
+            style="@style/function_text"
             android:text="画笔尺寸"
-            android:textColor="@color/text_color1"
-            android:textSize="@dimen/text_size_main_function" />
-    </LinearLayout>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/draw_guideline_size" />
 
-</LinearLayout>
+        <android.support.constraint.Guideline
+            android:id="@+id/draw_guideline_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.666" />
+    </android.support.constraint.ConstraintLayout>
+</android.support.constraint.ConstraintLayout>

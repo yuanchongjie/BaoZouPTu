@@ -5,13 +5,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.widget.FrameLayout;
 
+import a.baozouptu.common.appInfo.MyApplication;
 import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.util.BitmapTool;
 
 /**
  * Created by liuguicen on 2016/9/29.
  *
- * @description 贴图的FloatImageView的Bitmap操作类，
+ * 贴图的FloatImageView的Bitmap操作类，
  * <p>（1）
  * <p>从sd卡中取出图片，能控制图片的最大尺寸，缩放过程中不超过这个尺寸；
  * <p>用参数表示出他们
@@ -30,36 +31,28 @@ public class TietuSizeControler {
      *
      * @return 如果Bitmap用的内存超过剩余的值，会返回空
      */
-    public static Bitmap getBitmapInSize(String path, int nwidth, int nheight) {
+    public static Bitmap getBitmapInSize(String path) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(path, options);
-
-        options.inJustDecodeBounds = false;
-        options.inDither = true;
-        options.inPreferQualityOverSpeed = true;
-        options.inSampleSize = Math.min(options.outWidth / nwidth, options.outHeight / nheight);
-        long totalSize = options.outWidth / options.inSampleSize * (options.outHeight / options.inSampleSize) * 4;
-        long realFreeMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory();//使用freeMemaory不对
-        if (totalSize > realFreeMemory) {
-            return null;//内存超出了剩余内存
-        }
+        options = getFitOption(options);
+        if (options == null) return null;
         return BitmapFactory.decodeFile(path, options);
     }
 
-    /**
-     * 获取合适大小的Bitmap，Bitmap占用的内存不能超过剩余内存，如果超过，则返回空
-     *
-     * @return 如果Bitmap用的内存超过剩余的值，会返回空
-     */
-    public static Bitmap getSrcBitmap(String path) {
+    public static Bitmap getBitmapInSize(int id) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(path, options);
+        BitmapFactory.decodeResource(MyApplication.appContext.getResources(), id, options);
+        options = getFitOption(options);
+        if (options == null) return null;
+        return BitmapFactory.decodeResource(MyApplication.appContext.getResources(), id, options);
+    }
 
+    static private BitmapFactory.Options getFitOption(BitmapFactory.Options options) {
+        if(options.outWidth==0||options.outHeight==0)return null;
         int totalWidth = AllData.screenWidth;
         int totalHeight = AllData.screenHeight;
-
         int srcWidth = Math.min(options.outWidth, totalWidth);
         int srcHeight = Math.min(options.outHeight, totalHeight);
 
@@ -72,7 +65,7 @@ public class TietuSizeControler {
         if (totalSize > realFreeMemory) {
             return null;//内存超出了剩余内存
         }
-        return BitmapFactory.decodeFile(path, options);
+        return options;
     }
 
     /**
@@ -85,7 +78,7 @@ public class TietuSizeControler {
      * <p>
      * 位置为图片范围内的一个随机值
      *
-     * @param floatImageView
+     * @param floatImageView 显示图片的ImageView
      * @param srcWidth       原图的大小
      * @param srcHeight      原图的大小
      * @param picBound       显示的范围

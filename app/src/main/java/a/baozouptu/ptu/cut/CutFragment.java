@@ -1,7 +1,6 @@
 package a.baozouptu.ptu.cut;
 
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -31,26 +30,25 @@ import a.baozouptu.common.util.BitmapTool;
 import a.baozouptu.common.util.FileTool;
 import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.BasePtuFragment;
-import a.baozouptu.ptu.BasePtuFunction;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.repealRedo.CutStepData;
 import a.baozouptu.ptu.repealRedo.RepealRedoManager;
 import a.baozouptu.ptu.repealRedo.StepData;
-import a.baozouptu.ptu.view.PtuView;
+import a.baozouptu.ptu.view.PtuSeeView;
 import rx.Subscriber;
 
 public class CutFragment extends BasePtuFragment {
     private String TAG = "CutFragment";
     private Context mContext;
-    private PtuView ptuView;
+    private PtuSeeView ptuSeeView;
     private CutView cutView;
 
-    private LinearLayout fixedSize;
-    private LinearLayout fixedRatio;
-    private LinearLayout rotate;
-    private LinearLayout reversal;
+    private ViewGroup fixedSize;
+    private ViewGroup fixedRatio;
+    private ViewGroup rotate;
+    private ViewGroup reversal;
 
-    private LinearLayout[] layoutList;
+    private ViewGroup[] layoutList;
     private Drawable[] drawableList;
     private Drawable[] chosenDrawableList;
 
@@ -96,12 +94,12 @@ public class CutFragment extends BasePtuFragment {
         View view = inflater.inflate(R.layout.fragment_cut, null);
         mContext = getActivity();
 
-        fixedSize = (LinearLayout) view.findViewById(R.id.cut_fixed_size);
-        fixedRatio = (LinearLayout) view.findViewById(R.id.cut_fixed_ratio);
-        rotate = (LinearLayout) view.findViewById(R.id.cut_rotate);
-        reversal = (LinearLayout) view.findViewById(R.id.cut_reversal);
+        fixedSize = (ViewGroup) view.findViewById(R.id.cut_fix_size);
+        fixedRatio = (ViewGroup) view.findViewById(R.id.cut_fixed_ratio);
+        rotate = (ViewGroup) view.findViewById(R.id.cut_rotate);
+        reversal = (ViewGroup) view.findViewById(R.id.cut_reversal);
 
-        layoutList = new LinearLayout[]{
+        layoutList = new ViewGroup[]{
                 fixedSize,
                 fixedRatio,
                 rotate,
@@ -160,13 +158,13 @@ public class CutFragment extends BasePtuFragment {
         csd.picPath = tempPath;
 
         //重新绘制
-        ptuView.replaceSourceBm(resultBm);
+        ptuSeeView.replaceSourceBm(resultBm);
         return csd;
     }
 
     @Override
     public void addBigStep(StepData sd) {
-        ptuView.replaceSourceBm(BitmapTool.getLosslessBitmap(sd.picPath));
+        ptuSeeView.replaceSourceBm(BitmapTool.getLosslessBitmap(sd.picPath));
     }
 
     @Override
@@ -358,8 +356,8 @@ public class CutFragment extends BasePtuFragment {
         return cutView;
     }
 
-    public void setPtuView(PtuView ptuView) {
-        this.ptuView = ptuView;
+    public void setPtuSeeView(PtuSeeView ptuSeeView) {
+        this.ptuSeeView = ptuSeeView;
     }
 
     private TextView createItem(final int pad) {
@@ -407,6 +405,12 @@ public class CutFragment extends BasePtuFragment {
     @Override
     public void smallRedo() {
 
+    }
+    @Override
+    public void clear(){
+        if(sizeRatioDialog!=null){
+            sizeRatioDialog.dismissDialog();
+        }
     }
 
 }

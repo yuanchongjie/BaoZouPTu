@@ -15,6 +15,7 @@ import a.baozouptu.user.DeviceInfos;
 public class AppIntentService extends IntentService {
     final static String TAG = "AppIntentService";
 
+
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
      */

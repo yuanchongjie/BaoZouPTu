@@ -31,7 +31,7 @@ import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.repealRedo.TextStepData;
 import a.baozouptu.ptu.view.IconBitmapCreator;
 import a.baozouptu.ptu.view.PtuFrameLayout;
-import a.baozouptu.ptu.view.PtuView;
+import a.baozouptu.ptu.view.PtuSeeView;
 
 /**
  * 添加textView的顶部视图
@@ -412,18 +412,18 @@ public class FloatTextView extends EditText implements FloatView {
      * <p>另外，获取的图片view可能会过大，造成内存溢出，通过innerRect表示真实尺寸
      * <p>outRect表示需要的尺寸，最后绘制时缩放，减小内存溢出的可能
      *
-     * @param ptuView 底图图片视图，用于获取地图的各种信息。
+     * @param ptuSeeView 底图图片视图，用于获取地图的各种信息。
      * @return 成功返回数据，否则返回空
      */
-    public Bitmap getResultData(PtuView ptuView, TextStepData tsd) {
+    public Bitmap getResultData(PtuSeeView ptuSeeView, TextStepData tsd) {
         if (mText.trim().equals("")) return null;//表示没有添加以
         setCursorVisible(false);
         //文本在view中的位置
          /*代表view有效区域在底图上的位置的rect，相对于原始图片的左上角上下左右边的距离*/
         RectF boundRectInPic = new RectF();
-        getBoundInPic(ptuView, boundRectInPic);
+        getBoundInPic(ptuSeeView, boundRectInPic);
 
-        String realRatio = MU.di(Double.toString(1), Float.toString(ptuView.getTotalRatio()));
+        String realRatio = MU.di(Double.toString(1), Float.toString(ptuSeeView.getTotalRatio()));
         Bitmap textViewBm = generateProximateScaleBm(realRatio);
         Bitmap resultBm = Bitmap.createBitmap(textViewBm, Math.round(rimLeft), Math.round(rimTop),
                 Math.round(rimRight - rimLeft), Math.round(rimBottom - rimTop));
@@ -442,17 +442,17 @@ public class FloatTextView extends EditText implements FloatView {
      * @param boundRectInPic 代表view有效区域在底图上的位置的rect，相对于原始图片的左上角上下左右边的距离
      *                       <p>outRect大小和innerRect大小相同的</p>
      */
-    private void getBoundInPic(PtuView ptuView, RectF boundRectInPic) {
+    private void getBoundInPic(PtuSeeView ptuSeeView, RectF boundRectInPic) {
         String textLeft = MU.add(fLeft, rimLeft);
         String textTop = MU.add(fTop, rimTop);
         String textRight = MU.add(fLeft, rimRight);
         String textBottom = MU.add(fTop, rimBottom);
         //先计算出文字部分在当前整个PtuView中的位置
 
-        String[] temp = PtuUtil.getLocationAtPicture(textLeft, textTop, ptuView.getSrcRect(), ptuView.getDstRect());
+        String[] temp = PtuUtil.getLocationAtPicture(textLeft, textTop, ptuSeeView.getSrcRect(), ptuSeeView.getDstRect());
         boundRectInPic.left = Float.valueOf(temp[0]);
         boundRectInPic.top = Float.valueOf(temp[1]);
-        temp = PtuUtil.getLocationAtPicture(textRight, textBottom, ptuView.getSrcRect(), ptuView.getDstRect());
+        temp = PtuUtil.getLocationAtPicture(textRight, textBottom, ptuSeeView.getSrcRect(), ptuSeeView.getDstRect());
         boundRectInPic.right = Float.valueOf(temp[0]);
         boundRectInPic.bottom = Float.valueOf(temp[1]);
     }

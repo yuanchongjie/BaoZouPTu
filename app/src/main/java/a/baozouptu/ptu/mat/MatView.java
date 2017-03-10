@@ -9,14 +9,14 @@ import android.view.MotionEvent;
 
 import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.PtuUtil;
-import a.baozouptu.ptu.view.PtuView;
+import a.baozouptu.ptu.view.PtuSeeView;
 
 /**
  * Created by liuguicen on 2016/8/2.
  *
  * @description 抠图视图
  */
-public class MatView extends PtuView {
+public class MatView extends PtuSeeView {
 
     private static final int NO = 0;
     private static final String TAG = "MatView";

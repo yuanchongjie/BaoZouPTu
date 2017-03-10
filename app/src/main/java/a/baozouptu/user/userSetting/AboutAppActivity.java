@@ -7,6 +7,7 @@ import android.widget.TextView;
 import a.baozouptu.R;
 import a.baozouptu.common.BaseActivity;
 import a.baozouptu.common.appInfo.AppConfig;
+import a.baozouptu.common.appInfo.MyApplication;
 
 public class AboutAppActivity extends BaseActivity {
 
@@ -15,7 +16,7 @@ public class AboutAppActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about_app);
         ((TextView) findViewById(R.id.about_version)).
-                setText("暴走P图 " + AppConfig.CUR_VERSION_NAME);
+                setText(MyApplication.appContext.getResources().getText(R.string.app_name) + " " + AppConfig.CUR_VERSION_NAME);
 
         findViewById(R.id.about_return_btn).
                 setOnClickListener(

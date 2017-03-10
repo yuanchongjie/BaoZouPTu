@@ -10,6 +10,14 @@
         <!-- Active thumb color & Active track color(30% transparency) switch 打开时的拇指按钮的颜色 轨迹颜色默认为30%这个颜色 -->
     </style>
 
+    <!--AppcompatActivity全屏的
+    <style name="Theme.AppCompat.Light.NoActionBar.FullScreen" parent="@style/Theme.AppCompat.Light">
+            <item name="windowNoTitle">true</item>
+            <item name="windowActionBar">false</item>
+            <item name="android:windowFullscreen">true</item>
+            <item name="android:windowContentOverlay">@null</item>
+        </style>-->
+
     <style name="SettingAppThem" parent="AppTheme">
         <item name="colorControlActivated">@color/base_color1</item>
         <!-- Inactive thumb color switch关闭时的拇指按钮的颜色 -->
@@ -91,17 +99,46 @@
         <item name="android:layout_centerVertical">true</item>
         <item name="android:layout_alignParentRight">true</item>
     </style>
+    <!--底部功能条相关-->
+    <style name="function_total_layout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:paddingTop">1.5dp</item>
+        <item name="android:paddingBottom">3.5dp</item>
+    </style>
 
-    <style name="function_text">
-        <item name="android:gravity">center</item>
-        <item name="android:textColor">@color/text_color1</item>
-        <item name="android:textSize">@dimen/text_size_main_function</item>
+    <style name="function_layout">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">0dp</item>
     </style>
 
     <style name="function_image">
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_width">0dp</item>
         <item name="android:paddingBottom">@dimen/padding_function_item_image</item>
         <item name="android:paddingLeft">@dimen/padding_function_item_image</item>
         <item name="android:paddingRight">@dimen/padding_function_item_image</item>
         <item name="android:paddingTop">@dimen/padding_function_item_image</item>
     </style>
+
+    <style name="function_text">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/text_color1</item>
+        <item name="android:textSize">@dimen/text_size_main_function</item>
+    </style>
+
+    <style name="function_text_image" parent="function_image">
+        <item name="android:background">@drawable/function_background_text_yellow</item>
+    </style>
+
+    <style name="function_tietu_image" parent="function_image">
+        <item name="android:background">@drawable/function_background_tietu_green</item>
+    </style>
+
+    <style name="function_draw_image" parent="function_image">
+        <item name="android:background">@drawable/function_background__draw_pink</item>
+    </style>
+
 </resources>

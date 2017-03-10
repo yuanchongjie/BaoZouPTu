@@ -150,7 +150,7 @@ public class PtuFrameLayout extends FrameLayout {
 
             case MotionEvent.ACTION_MOVE:
 //             一个神坑， 有些手机屏幕不太稳定，点击时一定发生位移，所以要变成状态4，弹出输入法gg
-                if (Math.abs(event.getX() - downX) < Util.dp2Px(2) || Math.abs(event.getY() - downX) < Util.dp2Px(2))
+                if (GeoUtil.getDis(event.getX(), event.getY(), downX, downY) < 4)
                     break;
                 floatView.changeShowState(FloatView.STATUS_RIM);
                 if (event.getPointerCount() == 1 &&

@@ -14,9 +14,7 @@ import android.util.Pair;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +24,6 @@ import java.util.List;
 import java.util.Locale;
 
 import a.baozouptu.common.dataAndLogic.AllData;
-import okio.Okio;
 
 /**
  * 主要用于获取图片文件夹下的所有图片的路径，图片大小支取5k-6000k的见方法注解
@@ -35,8 +32,7 @@ import okio.Okio;
  * @version jdk 1.8, sdk 21
  */
 public class FileTool {
-    private static long lastTempTime=System.currentTimeMillis();
-    private String suffix;
+    private static long lastTempTime = System.currentTimeMillis();
 
     /**
      * 遍历目录,得到所有图片的路径，图片大小在5-6000k之间，注意判空
@@ -67,7 +63,7 @@ public class FileTool {
             for (String s : AllData.normalPictureFormat) {
                 if (htx.equals(s)) {
                     if (fileSizeValidity(f.getPath())) {
-                        oderedPaths.add(new Pair(-f.lastModified(), f.getPath()));
+                        oderedPaths.add(new Pair<>(-f.lastModified(), f.getPath()));
                     }
                     break;
                 }
@@ -99,13 +95,12 @@ public class FileTool {
 
                 cur = fis.available();
 
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
                 try {
-                    fis.close();
+                    if (fis != null)
+                        fis.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -113,7 +108,6 @@ public class FileTool {
             if (cur >= AllData.PIC_FILE_SIZE_MIN && cur <= AllData.PIC_FILE_SIZE_MAX)
                 return true;
         }
-
         return false;
     }
 
@@ -144,7 +138,7 @@ public class FileTool {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
         Date curDate = new Date(lastTempTime++);//获取当前时间
         String time = formatter.format(curDate);
-        time+="_"+lastTempTime%1000;
+        time += "_" + lastTempTime % 1000;
         String tempPath = tempDir + "/ptu" + time + ".png";
         return tempPath;
     }
@@ -229,11 +223,11 @@ public class FileTool {
      *
      * @param oldPath 以前的路径，用于获取图片后缀
      */
-    public static String getNewPictureFileDefult(String oldPath) {
+    public static String getNewPictureFileDefault(String oldPath) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA);
         Date curDate = new Date(System.currentTimeMillis());//获取当前时间
         String time = formatter.format(curDate);
-        String res = null;
+        String res;
         String prefix = AllData.picDir;
         try {
             File dir = new File(prefix);
@@ -242,19 +236,13 @@ public class FileTool {
             res = oldPath.substring(oldPath.lastIndexOf("."), oldPath.length());
             res = prefix + "baozou" + time + res;
         } catch (SecurityException se) {
-            res = null;
-        } finally {
-            return res;
+            return null;
         }
+        return res;
     }
 
     /**
      * 根据Uri获取图片绝对路径，解决Android4.4以上版本Uri转换
-     *
-     * @param context
-     * @param imageUri
-     * @author yaoxing
-     * @date 2014-10-12
      */
     @TargetApi(19)
     public static String getImagePathFromUri(Activity context, Uri imageUri) {

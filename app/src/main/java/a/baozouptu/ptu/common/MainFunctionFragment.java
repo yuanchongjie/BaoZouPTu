@@ -1,21 +1,17 @@
 package a.baozouptu.ptu.common;
 
 import android.annotation.TargetApi;
-import android.app.Fragment;
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,8 +23,12 @@ import a.baozouptu.ptu.BasePtuFragment;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.repealRedo.StepData;
 
+import static a.baozouptu.common.util.Util.getStateDrawable;
+import static a.baozouptu.common.util.Util.getStateList;
+
 /**
  * Created by Administrator on 2016/4/29.
+ *
  */
 @TargetApi(Build.VERSION_CODES.M)
 public class MainFunctionFragment extends BasePtuFragment {
@@ -38,7 +38,7 @@ public class MainFunctionFragment extends BasePtuFragment {
     private View view;
     private Listen listen;
     private List<ImageView> imageList = new ArrayList<>();
-    private List<LinearLayout> layoutList = new ArrayList<>();
+    private List<ViewGroup> layoutList = new ArrayList<>();
     private List<Integer> layoutIdList;
     private List<Integer> imageIdList;
     private List<Integer> functionConstantList;
@@ -90,14 +90,14 @@ public class MainFunctionFragment extends BasePtuFragment {
                 R.id.main_function_text,
                 R.id.main_function_tietu,
                 R.id.main_function_draw
-               // R.id.main_function_mat
+                // R.id.main_function_mat
         ));
         imageIdList = new ArrayList<>(Arrays.asList(
                 R.id.main_function_cut_iv,
                 R.id.main_function_text_iv,
                 R.id.main_function_tietu_iv,
                 R.id.main_function_draw_iv
-               // R.id.main_function_mat_iv
+                // R.id.main_function_mat_iv
         ));
 
         functionConstantList = new ArrayList<>(Arrays.asList(
@@ -117,18 +117,13 @@ public class MainFunctionFragment extends BasePtuFragment {
         ));
 
         chosenDrawableList = new ArrayList<>(Arrays.asList(
-                getStateDrawable(Util.getDrawable(R.mipmap.edit).mutate()
-                        , getStateList(), PorterDuff.Mode.SRC_IN),
-                getStateDrawable(Util.getDrawable(R.mipmap.text).mutate(),
-                        getStateList(), PorterDuff.Mode.SRC_IN),
-                getStateDrawable(Util.getDrawable(R.mipmap.tietu).mutate(),
-                        getStateList(), PorterDuff.Mode.MULTIPLY),
-                getStateDrawable(Util.getDrawable(R.mipmap.draw).mutate(),
-                        getStateList(), PorterDuff.Mode.SRC_IN)
+                Util.getMyShosenIcon(R.mipmap.edit),
+                Util.getMyShosenIcon(R.mipmap.text),
+                getStateDrawable(Util.getDrawable(R.mipmap.tietu).mutate(), getStateList(), PorterDuff.Mode.MULTIPLY),
+                Util.getMyShosenIcon(R.mipmap.draw))
               /*getStateDrawable(Util.getDrawable(R.mipmap.mat).mutate(),
                         getStateList(), PorterDuff.Mode.SRC_IN)*/
-
-        ));
+        );
         super.onCreate(savedInstanceState);
     }
 
@@ -146,7 +141,7 @@ public class MainFunctionFragment extends BasePtuFragment {
     private void initView(View view) {
         for (int i = 0; i < layoutIdList.size(); i++) {
             final int id = i;
-            LinearLayout li = (LinearLayout) view.findViewById(layoutIdList.get(i));
+            ViewGroup li = (ViewGroup) view.findViewById(layoutIdList.get(i));
             layoutList.add(li);
             imageList.add((ImageView) view.findViewById(imageIdList.get(i)));
             li.setOnClickListener(new View.OnClickListener() {
@@ -162,21 +157,6 @@ public class MainFunctionFragment extends BasePtuFragment {
                 }
             });
         }
-    }
-
-    private ColorStateList getStateList() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return getResources().getColorStateList(R.color.imageview_tint_function, null);
-        } else {
-            return getResources().getColorStateList(R.color.imageview_tint_function);
-        }
-    }
-
-    private Drawable getStateDrawable(Drawable src, ColorStateList colors, PorterDuff.Mode mode) {
-        Drawable drawable = DrawableCompat.wrap(src);
-        DrawableCompat.setTintList(drawable, colors);
-        DrawableCompat.setTintMode(drawable, mode);
-        return drawable;
     }
 
     /**

@@ -1,6 +1,5 @@
 package a.baozouptu.ptu.draw;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
@@ -8,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
@@ -17,14 +17,15 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
 
 import java.util.List;
 
 import a.baozouptu.R;
+import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.util.Util;
+import a.baozouptu.common.view.FirstUseDialog;
 import a.baozouptu.common.view.HorizontalListView;
 import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.ptu.PtuUtil;
@@ -33,22 +34,24 @@ import a.baozouptu.ptu.repealRedo.DrawStepData;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.view.ColorBar;
 import a.baozouptu.ptu.view.ColorLump;
-import a.baozouptu.ptu.view.PtuView;
+import a.baozouptu.ptu.view.ColorPicker;
+import a.baozouptu.ptu.view.PtuSeeView;
 
 /**
  * Created by Administrator on 2016/7/25.
+ *
  */
 public class DrawFragment extends DrawBasePtuFunction implements View.OnClickListener {
     private String TAG = "DrawFragment";
     private Context mContext;
-    private LinearLayout style;
-    private LinearLayout size;
-    private LinearLayout color;
+    private ConstraintLayout style;
+    private ConstraintLayout size;
+    private ConstraintLayout color;
     private DrawView drawView;
     private View view;
     private FunctionPopWindowBuilder drawPopupBuilder;
     private int lastColor = 0xff000000;
-    private PtuView ptuView;
+    private PtuSeeView ptuSeeView;
     private RepealRedoListener repealRedoListener;
 
     @Override
@@ -92,17 +95,17 @@ public class DrawFragment extends DrawBasePtuFunction implements View.OnClickLis
     public void addBigStep(StepData sd) {
         DrawStepData dsd = (DrawStepData) sd;
         //擦除的东西添加上去
-        Canvas canvas = new Canvas(ptuView.getSourceBm());
+        Canvas canvas = new Canvas(ptuSeeView.getSourceBm());
         List<DrawView.DrawPath> pathPaintList = dsd.getSavePath();
         for (DrawView.DrawPath pair : pathPaintList) {
             float width = pair.paint.getStrokeWidth();
             pair.paint.setStrokeWidth(pair.paint.getStrokeWidth()
-                    * ptuView.getSrcRect().height() * 1f / ptuView.getDstRect().height());
+                    * ptuSeeView.getSrcRect().height() * 1f / ptuSeeView.getDstRect().height());
             canvas.drawPath(pair.path, pair.paint);
             pair.paint.setStrokeWidth(width);
 
         }
-        ptuView.invalidate();
+        ptuSeeView.invalidate();
 
     }
 
@@ -117,11 +120,11 @@ public class DrawFragment extends DrawBasePtuFunction implements View.OnClickLis
         View view = inflater.inflate(R.layout.fragment_draw, null);
         mContext = getActivity();
         drawPopupBuilder = new FunctionPopWindowBuilder(mContext);
-        color = (LinearLayout) view.findViewById(R.id.draw_color);
-        style = (LinearLayout) view.findViewById(R.id.draw_style);
-        size = (LinearLayout) view.findViewById(R.id.draw_size);
+        color = (ConstraintLayout) view.findViewById(R.id.draw_color);
+        style = (ConstraintLayout) view.findViewById(R.id.draw_style);
+        size = (ConstraintLayout) view.findViewById(R.id.draw_size);
         setClick();
-        ((PtuActivity) getActivity()).ptuView.setCanDoubleClick(false);
+        ((PtuActivity) getActivity()).ptuSeeView.setCanDoubleClick(false);
 
         return view;
     }
@@ -129,7 +132,7 @@ public class DrawFragment extends DrawBasePtuFunction implements View.OnClickLis
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ((PtuActivity) getActivity()).ptuView.setCanDoubleClick(true);
+        ((PtuActivity) getActivity()).ptuSeeView.setCanDoubleClick(true);
     }
 
     private void setClick() {
@@ -138,9 +141,9 @@ public class DrawFragment extends DrawBasePtuFunction implements View.OnClickLis
         size.setOnClickListener(this);
     }
 
-    public View createDrawView(Context context, Rect totalBound, PtuView ptuView) {
-        drawView = new DrawView(context, totalBound, ptuView);
-        this.ptuView = ptuView;
+    public View createDrawView(Context context, Rect totalBound, PtuSeeView ptuSeeView) {
+        drawView = new DrawView(context, totalBound, ptuSeeView);
+        this.ptuSeeView = ptuSeeView;
         drawView.setRepealRedoListener(repealRedoListener);
         return drawView;
     }
@@ -198,8 +201,6 @@ public class DrawFragment extends DrawBasePtuFunction implements View.OnClickLis
      */
     public class FunctionPopWindowBuilder {
         Context mContext;
-        boolean isBold = false, isItalic = false, hasShadow = false;
-        int lastFontId = 0;
 
         public FunctionPopWindowBuilder(Context context) {
             mContext = context;
@@ -219,8 +220,40 @@ public class DrawFragment extends DrawBasePtuFunction implements View.OnClickLis
         }
 
         public void setColorPopWindow(View v) {
-            View contentView = getColorPopView();
-            setLayout(v, contentView);
+            ColorPicker colorPicker = new ColorPicker(getActivity());
+            colorPicker.setColorTarget(new ColorPicker.ColorTarget() {
+                @Override
+                public void setColor(int color) {
+                    drawView.selectPaintColor(color);
+                }
+
+                @Override
+                public int getCurColor() {
+                    return drawView.getCurPaintColor();
+                }
+            });
+            colorPicker.setAbsorbListener(new ColorPicker.AbsorbListener() {
+                @Override
+                public void startAbsorb(ColorPicker colorPicker) {
+                    if (!AllData.hasReadConfig.hasRead_absorb()) {
+                        FirstUseDialog firstUseDialog = new FirstUseDialog(getActivity());
+                        firstUseDialog.createDialog("吸取颜色", "可在图片中吸取想要的颜色，吸取之后点击其它地方即可使用", new FirstUseDialog.ActionListener() {
+                            @Override
+                            public void onSure() {
+                                AllData.hasReadConfig.write_absorb(true);
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public boolean stopAbsorbColor() {
+                    return false;
+                }
+            });
+            colorPicker.addViewToGetColor(ptuSeeView, ptuSeeView.getSourceBm(),
+                    ptuSeeView.getSrcRect(), ptuSeeView.getDstRect());
+            ColorPicker.showInDefaultLocation(getActivity(), colorPicker, v.getHeight() + Util.dp2Px(5), v);
         }
 
         /**
@@ -229,11 +262,11 @@ public class DrawFragment extends DrawBasePtuFunction implements View.OnClickLis
          * @return
          */
         private View getColorPopView() {
-            View contentView = LayoutInflater.from(mContext).inflate(R.layout.popwindow_chose_color, null);
+            View contentView = LayoutInflater.from(mContext).inflate(R.layout.layout_color_picker, null);
             //颜色选择条
-            final ColorBar colorBar = (ColorBar) contentView.findViewById(R.id.color_picker);
+            final ColorBar colorBar = (ColorBar) contentView.findViewById(R.id.color_picker_bar);
             //颜色块
-            final ColorLump colorLump = (ColorLump) contentView.findViewById(R.id.chosed_color);
+            final ColorLump colorLump = (ColorLump) contentView.findViewById(R.id.picked_color_lump);
             colorLump.setColor(lastColor);
             colorBar.setOnColorChangerListener(new ColorBar.ColorChangeListener() {
                 @Override
@@ -241,10 +274,10 @@ public class DrawFragment extends DrawBasePtuFunction implements View.OnClickLis
                     colorLump.setColor(color);
                 }
             });
-            colorBar.setOnColorChosedListener(new ColorBar.ColorChosedListener() {
+            colorBar.setOnColorChosenListener(new ColorBar.ColorChosenListener() {
                 @Override
-                public void colorChosed(int color) {
-                    drawView.selectPaintColor(color);
+                public void onColorPicked(int color) {
+
                 }
             });
             /**
@@ -255,7 +288,7 @@ public class DrawFragment extends DrawBasePtuFunction implements View.OnClickLis
             /**
              * 横向的颜色选择列表，里面是颜色选择块
              */
-            final HorizontalListView colorList = (HorizontalListView) contentView.findViewById(R.id.color_list);
+            final HorizontalListView colorList = (HorizontalListView) contentView.findViewById(R.id.color_picker_list);
 
             colorList.setAdapter(new BaseAdapter() {
                 @Override

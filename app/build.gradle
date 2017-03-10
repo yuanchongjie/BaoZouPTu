@@ -10,8 +10,8 @@ android {
         applicationId "a.baozouptu"
         minSdkVersion 16
         targetSdkVersion 19
-        versionCode 2
-        versionName "1.1.0"
+        versionCode 4
+        versionName "1.2.0"
         /**
          * 只支持中文，减小包大小
          */
@@ -93,5 +93,5 @@ dependencies {
     compile 'cn.bmob.android:http-legacy:1.0'
     // compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
+    compile 'com.android.support.constraint:constraint-layout:1.0.1'
 }

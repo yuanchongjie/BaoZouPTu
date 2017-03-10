@@ -34,4 +34,14 @@ public class HasReadConfig {
                 .apply();
     }
 
+    public boolean hasRead_absorb() {
+        return sp.getBoolean("absorb", false);
+    }
+
+    public void write_absorb(boolean isRead) {
+        sp.edit().putBoolean("absorb", isRead)
+                .apply();
+    }
+
+
 }

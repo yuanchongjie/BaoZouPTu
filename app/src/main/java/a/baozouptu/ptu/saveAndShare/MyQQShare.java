@@ -16,6 +16,8 @@ import com.tencent.tauth.UiError;
 
 import org.json.JSONObject;
 
+import a.baozouptu.R;
+import a.baozouptu.common.appInfo.MyApplication;
 import a.baozouptu.ptu.TestActivity;
 
 /**
@@ -24,15 +26,16 @@ import a.baozouptu.ptu.TestActivity;
  */
 public class MyQQShare extends Fragment {
     Context mContext;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.e("QQShare","OnCreate发生调用");
+        Log.e("QQShare", "OnCreate发生调用");
         super.onCreate(savedInstanceState);
     }
 
     @Override
     public void onDestroy() {
-        Log.e("QQShare","onDestroy发生调用");
+        Log.e("QQShare", "onDestroy发生调用");
         super.onDestroy();
     }
 
@@ -42,15 +45,15 @@ public class MyQQShare extends Fragment {
         myTencent = Tencent.createInstance("1105572903", mContext.getApplicationContext());
         Bundle params = new Bundle();
         params.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, picPath);
-        params.putString(QQShare.SHARE_TO_QQ_APP_NAME, "暴走P图");
+        params.putString(QQShare.SHARE_TO_QQ_APP_NAME, MyApplication.appContext.getResources().getString(R.string.app_name));
         params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_IMAGE);
-        myTencent.shareToQQ((Activity)mContext, params, new BaseUiListener());
+        myTencent.shareToQQ((Activity) mContext, params, new BaseUiListener());
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Tencent.onActivityResultData(requestCode,resultCode,data,new  BaseUiListener());
+        Tencent.onActivityResultData(requestCode, resultCode, data, new BaseUiListener());
         getActivity().getFragmentManager().beginTransaction().remove(this).commit();
     }
 
@@ -73,7 +76,7 @@ public class MyQQShare extends Fragment {
 
         @Override
         public void onCancel() {
-          //  Toast.makeText(mContext, "onCancel", Toast.LENGTH_LONG).show();
+            //  Toast.makeText(mContext, "onCancel", Toast.LENGTH_LONG).show();
         }
     }
 }

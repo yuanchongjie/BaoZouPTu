@@ -1,15 +1,20 @@
 package a.baozouptu.common.util;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.ColorRes;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Toast;
 
+import a.baozouptu.R;
 import a.baozouptu.common.appInfo.MyApplication;
 import a.baozouptu.common.dataAndLogic.AllData;
 
@@ -99,8 +104,6 @@ public class Util {
         }
 
         public static void mle(Object s1, Object s2) {
-            Log.e(AllData.TAG +
-                    s1.toString(), s2.toString());
         }
     }
 
@@ -178,5 +181,25 @@ public class Util {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             return MyApplication.appContext.getResources().getColor(id, null);
         return MyApplication.appContext.getResources().getColor(id);
+    }
+
+
+    public static ColorStateList getStateList() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return MyApplication.appContext.getResources().getColorStateList(R.color.imageview_tint_function, null);
+        } else {
+            return MyApplication.appContext.getResources().getColorStateList(R.color.imageview_tint_function);
+        }
+    }
+
+    public static Drawable getStateDrawable(Drawable src, ColorStateList colors, PorterDuff.Mode mode) {
+        Drawable drawable = DrawableCompat.wrap(src);
+        DrawableCompat.setTintList(drawable, colors);
+        DrawableCompat.setTintMode(drawable, mode);
+        return drawable;
+    }
+
+    public static Drawable getMyShosenIcon(int id) {
+        return getStateDrawable(getDrawable(id).mutate(),getStateList(),PorterDuff.Mode.SRC_IN);
     }
 }

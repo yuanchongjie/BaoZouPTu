@@ -24,7 +24,7 @@ public class ColorLump extends View {
     }
 
     /**
-     * 设置颜色，同时重回绘图像
+     * 设置选中的颜色，同时重回绘图像
      * @param color
      */
     public void setColor(int color) {
@@ -33,11 +33,6 @@ public class ColorLump extends View {
     }
     public int getColor() {
         return mcolor;
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
     }
 
     @Override

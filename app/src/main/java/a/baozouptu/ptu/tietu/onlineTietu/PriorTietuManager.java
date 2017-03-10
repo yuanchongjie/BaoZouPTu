@@ -71,7 +71,7 @@ public class PriorTietuManager {
      * 更新本地的贴图，删除不用的
      */
     private static void updateLocalTietu(String category, List<tietu_material> tietuMaterials, final Subscriber<? super List<tietu_material>> subscriber) {
-        File[] exitFiles = FileTool.getAllChildFiles(AllData.tietuDir);
+        File[] exitFiles = FileTool.getAllChildFiles(AllData.getTietuDir());
         //获取文件的名称列表
         List<String> fileName = new ArrayList<>();
         for (File file : exitFiles) {
@@ -101,7 +101,9 @@ public class PriorTietuManager {
      * @return 存在时返回贴图的文件 ，本地不存在时返回空，并且下载
      */
     public static File getLocalTietuFile(final tietu_material tietuMaterial) {
-        final File tietuFile = new File(PriorTietuManager.getTietuFilePath(tietuMaterial));
+        String tietuPath = PriorTietuManager.getTietuFilePath(tietuMaterial);
+        if (tietuPath == null) return null;
+        final File tietuFile = new File(tietuPath);
         if (!tietuFile.exists()) {
             tietuMaterial.getUrl().download(tietuFile, new DownloadFileListener() {
                 @Override
@@ -123,7 +125,7 @@ public class PriorTietuManager {
     }
 
     public static String getTietuFilePath(tietu_material tietuMaterial) {
-        return AllData.tietuDir + "/" + tietuMaterial.getCategory() + "_" + tietuMaterial.getTheOnlyName();
+        return AllData.getTietuDir() + "/" + tietuMaterial.getCategory() + "_" + tietuMaterial.getTheOnlyName();
     }
 
     public static String getCategoryByFileName(String fileName) {

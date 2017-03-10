@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import a.baozouptu.common.dataAndLogic.AllData;
+import a.baozouptu.common.util.CustomToast;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.DownloadFileListener;
@@ -19,7 +20,6 @@ import cn.bmob.v3.listener.DownloadFileListener;
 
 /**
  * Created by Administrator on 2016/11/21 0021.
- *
  */
 
 public class FileDownloader {
@@ -55,6 +55,7 @@ public class FileDownloader {
     public static void downLoadBmobFile(String url, String tietuDir) {
 
     }
+
     public static FileDownloader getInstance() {
         if (instance == null)
             instance = new FileDownloader();
@@ -85,11 +86,19 @@ public class FileDownloader {
             @Override
             public void done(String s, BmobException e) {
                 if (e == null) {
-                    Typeface typeface = Typeface.createFromFile(savePath);
-                    typefaceList.remove(id);
-                    typefaceList.add(id, typeface);
-                    textView.setTypeface(typeface);
-                    Toast.makeText(context, typefaceChinese.get(id) + "下载成功了,点击即可使用！", Toast.LENGTH_LONG).show();
+                    File typefaceFile = new File(savePath);
+                    if (!typefaceFile.exists()) {
+                        Toast.makeText(context, "下载失败,未能保存文件：", Toast.LENGTH_LONG).show();
+                    }
+                    try {
+                        Typeface typeface = Typeface.createFromFile(savePath);
+                        typefaceList.remove(id);
+                        typefaceList.add(id, typeface);
+                        textView.setTypeface(typeface);
+                        Toast.makeText(context, typefaceChinese.get(id) + "下载成功了,点击即可使用！", Toast.LENGTH_LONG).show();
+                    } catch (Exception ne) {
+                        CustomToast.makeText("解析字体失败,试试在设置中删除再重新下载", Toast.LENGTH_LONG).show();
+                    }
                 } else {
                     Toast.makeText(context, "下载失败：" + e.getErrorCode() + "," + e.getMessage(), Toast.LENGTH_LONG).show();
                     if (saveFile.exists()) saveFile.delete();//删除没下完整的文件

@@ -18,10 +18,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import a.baozouptu.common.util.GeoUtil;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.RepealRedoListener;
 import a.baozouptu.ptu.repealRedo.DrawStepData;
-import a.baozouptu.ptu.view.PtuView;
+import a.baozouptu.ptu.view.PtuSeeView;
 
 /**
  * 涂鸦View
@@ -52,7 +53,7 @@ public class DrawView extends View {
     public int currentSize = 15;
     private int currentStyle = 0;
     //原图
-    public PtuView ptuView = null;
+    public PtuSeeView ptuSeeView = null;
     Rect totalBound = null;
     Rect picBound = null;
     private RepealRedoListener repealRedoListener;
@@ -60,6 +61,10 @@ public class DrawView extends View {
     private EmbossMaskFilter emboss;
     private BlurMaskFilter blur;
     private Shader mShader;
+    /**
+     * 处理点击时画一个圆点
+     */
+    private boolean hasMove;
 
     public List<DrawPath> getResultData() {
         return picsavePath;
@@ -73,12 +78,12 @@ public class DrawView extends View {
     /**
      * @param context
      */
-    public DrawView(Context context, Rect totalBound, PtuView ptuView) {
+    public DrawView(Context context, Rect totalBound, PtuSeeView ptuSeeView) {
         super(context);
         this.context = context;
-        this.ptuView = ptuView;
+        this.ptuSeeView = ptuSeeView;
         this.totalBound = totalBound;
-        this.picBound = ptuView.getPicBound();
+        this.picBound = ptuSeeView.getPicBound();
         screenWidth = picBound.width();
         screenHeight = picBound.height();
 
@@ -372,11 +377,12 @@ public class DrawView extends View {
         float x = event.getX();
         float y = event.getY();
         float[] pxy = PtuUtil.getLocationAtPicture(x + getLeft(), y + getTop(),
-                ptuView.getSrcRect(), ptuView.getDstRect());
+                ptuSeeView.getSrcRect(), ptuSeeView.getDstRect());
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 // 每次down下去重新new一个Path
+                hasMove = false;
                 mPath = new Path();
                 mpicPath = new Path();
                 picdp = new DrawPath();
@@ -391,11 +397,21 @@ public class DrawView extends View {
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
+                if (GeoUtil.getDis(mX, mY, x, y) >= 1) {
+                    hasMove = true;
+                }
                 touch_move(x, y);
                 pic_touch_move(pxy[0], pxy[1]);
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
+                if (!hasMove) {  //处理点击时画一个圆点
+                    mX += 1;
+                    mY += 1;
+                    mPicX += 1;
+                    mPicY += 1;
+                }
+                hasMove = false;
                 touch_up();
                 pic_touch_up();
                 invalidate();
@@ -423,6 +439,10 @@ public class DrawView extends View {
     public void selectPaintColor(int which) {
         currentColor = which;
         setPaintStyle();
+    }
+
+    public int getCurPaintColor() {
+        return currentColor;
     }
 
 

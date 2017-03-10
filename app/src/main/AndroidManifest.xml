@@ -48,7 +48,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.EDIT" />
 
-                <data android:mimeType="image/*"/>
+                <data android:mimeType="image/*" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <!--
@@ -60,8 +60,6 @@
             -->
 
         </activity>
-
-        <activity android:name=".ptu.TestActivity" />
         <activity
             android:name=".user.userSetting.SettingActivity"
             android:theme="@style/SettingAppThem" />
@@ -71,6 +69,7 @@
             android:label="@string/title_activity_about_app"
             android:theme="@style/AppTheme" />
 
+        <activity android:name=".ptu.TestActivity" />
         <!-- 腾讯qq分享的 -->
         <activity
             android:name="com.tencent.tauth.AuthActivity"

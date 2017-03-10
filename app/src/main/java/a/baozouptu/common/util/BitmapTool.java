@@ -30,7 +30,6 @@ import rx.schedulers.Schedulers;
  */
 public class BitmapTool {
 
-
     /**
      * 解析出指定大小的图片 ，返回其Bitmap对象
      *
@@ -161,7 +160,7 @@ public class BitmapTool {
                 context.sendBroadcast(intent);
             }
         } catch (SecurityException se) {
-            return se.getMessage();
+            return "安全权限禁止"+se.getMessage();
         } catch (FileNotFoundException e) {
             return e.getMessage();
         } catch (IOException e) {

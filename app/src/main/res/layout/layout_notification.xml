@@ -26,7 +26,7 @@
         >
 
         <LinearLayout
-            android:id="@+id/notify_layout_ptu"
+            android:id="@+id/notify_layout_choose"
             android:layout_width="0dp"
             android:layout_weight="10"
             android:layout_height="wrap_content"

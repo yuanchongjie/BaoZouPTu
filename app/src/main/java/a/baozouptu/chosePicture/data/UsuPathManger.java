@@ -120,7 +120,15 @@ public class UsuPathManger {
     public void addRecentPathFirst(String path) {
         mUsuallyPicPathList.add(usedNumber + 2, path);
         recentNumber++;
+        if(recentNumber>MAX_RECENT_NUMBER){
+            removeLastRecentPath();
+        }
         Log.e("---------", "addRecentPathFirst: 添加最近图片成功+数量=" + recentNumber);
+    }
+
+    private void removeLastRecentPath() {
+        mUsuallyPicPathList.remove(usedNumber+recentNumber+2-1);
+        recentNumber--;
     }
 
     /**
@@ -141,13 +149,16 @@ public class UsuPathManger {
     }
 
     /**
-     * 删除常用图片
+     * 删除喜爱图片路径
+     *
+     * @param path 喜爱图片的途径，不是位置
      */
-    public void deletePreferPath(String path, int index) {
+    public void deletePreferPath(String path) {
         try {
             mDB = MyDatabase.getInstance(mContext);
+            int index = mUsuallyPicPathList.lastIndexOf(path);
             mUsuallyPicPathList.remove(index);
-            mDB.deleteFrequentlyPic(path);
+            mDB.deletePreferPicPath(path);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -158,16 +169,18 @@ public class UsuPathManger {
 
     /**
      * 检测最近的图片是否存在，不存在就删除
+     *
      * @return 返回是否有变动的
      */
     public boolean checkRecentExit() {
-        boolean has=false;
+        boolean has = false;
         for (int i = usedNumber + 2; i < recentNumber + usedNumber + 2; i++) {
+            if (i >= mUsuallyPicPathList.size()) break;
             String path = mUsuallyPicPathList.get(i);
             if (!new File(path).exists()) {
                 mUsuallyPicPathList.remove(i);
                 recentNumber--;
-                has=true;
+                has = true;
             }
         }
         return has;
@@ -175,6 +188,7 @@ public class UsuPathManger {
 
     private boolean isInRecent(String path) {
         for (int i = usedNumber + 2; i < recentNumber + usedNumber + 2; i++) {
+            if (i >= mUsuallyPicPathList.size()) break;
             if (mUsuallyPicPathList.get(i).equals(path))
                 return true;
         }
@@ -208,7 +222,7 @@ public class UsuPathManger {
             }
             //如果包含在常用列表
             if (mUsuallyPicPathList.contains(path)) {
-                mDB.deleteFrequentlyPic(path);
+                mDB.deletePreferPicPath(path);
                 mUsuallyPicPathList.remove(path);
             }
         } catch (Exception e) {

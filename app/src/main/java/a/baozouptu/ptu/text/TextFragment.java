@@ -7,14 +7,13 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.constraint.ConstraintLayout;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -24,15 +23,15 @@ import a.baozouptu.common.util.BitmapTool;
 import a.baozouptu.common.util.FileTool;
 import a.baozouptu.common.view.FirstUseDialog;
 import a.baozouptu.ptu.BasePtuFragment;
-import a.baozouptu.ptu.BasePtuFunction;
 import a.baozouptu.ptu.PtuActivity;
 import a.baozouptu.ptu.PtuUtil;
 import a.baozouptu.ptu.RepealRedoListener;
 import a.baozouptu.ptu.common.PtuData;
 import a.baozouptu.ptu.repealRedo.StepData;
 import a.baozouptu.ptu.repealRedo.TextStepData;
+import a.baozouptu.ptu.view.ColorPicker;
 import a.baozouptu.ptu.view.PtuFrameLayout;
-import a.baozouptu.ptu.view.PtuView;
+import a.baozouptu.ptu.view.PtuSeeView;
 import rx.Subscriber;
 
 /**
@@ -41,18 +40,18 @@ import rx.Subscriber;
  */
 public class TextFragment extends BasePtuFragment {
     PtuActivity mAcitivty;
-    LinearLayout toumingdu;
-    LinearLayout style;
-    LinearLayout color;
-    LinearLayout typeface;
-    LinearLayout rubber;
-    //LinearLayout bouble;
+    ConstraintLayout toumingdu;
+    ConstraintLayout style;
+    ConstraintLayout color;
+    ConstraintLayout typeface;
+    ConstraintLayout rubber;
+    //ConstraintLayout bouble;
     private FunctionPopWindowBuilder textPopupBuilder;
     private FloatTextView floatTextView;
     private String TAG = "TextFragment";
     private RubberView rubberView;
     RepealRedoListener repealRedoListener;
-    PtuView ptuView;
+    PtuSeeView ptuSeeView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -76,12 +75,12 @@ public class TextFragment extends BasePtuFragment {
      * @param view
      */
     private void initView(View view) {
-        toumingdu = (LinearLayout) view.findViewById(R.id.add_text_toumingdu);
-        style = (LinearLayout) view.findViewById(R.id.add_text_style);
-        color = (LinearLayout) view.findViewById(R.id.add_text_color);
-        typeface = (LinearLayout) view.findViewById(R.id.add_text_typeface);
-        rubber = (LinearLayout) view.findViewById(R.id.text_rubber);
-        //bouble = (LinearLayout) view.findViewById(R.id.add_text_bubble);
+        toumingdu = (ConstraintLayout) view.findViewById(R.id.add_text_toumingdu);
+        style = (ConstraintLayout) view.findViewById(R.id.add_text_style);
+        color = (ConstraintLayout) view.findViewById(R.id.add_text_color);
+        typeface = (ConstraintLayout) view.findViewById(R.id.add_text_typeface);
+        rubber = (ConstraintLayout) view.findViewById(R.id.text_rubber);
+        //bouble = (ConstraintLayout) view.findViewById(R.id.add_text_bubble);
     }
 
     /**
@@ -97,7 +96,26 @@ public class TextFragment extends BasePtuFragment {
         color.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                textPopupBuilder.setColorPopWindow(v);
+                textPopupBuilder.setColorPopWindow(v, new ColorPicker.ColorTarget() {
+                    @Override
+                    public void setColor(int color) {
+                        if (floatTextView.isClickable()) {
+                            floatTextView.setTextColor(color);
+                            floatTextView.setHintTextColor(color);
+                        } else {
+                            rubberView.setColor(color);
+                        }
+                    }
+
+                    @Override
+                    public int getCurColor() {
+                        if (floatTextView.isClickable()) {
+                            return floatTextView.getCurrentTextColor();
+                        } else {
+                            return rubberView.getColor();
+                        }
+                    }
+                });
             }
         });
         typeface.setOnClickListener(new View.OnClickListener() {
@@ -161,14 +179,14 @@ public class TextFragment extends BasePtuFragment {
         repealRedoListener.canRedo(false);
     }
 
-    public void setPtuView(PtuView ptuView) {
-        this.ptuView = ptuView;
+    public void setPtuSeeView(PtuSeeView ptuSeeView) {
+        this.ptuSeeView = ptuSeeView;
     }
 
     public void addRubberView(Context context, PtuFrameLayout ptuFrame) {
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ptuView.getDstRect().width(), ptuView.getDstRect().height());
-        params.setMargins(ptuView.getDstRect().left, ptuView.getDstRect().top, 0, 0);
-        rubberView = new RubberView(context, ptuView);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ptuSeeView.getDstRect().width(), ptuSeeView.getDstRect().height());
+        params.setMargins(ptuSeeView.getDstRect().left, ptuSeeView.getDstRect().top, 0, 0);
+        rubberView = new RubberView(context, ptuSeeView);
         rubberView.setRepealRedoListener(repealRedoListener);
         ptuFrame.addView(rubberView, params);
     }
@@ -201,7 +219,7 @@ public class TextFragment extends BasePtuFragment {
     public StepData getResultDataAndDraw(float ratio) {
         //获取和保存数据
         TextStepData tsd = new TextStepData(PtuUtil.EDIT_TEXT);
-        Bitmap resultBm = floatTextView.getResultData(ptuView, tsd);
+        Bitmap resultBm = floatTextView.getResultData(ptuSeeView, tsd);
         if (resultBm != null) {
             String tempPath = FileTool.createTempPicPath();
             BitmapTool.asySaveTempBm(tempPath, resultBm, new Subscriber<String>() {
@@ -244,16 +262,16 @@ public class TextFragment extends BasePtuFragment {
         //擦除的东西添加上去
         ArrayList<Pair<Path, Paint>> pathPaintList = tsd.getRubberData();
         if (pathPaintList != null) {//存在橡皮数据
-            Canvas canvas = new Canvas(ptuView.getSourceBm());
+            Canvas canvas = new Canvas(ptuSeeView.getSourceBm());
             for (Pair<Path, Paint> pair : pathPaintList) {
                 canvas.drawPath(pair.first, pair.second);
             }
         }
         if (textAddBm != null) {//存在文字数据
-            ptuView.addBitmap(textAddBm, tsd.boundRectInPic, 0);
+            ptuSeeView.addBitmap(textAddBm, tsd.boundRectInPic, 0);
         } else if (pathPaintList != null)  //存橡皮数据，只刷新橡皮
         {
-            ptuView.invalidate();
+            ptuSeeView.invalidate();
         }
     }
 

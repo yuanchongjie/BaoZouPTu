@@ -1,10 +1,8 @@
 package a.baozouptu.chosePicture.data;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -14,17 +12,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import a.baozouptu.R;
 import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.util.FileTool;
 import a.baozouptu.common.util.Util;
-import a.baozouptu.network.FileDownloader;
 
 /**
  * Created by LiuGuicen on 2017/1/18 0018.
+ *
  */
 
 public class PicDirInfoManager {
@@ -85,6 +81,7 @@ public class PicDirInfoManager {
     }
 
     public String getDirPath(int position) {
+        if(position>=picDirInfos.size())position=picDirInfos.size()-1;
         return picDirInfos.get(position).getDirPath();
     }
 
@@ -93,7 +90,7 @@ public class PicDirInfoManager {
      *
      * @param dirPath 目录路径
      */
-    int findDirPathId(String dirPath) {
+    private int findDirPathId(String dirPath) {
         for (int i = 0; i < picDirInfos.size(); i++) {
             if (picDirInfos.get(i).getDirPath().equals(dirPath))
                 return i;
@@ -104,7 +101,7 @@ public class PicDirInfoManager {
     /**
      * 新增一张图片时改变相应的目录信息
      *
-     * @return 针对添加图片时，图片目录尚存在的情况，刷新图片列表
+     * @return 针对添加图片时，图片目录尚不存在的情况，刷新图片列表
      */
     public boolean onAddNewPic(String newPicPath) {
         String parentPath = FileTool.getParentPath(newPicPath);

@@ -1,9 +1,7 @@
 package a.baozouptu.ptu;
 
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -11,27 +9,23 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Toast;
-
-import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import java.io.File;
 
 import a.baozouptu.CertainLeaveDialog;
 import a.baozouptu.R;
 import a.baozouptu.chosePicture.data.PicInfoScanner;
+import a.baozouptu.common.BaseActivity;
 import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.util.BitmapTool;
 import a.baozouptu.common.util.FileTool;
@@ -52,7 +46,7 @@ import a.baozouptu.ptu.text.TextFragment;
 import a.baozouptu.ptu.tietu.TietuFragment;
 import a.baozouptu.ptu.view.PtuFrameLayout;
 import a.baozouptu.ptu.view.PtuTopRelativeLayout;
-import a.baozouptu.ptu.view.PtuView;
+import a.baozouptu.ptu.view.PtuSeeView;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -70,7 +64,7 @@ import static a.baozouptu.ptu.PtuUtil.EDIT_MAT;
 /**
  *
  */
-public class PtuActivity extends AppCompatActivity implements MainFunctionFragment.Listen {
+public class PtuActivity extends BaseActivity implements MainFunctionFragment.Listen {
     private static final String TAG = "PtuActivity";
     static int CURRENT_EDIT_MODE = 0;
 
@@ -84,7 +78,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     private DrawFragment drawFrag;
     private CutFragment cutFrag;
     private MatFragment matFrag;
-    public PtuView ptuView;
+    public PtuSeeView ptuSeeView;
 
     private PtuFrameLayout ptuFrame;
     private PtuConstraintLayout ptuLayout;
@@ -102,7 +96,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
      * 整个PtuFragment的范围,初始时为0,要用与判断是否已经加载了图片
      */
     private Rect totalBound = new Rect(0, 0, 0, 0);
-    private SaveSetDialogManager saveSetmanager;
+    private SaveSetDialogManager saveSetManager;
     private ProgressDialog mProgressDialog;
 
     private String endType = "normal";
@@ -117,13 +111,13 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        test();
-        saveSetInstance = new SaveSetInstance();
         setContentView(R.layout.activity_ptu);
+        // TODO: 2017/3/3 0003 这里开一条线程处理，不是直接的处理
+        saveSetInstance = new SaveSetInstance();
         setTitle("");
         Log.e(TAG, "使用最新图片返回图片-1");
         initView();
         Log.e(TAG, "使用最新图片返回图片-0");
-        initToolbar();
         //如果加载数据不成功，（图片加载失败）返回，
         if (!initData()) return;
         initFragment();
@@ -135,6 +129,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     private void initFragment() {
         mainFrag = new MainFunctionFragment();
+        currentFrag = mainFrag;
         fm = getFragmentManager();
         fm.beginTransaction()
                 .replace(R.id.fragment_main_function, mainFrag)
@@ -155,7 +150,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     @Override
     public void switchFragment(int function) {
-        ptuView.resetShow();
+        ptuSeeView.resetShow();
         lastFrag = currentFrag;
         if (function == EDIT_MAIN) {
             mainFrag.eraseChosenColor();
@@ -171,7 +166,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 case EDIT_CUT:
                     if (cutFrag == null) {
                         cutFrag = new CutFragment();
-                        cutFrag.setPtuView(ptuView);
+                        cutFrag.setPtuSeeView(ptuSeeView);
                     }
                     fm.beginTransaction()
                             .setCustomAnimations(R.animator.slide_bottom_in, R.animator.slide_bottom_out,
@@ -182,7 +177,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                             new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                     cutFloatParams.setMargins(0, 0, 0, 0);
                     ptuFrame.addView(
-                            cutFrag.createCutView(this, totalBound, ptuView.getSourceBm())
+                            cutFrag.createCutView(this, totalBound, ptuSeeView.getSourceBm())
                             , cutFloatParams);
                     currentFrag = cutFrag;
                     CURRENT_EDIT_MODE = EDIT_CUT;
@@ -190,7 +185,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 case EDIT_TEXT:
                     if (textFrag == null) {
                         textFrag = new TextFragment();
-                        textFrag.setPtuView(ptuView);
+                        textFrag.setPtuSeeView(ptuSeeView);
                         textFrag.setRepealRedoListener(repealRedoListener);
                     }
                     fm.beginTransaction()
@@ -200,7 +195,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                             .commit();
                     CURRENT_EDIT_MODE = EDIT_TEXT;
                     textFrag.addRubberView(this, ptuFrame);
-                    FloatTextView floatTextView = ptuFrame.initAddTextFloat(ptuView.getPicBound());
+                    FloatTextView floatTextView = ptuFrame.initAddTextFloat(ptuSeeView.getPicBound());
                     textFrag.setFloatView(floatTextView);
                     currentFrag = textFrag;
                     break;
@@ -208,7 +203,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     if (tietuFrag == null) {
                         tietuFrag = new TietuFragment();
                     }
-                    tietuFrag.initBeforeCreateView(ptuFrame, ptuView);
+                    tietuFrag.initBeforeCreateView(ptuFrame, ptuSeeView);
 
                     fm.beginTransaction()
                             .setCustomAnimations(R.animator.slide_bottom_in, R.animator.slide_bottom_out,
@@ -230,9 +225,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                             .commit();
                     FrameLayout.LayoutParams drawFloatParams =
                             new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    drawFloatParams.setMargins(ptuView.getDstRect().left, ptuView.getDstRect().top, ptuView.getDstRect().left, ptuView.getDstRect().top);
+                    drawFloatParams.setMargins(ptuSeeView.getDstRect().left, ptuSeeView.getDstRect().top, ptuSeeView.getDstRect().left, ptuSeeView.getDstRect().top);
                     ptuFrame.addView(
-                            drawFrag.createDrawView(this, totalBound, ptuView)
+                            drawFrag.createDrawView(this, totalBound, ptuSeeView)
                             , drawFloatParams);
                     currentFrag = drawFrag;
                     CURRENT_EDIT_MODE = EDIT_DRAW;
@@ -251,23 +246,13 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     //设置布局
                     FrameLayout.LayoutParams floatParams =
                             new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    ptuFrame.addView(matFrag.createMatView(PtuActivity.this, totalBound, ptuView.getSourceBm()), floatParams);
+                    ptuFrame.addView(matFrag.createMatView(PtuActivity.this, totalBound, ptuSeeView.getSourceBm()), floatParams);
                     CURRENT_EDIT_MODE = EDIT_MAT;
                     currentFrag = matFrag;
                     break;
             }
         }
         Util.P.le(TAG, "switchFragment完成");
-    }
-
-    @TargetApi(19)
-    private void initToolbar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            SystemBarTintManager tintManager = new SystemBarTintManager(this);
-            tintManager.setStatusBarTintColor(Util.getColor(this, R.color.base_toolbar_background));
-            tintManager.setStatusBarTintEnabled(true);
-        }
     }
 
     /**
@@ -336,10 +321,11 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     @Override
                     public void onNext(String picPath) {
                         Log.e(TAG, "使用最新图片返回图片成功" + " 路径" + picPath);
+                        PtuActivity.this.picPath = picPath;
                         progressDialog.dismiss();
                         if (totalBound.width() > 0) {
-                            ptuView.replaceSourceBm(BitmapTool.getLosslessBitmap(picPath));
-                            repealRedoManager.setBaseBm(ptuView.getSourceBm()
+                            ptuSeeView.replaceSourceBm(BitmapTool.getLosslessBitmap(picPath));
+                            repealRedoManager.setBaseBm(ptuSeeView.getSourceBm()
                                     .copy(Bitmap.Config.ARGB_8888, true));//要设置好撤消重做的图
                         }
                     }
@@ -387,7 +373,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     private void initView() {
         ptuLayout = (PtuConstraintLayout) findViewById(R.id.ptu_layout);
         ptuFrame = (PtuFrameLayout) findViewById(R.id.ptu_frame);
-        ptuView = (PtuView) findViewById(R.id.ptu_view);
+        ptuSeeView = (PtuSeeView) findViewById(R.id.ptu_view);
 
         int top_btn_width = AllData.screenWidth / 10;
         int smallDividerWidth = Util.dp2Px(16);
@@ -492,8 +478,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             sure();
         mProgressDialog = ProgressDialog.show(PtuActivity.this, "请稍后",
                 "正在处理...", true);
-        saveResultBm(1);
+        String path = saveResultBm(1);
         mProgressDialog.dismiss();
+        if (path == null) return;
         setReturnResultAndFinish("finish", new Bundle(), true);
     }
 
@@ -501,13 +488,13 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     @Override
     protected void onStart() {
         Util.P.le(TAG, "onStart_1");
-        if (saveSetmanager == null) {
+        if (saveSetManager == null) {
             Observable.create(
                     new Observable.OnSubscribe<Object>() {
                         @Override
                         public void call(Subscriber<? super Object> subscriber) {
                             Log.e(TAG, "call: 执行了saveset Rx");
-                            saveSetmanager = saveSetInstance.getInstance(PtuActivity.this);
+                            saveSetManager = saveSetInstance.getInstance(PtuActivity.this);
                             subscriber.onNext(null);
                         }
                     })
@@ -529,9 +516,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                     @Override
                     public void onGlobalLayout() {
                         totalBound.set(0, 0, ptuFrame.getWidth(), ptuFrame.getHeight());
-                        ptuView.setTotalBound(totalBound);
-                        ptuView.setBitmapAndInit(picPath, totalBound);
-                        repealRedoManager.setBaseBm(ptuView.getSourceBm()
+                        ptuSeeView.setTotalBound(totalBound);
+                        ptuSeeView.setBitmapAndInit(picPath, totalBound);
+                        repealRedoManager.setBaseBm(ptuSeeView.getSourceBm()
                                 .copy(Bitmap.Config.ARGB_8888, true));
                         ptuFrame.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                         switchFragment(EDIT_MAIN);
@@ -542,12 +529,12 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
     }
 
     private void saveSet() {
-        if (saveSetmanager == null)
-            saveSetmanager = saveSetInstance.getInstance(this);
-        saveSetmanager.init(BitmapTool.getSize(
-                ptuView.getSourceBm()));
-        saveSetmanager.createDialog();
-        saveSetmanager.setClickListener(new SaveSetDialogManager.clickListenerInterface() {
+        if (saveSetManager == null)
+            saveSetManager = saveSetInstance.getInstance(this);
+        saveSetManager.init(BitmapTool.getSize(
+                ptuSeeView.getSourceBm()));
+        saveSetManager.createDialog();
+        saveSetManager.setClickListener(new SaveSetDialogManager.clickListenerInterface() {
 
             /**
              * @param saveRatio 注意先完成自己的操作，在调用此方法。这里会结束activity
@@ -567,11 +554,16 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
             @Override
             public String onShareItemClick(float saveRatio) {
                 endType = "share";
-                String savePath = FileTool.getNewPictureFileDefult(picPath);
-                if (savePath == null) return null;
-                String res = BitmapTool.saveBitmap(PtuActivity.this, ptuView.getSourceBm(), savePath, true);
-                if (!res.equals("success")) return null;
-                repealRedoManager.setHasSavePic(true);//分享过后图片就相当于已经保存了
+                String savePath;
+                if (repealRedoManager.hasChangePic()) {
+                    savePath = FileTool.getNewPictureFileDefault(picPath);
+                    if (savePath == null) return null;
+                    String res = BitmapTool.saveBitmap(PtuActivity.this, ptuSeeView.getSourceBm(), savePath, true);
+                    if (!res.equals("success")) return null;
+                    repealRedoManager.setHasSavePic(true);//分享过后图片就相当于已经保存了
+                } else {
+                    savePath = picPath;
+                }
                 return savePath;
             }
         });
@@ -641,8 +633,8 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 //            移除除了PtuView以外的视图
             ptuFrame.removeViewAt(i);
         }
-        if (ptuView.getVisibility() == View.INVISIBLE) {
-            ptuView.setVisibility(View.VISIBLE);
+        if (ptuSeeView.getVisibility() == View.INVISIBLE) {
+            ptuSeeView.setVisibility(View.VISIBLE);
         }
         topRelativeLayout.removeCancel();
         topRelativeLayout.removeSure();
@@ -701,10 +693,10 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
         if (repealRedoManager.canRepeal()) {
             repealRedoManager.repealPrepare();
-            ptuView.releaseResource();
+            ptuSeeView.releaseResource();
             Bitmap newSourceBm = repealRedoManager.getBaseBitmap().
                     copy(Bitmap.Config.ARGB_8888, true);
-            ptuView.replaceSourceBm(newSourceBm);
+            ptuSeeView.replaceSourceBm(newSourceBm);
             Util.P.le(TAG, "撤销的替换基图成功");
             int index = repealRedoManager.getCurrentIndex();
             for (int i = 0; i <= index; i++) {
@@ -712,7 +704,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
                 addBigStep(sd);
             }
             Util.P.le(TAG, "撤销的多步添加图片完成");
-            ptuView.resetShow();
+            ptuSeeView.resetShow();
         }
 
         progressDialog.dismiss();
@@ -777,9 +769,9 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
      */
     @Nullable
     private String saveResultBm(final float saveRatio) {
-        String result = null;
-        Bitmap bitmap = ptuView.getFinalPicture(saveRatio);
-        String savePath = FileTool.getNewPictureFileDefult(picPath);
+        String result;
+        Bitmap bitmap = ptuSeeView.getFinalPicture(saveRatio);
+        String savePath = FileTool.getNewPictureFileDefault(picPath);
         if (savePath == null) {
             Toast.makeText(this, "创建SD卡文件失败", Toast.LENGTH_LONG).show();
             return null;
@@ -810,7 +802,7 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        saveSetmanager.onActivityResult(requestCode, resultCode, data);
+        saveSetManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -826,10 +818,15 @@ public class PtuActivity extends AppCompatActivity implements MainFunctionFragme
 
     @Override
     protected void onDestroy() {
-        if (ptuView != null)
-            ptuView.releaseResource();
+        if (ptuSeeView != null)
+            ptuSeeView.releaseResource();
         if (repealRedoManager != null)
             repealRedoManager.clear(this);
+        if (saveSetManager != null) {
+            saveSetManager.dismissDialog();
+        }
+        if (currentFrag != null)
+            currentFrag.clear();
         super.onDestroy();
     }
 

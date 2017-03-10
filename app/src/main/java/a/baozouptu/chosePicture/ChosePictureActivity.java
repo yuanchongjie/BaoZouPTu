@@ -14,6 +14,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -41,7 +42,7 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
 
     private DrawerLayout fileListDrawer;
     private PicGridAdapter picAdapter;
-    private RecyclerView pictureGridview;
+    private RecyclerView pictureGridView;
 
     private GridLayoutManager gridLayoutManager;
     boolean isFromCreate = false;
@@ -64,7 +65,7 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
             if (s != null && s.equals("tietu"))
                 isChooseTietu = true;
         }
-        test();
+//        test();
         presenter = new ChosePicPresenter(this);
         initView();
         isFromCreate = true;
@@ -94,7 +95,7 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
             });
         }
         fileListDrawer = (DrawerLayout) findViewById(R.id.drawer_layout_show_picture);
-        pictureGridview = (RecyclerView) findViewById(R.id.gv_photolist);
+        pictureGridView = (RecyclerView) findViewById(R.id.gv_photolist);
         final ImageButton showFile = (ImageButton) findViewById(R.id.show_pic_file);
         showFile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,6 +107,28 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
             }
         });
         initPicListView();
+        getScreenSizeAgain();
+    }
+
+    /**
+     * 再次获取，防止没获取到
+     */
+    public void getScreenSizeAgain() {
+        View root = findViewById(R.id.layout_show_picture);
+        while (root.getParent() != null) {
+            root = (View) root.getParent();
+        }
+        final View finalRoot = root;
+        root.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (AllData.screenWidth == 0 || AllData.screenHeight == 0) {
+                    AllData.screenWidth = finalRoot.getWidth();
+                    AllData.screenHeight = finalRoot.getHeight();
+                }
+                finalRoot.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
     }
 
     /**
@@ -133,7 +156,7 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
                 return 1;
             }
         });
-        pictureGridview.setLayoutManager(gridLayoutManager);
+        pictureGridView.setLayoutManager(gridLayoutManager);
         picAdapter.setClickListener(
                 new PicGridAdapter.ItemClickListener() {
                     @Override
@@ -163,7 +186,6 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
                     public boolean onItemLongClick(PicGridAdapter.ItemHolder itemHolder) {
                         View view = itemHolder.iv;
                         int position = itemHolder.getAdapterPosition();
-                        Util.P.le("position " + position);
 
                         return LongPicPopupWindow.setPicPopWindow(presenter, ChosePictureActivity.this, view, position);
                     }
@@ -171,7 +193,7 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
 
         );
 
-        pictureGridview.addOnScrollListener(
+        pictureGridView.addOnScrollListener(
                 new RecyclerView.OnScrollListener() {
                     AsyncImageLoader imageLoader = AsyncImageLoader.getInstance();
                     int lastScrollState = RecyclerView.SCROLL_STATE_IDLE;
@@ -216,9 +238,9 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
                             if (position < 0 || position >= presenter.getCurrentSize())
                                 break;//一行中左边有数据，右边没有数据，各自position仍然当做存在
                             Util.P.le(TAG, "" + position);
-                            View view = pictureGridview.findViewWithTag(presenter.getCurrentPath(position));
+                            View view = pictureGridView.findViewWithTag(presenter.getCurrentPath(position));
                             if (view != null) {
-                                picAdapter.myBindViewHolder(pictureGridview.getChildViewHolder(view),
+                                picAdapter.myBindViewHolder(pictureGridView.getChildViewHolder(view),
                                         position);
                             }
                         }
@@ -235,7 +257,7 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
                 @Override
                 public void onSure() {
                     FirstUseDialog firstUseSetting = new FirstUseDialog(ChosePictureActivity.this);
-                    firstUseSetting.createDialog(null, "点击左上角图标可进入设置", new FirstUseDialog.ActionListener() {
+                    firstUseSetting.createDialog(null, "点击左上角图标可进入设置，\n右边侧滑可选择文件图片", new FirstUseDialog.ActionListener() {
                         @Override
                         public void onSure() {
                             AllData.hasReadConfig.write_usuPicUse(true);
@@ -244,14 +266,12 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
                 }
             });
         }
-        pictureGridview.setAdapter(picAdapter);
+        pictureGridView.setAdapter(picAdapter);
         m_ProgressDialog.dismiss();
     }
 
     /**
      * 删除一张图片
-     *
-     * @param path
      */
     public void deleteOnePic(final String path) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -304,7 +324,7 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
 
     @Override
     public void onTogglePicList(PicGridAdapter picAdapter) {
-        pictureGridview.setAdapter(picAdapter);
+        pictureGridView.setAdapter(picAdapter);
     }
 
     @Override
@@ -394,4 +414,5 @@ public class ChosePictureActivity extends BaseActivity implements ChoosePicContr
     public void setPresenter(ChoosePicContract.PicPresenter presenter) {
 
     }
+
 }

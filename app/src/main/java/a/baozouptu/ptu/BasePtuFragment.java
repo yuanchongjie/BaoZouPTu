@@ -11,4 +11,7 @@ public abstract class BasePtuFragment extends Fragment implements  BasePtuFuncti
     public boolean onBackPressed() {
         return false;
     }
+    @Override
+    public void clear(){}
+
 }

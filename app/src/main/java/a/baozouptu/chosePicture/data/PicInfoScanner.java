@@ -16,7 +16,6 @@ import java.util.TreeMap;
 
 import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.util.Util;
-import rx.Subscriber;
 
 /**
  * Created by LiuGuicen on 2017/1/18 0018.
@@ -38,6 +37,9 @@ public class PicInfoScanner {
 
     public enum PicUpdateType {
         NO_CHANGE,
+        /**
+         * 改变所有图片
+         */
         CHANGE_ALL_PIC,
         CHANGE_ALL_FILE,
         CHANGE_PIC,
@@ -46,12 +48,10 @@ public class PicInfoScanner {
     }
 
     private int totalPicNumber;
-    private UsuPathManger usuProcessor;
 
     private PicDirInfoManager picDirInfoManager;
 
-    public PicInfoScanner(UsuPathManger usuProcessor, PicDirInfoManager picDirInfoManager) {
-        this.usuProcessor = usuProcessor;
+    public PicInfoScanner(UsuPathManger usuPathManger, PicDirInfoManager picDirInfoManager) {
         this.picDirInfoManager = picDirInfoManager;
         totalPicNumber = 0;
     }
@@ -98,9 +98,9 @@ public class PicInfoScanner {
      * 更新最近图片信息，在usu列表中的
      *
      */
-    public PicUpdateType updateRecentPic() {
+    public PicUpdateType updateRecentPic(UsuPathManger usuPathManger) {
         totalPicNumber = sortedPicPathsByTime.size();
-        usuProcessor.updateRecentInfoInUsu(sortedPicPathsByTime);
+        usuPathManger.updateRecentInfoInUsu(sortedPicPathsByTime);
         sortedPicPathsByTime.clear();
         return PicUpdateType.CHANGE_ALL_PIC;
     }
@@ -108,10 +108,10 @@ public class PicInfoScanner {
     /**
      * 更新图片文件的信息，在drawer中的，包括文件目录信息，文件中图片数目，最新图片的路径
      */
-    public PicUpdateType updateAllFileInfo() {
+    public PicUpdateType updateAllFileInfo(UsuPathManger usuPathManger) {
         //处理文件信息
         picDirInfoManager.clear();//清理
-        picDirInfoManager.updateUsuInfo(usuProcessor.getUsuPaths());//给常用图片添加信息
+        picDirInfoManager.updateUsuInfo(usuPathManger.getUsuPaths());//给常用图片添加信息
         picDirInfoManager.updateAllFileInfo(picFileNumberMap, picFileRepresentMap);//添加其他文件的信息
         Log.e("Rx更新", "updateAllFileInfo: 发送文件更新信息");
         picFileNumberMap.clear();
@@ -147,7 +147,7 @@ public class PicInfoScanner {
                 long modifyTime = cursor.getLong(cursor
                         .getColumnIndex(MediaStore.Images.Media.DATE_MODIFIED)) * 1000;// 最近修改时间
                 if (AllData.PIC_FILE_SIZE_MIN < size && size < AllData.PIC_FILE_SIZE_MAX) {// 图片符合条件
-                    sortPictureList.add(new Pair(modifyTime, path));
+                    sortPictureList.add(new Pair<>(modifyTime, path));
                     String parentPath = path.substring(0,
                             path.lastIndexOf('/'));
                     if (fileRepresentTime.containsKey(parentPath)) {

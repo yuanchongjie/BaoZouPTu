@@ -17,14 +17,14 @@ import a.baozouptu.common.util.GeoUtil;
 import a.baozouptu.common.util.MU;
 import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.PtuUtil;
-import a.baozouptu.ptu.view.PtuView;
+import a.baozouptu.ptu.view.PtuSeeView;
 import a.baozouptu.ptu.view.TSRView;
 
 /**
  * Created by liuguicen on 2016/8/5.
  */
 
-public class CutView extends PtuView implements TSRView {
+public class CutView extends PtuSeeView implements TSRView {
     private final Context mContext;
     private final String TAG = "CutView";
     private Paint clearPaint;

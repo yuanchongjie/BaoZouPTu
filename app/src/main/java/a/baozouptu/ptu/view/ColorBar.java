@@ -66,19 +66,34 @@ public class ColorBar extends View {
 
     public interface ColorChangeListener {
         void colorChange(int color);
-    } public interface ColorChosedListener {
-        void colorChosed(int color);
     }
-    ColorChangeListener colorChangeListener; 
-    ColorChosedListener colorChosedListener;
+
+    public interface ColorChosenListener {
+        void onColorPicked(int color);
+    }
+
+    ColorChangeListener colorChangeListener;
+    ColorChosenListener colorChosenListener;
+
     public void setOnColorChangerListener(ColorChangeListener colorChangerListener) {
         this.colorChangeListener = colorChangerListener;
     }
-    public void setOnColorChosedListener(ColorChosedListener colorChosedrListener) {
-        this.colorChosedListener = colorChosedrListener;
+
+    public void setOnColorChosenListener(ColorChosenListener colorChosenListener) {
+        this.colorChosenListener = colorChosenListener;
     }
+
+    public ColorBar(Context context) {
+        super(context);
+        init();
+    }
+
     public ColorBar(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init();
+    }
+
+    private void init() {
         currentColor = COLORS[0];
         STATUS = STATUS_INIT;
         invalidate();
@@ -86,11 +101,6 @@ public class ColorBar extends View {
 
     /**
      * onsizechanged时获取组件的长和宽，后面ondraw时就利用它们进行绘图
-     *
-     * @param w
-     * @param h
-     * @param oldw
-     * @param oldh
      */
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -144,9 +154,10 @@ public class ColorBar extends View {
                     currentThumbOffset = barWidth + thumbRadius;
                 break;
             case MotionEvent.ACTION_UP:
-                if (colorChosedListener != null)
+                if (colorChosenListener != null) {
                     currentColor = getCurrentColor();
-                    colorChosedListener.colorChosed(currentColor);
+                    colorChosenListener.onColorPicked(currentColor);
+                }
 
         }
         //局部更新，好像没什么用

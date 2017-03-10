@@ -100,12 +100,12 @@ public class SimpleUser extends BmobObject {
                                     new UpdateListener() {
 
                                         @Override
-                                        public void done(BmobException e) {
-                                            if (e == null) {
+                                        public void done(BmobException ee) {
+                                            if (ee == null) {
                                                 AllData.appConfig.writeConfig_LastUsedData(System.currentTimeMillis());
                                                 Log.e("bmob", "更新成功");
                                             } else {
-                                                Log.e("bmob", "更新失败：" + e.getMessage() + "," + e.getErrorCode());
+                                                Log.e("bmob", "更新失败：" + ee.getMessage() + "," + ee.getErrorCode());
                                             }
                                         }
                                     });
@@ -121,8 +121,8 @@ public class SimpleUser extends BmobObject {
      * 查看是否需要更新，并且会查看是否添加到服务器，没有添加时则由这里添加
      */
     private boolean isUpdateNeeded() {
-        long data = System.currentTimeMillis() / 24 / 3600 / 100;//日为单位
-        long lastData = AllData.appConfig.readConfig_LastUseData() / 24 / 3600 / 100;//日为单位
+        long data = System.currentTimeMillis() / 24 / 3600 / 1000;//日为单位
+        long lastData = AllData.appConfig.readConfig_LastUseData() / 24 / 3600 / 1000;//日为单位
         if (lastData == 0)//网络端还为创建或者没有创建成功,则重新创建
         {
             create();

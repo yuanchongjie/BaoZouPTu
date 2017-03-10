@@ -4,11 +4,10 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,9 +19,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -50,14 +51,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initApp();
-        getScreenWidth();
+        getScreenSize();
 
 //关闭通知
 //nm.stop(0);
 
         boolean isTest = true;
         if (isTest) {
-         //   new NetWorkTest().test();
+            //   new NetWorkTest().test();
             test();
             sendNotify();
         } else {
@@ -77,13 +78,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**
      * 获取屏幕的宽度
      */
-    void getScreenWidth() {
+    // TODO: 2017/3/9 0009 这里获取宽高有很多点，碎片化严重，有说在onCreate中获取到的总是0，
+    // 有说必须在manifest中加入多种屏幕支持的，还有说
+
+    // TODO: 2017/3/9 0009  其中一个如果多窗口时用AC的context获取是当前宽高，用application的获取的是整个
+    void getScreenSize() {
         DisplayMetrics metric = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metric);
         AllData.screenWidth = metric.widthPixels; // 屏幕宽度（像素）
         AllData.screenHeight = metric.heightPixels;
+        if (AllData.screenWidth == 0 || AllData.screenHeight == 0) {
+            DisplayMetrics dm = getResources().getDisplayMetrics();
+            AllData.screenWidth = dm.widthPixels; // 屏幕宽（像素，如：3200px）
+            AllData.screenHeight = dm.heightPixels; // 屏幕高（像素，如：1280px）
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            if (AllData.screenWidth == 0 || AllData.screenHeight == 0) {
+                WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+                Display display = wm.getDefaultDisplay();
+                Point size = new Point();
+                display.getRealSize(size);
+                AllData.screenHeight = size.y;
+                AllData.screenWidth = size.x;
+            }
+        }
     }
-
 
     /**
      * 傻逼360开发平台
@@ -95,16 +114,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //  if (checkVersion()) {
         Intent intent = new Intent(this, ChosePictureActivity.class);
         intent.putExtra("test", "test");
-        startActivityForResult(intent, 0);
+        startActivity(intent);
         finish();
-        Log.e(TAG,"完成时间  "+System.currentTimeMillis());
+        Log.e(TAG, "完成时间  " + System.currentTimeMillis());
         //  }
     }
 
 
     private void sendNotify() {
         //如果设置为不允许则不发送
-        if(!AllData.settingDataSource.getSendShortcutNotify())
+        if (!AllData.settingDataSource.getSendShortcutNotify())
             return;
         // 第一步：获取NotificationManager
 
@@ -112,15 +131,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 getSystemService(Context.NOTIFICATION_SERVICE);
 
         // 第二步：定义Notification
-        Intent intent = new Intent(this, ChosePictureActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setAction("notify_ptu");
+        Intent intentChose = new Intent(this, ChosePictureActivity.class);
+        intentChose.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intentChose.setAction("notify_ptu");
         //PendingIntent是待执行的Intent
-        PendingIntent pi = PendingIntent.getActivity(this, 0, intent,
+        PendingIntent piChoose = PendingIntent.getActivity(this, 0, intentChose,
                 PendingIntent.FLAG_CANCEL_CURRENT);
         Notification notification = new Notification.Builder(this)
                 .setSmallIcon(R.mipmap.icon)
-                .setContentIntent(pi)
                 .build();
         // 当用户下来通知栏时候看到的就是RemoteViews中自定义的Notification布局
         RemoteViews contentView = new RemoteViews(this.getPackageName(),
@@ -134,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         contentView.setTextViewText(R.id.notify_latest_name,
                 getResources().getString(R.string.latest_pic));
 
-
+        contentView.setOnClickPendingIntent(R.id.notify_layout_choose, piChoose);
         Intent latestIntent = new Intent(this, PtuActivity.class);
         latestIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         latestIntent.setAction("notify_latest");

@@ -24,7 +24,7 @@ import a.baozouptu.common.dataAndLogic.ShareDBUtil;
 
 public class ShareUtil {
     /**
-     * @param preferApps 优先旋转的应用Activity的title，越前面，优先级越高
+     * @param preferApps 优先选择的应用Activity的title，越前面，优先级越高
      * @return
      */
     public static List<ListDrawableItem> getSortedAppData(Context context, List<Pair<String,String>> preferApps, List<ResolveInfo> resolveInfos) {

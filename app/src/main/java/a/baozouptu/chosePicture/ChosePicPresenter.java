@@ -1,7 +1,6 @@
 package a.baozouptu.chosePicture;
 
 import android.content.Context;
-import android.support.constraint.solver.SolverVariable;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import a.baozouptu.common.util.Util;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -26,7 +24,7 @@ import rx.schedulers.Schedulers;
  * Created by LiuGuicen on 2017/1/17 0017.
  */
 
-public class ChosePicPresenter implements ChoosePicContract.PicPresenter {
+class ChosePicPresenter implements ChoosePicContract.PicPresenter {
     private final String TAG = "ChosePicPresenter";
     private ChoosePicContract.View view;
     /**
@@ -77,8 +75,8 @@ public class ChosePicPresenter implements ChoosePicContract.PicPresenter {
                     public PicUpdateType call(Integer type) {
                         Log.e(TAG, "call: 当前线程" + Thread.currentThread().getName());
                         if (type == 1)
-                            return picInfoScanner.updateRecentPic();
-                        else return picInfoScanner.updateAllFileInfo();
+                            return picInfoScanner.updateRecentPic(usuManager);
+                        else return picInfoScanner.updateAllFileInfo(usuManager);
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -146,7 +144,7 @@ public class ChosePicPresenter implements ChoosePicContract.PicPresenter {
 
     @Override
     public void deletePreferPath(String path, int finalPosition) {
-        usuManager.deletePreferPath(path, finalPosition);
+        usuManager.deletePreferPath(path);
         picDirInfoManager.updateUsuInfo(usuManager.getUsuPaths());
         fileAdapter.notifyDataSetChanged();
         if (currentPicPathList == usuManager.getUsuPaths())
@@ -155,7 +153,7 @@ public class ChosePicPresenter implements ChoosePicContract.PicPresenter {
 
     @Override
     public void addPreferPath(String path) {
-        boolean res = usuManager.addPreferPath(path);
+        usuManager.addPreferPath(path);
         picDirInfoManager.updateUsuInfo(usuManager.getUsuPaths());
         fileAdapter.notifyDataSetChanged();
         if (currentPicPathList == usuManager.getUsuPaths())
@@ -186,11 +184,12 @@ public class ChosePicPresenter implements ChoosePicContract.PicPresenter {
                     public PicUpdateType call(Integer type) {
                         Log.e(TAG, "call: 进行图片更新了");
                         if (type == 1) {
-                            PicUpdateType picUpdateType = picInfoScanner.updateRecentPic();
-                            if (latestPic != null&&!usuManager.hasRecentPic(latestPic))//解决最新添加的图片扫描不到的问题，手动添加
+                            PicUpdateType picUpdateType = picInfoScanner.updateRecentPic(usuManager);
+                            if (latestPic != null && !usuManager.hasRecentPic(latestPic) &&
+                                    !usuManager.getUsuPaths().contains(latestPic))//解决最新添加的图片扫描不到的问题，手动添加
                                 usuManager.addRecentPathFirst(latestPic);
                             return picUpdateType;
-                        } else return picInfoScanner.updateAllFileInfo();
+                        } else return picInfoScanner.updateAllFileInfo(usuManager);
                     }
                 })
                 .subscribe(new Subscriber<PicUpdateType>() {
@@ -202,19 +201,22 @@ public class ChosePicPresenter implements ChoosePicContract.PicPresenter {
                     @Override
                     public void onError(Throwable throwable) {
                         Log.e(TAG, "onError: 跑出了错误");
-                        view.showPicList();
+                        view.refreshFileInfosList();
                     }
 
                     @Override
                     public void onNext(PicUpdateType updateType) {
                         switch (updateType) {
                             case CHANGE_ALL_PIC:
-                                picAdapter.setImageUrls(usuManager.getUsuPaths());
-                                view.refreshPicList();
+                                if (usuManager.isUsuPic(currentPicPathList)) {
+                                    picAdapter.setImageUrls(usuManager.getUsuPaths());
+                                    view.refreshPicList();
+                                }
                                 Util.P.le(TAG, "初始化显示图片完成");
                                 break;
                             case CHANGE_ALL_FILE:
-                                view.refreshFileInfosList();
+                                if (!usuManager.isUsuPic(currentPicPathList))
+                                    view.refreshFileInfosList();
                         }
                     }
                 });
@@ -238,6 +240,8 @@ public class ChosePicPresenter implements ChoosePicContract.PicPresenter {
 
     @Override
     public String getCurrentPath(int position) {
+        if (position >= currentPicPathList.size())//多线程+设计问题，列表数据出问题了，先只有这样死守outOfBound了
+            return currentPicPathList.get(currentPicPathList.size() - 1);
         return currentPicPathList.get(position);
     }
 
@@ -265,15 +269,18 @@ public class ChosePicPresenter implements ChoosePicContract.PicPresenter {
     @Override
     public void addUsedAndNewPath(String recent_use_pic, String newPicPath) {
         usuManager.addUsedPath(recent_use_pic);
-        latestPic = newPicPath;
-        usuManager.addRecentPathFirst(newPicPath);
-        // 这里图片没有保存到当前文件夹下面
-        //更新文件信息
-        if (picDirInfoManager.onAddNewPic(newPicPath)) {
-            view.refreshPicList();
+        if (newPicPath != null) {//最新图片不为空，最新图等于它，并且添加到常用列表，更新文件信息
+            latestPic = newPicPath;
+            usuManager.addRecentPathFirst(newPicPath);
+            // 这里图片没有保存到当前文件夹下面
+            //更新文件信息
+            if (picDirInfoManager.onAddNewPic(newPicPath)) {
+                view.refreshPicList();
+            }
         }
         if (currentPicPathList == usuManager.getUsuPaths())
             view.refreshPicList();
+
     }
 
     @Override
