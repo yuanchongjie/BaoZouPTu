@@ -63,6 +63,7 @@ public class GeoUtil {
 
     /**
      * 高精度计算缩放后的坐标
+     *
      * @param xy    存放缩放后的坐标
      * @param cx    缩放中心的x坐标
      * @param cy    缩放中心的y坐标
@@ -75,6 +76,7 @@ public class GeoUtil {
         xy[0] = Float.valueOf(MU.su(cx, MU.mu(MU.su(cx, String.valueOf(bx)), ratio)));
         xy[1] = Float.valueOf(MU.su(cy, MU.mu(MU.su(cy, String.valueOf(by)), ratio)));
     }
+
     /**
      * 非水平的矩形,可以为斜的的那种矩形，注意构造时必须按顺时针或逆时针放入四个点
      * Created by Administrator on 2016/5/31.

@@ -114,7 +114,7 @@ public class FileDownloader {
 
     private void adjustNetwork(final Context context, final int id, final ArrayList<Typeface> typefaceList, final TextView textView) {
         float size = typefaceSizes[id];
-        int state = NetworkState.detectNetworkType(context);
+        int state = NetWorkState.detectNetworkType(context);
         String msg;
         if (state == -1) {//没有网络
             Toast.makeText(context, "网络未连接，不能下载字体，请稍后再试！", Toast.LENGTH_LONG).show();

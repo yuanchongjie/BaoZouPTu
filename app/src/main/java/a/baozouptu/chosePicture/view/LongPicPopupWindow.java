@@ -15,7 +15,6 @@ import a.baozouptu.common.util.Util;
 
 /**
  * Created by LiuGuicen on 2017/1/17 0017.
- *
  */
 
 public class LongPicPopupWindow {
@@ -29,8 +28,8 @@ public class LongPicPopupWindow {
                                           final ChoosePicContract.View activity,
                                           View view,
                                           final int position) {
-        final PopupWindow popWindowFile = new PopupWindow((Context)activity);
-        LinearLayout linearLayout = new LinearLayout((Context)activity);
+        final PopupWindow popWindowFile = new PopupWindow((Context) activity);
+        LinearLayout linearLayout = new LinearLayout((Context) activity);
         linearLayout.setOrientation(LinearLayout.HORIZONTAL);
         linearLayout.setGravity(Gravity.CENTER);
         linearLayout.setDividerPadding(10);
@@ -98,8 +97,8 @@ public class LongPicPopupWindow {
         popWindowFile.setBackgroundDrawable(Util.getDrawable(
                 R.drawable.background_pic_operation));
         popWindowFile.showAsDropDown(view, 0,
-                -view.getHeight()+(int)(((Context)activity).getResources().
-                        getDimension(R.dimen.choose_pic_item_divider)*3+0.5f));
+                -view.getHeight() + (int) (((Context) activity).getResources().
+                        getDimension(R.dimen.choose_pic_item_divider) * 3 + 0.5f));
         return true;
     }
 

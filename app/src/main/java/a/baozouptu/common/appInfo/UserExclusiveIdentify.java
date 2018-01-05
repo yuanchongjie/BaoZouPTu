@@ -116,8 +116,8 @@ public class UserExclusiveIdentify {
             m_szUniqueID += Integer.toHexString(b);
         }   // hex string to uppercase
         m_szUniqueID = m_szUniqueID.toUpperCase();
-        SharedPreferences.Editor editor=sp.edit();
-        editor.putString("device_identify",m_szUniqueID).apply();
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("device_identify", m_szUniqueID).apply();
         return m_szUniqueID;
     }
 }

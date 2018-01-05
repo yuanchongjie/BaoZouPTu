@@ -1,6 +1,5 @@
 package a.baozouptu.ptu.mat;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -14,7 +13,6 @@ import android.widget.LinearLayout;
 import a.baozouptu.R;
 import a.baozouptu.common.util.Util;
 import a.baozouptu.ptu.BasePtuFragment;
-import a.baozouptu.ptu.BasePtuFunction;
 import a.baozouptu.ptu.repealRedo.StepData;
 
 /**
@@ -47,7 +45,7 @@ public class MatFragment extends BasePtuFragment {
         shape = (LinearLayout) view.findViewById(R.id.mat_shape);
         rubber = (LinearLayout) view.findViewById(R.id.mat_rubber);
         setClick();
-        Util.P.le(TAG,"创建MatView完成");
+        Util.P.le(TAG, "创建MatView完成");
         return view;
     }
 
@@ -108,7 +106,7 @@ public class MatFragment extends BasePtuFragment {
         matView.releaseResource();
     }
 
-    public MatView createMatView(Context context,Rect bound, Bitmap bitmap) {
+    public MatView createMatView(Context context, Rect bound, Bitmap bitmap) {
         matView = new MatView(context, bitmap, bound);
         matView.setBitmapAndInit(bitmap, bound);
         matView.setCanDoubleClick(false);

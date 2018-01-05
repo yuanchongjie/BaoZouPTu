@@ -24,7 +24,7 @@ import a.baozouptu.network.FileDownloader;
  * 注意使用弱引用的方式持有，外部都是弱引用，不要在内部被反向向持有了
  * 注意这里contentView的监听器是持有TypefacePopWindow的，contentView被window持有，
  * <p>
- *<p>window消失之后监听器当做强引用方式回收，这时相当于TypefacePopWindow没被引用了那样回收
+ * <p>window消失之后监听器当做强引用方式回收，这时相当于TypefacePopWindow没被引用了那样回收
  * 既FunctionPopWindowBuilder还在，TypefacePopWindow相当于不存在了
  */
 

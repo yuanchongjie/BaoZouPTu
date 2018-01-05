@@ -55,6 +55,7 @@ public interface ChoosePicContract {
 
 
         //图片增删相关
+
         /**
          * 低效方法，有时间改进
          * 删除图片文件，并更新目录列表信息

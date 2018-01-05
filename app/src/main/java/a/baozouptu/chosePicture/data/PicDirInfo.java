@@ -4,7 +4,6 @@ import android.text.SpannableString;
 
 /**
  * Created by LiuGuicen on 2017/1/18 0018.
- *
  */
 
 public class PicDirInfo {
@@ -36,13 +35,13 @@ public class PicDirInfo {
         if (!(obj instanceof PicDirInfo))
             return false;
         PicDirInfo info = (PicDirInfo) obj;
-        return (dirPath==info.dirPath||dirPath!=null&&dirPath.equals(info.dirPath))
-                &&(picNumInfo==info.picNumInfo||picNumInfo!=null&&picNumInfo.equals(info.picNumInfo))
-                &&(representPicPath==info.representPicPath||representPicPath!=null&&representPicPath.equals(info.representPicPath));
+        return (dirPath == info.dirPath || dirPath != null && dirPath.equals(info.dirPath))
+                && (picNumInfo == info.picNumInfo || picNumInfo != null && picNumInfo.equals(info.picNumInfo))
+                && (representPicPath == info.representPicPath || representPicPath != null && representPicPath.equals(info.representPicPath));
     }
 
     @Override
     public int hashCode() {
-        return (dirPath+picNumInfo+representPicPath).hashCode();
+        return (dirPath + picNumInfo + representPicPath).hashCode();
     }
 }

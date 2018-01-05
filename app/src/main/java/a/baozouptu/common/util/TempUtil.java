@@ -13,19 +13,19 @@ import android.widget.ImageView;
  */
 public class TempUtil {
 
-    public static void showBitmapInDialog(Context context,Bitmap bitmap) {
+    public static void showBitmapInDialog(Context context, Bitmap bitmap) {
         Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        FrameLayout layout=new FrameLayout(context);
-        layout.setLayoutParams(new ViewGroup.LayoutParams(bitmap.getWidth(),bitmap.getHeight()));
+        FrameLayout layout = new FrameLayout(context);
+        layout.setLayoutParams(new ViewGroup.LayoutParams(bitmap.getWidth(), bitmap.getHeight()));
         ImageView image = new ImageView(context);
         image.setImageBitmap(bitmap);
-        image.setLayoutParams(new ViewGroup.LayoutParams(bitmap.getWidth(),bitmap.getHeight()));
+        image.setLayoutParams(new ViewGroup.LayoutParams(bitmap.getWidth(), bitmap.getHeight()));
         layout.addView(image);
         dialog.setContentView(layout);
 
-        dialog.getWindow().setLayout(bitmap.getWidth(),bitmap.getHeight());
+        dialog.getWindow().setLayout(bitmap.getWidth(), bitmap.getHeight());
         dialog.show();
     }
 }

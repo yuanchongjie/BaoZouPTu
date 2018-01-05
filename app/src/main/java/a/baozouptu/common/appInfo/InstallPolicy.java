@@ -7,7 +7,6 @@ import android.widget.Toast;
 import java.io.IOException;
 
 import a.baozouptu.common.dataAndLogic.MyDatabase;
-import a.baozouptu.common.util.CustomToast;
 
 import static a.baozouptu.common.dataAndLogic.AllData.appConfig;
 
@@ -33,7 +32,7 @@ public class InstallPolicy {
         if (AppConfig.CUR_APP_VERSION == lastVersion) {//已经更新版本数据，或者新安装的版本相同
             return;
         } else if (AppConfig.CUR_APP_VERSION < lastVersion) {//更新的版本小于当前安装好的版本
-            Toast.makeText(MyApplication.appContext,"更新的版本过低，请安装较新版本",Toast.LENGTH_LONG).show();
+            Toast.makeText(MyApplication.appContext, "更新的版本过低，请安装较新版本", Toast.LENGTH_LONG).show();
         } else {//执行版本更新操作=》是大于，不是==或《=
 
             if (lastVersion == -1 && !appConfig.hasNewInstall())//是新安装

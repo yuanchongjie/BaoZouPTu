@@ -61,10 +61,10 @@ class MyFileListAdapter extends BaseAdapter {
     public View getView(final int position, View convertView,
                         ViewGroup parent) {
         final int realPosition;
-        if(position>=picDirInfos.size())
-            realPosition=picDirInfos.size()-1;// TODO: 2017/3/10 0010 多线程+设计导致出问题，强行抑制，后期想办法改
+        if (position >= picDirInfos.size())
+            realPosition = picDirInfos.size() - 1;// TODO: 2017/3/10 0010 多线程+设计导致出问题，强行抑制，后期想办法改
         else
-            realPosition=position;
+            realPosition = position;
 
         final ViewHolder viewHolder;
         if (convertView == null) {

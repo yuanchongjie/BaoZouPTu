@@ -6,7 +6,7 @@ import android.net.NetworkInfo;
 
 import a.baozouptu.common.appInfo.MyApplication;
 
-public class NetworkState {
+public class NetWorkState {
 
     public static int detectNetworkType() {
         return detectNetworkType(MyApplication.appContext);
@@ -15,8 +15,7 @@ public class NetworkState {
     /**
      * 检测网络状态，
      *
-     * @return
-     * <p>-1表示没有联网
+     * @return <p>-1表示没有联网
      * <p>0表示GPRS流量
      * <p>1表示WiFi
      * <p>2表示其它网络

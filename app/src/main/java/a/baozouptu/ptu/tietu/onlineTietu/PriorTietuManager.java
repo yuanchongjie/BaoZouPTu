@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import a.baozouptu.common.dataAndLogic.AllData;
 import a.baozouptu.common.util.FileTool;
-import a.baozouptu.network.NetworkState;
+import a.baozouptu.network.NetWorkState;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.datatype.BmobQueryResult;
 import cn.bmob.v3.exception.BmobException;
@@ -41,7 +41,7 @@ public class PriorTietuManager {
                 " limit " + PRIOR_TIETU_NUMBER;
         query.setSQL(sql);
         boolean useCache = false;
-        if (query.hasCachedResult(tietu_material.class) || NetworkState.detectNetworkType() == -1) {
+        if (query.hasCachedResult(tietu_material.class) || NetWorkState.detectNetworkType() == -1) {
             useCache = true;
             query.setCachePolicy(BmobQuery.CachePolicy.CACHE_ONLY);
         } else {

@@ -16,7 +16,6 @@ import a.baozouptu.common.util.Util;
 
 /**
  * Created by liuguicen on 2016/9/8.
- *
  */
 class ShareRecyclerAdapter extends RecyclerView.Adapter<ShareViewHolder> implements View.OnClickListener {
 
@@ -66,7 +65,7 @@ class ShareRecyclerAdapter extends RecyclerView.Adapter<ShareViewHolder> impleme
             Util.P.le("recyclerView受到点击");
             //注意这里使用getTag方法获取数据
             mOnItemClickListener.onItemClick(v,
-                    (ListDrawableItem) ((LinearLayout)v).getChildAt(0).getTag());
+                    (ListDrawableItem) ((LinearLayout) v).getChildAt(0).getTag());
         }
     }
 

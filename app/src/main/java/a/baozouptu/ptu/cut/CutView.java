@@ -64,6 +64,7 @@ public class CutView extends PtuSeeView implements TSRView {
 
 
     }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (frame.onTouchEvent(event)) return true;//是否交给Frame处理
@@ -174,11 +175,12 @@ public class CutView extends PtuSeeView implements TSRView {
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         frame.onDraw(canvas);
-        Log.e(TAG,"draw完成");
+        Log.e(TAG, "draw完成");
     }
 
     /**
      * 自动缩放时控制比例，不能太大或太小
+     *
      * @param ratio 期望的比例
      * @return 实际能缩放的比例
      */
@@ -199,22 +201,22 @@ public class CutView extends PtuSeeView implements TSRView {
         //原图
         if (srcRect.width() == sourceBitmap.getWidth() && srcRect.height() == sourceBitmap.getHeight() &&
                 frame.frameWidth >= dstRect.width() - 1 && frame.frameHeight >= dstRect.height() - 1
-                &&!frame.isFixedSize()) {
-            return sourceBitmap.copy(sourceBitmap.getConfig(),true);
+                && !frame.isFixedSize()) {
+            return sourceBitmap.copy(sourceBitmap.getConfig(), true);
         } else {
             int left = Math.round((frame.frameLeft - picLeft) / totalRatio);
             int top = Math.round((frame.frameTop - picTop) / totalRatio);
             int rw = Math.round(frame.frameWidth / totalRatio);
             int rh = Math.round(frame.frameHeight / totalRatio);
-            Matrix matrix=new Matrix();
-            if(frame.isFixedSize()){
-                matrix.postScale(frame.getFixedWidth()*1f/rw,frame.getFixedWidth()*1f/rw);
+            Matrix matrix = new Matrix();
+            if (frame.isFixedSize()) {
+                matrix.postScale(frame.getFixedWidth() * 1f / rw, frame.getFixedWidth() * 1f / rw);
             }
-            if(left<0)left=0;
-            else if(top<0)top=0;
-            if(left+rw>sourceBitmap.getWidth())rw=sourceBitmap.getWidth()-left;
-            if(top+rh>sourceBitmap.getHeight())rh=sourceBitmap.getHeight()-top;
-            return Bitmap.createBitmap(sourceBitmap, left, top, rw, rh,matrix,true);
+            if (left < 0) left = 0;
+            else if (top < 0) top = 0;
+            if (left + rw > sourceBitmap.getWidth()) rw = sourceBitmap.getWidth() - left;
+            if (top + rh > sourceBitmap.getHeight()) rh = sourceBitmap.getHeight() - top;
+            return Bitmap.createBitmap(sourceBitmap, left, top, rw, rh, matrix, true);
         }
     }
 
@@ -273,7 +275,7 @@ public class CutView extends PtuSeeView implements TSRView {
 
     public void setFixedSize(int width, int height) {
         frame.cancelFixedRatio();//先取消其他的状态
-        frame.setFixedSize(width,height);
+        frame.setFixedSize(width, height);
     }
 
     {

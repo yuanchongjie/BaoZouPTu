@@ -406,9 +406,10 @@ public class CutFragment extends BasePtuFragment {
     public void smallRedo() {
 
     }
+
     @Override
-    public void clear(){
-        if(sizeRatioDialog!=null){
+    public void clear() {
+        if (sizeRatioDialog != null) {
             sizeRatioDialog.dismissDialog();
         }
     }

@@ -1,17 +1,7 @@
 package a.baozouptu.ptu.tietu.onlineTietu;
 
-import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import cn.bmob.v3.BmobObject;
-import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.datatype.BmobFile;
-import cn.bmob.v3.datatype.BmobQueryResult;
-import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.SQLQueryListener;
-import rx.Subscriber;
 
 /**
  * Created by LiuGuicen on 2017/2/17 0017.
@@ -50,6 +40,6 @@ public class tietu_material extends BmobObject {
     }
 
     public String getTheOnlyName() {
-        return url.getUrl().substring(url.getUrl().lastIndexOf("/")+1);
+        return url.getUrl().substring(url.getUrl().lastIndexOf("/") + 1);
     }
 }

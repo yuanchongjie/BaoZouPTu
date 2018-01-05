@@ -41,9 +41,10 @@ public class AsyncImageLoader {
     /**
      * 较好的线程安全的获取单例的形式
      */
-    private static class SingleTonHolder{
-        private static final AsyncImageLoader asyncImageLoader=new AsyncImageLoader();
+    private static class SingleTonHolder {
+        private static final AsyncImageLoader asyncImageLoader = new AsyncImageLoader();
     }
+
     private AsyncImageLoader() {
         lque = new LinkedBlockingQueue<Runnable>();
         int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);

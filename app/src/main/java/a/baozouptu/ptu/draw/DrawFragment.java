@@ -39,7 +39,6 @@ import a.baozouptu.ptu.view.PtuSeeView;
 
 /**
  * Created by Administrator on 2016/7/25.
- *
  */
 public class DrawFragment extends DrawBasePtuFunction implements View.OnClickListener {
     private String TAG = "DrawFragment";

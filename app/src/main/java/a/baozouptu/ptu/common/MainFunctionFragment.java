@@ -28,7 +28,6 @@ import static a.baozouptu.common.util.Util.getStateList;
 
 /**
  * Created by Administrator on 2016/4/29.
- *
  */
 @TargetApi(Build.VERSION_CODES.M)
 public class MainFunctionFragment extends BasePtuFragment {

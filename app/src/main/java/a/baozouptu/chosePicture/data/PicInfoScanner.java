@@ -96,7 +96,6 @@ public class PicInfoScanner {
 
     /**
      * 更新最近图片信息，在usu列表中的
-     *
      */
     public PicUpdateType updateRecentPic(UsuPathManger usuPathManger) {
         totalPicNumber = sortedPicPathsByTime.size();

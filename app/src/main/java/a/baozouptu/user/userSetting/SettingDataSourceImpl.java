@@ -40,7 +40,7 @@ public class SettingDataSourceImpl implements SettingDataSource {
         /**
          * 写死的部分
          */
-         // TODO: 2017/3/5 0005 目前的贴图位置有两个
+        // TODO: 2017/3/5 0005 目前的贴图位置有两个
         DATA_DIRS = new String[]{AllData.zitiDir, AllData.getTietuDir()};
 
         DATA_NAMES = new String[]{"字体文件", "贴图文件"};

@@ -5,5 +5,5 @@ package a.baozouptu.ptu.common;
  */
 
 public class PtuData {
-    public static PtuConfig ptuConfig=new PtuConfig();
+    public static PtuConfig ptuConfig = new PtuConfig();
 }

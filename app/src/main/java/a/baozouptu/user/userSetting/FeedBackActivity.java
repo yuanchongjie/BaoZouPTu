@@ -10,14 +10,12 @@ import android.widget.Toast;
 
 import a.baozouptu.R;
 import a.baozouptu.common.BaseActivity;
+import a.baozouptu.common.util.CustomToast;
 import a.baozouptu.common.util.Util;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
-import a.baozouptu.common.util.CustomToast;
 
-import static java.util.ResourceBundle.clearCache;
-
-public class FeedbackActivity extends BaseActivity {
+public class FeedBackActivity extends BaseActivity {
     String lastComment;
     private EditText contactEdit;
 
@@ -34,7 +32,7 @@ public class FeedbackActivity extends BaseActivity {
         Button btnCommit = (Button) findViewById(R.id.feedback_btn_commit);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             btnCommit.setBackground(Util.getDrawable(R.drawable.rip_blue_cornor_backgound));
-        }else{
+        } else {
             btnCommit.setBackground(Util.getDrawable(R.drawable.background_round_corner_blue));
         }
         ImageView btnReturn = (ImageView) findViewById(R.id.feedback_return_btn);
@@ -84,9 +82,9 @@ public class FeedbackActivity extends BaseActivity {
             @Override
             public void done(String s, BmobException e) {
                 if (e == null) {
-                    CustomToast.makeText(FeedbackActivity.this, "提交成功，感谢您的反馈！", Toast.LENGTH_SHORT).show();
+                    CustomToast.makeText(FeedBackActivity.this, "提交成功，感谢您的反馈！", Toast.LENGTH_SHORT).show();
                 } else {
-                    CustomToast.makeText(FeedbackActivity.this, "记录成功，感谢您的反馈！", Toast.LENGTH_SHORT).show();
+                    CustomToast.makeText(FeedBackActivity.this, "记录成功，感谢您的反馈！", Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -2,7 +2,6 @@ package a.baozouptu.common.util;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -16,7 +15,6 @@ import android.widget.Toast;
 
 import a.baozouptu.R;
 import a.baozouptu.common.appInfo.MyApplication;
-import a.baozouptu.common.dataAndLogic.AllData;
 
 /**
  * Created 0 Administrator on 2016/5/19.
@@ -200,6 +198,6 @@ public class Util {
     }
 
     public static Drawable getMyShosenIcon(int id) {
-        return getStateDrawable(getDrawable(id).mutate(),getStateList(),PorterDuff.Mode.SRC_IN);
+        return getStateDrawable(getDrawable(id).mutate(), getStateList(), PorterDuff.Mode.SRC_IN);
     }
 }

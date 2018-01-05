@@ -5,7 +5,6 @@ import android.util.Log;
 import java.util.List;
 
 import a.baozouptu.common.dataAndLogic.AllData;
-import a.baozouptu.user.DeviceInfos;
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
@@ -54,6 +53,7 @@ public class SimpleUser extends BmobObject {
     public void setUsedDays(Integer usedDays) {
         this.usedDays = usedDays;
     }
+
     /**
      * 在每次判断是否需要更新时查看是否已添加到服务器 ，若没有添加到服务器，则这个时候调用此函数进行添加
      */
@@ -89,10 +89,9 @@ public class SimpleUser extends BmobObject {
 
                             String objectId = simpleUser.getObjectId();
                             //更新使用天数
-                            if(simpleUser.getUsedDays()!=null) {
+                            if (simpleUser.getUsedDays() != null) {
                                 simpleUser.setUsedDays(simpleUser.getUsedDays() + 1);
-                            }else
-                            {
+                            } else {
                                 simpleUser.setUsedDays(1);
                             }
 

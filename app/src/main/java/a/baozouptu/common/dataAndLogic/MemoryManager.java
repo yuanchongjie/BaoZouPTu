@@ -13,12 +13,12 @@ public class MemoryManager {
     /**
      * @return 获取剩余可用字节数
      * 注意，和另外两个区分
-     *  //应用程序已获得内存
-    long totalMemory = ((int) Runtime.getRuntime().totalMemory())/1024/1024;
-    //应用程序已获得内存中未使用内存
-    long freeMemory = ((int) Runtime.getRuntime().freeMemory())/1024/1024;
+     * //应用程序已获得内存
+     * long totalMemory = ((int) Runtime.getRuntime().totalMemory())/1024/1024;
+     * //应用程序已获得内存中未使用内存
+     * long freeMemory = ((int) Runtime.getRuntime().freeMemory())/1024/1024;
      */
-    public static long getUsableMemoryByte(){
-       return Runtime.getRuntime().maxMemory()-Runtime.getRuntime().totalMemory()+Runtime.getRuntime().freeMemory();
+    public static long getUsableMemoryByte() {
+        return Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory() + Runtime.getRuntime().freeMemory();
     }
 }

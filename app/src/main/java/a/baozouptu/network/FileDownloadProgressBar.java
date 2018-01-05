@@ -15,10 +15,12 @@ import a.baozouptu.common.util.Util;
 
 public class FileDownloadProgressBar {
     private Context context;
-    public FileDownloadProgressBar(Context context){
-        this.context= context;
+
+    public FileDownloadProgressBar(Context context) {
+        this.context = context;
     }
-    public  void sendNotify() {
+
+    public void sendNotify() {
         // 第一步：获取NotificationManager
         NotificationManager nm = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -35,7 +37,7 @@ public class FileDownloadProgressBar {
 
         contentView.setTextViewText(R.id.notify_latest_name,
                 context.getResources().getString(R.string.latest_pic));
-        contentView.setInt(R.id.notify_file_download_progress,"setProgress",10);
+        contentView.setInt(R.id.notify_file_download_progress, "setProgress", 10);
         notification.contentView = contentView;
         notification.flags = Notification.FLAG_AUTO_CANCEL;
         //第三步：启动通知栏，第一个参数是一个通知的唯一标识

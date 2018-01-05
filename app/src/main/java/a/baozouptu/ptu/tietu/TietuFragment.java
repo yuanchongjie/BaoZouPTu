@@ -22,16 +22,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import a.baozouptu.R;
+import a.baozouptu.chosePicture.ChosePictureActivity;
 import a.baozouptu.common.util.BitmapTool;
 import a.baozouptu.common.util.CustomToast;
 import a.baozouptu.common.util.FileTool;
 import a.baozouptu.common.util.Util;
-import a.baozouptu.chosePicture.ChosePictureActivity;
 import a.baozouptu.common.view.PtuConstraintLayout;
 import a.baozouptu.ptu.BasePtuFragment;
 import a.baozouptu.ptu.PtuUtil;
@@ -41,7 +40,6 @@ import a.baozouptu.ptu.tietu.onlineTietu.PriorTietuManager;
 import a.baozouptu.ptu.tietu.onlineTietu.TietuRecyclerAdapter;
 import a.baozouptu.ptu.tietu.onlineTietu.tietu_material;
 import a.baozouptu.ptu.tietu.tietuImpact.PictureSynthesis;
-import a.baozouptu.ptu.tietu.tietuImpact.SynthesisImagePopupWindow;
 import a.baozouptu.ptu.view.PtuFrameLayout;
 import a.baozouptu.ptu.view.PtuSeeView;
 import rx.Observable;
@@ -179,7 +177,7 @@ public class TietuFragment extends BasePtuFragment implements TietuContract.Tiet
      */
     private void addTietuByPath(String path) {
         Bitmap srcBitmap = TietuSizeControler.getBitmapInSize(path);
-        if (srcBitmap == null||srcBitmap.getWidth()==0||srcBitmap.getHeight()==0) {
+        if (srcBitmap == null || srcBitmap.getWidth() == 0 || srcBitmap.getHeight() == 0) {
             CustomToast.makeText("获取贴图失败", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -196,7 +194,7 @@ public class TietuFragment extends BasePtuFragment implements TietuContract.Tiet
      */
     private void addTietuById(Integer id) {
         Bitmap srcBitmap = TietuSizeControler.getBitmapInSize(id);
-        if (srcBitmap == null||srcBitmap.getWidth()==0||srcBitmap.getHeight()==0)  {
+        if (srcBitmap == null || srcBitmap.getWidth() == 0 || srcBitmap.getHeight() == 0) {
             CustomToast.makeText("获取贴图失败", Toast.LENGTH_SHORT).show();
             return;
         }

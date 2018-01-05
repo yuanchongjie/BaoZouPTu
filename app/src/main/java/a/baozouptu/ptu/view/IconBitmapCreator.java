@@ -36,8 +36,8 @@ public class IconBitmapCreator {
      *
      * @param color 前景
      */
-    public static Bitmap getEditBitmap( int width, int color) {
-        return getEditBitmap( width, color, 0x00000000);
+    public static Bitmap getEditBitmap(int width, int color) {
+        return getEditBitmap(width, color, 0x00000000);
     }
 
     /**
@@ -46,7 +46,7 @@ public class IconBitmapCreator {
      * @param color     前景
      * @param backColor 背景色默认透明
      */
-    public static Bitmap CreateToBottomCenterBitmap( int width, int color, int backColor) {
+    public static Bitmap CreateToBottomCenterBitmap(int width, int color, int backColor) {
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
@@ -67,8 +67,8 @@ public class IconBitmapCreator {
      *
      * @param color 前景
      */
-    public static Bitmap CreateToBottomCenterBitmap( int width, int color) {
-        return CreateToBottomCenterBitmap( width, color, 0x00000000);
+    public static Bitmap CreateToBottomCenterBitmap(int width, int color) {
+        return CreateToBottomCenterBitmap(width, color, 0x00000000);
     }
 
     /**
@@ -77,7 +77,7 @@ public class IconBitmapCreator {
      * @param color     前景
      * @param backColor 背景色
      */
-    public static Bitmap getRotateBitmap( int width, int color, int backColor) {
+    public static Bitmap getRotateBitmap(int width, int color, int backColor) {
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         int gap = width / 8, arcWidth = 5;
@@ -104,18 +104,18 @@ public class IconBitmapCreator {
      *
      * @param color 前景
      */
-    public static Bitmap getRotateBitmap( int width, int color) {
-        return getRotateBitmap( width, color, 0x00000000);
+    public static Bitmap getRotateBitmap(int width, int color) {
+        return getRotateBitmap(width, color, 0x00000000);
     }
 
     /**
      * 一个叉的形状，取消的icon
      */
-    public static Bitmap createCancelBitmap( int width, int foregroundColor) {
+    public static Bitmap createCancelBitmap(int width, int foregroundColor) {
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        canvas.scale(1.20f,1.20f);//一开始图标的边界padding太大，减小边界
-        canvas.translate(-0.1f*width,-0.1f*width);
+        canvas.scale(1.20f, 1.20f);//一开始图标的边界padding太大，减小边界
+        canvas.translate(-0.1f * width, -0.1f * width);
 
         //内圆上画图标
         Paint paint = new Paint();
@@ -141,23 +141,24 @@ public class IconBitmapCreator {
         //画背景
         paint.setStrokeWidth(0);
         paint.setColor(backgroundColor);
-        canvas.drawCircle(width/2,width/2,width/2,paint);
+        canvas.drawCircle(width / 2, width / 2, width / 2, paint);
 
         //画前景
 
         paint.setStrokeWidth(3f);
         paint.setColor(foregroundColor);
-        int dx = width*2/7;
+        int dx = width * 2 / 7;
         canvas.drawLine(dx, dx, width - dx, width - dx, paint);
         canvas.drawLine(width - dx, dx, dx, width - dx, paint);
         return bitmap;
 
     }
-    public static Bitmap createSureBitmap( int width, int foregroundColor) {
+
+    public static Bitmap createSureBitmap(int width, int foregroundColor) {
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        canvas.scale(1.20f,1.20f);//一开始图标的边界padding太大，减小边界
-        canvas.translate(-0.1f*width,-0.1f*width);
+        canvas.scale(1.20f, 1.20f);//一开始图标的边界padding太大，减小边界
+        canvas.translate(-0.1f * width, -0.1f * width);
 
         Paint paint = new Paint();
         paint.setAntiAlias(true);
@@ -171,11 +172,11 @@ public class IconBitmapCreator {
     }
 
 
-    public static Bitmap createRedoBitmap( int width, int foregroundColor) {
+    public static Bitmap createRedoBitmap(int width, int foregroundColor) {
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        canvas.scale(1.25f,1.25f);//一开始图标的边界padding太大，减小边界
-        canvas.translate(-0.125f*width,-0.125f*width);
+        canvas.scale(1.25f, 1.25f);//一开始图标的边界padding太大，减小边界
+        canvas.translate(-0.125f * width, -0.125f * width);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setDither(true);
@@ -240,8 +241,8 @@ public class IconBitmapCreator {
     /**
      * 制作重做图标的bitmap
      */
-    public static Bitmap createRepealBitmap( int width, int foregroundColor) {
-        Bitmap tempBitmap = createRedoBitmap( width, foregroundColor);
+    public static Bitmap createRepealBitmap(int width, int foregroundColor) {
+        Bitmap tempBitmap = createRedoBitmap(width, foregroundColor);
         Matrix m = new Matrix();
         m.setScale(-1, 1);
         m.postTranslate(tempBitmap.getWidth(), 0); //镜像水平翻转
@@ -253,8 +254,8 @@ public class IconBitmapCreator {
         width = (int) (width * (0.72));
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        canvas.scale(1.25f,1.25f);
-        canvas.translate(-0.125f*width,-0.125f*width);
+        canvas.scale(1.25f, 1.25f);
+        canvas.translate(-0.125f * width, -0.125f * width);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setDither(true);
@@ -353,24 +354,24 @@ public class IconBitmapCreator {
      */
     public static Bitmap createJustifyIcon(int width, int foregroundColor, int backgroundColor, int mode) {
         float h1 = 1.12f * width / 4, h2 = 2f * width / 4, h3 = 2.88f * width / 4;
-        float sw=35f / 400 * width,bw=78f / 400 * width;
+        float sw = 35f / 400 * width, bw = 78f / 400 * width;
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         Bitmap bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        canvas.scale(1.25f,1.25f);//一开始图标的边界padding太大，减小边界
-        canvas.translate(-0.125f*width,-0.125f*width);
+        canvas.scale(1.25f, 1.25f);//一开始图标的边界padding太大，减小边界
+        canvas.translate(-0.125f * width, -0.125f * width);
         paint.setDither(true);
         paint.setColor(foregroundColor);
         paint.setStrokeWidth(1.5f);
-        canvas.drawLine(sw, h1, width-sw, h1, paint);
-        canvas.drawLine(sw, h3, width-sw, h3, paint);
+        canvas.drawLine(sw, h1, width - sw, h1, paint);
+        canvas.drawLine(sw, h3, width - sw, h3, paint);
         if (mode == 0) {
-            canvas.drawLine(bw, h2, width-bw, h2, paint);
+            canvas.drawLine(bw, h2, width - bw, h2, paint);
         } else if (mode == 1) {
-            canvas.drawLine(sw, h2, width-bw*2+sw, h2, paint);
+            canvas.drawLine(sw, h2, width - bw * 2 + sw, h2, paint);
         } else if (mode == 2) {
-            canvas.drawLine(bw*2-sw, h2, width-sw, h2, paint);
+            canvas.drawLine(bw * 2 - sw, h2, width - sw, h2, paint);
         }
         return bitmap;
     }

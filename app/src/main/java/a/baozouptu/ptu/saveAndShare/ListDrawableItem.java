@@ -27,9 +27,10 @@ public class ListDrawableItem implements Serializable {
     private CharSequence packageName;
     private CharSequence title;
     private Drawable icon;
+
     /**
-     * @author YOLANDA
      * @return the title
+     * @author YOLANDA
      */
     public CharSequence getTitle() {
         return title;
@@ -40,38 +41,38 @@ public class ListDrawableItem implements Serializable {
     }
 
     /**
-     * @author YOLANDA
      * @param title the title to set
+     * @author YOLANDA
      */
     public void setTitle(CharSequence title) {
         this.title = title;
     }
 
     /**
-     * @author YOLANDA
      * @return the icon
+     * @author YOLANDA
      */
     public Drawable getIcon() {
         return icon;
     }
 
     /**
-     * @author YOLANDA
      * @param icon the icon to set
+     * @author YOLANDA
      */
     public void setIcon(Drawable icon) {
         this.icon = icon;
     }
 
     /**
-     * @author YOLANDA
      * @param packageName
      * @param title
      * @param icon
+     * @author YOLANDA
      */
     public ListDrawableItem(CharSequence packageName, CharSequence title, Drawable icon) {
         super();
-        this.packageName=packageName;
+        this.packageName = packageName;
         this.title = title;
         this.icon = icon;
     }

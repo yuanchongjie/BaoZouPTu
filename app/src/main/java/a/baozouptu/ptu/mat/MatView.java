@@ -35,11 +35,12 @@ public class MatView extends PtuSeeView {
 
     /**
      * 必须在
-     *@param  sourceBitmap 显示的图片
-     * @param totalBound 整个PtuFragment的bound
+     *
+     * @param sourceBitmap 显示的图片
+     * @param totalBound   整个PtuFragment的bound
      */
-    public MatView(Context context, Bitmap sourceBitmap,Rect totalBound) {
-        super(context,sourceBitmap,totalBound);
+    public MatView(Context context, Bitmap sourceBitmap, Rect totalBound) {
+        super(context, sourceBitmap, totalBound);
 
         mContext = context;
         this.totalBound = totalBound;
@@ -61,9 +62,9 @@ public class MatView extends PtuSeeView {
                         if (pen.isDoubleClick()) {//检测是否是双击，如果是，设置isDrawLine变量
                             if (pen.isDrawLine()) {//转换到划线状态
                                 CUR_STATUS = PEN_DRAW_LINE;
-                                String[] sxy=PtuUtil.getLocationAtPicture(Float.toString(pen.pointLeft), Float.toString(pen.pointTop),
+                                String[] sxy = PtuUtil.getLocationAtPicture(Float.toString(pen.pointLeft), Float.toString(pen.pointTop),
                                         srcRect, dstRect);
-                                matPathManager.startDrawLine(new float[]{Float.valueOf(sxy[0]),Float.valueOf(sxy[1])});
+                                matPathManager.startDrawLine(new float[]{Float.valueOf(sxy[0]), Float.valueOf(sxy[1])});
                             } else {//转换到move状态
                                 CUR_STATUS = PEN_MOVE;
                                 matPathManager.finishDrawLine();
@@ -88,7 +89,7 @@ public class MatView extends PtuSeeView {
                 CUR_STATUS = PEN;//多个手指，进行缩放
             case MotionEvent.ACTION_MOVE:
                 float h = event.getHistorySize();
-                for (int i = 0; i < h; i+=3) {
+                for (int i = 0; i < h; i += 3) {
                     float x = event.getHistoricalX(i), y = event.getHistoricalY(i);
                     if ((CUR_STATUS & PEN) != 0) {//在PEN相关状态下发生移动
                         if (pen.contain(x, y)) {
@@ -112,7 +113,7 @@ public class MatView extends PtuSeeView {
                 }
                 break;
             case MotionEvent.ACTION_CANCEL:
-                Util.P.le(TAG,"接受到了cancel事件");
+                Util.P.le(TAG, "接受到了cancel事件");
             case MotionEvent.ACTION_UP:
                 switch (CUR_STATUS) {
                     case PEN:

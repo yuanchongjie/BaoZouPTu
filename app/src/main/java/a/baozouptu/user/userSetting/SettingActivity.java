@@ -75,7 +75,7 @@ public class SettingActivity extends BaseActivity implements SettingContract.Vie
         layout_comment_feedback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(SettingActivity.this, FeedbackActivity.class));
+                startActivity(new Intent(SettingActivity.this, FeedBackActivity.class));
             }
         });
         layout_about_app.setOnClickListener(new View.OnClickListener() {

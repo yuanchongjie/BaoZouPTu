@@ -15,6 +15,7 @@ public interface TSRView {
     /**
      * 如果缩放，要在adjustSize后面调用
      * 在不超过边界情况下设置好位置
+     *
      * @param dx 移动距离
      * @param dy 移动距离
      */

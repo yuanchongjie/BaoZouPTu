@@ -73,10 +73,10 @@ public class CutFrame {
         this.totalBound = totalBound;
         CUR_STATA = MOVESTATE.NONE;
         int color = Util.getColor(R.color.cut_frame);
-        frameLeft=cutView.getDstRect().left;
-        frameTop=cutView.getDstRect().top;
-        frameWidth=cutView.getDstRect().width();
-        frameHeight=cutView.getDstRect().height();
+        frameLeft = cutView.getDstRect().left;
+        frameTop = cutView.getDstRect().top;
+        frameWidth = cutView.getDstRect().width();
+        frameHeight = cutView.getDstRect().height();
 
         mLinePaint = new Paint();
         mLinePaint.setAntiAlias(true);

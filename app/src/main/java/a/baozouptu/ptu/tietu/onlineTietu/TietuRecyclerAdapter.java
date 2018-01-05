@@ -21,12 +21,11 @@ import a.baozouptu.R;
 
 /**
  * Created by liuguicen on 2016/6/17.
- *
  */
 public class TietuRecyclerAdapter extends RecyclerView.Adapter<TietuRecyclerAdapter.MyViewHolder>
         implements View.OnClickListener {
 
-    private static final String TAG="TietuRecyclerAdapter";
+    private static final String TAG = "TietuRecyclerAdapter";
 
     TietuListProxy listProxy = new TietuListProxy();
 
@@ -85,7 +84,7 @@ public class TietuRecyclerAdapter extends RecyclerView.Adapter<TietuRecyclerAdap
                         .load(tietuFile)
                         .into(holder.iv);
             } else {//本地不存在，从网络上下载
-                Log.e(TAG, "picasso: 从网络下载了贴图" );
+                Log.e(TAG, "picasso: 从网络下载了贴图");
                 Picasso.with(mContext)
                         .load(((tietu_material) data).getUrl().getUrl())
                         .into(holder.iv);

@@ -120,14 +120,14 @@ public class UsuPathManger {
     public void addRecentPathFirst(String path) {
         mUsuallyPicPathList.add(usedNumber + 2, path);
         recentNumber++;
-        if(recentNumber>MAX_RECENT_NUMBER){
+        if (recentNumber > MAX_RECENT_NUMBER) {
             removeLastRecentPath();
         }
         Log.e("---------", "addRecentPathFirst: 添加最近图片成功+数量=" + recentNumber);
     }
 
     private void removeLastRecentPath() {
-        mUsuallyPicPathList.remove(usedNumber+recentNumber+2-1);
+        mUsuallyPicPathList.remove(usedNumber + recentNumber + 2 - 1);
         recentNumber--;
     }
 

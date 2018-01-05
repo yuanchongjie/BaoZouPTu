@@ -20,7 +20,6 @@ import a.baozouptu.common.util.Util;
 
 /**
  * Created by LiuGuicen on 2017/1/18 0018.
- *
  */
 
 public class PicDirInfoManager {
@@ -39,7 +38,7 @@ public class PicDirInfoManager {
         //常用图的信息，
         String representPath = usuPaths.size() == 0 ? null : usuPaths.get(1);
         PicDirInfo picDirInfo = new PicDirInfo("aaaaa",
-                formatDescribeInfo("常用图片", usuPaths.size()-3),
+                formatDescribeInfo("常用图片", usuPaths.size() - 3),
                 representPath);
         picDirInfos.set(0, picDirInfo);
     }
@@ -81,7 +80,7 @@ public class PicDirInfoManager {
     }
 
     public String getDirPath(int position) {
-        if(position>=picDirInfos.size())position=picDirInfos.size()-1;
+        if (position >= picDirInfos.size()) position = picDirInfos.size() - 1;
         return picDirInfos.get(position).getDirPath();
     }
 

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import a.baozouptu.common.dataAndLogic.AllData;
-import a.baozouptu.common.util.Util;
 
 /**
  * Created by LiuGuicen on 2016/12/26 0026.
@@ -14,9 +13,10 @@ import a.baozouptu.common.util.Util;
 public class PtuConfig {
     private final SharedPreferences sp;
 
-    public PtuConfig(){
+    public PtuConfig() {
         sp = AllData.appContext.getSharedPreferences("ptu_config", Context.MODE_PRIVATE);
     }
+
     public boolean hasReadTextRubber() {
         return sp.getBoolean("text_rubber", false);
     }

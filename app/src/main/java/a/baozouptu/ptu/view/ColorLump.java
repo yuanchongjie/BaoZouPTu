@@ -2,7 +2,6 @@ package a.baozouptu.ptu.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
@@ -13,7 +12,7 @@ import android.view.View;
  */
 public class ColorLump extends View {
     private int mcolor;
-    Paint mPaint=new Paint();
+    Paint mPaint = new Paint();
 
     public ColorLump(Context context) {
         super(context);
@@ -25,12 +24,14 @@ public class ColorLump extends View {
 
     /**
      * 设置选中的颜色，同时重回绘图像
+     *
      * @param color
      */
     public void setColor(int color) {
         mcolor = color;
         invalidate();
     }
+
     public int getColor() {
         return mcolor;
     }
@@ -38,7 +39,7 @@ public class ColorLump extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         mPaint.setColor(mcolor);
-        canvas.drawRect(0,0,getWidth()-getPaddingRight(),getHeight(),mPaint);
+        canvas.drawRect(0, 0, getWidth() - getPaddingRight(), getHeight(), mPaint);
         super.onDraw(canvas);
     }
 }

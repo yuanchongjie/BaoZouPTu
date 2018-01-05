@@ -33,7 +33,7 @@ public class RepealRedoManager<T> {
         this.maxStep = maxStep;
         stepList = new LinkedList<>();
         iter = stepList.listIterator();
-        hasSavePic=false;
+        hasSavePic = false;
     }
 
 
@@ -43,7 +43,7 @@ public class RepealRedoManager<T> {
      * <p>然后需要将BaseBitmap前进一步，
      */
     public T commit(T sd) {
-        hasSavePic=false;
+        hasSavePic = false;
         while (iter.hasNext()) {
             iter.next();
             iter.remove();
@@ -63,6 +63,7 @@ public class RepealRedoManager<T> {
         }
         return null;
     }
+
     public int getCurrentIndex() {
         return iter.previousIndex();
     }
@@ -84,7 +85,6 @@ public class RepealRedoManager<T> {
     public boolean canRepeal() {
         return iter.hasPrevious();
     }
-
 
 
     public T getStepdata(int i) {
@@ -162,6 +162,7 @@ public class RepealRedoManager<T> {
         Util.P.le(TAG, "getInnerBmFromView完成");
         return innerBitmap[0];
     }
+
     public void setBaseBm(Bitmap baseBitmap) {
         this.baseBitmap = baseBitmap;
     }
@@ -172,7 +173,7 @@ public class RepealRedoManager<T> {
      * @return
      */
     public boolean hasChangePic() {
-        if(hasSavePic)return false;
+        if (hasSavePic) return false;
         if (hasChangePic)
             return true;
         else if (getCurrentIndex() >= 0) {

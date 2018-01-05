@@ -12,10 +12,10 @@ import java.util.List;
  * @description 分享功能的数据库
  */
 public class ShareDBUtil {
-    public static void deletePreferInfo(Context context, String packageName,String title) {
+    public static void deletePreferInfo(Context context, String packageName, String title) {
         MyDatabase mdb = MyDatabase.getInstance(context);
         try {
-            mdb.deletePreferShare(packageName,title);
+            mdb.deletePreferShare(packageName, title);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -23,11 +23,11 @@ public class ShareDBUtil {
         }
     }
 
-    public static void deletePreferInfo(Context context, List<Pair<String,String>> acInfos) {
+    public static void deletePreferInfo(Context context, List<Pair<String, String>> acInfos) {
         MyDatabase mdb = MyDatabase.getInstance(context);
         try {
-            for (Pair<String,String> aci : acInfos)
-                mdb.deletePreferShare(aci.first,aci.second);
+            for (Pair<String, String> aci : acInfos)
+                mdb.deletePreferShare(aci.first, aci.second);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -36,10 +36,10 @@ public class ShareDBUtil {
     }
 
 
-    public static void inseartMultiPreferInfo(Context context, List<Pair<String,String>> acInfos) {
+    public static void inseartMultiPreferInfo(Context context, List<Pair<String, String>> acInfos) {
         MyDatabase mdb = MyDatabase.getInstance(context);
         try {
-            for (Pair<String,String> aci : acInfos)
+            for (Pair<String, String> aci : acInfos)
                 mdb.insertPreferShare(aci.first, aci.second, System.currentTimeMillis());
         } catch (IOException e) {
             e.printStackTrace();
@@ -48,10 +48,10 @@ public class ShareDBUtil {
         }
     }
 
-    public static void inseartPreferInfo(Context context, String packageName,String title) {
+    public static void inseartPreferInfo(Context context, String packageName, String title) {
         MyDatabase mdb = MyDatabase.getInstance(context);
         try {
-            mdb.insertPreferShare(packageName,title, System.currentTimeMillis());
+            mdb.insertPreferShare(packageName, title, System.currentTimeMillis());
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

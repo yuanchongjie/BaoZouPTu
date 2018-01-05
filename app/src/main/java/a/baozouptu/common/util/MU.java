@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 
 /**
  * 高精度运算
- *
  */
 public class MU {
     //默认除法运算精度
@@ -88,9 +87,11 @@ public class MU {
     public static int co(float v1, float v2) {
         return co(Float.toString(v1), Float.toString(v2));
     }
+
     public static int co(String v1, float v2) {
         return co(v1, Float.toString(v2));
     }
+
     public static int co(float v1, String v2) {
         return co(Float.toString(v1), v2);
     }
@@ -127,7 +128,7 @@ public class MU {
         return di(Double.toString(v1), Double.toString(v2), DEFAULT_DIV_SCALE);
     }
 
-    public static  String di(String v1, double v2) {
+    public static String di(String v1, double v2) {
         return di(v1, Double.toString(v2));
     }
 

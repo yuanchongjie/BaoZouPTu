@@ -10,7 +10,6 @@ import a.baozouptu.common.util.Util;
 
 /**
  * Created by liuguicen on 2016/8/5.
- *
  */
 class MatPathManager {
     private Paint mPenPaint, mlinePaint;
@@ -31,7 +30,7 @@ class MatPathManager {
         mlinePaint.setColor(Util.getColor(R.color.base_color1));
 
         mLinePath = new Path();
-        lastLineLeft=lastLineTop=-1;
+        lastLineLeft = lastLineTop = -1;
     }
 
     public void addLinePoint(float[] xy) {
@@ -53,8 +52,8 @@ class MatPathManager {
      */
     public void startDrawLine(float[] xy) {
         mLinePath.moveTo(xy[0], xy[1]);
-        lastLineLeft=xy[0];
-        lastLineTop=xy[1];
+        lastLineLeft = xy[0];
+        lastLineTop = xy[1];
     }
 
     public void finishDrawLine() {

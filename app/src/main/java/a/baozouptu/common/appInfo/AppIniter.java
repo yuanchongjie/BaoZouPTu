@@ -14,7 +14,6 @@ import cn.bmob.v3.Bmob;
 
 /**
  * Created by LiuGuicen on 2017/1/18 0018.
- *
  */
 
 public class AppIniter {
@@ -29,7 +28,7 @@ public class AppIniter {
         //初始化全局数据
         AllData.appConfig = new AppConfig(MyApplication.appContext);
         AllData.hasReadConfig = new HasReadConfig();
-        AllData.settingDataSource=new SettingDataSourceImpl(MyApplication.appContext);
+        AllData.settingDataSource = new SettingDataSourceImpl(MyApplication.appContext);
         Bmob.initialize(MyApplication.appContext, "3000c4af659e92854854c5b10f0824a2");//再是网络初始化
 
         new InstallPolicy().processPolicy();//执行第一次安装或更新新版本所需的东西

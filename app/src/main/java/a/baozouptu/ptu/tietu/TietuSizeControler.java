@@ -11,7 +11,7 @@ import a.baozouptu.common.util.BitmapTool;
 
 /**
  * Created by liuguicen on 2016/9/29.
- *
+ * <p>
  * 贴图的FloatImageView的Bitmap操作类，
  * <p>（1）
  * <p>从sd卡中取出图片，能控制图片的最大尺寸，缩放过程中不超过这个尺寸；
@@ -50,7 +50,7 @@ public class TietuSizeControler {
     }
 
     static private BitmapFactory.Options getFitOption(BitmapFactory.Options options) {
-        if(options.outWidth==0||options.outHeight==0)return null;
+        if (options.outWidth == 0 || options.outHeight == 0) return null;
         int totalWidth = AllData.screenWidth;
         int totalHeight = AllData.screenHeight;
         int srcWidth = Math.min(options.outWidth, totalWidth);

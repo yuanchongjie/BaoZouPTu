@@ -9,10 +9,13 @@ import android.content.Context;
 
 public class SaveSetInstance {
     private SaveSetDialogManager saveSetDialogManager;
-    public SaveSetInstance(){}
-    public synchronized SaveSetDialogManager getInstance(Context context){
-        if(saveSetDialogManager==null)
-            saveSetDialogManager=new SaveSetDialogManager(context);
+
+    public SaveSetInstance() {
+    }
+
+    public synchronized SaveSetDialogManager getInstance(Context context) {
+        if (saveSetDialogManager == null)
+            saveSetDialogManager = new SaveSetDialogManager(context);
         return saveSetDialogManager;
     }
 

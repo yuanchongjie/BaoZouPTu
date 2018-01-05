@@ -105,7 +105,6 @@ public interface FloatView {
     void scale(float ratio);
 
     /**
-     *
      * @param ratio
      */
     float adjustSize(float ratio);
@@ -113,9 +112,10 @@ public interface FloatView {
     /**
      * 适配floatview的位置,不能超出图片的边界,不算padding的内部就不能超出边界
      * 超出之后移动startx，starty,不影响其它数据
+     *
      * @return 返回是否需要位置是否改变
      */
-    boolean adjustEdgeBound(float nx,float ny);
+    boolean adjustEdgeBound(float nx, float ny);
 
     /**
      * 拖动floatview，利用相对点，相对点变化，

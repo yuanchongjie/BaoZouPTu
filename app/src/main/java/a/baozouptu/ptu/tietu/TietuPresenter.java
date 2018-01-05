@@ -1,12 +1,10 @@
 package a.baozouptu.ptu.tietu;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import a.baozouptu.common.util.CustomToast;
 import a.baozouptu.ptu.tietu.onlineTietu.PriorTietuManager;
 import a.baozouptu.ptu.tietu.onlineTietu.TietuRecyclerAdapter;
 import a.baozouptu.ptu.tietu.onlineTietu.tietu_material;
@@ -64,8 +62,7 @@ public class TietuPresenter implements TietuContract.TietuPresenter {
                         if (cateGory == tietu_material.CATEGORY_EXPRESSION) {
                             expressionAdapter.setTietuMaterials(new ArrayList<tietu_material>());
                             view.showExpressionList();
-                        }
-                        else if (cateGory == tietu_material.CATEGORY_PROPERTY) {
+                        } else if (cateGory == tietu_material.CATEGORY_PROPERTY) {
                             propertyAdapter.setTietuMaterials(new ArrayList<tietu_material>());
                             view.showPropertyList();
                         }

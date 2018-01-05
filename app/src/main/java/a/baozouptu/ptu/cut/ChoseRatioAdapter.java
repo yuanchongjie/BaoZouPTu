@@ -14,17 +14,17 @@ import a.baozouptu.common.util.Util;
  * Created by Administrator on 2016/11/16 0016.
  */
 
-public class ChoseRatioAdapter extends BaseAdapter{
+public class ChoseRatioAdapter extends BaseAdapter {
     private Context mContext;
 
 
     private String[] ratios;
     private int textWidth;
 
-    ChoseRatioAdapter(Context context,String[] ratios,int textWidth){
-        mContext=context;
-        this.ratios=ratios;
-        this.textWidth=textWidth;
+    ChoseRatioAdapter(Context context, String[] ratios, int textWidth) {
+        mContext = context;
+        this.ratios = ratios;
+        this.textWidth = textWidth;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ChoseRatioAdapter extends BaseAdapter{
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView tv = new TextView(mContext);
         tv.setWidth(textWidth);
-        tv.setPadding(0,10,0,10);
+        tv.setPadding(0, 10, 0, 10);
         tv.setGravity(Gravity.CENTER);
         tv.setTextSize(20);
         tv.setTextColor(Util.getColor(R.color.text_deep_black));

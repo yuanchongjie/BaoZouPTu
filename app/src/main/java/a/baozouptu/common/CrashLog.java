@@ -69,7 +69,7 @@ public class CrashLog extends BmobObject {
      */
     public void commit(Thread thread, Throwable ex) {
         //获取异常常栈信息到字符串中
-        if(ex==null)return;
+        if (ex == null) return;
         StringBuilder sb = new StringBuilder();
         sb.append("线程名称:")
                 .append(thread.getName())

@@ -11,7 +11,6 @@ import cn.bmob.v3.listener.SaveListener;
 
 /**
  * Created by LiuGuicen on 2017/1/21 0021.
- *
  */
 
 public class DeviceInfos extends BmobObject {
@@ -88,7 +87,7 @@ public class DeviceInfos extends BmobObject {
         model = Build.MODEL;
 //            CPU架构
         cpuAbi = Build.CPU_ABI;
-        deviceIdentify= UserExclusiveIdentify.getExclusiveIndentify();
+        deviceIdentify = UserExclusiveIdentify.getExclusiveIndentify();
     }
 
     /**

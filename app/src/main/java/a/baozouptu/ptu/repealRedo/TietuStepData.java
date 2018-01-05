@@ -1,6 +1,5 @@
 package a.baozouptu.ptu.repealRedo;
 
-import android.graphics.Rect;
 import android.graphics.RectF;
 
 import java.util.ArrayList;
@@ -45,6 +44,7 @@ public class TietuStepData extends StepData implements Iterable {
             this.boundRectInPic = boundRectInPic;
             this.rotateAngle = rotateAngle;
         }
+
         public OneTietu(int picId, RectF boundRectInPic, float rotateAngle) {
             this.picId = picId;
             this.boundRectInPic = boundRectInPic;

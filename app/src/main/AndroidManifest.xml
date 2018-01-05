@@ -63,7 +63,7 @@
         <activity
             android:name=".user.userSetting.SettingActivity"
             android:theme="@style/SettingAppThem" />
-        <activity android:name=".user.userSetting.FeedbackActivity" />
+        <activity android:name=".user.userSetting.FeedBackActivity" />
         <activity
             android:name=".user.userSetting.AboutAppActivity"
             android:label="@string/title_activity_about_app"

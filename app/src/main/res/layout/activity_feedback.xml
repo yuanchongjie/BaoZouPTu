@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:acContext="a.baozouptu.user.userSetting.FeedbackActivity">
+    tools:acContext="a.baozouptu.user.userSetting.FeedBackActivity">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/feedback_top_constraint"

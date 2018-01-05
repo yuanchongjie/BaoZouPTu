@@ -12,6 +12,7 @@ import android.view.Window;
 public class CertainLeaveDialog {
     Context mContext;
     AlertDialog dialog;
+
     public interface ActionListener {
         void onSure();
     }
@@ -20,7 +21,7 @@ public class CertainLeaveDialog {
         this.mContext = context;
     }
 
-    public void createDialog(String title,String msg,final ActionListener actionListener) {
+    public void createDialog(String title, String msg, final ActionListener actionListener) {
 //判断对话框是否已经存在了,防止重复点击
         if (dialog != null && dialog.isShowing()) return;
         AlertDialog dialog = new AlertDialog.Builder(mContext)
@@ -31,7 +32,7 @@ public class CertainLeaveDialog {
                         actionListener.onSure();
                     }
                 })
-                .setNegativeButton("取消",null)
+                .setNegativeButton("取消", null)
                 .create();
         if (title != null)
             dialog.setTitle(title);

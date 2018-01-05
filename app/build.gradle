@@ -93,5 +93,5 @@ dependencies {
     compile 'cn.bmob.android:http-legacy:1.0'
     // compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support.constraint:constraint-layout:1.0.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }

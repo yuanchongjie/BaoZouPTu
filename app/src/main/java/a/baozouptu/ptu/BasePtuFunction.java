@@ -1,7 +1,6 @@
 package a.baozouptu.ptu;
 
 import android.graphics.Bitmap;
-import android.support.annotation.Nullable;
 
 import a.baozouptu.ptu.repealRedo.StepData;
 
@@ -46,6 +45,7 @@ public interface BasePtuFunction {
 
     /**
      * 责任链模式，处理按键返回事件
+     *
      * @return 是否消费返回按键
      */
     boolean onBackPressed();

@@ -274,7 +274,7 @@ public class TietuFrameLayout extends FrameLayout {
 
     @Override
     public void onViewRemoved(View child) {
-        if(child==chosenView)chosenView=null;
+        if (child == chosenView) chosenView = null;
         super.onViewRemoved(child);
     }
 }

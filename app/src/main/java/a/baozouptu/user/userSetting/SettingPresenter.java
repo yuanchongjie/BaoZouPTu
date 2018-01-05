@@ -61,10 +61,10 @@ public class SettingPresenter implements SettingContract.Presenter {
     @Override
     public void realClearData(boolean[] userChosenItems) {
         String res = dataSource.clearAppCache(userChosenItems);
-        if(res.isEmpty())
-            res="清除成功";
+        if (res.isEmpty())
+            res = "清除成功";
         else
-            res = "清除成功!" + res+"未清除";
+            res = "清除成功!" + res + "未清除";
         view.showClearResult(res);
         //除以清除完成之后刷新视图
         view.showAppCache(getAppCache());

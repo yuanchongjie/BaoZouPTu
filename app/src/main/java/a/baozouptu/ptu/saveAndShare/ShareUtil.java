@@ -27,16 +27,16 @@ public class ShareUtil {
      * @param preferApps 优先选择的应用Activity的title，越前面，优先级越高
      * @return
      */
-    public static List<ListDrawableItem> getSortedAppData(Context context, List<Pair<String,String>> preferApps, List<ResolveInfo> resolveInfos) {
+    public static List<ListDrawableItem> getSortedAppData(Context context, List<Pair<String, String>> preferApps, List<ResolveInfo> resolveInfos) {
         List<ListDrawableItem> appInfos = getShowData(context, resolveInfos);
-        List<Pair<String,String>> delActivity = new ArrayList<>();
+        List<Pair<String, String>> delActivity = new ArrayList<>();
         int size = preferApps.size();
         for (int p = size - 1; p >= 0; p--) {
-            CharSequence packageNmae=preferApps.get(p).first;
+            CharSequence packageNmae = preferApps.get(p).first;
             CharSequence title = preferApps.get(p).second;
             int i = 0;
             for (; i < appInfos.size(); i++) {
-                if (appInfos.get(i).getPackageName().equals(packageNmae)&&
+                if (appInfos.get(i).getPackageName().equals(packageNmae) &&
                         appInfos.get(i).getTitle().equals(title)) {
                     resolveInfos.add(0, resolveInfos.remove(i));
                     appInfos.add(0, appInfos.remove(i));
@@ -48,7 +48,7 @@ public class ShareUtil {
                 delActivity.add(preferApps.get(p));
             }
         }
-        for (Pair<String,String> ac : delActivity) {
+        for (Pair<String, String> ac : delActivity) {
             preferApps.remove(ac);
         }
         ShareDBUtil.deletePreferInfo(context, delActivity);

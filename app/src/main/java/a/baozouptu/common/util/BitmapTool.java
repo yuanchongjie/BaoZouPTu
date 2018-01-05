@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,10 +15,7 @@ import java.io.IOException;
 import a.baozouptu.common.dataAndLogic.AllData;
 import rx.Observable;
 import rx.Subscriber;
-import rx.android.plugins.RxAndroidPlugins;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -160,7 +156,7 @@ public class BitmapTool {
                 context.sendBroadcast(intent);
             }
         } catch (SecurityException se) {
-            return "安全权限禁止"+se.getMessage();
+            return "安全权限禁止" + se.getMessage();
         } catch (FileNotFoundException e) {
             return e.getMessage();
         } catch (IOException e) {
