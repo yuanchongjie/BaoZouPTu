@@ -41,6 +41,14 @@ android {
             keyPassword "111111"
         }
     }
+
+
+    productFlavors {
+        memorynote {
+            minSdkVersion 17
+        }
+    }
+
     buildTypes {
         release {
             signingConfig signingConfigs.release

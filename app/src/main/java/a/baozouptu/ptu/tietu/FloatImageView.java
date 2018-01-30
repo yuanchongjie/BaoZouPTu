@@ -9,7 +9,6 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.widget.ImageView;
 
 import a.baozouptu.R;
 import a.baozouptu.common.util.Util;
@@ -21,7 +20,7 @@ import a.baozouptu.ptu.view.IconBitmapCreator;
  *
  * @description
  */
-public class FloatImageView extends ImageView {
+public class FloatImageView extends android.support.v7.widget.AppCompatImageView {
     private static final String TAG = "FloatImageView";
     public static int pad = Util.dp2Px(10);
     private static Bitmap iconBitmap = IconBitmapCreator.createCancelBitmap(pad * 2, Color.WHITE, Util.getColor(R.color.mat_pen_line2));

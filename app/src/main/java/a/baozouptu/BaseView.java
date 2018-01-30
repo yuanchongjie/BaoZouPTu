@@ -5,5 +5,7 @@ package a.baozouptu;
  */
 
 public interface BaseView<T> {
+    void switchEdit(boolean mIsInEdit);
+
     void setPresenter(T presenter);
 }

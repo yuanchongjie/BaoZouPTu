@@ -13,6 +13,9 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import a.baozouptu.R;
 import a.baozouptu.common.appInfo.MyApplication;
 
@@ -200,4 +203,14 @@ public class Util {
     public static Drawable getMyShosenIcon(int id) {
         return getStateDrawable(getDrawable(id).mutate(), getStateList(), PorterDuff.Mode.SRC_IN);
     }
+
+    /**
+     * 把long 转换成 日期 再转换成String类型
+     * transferLongToDate("yyyy-MM-dd HH:mm:ss",1245678944);
+     */
+   public static String long2Date(String dateFormat, Long millSec) {
+       SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+       Date date = new Date(millSec);
+       return sdf.format(date);
+   }
 }

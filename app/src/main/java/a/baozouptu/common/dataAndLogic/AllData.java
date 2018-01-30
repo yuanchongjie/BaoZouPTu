@@ -71,5 +71,5 @@ public class AllData {
     //一些基本配置
     public static AppConfig appConfig;
     public static HasReadConfig hasReadConfig;
-    public static SettingDataSource settingDataSource;
+    public static SettingDateSource settingDataSource;
 }
