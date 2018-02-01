@@ -289,7 +289,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
 
     /**
      * When this HorizontalListView is embedded within a vertical scrolling view it is important to disable the parent view from interacting with
-     * any touch events while the user is scrolling within this HorizontalListView. This will start at this view and go up the view tree looking
+     * any touch events while the user is scrolling within this HorizontalListView. This will initDate at this view and go up the view tree looking
      * for a vertical scrolling view. If one is found it will enable or disable parent touch interception.
      *
      * @param disallowIntercept If true the parent will be prevented from intercepting child touch events

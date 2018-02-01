@@ -44,7 +44,7 @@ public class AppIniter {
      * <p>1.在后台发送用户使用信息
      */
     private void startBackgroundService() {
-        Intent intent = new Intent("start");
+        Intent intent = new Intent("initDate");
         intent.setAction("a.baozouptu.common.appInfo.AppIntentService");
         firstAc.startService(intent);
     }

@@ -28,14 +28,16 @@ import java.util.List;
 public class Word {
 
     public String word;
+    public List<WordMeaning> meaningList = new ArrayList<>();
     public int strangeDegree;
-    public long lastRememberTime;
     public List<String> similarWordList;
+    public long lastRememberTime;
 
+    /**
+     * 用户输入的原始数据，用户用户再次编辑时使用
+     */
     public String inputMeaning;
     public String inputSimilarWords;
-
-    public List<WordMeaning> meaningList = new ArrayList<>();
 
     public static class WordMeaning {
 

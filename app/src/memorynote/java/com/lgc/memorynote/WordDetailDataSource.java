@@ -11,4 +11,6 @@ public interface WordDetailDataSource {
     void addWord(Word word);
 
     void updateWord(Word word);
+
+    Word getWordByName(String wordName);
 }

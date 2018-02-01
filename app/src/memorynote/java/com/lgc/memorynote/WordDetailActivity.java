@@ -34,7 +34,7 @@ public class WordDetailActivity extends AppCompatActivity implements WordDetailC
         mPresenter = new WordDetailPresenter(
                 new WordDetailDataSourceImpl(this.getApplicationContext()), this);
         initView();
-        mPresenter.initDate(getIntent());
+        mPresenter.initDate(getIntent()); // 要在View初始化之后调用
     }
 
     private void initView() {

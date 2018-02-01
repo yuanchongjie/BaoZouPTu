@@ -20,7 +20,6 @@ public class WordDetailPresenter implements WordDetailContract.Presenter {
     private boolean mIsInEdit = false;
     private Context mContext;
     private Word mWord;
-    private String mWordName;
 
     WordDetailPresenter(WordDetailDataSource wordDetailDataSource, WordDetailContract.View wordDetailView) {
         mDataSource = wordDetailDataSource;
@@ -30,29 +29,17 @@ public class WordDetailPresenter implements WordDetailContract.Presenter {
     }
 
     @Override
-    public void setWordName(String wordName) {
-        mWordName = wordName;
-    }
-
-    @Override
     public void initDate(Intent intent) {
-        if (intent != null) {
-            mIsAdd = intent.getBooleanExtra(INTENT_EXTRA_IS_ADD, false);
-            if (!mIsAdd) {
-                mWordName = intent.getStringExtra(INTENT_EXTRA_WORD_NAME);
-            }
-        }
-    }
-
-    @Override
-    public void start() {
-        if (!mIsAdd) {
-            mWord = mDataSource.getWordDetail(mWordName);
-        } else {
+        mIsAdd = intent.getBooleanExtra(INTENT_EXTRA_IS_ADD, false);
+        if (mIsAdd) {
             mWord = new Word();
             if (!mIsInEdit) {
                 switchEdit();
             }
+        } else {
+            String wordName = intent.getStringExtra(INTENT_EXTRA_WORD_NAME);
+            mWord = mDataSource.getWordByName(wordName);
+            showData(false);
         }
     }
 
@@ -72,11 +59,28 @@ public class WordDetailPresenter implements WordDetailContract.Presenter {
     @Override
     public void switchEdit() {
         mIsInEdit = !mIsInEdit;
-        mView.switchEdit(mIsInEdit);
         if (!mIsInEdit) { // 编辑完成
             saveWordDate();
         }
+        showData(true);
+        mView.switchEdit(mIsInEdit);
     }
+
+    private void showData(boolean isSwitchEdit) {
+        if (mIsInEdit) {
+            mView.showInputSimilarWords(mWord.getInputSimilarWords());
+            mView.showInputMeanig(mWord.getInputMeaning());
+        } else {
+            mView.showWordMeaning(mWord.getMeaningList());
+            mView.showSimilarWords(mWord.getSimilarWordList());
+        }
+        if (!isSwitchEdit) { // 切换编辑的过程中，这些视图的数据不用变
+            mView.showWord(mWord.getWord());
+            mView.showStrangeDegree(mWord.getStrangeDegree());
+            mView.showLastRememberTime(mWord.getLastRememberTime());
+        }
+    }
+
 
     @Override
     public boolean addStrangeDegree() {
@@ -94,6 +98,8 @@ public class WordDetailPresenter implements WordDetailContract.Presenter {
     public void setSimilarFormatWords(String inputSimilarWord) {
         List<String> similarWordList = new ArrayList<>();
         WordAnalyzer.analyzeSimilarWordsFromUser(inputSimilarWord, similarWordList);
+        mWord.setInputSimilarWords(inputSimilarWord);
+        mWord.setSimilarWordList(similarWordList);
     }
 
     @Override
@@ -112,5 +118,10 @@ public class WordDetailPresenter implements WordDetailContract.Presenter {
     @Override
     public void setLastRememberTime() {
         mWord.lastRememberTime = System.currentTimeMillis();
+    }
+
+    @Override
+    public void start() {
+
     }
 }

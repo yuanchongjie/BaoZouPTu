@@ -2,6 +2,8 @@ package com.lgc.memorynote;
 
 import android.content.Intent;
 
+import java.util.List;
+
 import a.baozouptu.BasePresenter;
 import a.baozouptu.BaseView;
 
@@ -14,9 +16,13 @@ public interface WordDetailContract {
     interface View extends BaseView<Presenter>, android.view.View.OnClickListener {
         void showWord(String word);
 
-        void showWordMeaning(String wordMeaning);
+        void showWordMeaning(List<Word.WordMeaning> wordMeaningList);
 
-        void showSimilarWords(String similarWords);
+        void showInputMeanig(String inputMeaning);
+
+        void showSimilarWords(List<String> similarWordList);
+
+        void showInputSimilarWords(String inputSimilarWords);
 
         void showStrangeDegree(int strangeDegree);
 
@@ -26,10 +32,6 @@ public interface WordDetailContract {
     }
 
     interface Presenter extends BasePresenter {
-
-        void initDate(Intent intent);
-
-        void setWordName(String wordName);
 
         boolean isInEdit();
 
@@ -55,6 +57,8 @@ public interface WordDetailContract {
         boolean addWord(String word);
 
         void setLastRememberTime();
+
+        void initDate(Intent intent);
     }
 
 }
