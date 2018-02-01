@@ -3,6 +3,9 @@ package com.lgc.memorynote;
 import android.content.Context;
 import android.content.Intent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.lgc.memorynote.WordDetailActivity.INTENT_EXTRA_IS_ADD;
 import static com.lgc.memorynote.WordDetailActivity.INTENT_EXTRA_WORD_NAME;
 
@@ -46,8 +49,10 @@ public class WordDetailPresenter implements WordDetailContract.Presenter {
         if (!mIsAdd) {
             mWord = mDataSource.getWordDetail(mWordName);
         } else {
-            switchEdit();
             mWord = new Word();
+            if (!mIsInEdit) {
+                switchEdit();
+            }
         }
     }
 
@@ -86,13 +91,17 @@ public class WordDetailPresenter implements WordDetailContract.Presenter {
     }
 
     @Override
-    public void setSimilarFormatWords(String similarFormatWords) {
-
+    public void setSimilarFormatWords(String inputSimilarWord) {
+        List<String> similarWordList = new ArrayList<>();
+        WordAnalyzer.analyzeSimilarWordsFromUser(inputSimilarWord, similarWordList);
     }
 
     @Override
-    public void setWordMeaning(String wordMeaning) {
-
+    public void setWordMeaning(String inputMeaning) {
+        List<Word.WordMeaning> meaningList = new ArrayList<>();
+        WordAnalyzer.analyzeMeaningFromUser(inputMeaning, meaningList);
+        mWord.setMeaningList(meaningList);
+        mWord.setInputMeaning(inputMeaning);
     }
 
     @Override
