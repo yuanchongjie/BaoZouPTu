@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.List;
+
 import a.baozouptu.R;
 import a.baozouptu.common.util.Util;
 
@@ -95,13 +97,23 @@ public class WordDetailActivity extends AppCompatActivity implements WordDetailC
     }
 
     @Override
-    public void showWordMeaning(String wordMeaning) {
+    public void showWordMeaning(List<Word.WordMeaning> wordMeaningList) {
         // 解析词义，特殊的词意采用特殊的颜色
-        mTvWordMeaning.setText(wordMeaning);
+        String lastCixing = Word.WordMeaning.MEANING_N;
+        for (Word.WordMeaning oneMeaning : wordMeaningList) {
+            if (!lastCixing.equals(oneMeaning.getCiXing())) {
+                lastCixing = oneMeaning.getCiXing();
+            }
+            if (oneMeaning.isGuai() && oneMeaning.isSheng()) {
+                mTvWordMeaning.setText(wordMeaningList);
+            } else if (oneMeaning.isGuai() || oneMeaning.isSheng()) {
+
+            }
+        }
     }
 
     @Override
-    public void showSimilarWords(String similarWords) {
+    public void showSimilarWords(List<String> similarWordList) {
         mTvSimilarWord.setText(similarWords);
     }
 

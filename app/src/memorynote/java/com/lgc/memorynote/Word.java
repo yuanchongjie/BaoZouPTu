@@ -3,6 +3,8 @@ package com.lgc.memorynote;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /************************************
@@ -51,6 +53,22 @@ public class Word {
         private boolean isSheng = false;
         private String ciXing = "null";
         private String meaning;
+
+        public static int getCixingImportance(String ciXing) {
+            if (ciXing == null) {
+                return 0;
+            } else if (MEANING_N.equals(ciXing)) {
+                return 1;
+            } else if (MEANING_V.equals(ciXing)) {
+                return 2;
+            } else if (MEANING_ADJ.equals(ciXing)) {
+                return 3;
+            } else if (MEANING_ADV.equals(ciXing)) {
+                return 4;
+            } else {
+                return 0;
+            }
+        }
 
 
         public void setGuai(boolean guai) {
@@ -112,6 +130,18 @@ public class Word {
     }
 
     public void setMeaningList(List<WordMeaning> meaningList) {
+        if (meaningList != null) {
+            // 按照词性排序
+            Collections.sort(meaningList, new Comparator<WordMeaning>() {
+                @Override
+                public int compare(WordMeaning o1, WordMeaning o2) {
+                    if (o1 == null || o2 == null)
+                        return 0;
+                    return WordMeaning.getCixingImportance(o2.getCiXing())
+                            -WordMeaning.getCixingImportance(o1.getCiXing());
+                }
+            });
+        }
         this.meaningList = meaningList;
     }
 
