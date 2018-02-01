@@ -21,6 +21,8 @@ public interface WordDetailContract {
         void showStrangeDegree(int strangeDegree);
 
         void showLastRememberTime(long lastRememberTime);
+
+        void switchEdit(boolean mIsInEdit);
     }
 
     interface Presenter extends BasePresenter {

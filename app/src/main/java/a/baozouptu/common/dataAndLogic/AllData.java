@@ -3,7 +3,6 @@ package a.baozouptu.common.dataAndLogic;
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.File;
 
@@ -12,7 +11,6 @@ import a.baozouptu.common.appInfo.AppConfig;
 import a.baozouptu.common.appInfo.HasReadConfig;
 import a.baozouptu.common.appInfo.MyApplication;
 import a.baozouptu.user.userSetting.SettingDataSource;
-import okhttp3.OkHttpClient;
 
 /**
  * 保存应用所需的一些常用通用的数据项
@@ -71,5 +69,5 @@ public class AllData {
     //一些基本配置
     public static AppConfig appConfig;
     public static HasReadConfig hasReadConfig;
-    public static SettingDateSource settingDataSource;
+    public static SettingDataSource settingDataSource;
 }
