@@ -130,7 +130,7 @@ public class Util {
     /**
      * Created by Administrator on 2016/5/8.
      */
-    public static class DoubleClick {
+    public static class RepetitiveEventFilter {
         public static long lastTime = -1;
 
         public static boolean isDoubleClick() {

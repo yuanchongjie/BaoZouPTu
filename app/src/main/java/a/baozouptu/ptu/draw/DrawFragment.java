@@ -167,7 +167,7 @@ public class DrawFragment extends DrawBasePtuFunction implements View.OnClickLis
     private int select_paint_style_index = 0;
 
     public void showMoreDialog(View parent) {
-        if (Util.DoubleClick.isDoubleClick()) return;
+        if (Util.RepetitiveEventFilter.isDoubleClick()) return;
         new AlertDialog.Builder(getActivity())
                 .setTitle("画笔样式")
                 .setSingleChoiceItems(R.array.paintstyle, select_paint_style_index, new DialogInterface.OnClickListener() {

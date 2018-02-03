@@ -53,7 +53,7 @@ public class FeedBackActivity extends BaseActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (Util.DoubleClick.isDoubleClick()) return;
+                        if (Util.RepetitiveEventFilter.isDoubleClick()) return;
                         if (commentEdit.getText() == null) return;
                         commitComment(commentEdit.getText().toString());
                     }

@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -17,7 +18,8 @@ import java.util.List;
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
-        testAnalyzeSimilarWord();
+//        testAnalyzeSimilarWord();
+        System.out.println(Pattern.compile("[^a-zA-Z\\-]").matcher("群").find());
     }
 
     private void testAnalyzeSimilarWord() {

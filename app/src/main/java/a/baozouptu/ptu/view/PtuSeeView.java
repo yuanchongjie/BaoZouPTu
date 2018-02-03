@@ -206,7 +206,7 @@ public class PtuSeeView extends View implements TSRView {
                 lastX = event.getX();
                 lastY = event.getY();
                 Util.P.le(TAG, "经过了down");
-                if (Util.DoubleClick.isDoubleClick()) {
+                if (Util.RepetitiveEventFilter.isDoubleClick()) {
                     if (!canDoubleClick) return true;//不支持双击
                     if (lastX < dstRect.left || lastX > dstRect.right || lastY < dstRect.top
                             || lastY > dstRect.bottom)//点击不在图片范围内
@@ -221,7 +221,7 @@ public class PtuSeeView extends View implements TSRView {
                 }
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
-                Util.DoubleClick.cancel();//多个手指，或者移动了，双击取消
+                Util.RepetitiveEventFilter.cancel();//多个手指，或者移动了，双击取消
                 lastDis = GeoUtil.getDis(event.getX(0), event.getY(0), event.getX(1), event.getY(1));
 
                 //移动
@@ -229,7 +229,7 @@ public class PtuSeeView extends View implements TSRView {
                 lastY = (event.getY(0) + event.getY(1)) / 2;
             case MotionEvent.ACTION_MOVE:
                 if (GeoUtil.getDis(lastX, lastY, event.getX(), event.getY()) > 5)//防抖动
-                    Util.DoubleClick.cancel();
+                    Util.RepetitiveEventFilter.cancel();
                 if (event.getPointerCount() == 1) {
                     move(event.getX(), event.getY());
                 } else {

@@ -443,7 +443,7 @@ public class PtuActivity extends BaseActivity implements MainFunctionFragment.Li
         saveSetLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!Util.DoubleClick.isDoubleClick())
+                if (!Util.RepetitiveEventFilter.isDoubleClick())
                     saveSet();
             }
         });
