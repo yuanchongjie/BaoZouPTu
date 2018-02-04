@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import a.baozouptu.CertainLeaveDialog;
+import a.baozouptu.CertainDialog;
 import a.baozouptu.R;
 import a.baozouptu.chosePicture.data.PicInfoScanner;
 import a.baozouptu.common.BaseActivity;
@@ -460,8 +460,8 @@ public class PtuActivity extends BaseActivity implements MainFunctionFragment.Li
 
     private void certainLeave() {
         if (repealRedoManager.hasChangePic()) {
-            CertainLeaveDialog certainLeaveDialog = new CertainLeaveDialog(PtuActivity.this);
-            certainLeaveDialog.createDialog(null, null, new CertainLeaveDialog.ActionListener() {
+            CertainDialog certainLeaveDialog = new CertainDialog(PtuActivity.this);
+            certainLeaveDialog.showDialog(null, null, new CertainDialog.ActionListener() {
                 @Override
                 public void onSure() {
                     setReturnResultAndFinish("leave", new Bundle(), false);

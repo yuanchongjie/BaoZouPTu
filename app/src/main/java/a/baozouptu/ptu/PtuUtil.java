@@ -10,7 +10,7 @@ import a.baozouptu.common.util.MU;
  *
  * @description
  */
-class PtuUtil {
+public class PtuUtil {
 
     public static final int EDIT_MAIN = 0;
     public static final int EDIT_CUT = 1;
