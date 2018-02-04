@@ -245,7 +245,7 @@ public class TietuFragment extends BasePtuFragment implements TietuContract.Tiet
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (!Util.DoubleClick.isDoubleClick() && tietuLayout.getChildCount() != 0)
+                        if (!Util.RepetitiveEventFilter.isDoubleClick() && tietuLayout.getChildCount() != 0)
                             asySynthesis();
                     }
                 });

@@ -69,12 +69,12 @@ public class TietuFrameLayout extends FrameLayout {
             case MotionEvent.ACTION_DOWN:
                 lastX = x;
                 lastY = y;
-                Util.DoubleClick.isDoubleClick();
+                Util.RepetitiveEventFilter.isDoubleClick();
                 Util.P.le(TAG, "经过了down");
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 //缩放
-                Util.DoubleClick.cancel();//点击事件取消
+                Util.RepetitiveEventFilter.cancel();//点击事件取消
                 lastDis = GeoUtil.getDis(x0, y0, x1, y1);
 
                 //旋转
@@ -84,7 +84,7 @@ public class TietuFrameLayout extends FrameLayout {
                 lastY = (y0 + y1) / 2;
             case MotionEvent.ACTION_MOVE:
                 if (GeoUtil.getDis(event.getX(), event.getY(), lastX, lastY) > 5)//这里doubleclick用来判断点击，距离很近不取消，远就取消它
-                    Util.DoubleClick.cancel();
+                    Util.RepetitiveEventFilter.cancel();
                 //移动
                 if (event.getPointerCount() == 1) {
                     moveTietu(chosenView, x - lastX, y - lastY);
@@ -151,7 +151,7 @@ public class TietuFrameLayout extends FrameLayout {
 
     public boolean onEventUp(MotionEvent event) {
         float x = event.getX(), y = event.getY();
-        if (Util.DoubleClick.isDoubleClick())//判断发生点击事件
+        if (Util.RepetitiveEventFilter.isDoubleClick())//判断发生点击事件
         {
             if (chosenView != null && chosenView.isOnCancel(x - chosenView.getLeft(), y - chosenView.getTop()))//如果点击到了取消
             {
