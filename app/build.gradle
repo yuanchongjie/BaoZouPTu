@@ -42,13 +42,6 @@ android {
         }
     }
 
-
-    productFlavors {
-        memorynote {
-            minSdkVersion 17
-        }
-    }
-
     buildTypes {
         release {
             signingConfig signingConfigs.release
